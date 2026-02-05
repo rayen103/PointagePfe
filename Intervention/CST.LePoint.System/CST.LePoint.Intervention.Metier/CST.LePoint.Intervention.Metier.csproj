@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3D79A64C-55C9-462A-9A8A-587C7502359E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CST.LePoint.Intervention.Metier</RootNamespace>
+    <AssemblyName>CST.LePoint.Intervention.Metier</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Design" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AFCSPrinter .cs" />
+    <Compile Include="Bus.cs" />
+    <Compile Include="Chantier.cs" />
+    <Compile Include="ChantierBC.cs" />
+    <Compile Include="ChargesDivers.cs" />
+    <Compile Include="Circuit.cs" />
+    <Compile Include="CircuitPointCollecte.cs" />
+    <Compile Include="GPSTracking.cs" />
+    <Compile Include="Modem.cs" />
+    <Compile Include="PointCollecte.cs" />
+    <Compile Include="ConventionClient.cs" />
+    <Compile Include="ConventionClientDetail.cs" />
+    <Compile Include="ConventionClientPlanificationMotif.cs" />
+    <Compile Include="ConventionClientSimulation.cs" />
+    <Compile Include="Equipe.cs" />
+    <Compile Include="FeuilleRoute.cs" />
+    <Compile Include="LatLng.cs" />
+    <Compile Include="Location.cs" />
+    <Compile Include="OrdredeTravail.cs" />
+    <Compile Include="Employe.cs" />
+    <Compile Include="Consommation.cs" />
+    <Compile Include="OrdreTravailDetail.cs" />
+    <Compile Include="Rattachement.cs" />
+    <Compile Include="RattachementArticle.cs" />
+    <Compile Include="RattachementChargesDivers.cs" />
+    <Compile Include="RattachementEmploye.cs" />
+    <Compile Include="RattachementPhotos.cs" />
+    <Compile Include="RattachementTaches.cs" />
+    <Compile Include="InterventionVehicule.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Recouvrement.cs" />
+    <Compile Include="Shift.cs" />
+    <Compile Include="TacheAffecter.cs" />
+    <Compile Include="TraceEquipe.cs" />
+    <Compile Include="TraceEquipeDetail.cs" />
+    <Compile Include="TraceLoc.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CST.LePoint.Referentiel\CST.LePoint.Referentiel.csproj">
+      <Project>{49a25ff5-108d-4545-a637-f3fdb0d31699}</Project>
+      <Name>CST.LePoint.Referentiel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CST.LePoint.Securite\CST.LePoint.Securite.csproj">
+      <Project>{e140ed8b-329f-49ee-a023-57df22035cd1}</Project>
+      <Name>CST.LePoint.Securite</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CST.LePoint.Vente.Metier\CST.LePoint.Vente.Metier.csproj">
+      <Project>{2e48da14-d486-483c-8645-8014b044cf6b}</Project>
+      <Name>CST.LePoint.Vente.Metier</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

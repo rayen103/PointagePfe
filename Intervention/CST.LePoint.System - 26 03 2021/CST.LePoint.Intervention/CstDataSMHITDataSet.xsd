@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="CstDataSMHITDataSet" targetNamespace="http://tempuri.org/CstDataSMHITDataSet.xsd" xmlns:mstns="http://tempuri.org/CstDataSMHITDataSet.xsd" xmlns="http://tempuri.org/CstDataSMHITDataSet.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="1" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="Settings" AppSettingsPropertyName="CstDataSTSConnectionString" IsAppSettingsProperty="true" Modifier="Assembly" Name="CstDataSTSConnectionString (Settings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.CST.LePoint.Intervention.Properties.Settings.GlobalReference.Default.CstDataSTSConnectionString" Provider="System.Data.SqlClient" />
+          <Connection AppSettingsObjectName="Settings" AppSettingsPropertyName="CstDataSMHITConnectionString" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="CstDataSMHITConnectionString (Settings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.CST.LePoint.Intervention.Properties.Settings.GlobalReference.Default.CstDataSMHITConnectionString" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="View_VisiteManqTableAdapter" GeneratorDataComponentClassName="View_VisiteManqTableAdapter" Name="View_VisiteManq" UserDataComponentName="View_VisiteManqTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="CstDataSMHITConnectionString (Settings)" DbObjectName="CstDataSMHITBetaC.dbo.View_VisiteManq" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT        Convention, CClient, RaisonSociale, CEquipe, Equipe, DateTemps, MoisLettre, Annee, JourSemaine, Semaine, Visite, Etablissement, DatePlanification
+FROM            View_VisiteManq</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Convention" DataSetColumn="Convention" />
+              <Mapping SourceColumn="CClient" DataSetColumn="CClient" />
+              <Mapping SourceColumn="RaisonSociale" DataSetColumn="RaisonSociale" />
+              <Mapping SourceColumn="CEquipe" DataSetColumn="CEquipe" />
+              <Mapping SourceColumn="Equipe" DataSetColumn="Equipe" />
+              <Mapping SourceColumn="DateTemps" DataSetColumn="DateTemps" />
+              <Mapping SourceColumn="MoisLettre" DataSetColumn="MoisLettre" />
+              <Mapping SourceColumn="Annee" DataSetColumn="Annee" />
+              <Mapping SourceColumn="JourSemaine" DataSetColumn="JourSemaine" />
+              <Mapping SourceColumn="Semaine" DataSetColumn="Semaine" />
+              <Mapping SourceColumn="Visite" DataSetColumn="Visite" />
+              <Mapping SourceColumn="DatePlanification" DataSetColumn="DatePlanification" />
+              <Mapping SourceColumn="Etablissement" DataSetColumn="Etablissement" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+        </Tables>
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="CstDataSMHITDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="True" msprop:Generator_DataSetName="CstDataSMHITDataSet" msprop:Generator_UserDSName="CstDataSMHITDataSet">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="View_VisiteManq" msprop:Generator_TableClassName="View_VisiteManqDataTable" msprop:Generator_TableVarName="tableView_VisiteManq" msprop:Generator_RowChangedName="View_VisiteManqRowChanged" msprop:Generator_TablePropName="View_VisiteManq" msprop:Generator_RowDeletingName="View_VisiteManqRowDeleting" msprop:Generator_RowChangingName="View_VisiteManqRowChanging" msprop:Generator_RowEvHandlerName="View_VisiteManqRowChangeEventHandler" msprop:Generator_RowDeletedName="View_VisiteManqRowDeleted" msprop:Generator_RowClassName="View_VisiteManqRow" msprop:Generator_UserTableName="View_VisiteManq" msprop:Generator_RowEvArgName="View_VisiteManqRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Convention" msprop:Generator_ColumnVarNameInTable="columnConvention" msprop:Generator_ColumnPropNameInRow="Convention" msprop:Generator_ColumnPropNameInTable="ConventionColumn" msprop:Generator_UserColumnName="Convention">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="10" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="CClient" msprop:Generator_ColumnVarNameInTable="columnCClient" msprop:Generator_ColumnPropNameInRow="CClient" msprop:Generator_ColumnPropNameInTable="CClientColumn" msprop:Generator_UserColumnName="CClient" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="10" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="RaisonSociale" msprop:Generator_ColumnVarNameInTable="columnRaisonSociale" msprop:Generator_ColumnPropNameInRow="RaisonSociale" msprop:Generator_ColumnPropNameInTable="RaisonSocialeColumn" msprop:Generator_UserColumnName="RaisonSociale" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="CEquipe" msprop:Generator_ColumnVarNameInTable="columnCEquipe" msprop:Generator_ColumnPropNameInRow="CEquipe" msprop:Generator_ColumnPropNameInTable="CEquipeColumn" msprop:Generator_UserColumnName="CEquipe">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="10" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Equipe" msprop:Generator_ColumnVarNameInTable="columnEquipe" msprop:Generator_ColumnPropNameInRow="Equipe" msprop:Generator_ColumnPropNameInTable="EquipeColumn" msprop:Generator_UserColumnName="Equipe" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="DateTemps" msprop:Generator_ColumnVarNameInTable="columnDateTemps" msprop:Generator_ColumnPropNameInRow="DateTemps" msprop:Generator_ColumnPropNameInTable="DateTempsColumn" msprop:Generator_UserColumnName="DateTemps" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="MoisLettre" msprop:Generator_ColumnVarNameInTable="columnMoisLettre" msprop:Generator_ColumnPropNameInRow="MoisLettre" msprop:Generator_ColumnPropNameInTable="MoisLettreColumn" msprop:Generator_UserColumnName="MoisLettre" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Annee" msprop:Generator_ColumnVarNameInTable="columnAnnee" msprop:Generator_ColumnPropNameInRow="Annee" msprop:Generator_ColumnPropNameInTable="AnneeColumn" msprop:Generator_UserColumnName="Annee" type="xs:int" minOccurs="0" />
+              <xs:element name="JourSemaine" msprop:Generator_ColumnVarNameInTable="columnJourSemaine" msprop:Generator_ColumnPropNameInRow="JourSemaine" msprop:Generator_ColumnPropNameInTable="JourSemaineColumn" msprop:Generator_UserColumnName="JourSemaine" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Semaine" msprop:Generator_ColumnVarNameInTable="columnSemaine" msprop:Generator_ColumnPropNameInRow="Semaine" msprop:Generator_ColumnPropNameInTable="SemaineColumn" msprop:Generator_UserColumnName="Semaine" type="xs:int" minOccurs="0" />
+              <xs:element name="Visite" msdata:ReadOnly="true" msprop:Generator_ColumnVarNameInTable="columnVisite" msprop:Generator_ColumnPropNameInRow="Visite" msprop:Generator_ColumnPropNameInTable="VisiteColumn" msprop:Generator_UserColumnName="Visite" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="9" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="DatePlanification" msprop:Generator_ColumnVarNameInTable="columnDatePlanification" msprop:Generator_ColumnPropNameInRow="DatePlanification" msprop:Generator_ColumnPropNameInTable="DatePlanificationColumn" msprop:Generator_UserColumnName="DatePlanification" type="xs:dateTime" />
+              <xs:element name="Etablissement" msprop:Generator_ColumnVarNameInTable="columnEtablissement" msprop:Generator_ColumnPropNameInRow="Etablissement" msprop:Generator_ColumnPropNameInTable="EtablissementColumn" msprop:Generator_UserColumnName="Etablissement" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

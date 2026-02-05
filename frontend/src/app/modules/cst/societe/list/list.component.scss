@@ -1,0 +1,55 @@
+/* Styles de base pour la grille */
+.societe-grid-header {
+    display: none;
+    @screen sm {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+.societe-grid {
+    display: none;
+    @screen sm {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+.societe-grid-item {
+    display: grid;
+    grid-template-columns: 1fr;
+    @screen sm {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+/* Styles pour les petits écrans */
+@media (max-width: 640px) {
+    .button-container {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn-add {
+        width: 100%;
+        margin-top: 8px;
+        margin-left: 0;
+    }
+
+    .fuse-mat-dense {
+        width: 100%;
+    }
+
+    /* Styles pour les éléments de la liste en mobile */
+    .societe-grid-item > div {
+        padding: 4px 0;
+    }
+
+    /* Ajustement de la taille des icônes en mobile */
+    mat-icon {
+        width: 20px;
+        height: 20px;
+        font-size: 20px;
+    }
+}

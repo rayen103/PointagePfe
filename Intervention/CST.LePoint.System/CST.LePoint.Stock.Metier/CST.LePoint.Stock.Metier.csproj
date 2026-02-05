@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{176AD56B-7ABB-4591-9963-B7BDE090E974}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CST.Stock.Metier</RootNamespace>
+    <AssemblyName>CST.Stock.Metier</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Article\ArticleLotEntrepot.cs" />
+    <Compile Include="Article\CodificationArticle.cs" />
+    <Compile Include="Article\Contenant.cs" />
+    <Compile Include="Article\Lot.cs" />
+    <Compile Include="Article\LotArticle.cs" />
+    <Compile Include="Article\MobileArticle.cs" />
+    <Compile Include="Article\MobileArticleFamille.cs" />
+    <Compile Include="Mouvements\BonEntreeDetailLot.cs" />
+    <Compile Include="Mouvements\BonLivraisonInterne.cs" />
+    <Compile Include="Mouvements\BonLivraisonInterneDetail.cs" />
+    <Compile Include="Mouvements\BonPreparation.cs" />
+    <Compile Include="Mouvements\BonPreparationDetail.cs" />
+    <Compile Include="Mouvements\BonProduction.cs" />
+    <Compile Include="Mouvements\BonSortieDetailLot.cs" />
+    <Compile Include="Mouvements\BonTransformationDetail.cs" />
+    <Compile Include="Mouvements\BonTransformation.cs" />
+    <Compile Include="Mouvements\BonReceptionProductionDetail.cs" />
+    <Compile Include="Mouvements\BonReceptionProduction.cs" />
+    <Compile Include="Mouvements\DemandeApprovisionnement.cs" />
+    <Compile Include="Mouvements\DemandeApprovisionnementDetail.cs" />
+    <Compile Include="Article\Article.cs" />
+    <Compile Include="Article\ArticleEntrepot.cs" />
+    <Compile Include="Article\ArticleEquivalent.cs" />
+    <Compile Include="Article\ArticleFournisseur.cs" />
+    <Compile Include="Article\ArticleComposant.cs" />
+    <Compile Include="Article\ArticlePrix.cs" />
+    <Compile Include="Mouvements\BonInventaire.cs" />
+    <Compile Include="Mouvements\BonInventaireDetail.cs" />
+    <Compile Include="Mouvements\BonEntree.cs" />
+    <Compile Include="Mouvements\BonEntreeDetail.cs" />
+    <Compile Include="Mouvements\BonEntreeTaxe.cs" />
+    <Compile Include="Mouvements\PreInventaie.cs" />
+    <Compile Include="Mouvements\PreInventaireDetail.cs" />
+    <Compile Include="Mouvements\PriseInventaire.cs" />
+    <Compile Include="Mouvements\PriseInventaireDetail.cs" />
+    <Compile Include="Mouvements\StockHelper.cs" />
+    <Compile Include="Mouvements\BonSortieDetail.cs" />
+    <Compile Include="Mouvements\BonSortie.cs" />
+    <Compile Include="Mouvements\TypeMouvement.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CST.LePoint.Referentiel\CST.LePoint.Referentiel.csproj">
+      <Project>{49a25ff5-108d-4545-a637-f3fdb0d31699}</Project>
+      <Name>CST.LePoint.Referentiel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CST.LePoint.Tools\CST.LePoint.Tools.csproj">
+      <Project>{b0c1dd35-77c2-43cd-a498-aa9ca4ef1ee4}</Project>
+      <Name>CST.LePoint.Tools</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

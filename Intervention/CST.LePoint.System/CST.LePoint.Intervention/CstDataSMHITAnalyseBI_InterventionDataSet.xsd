@@ -1,0 +1,182 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="CstDataSMHITAnalyseBI_InterventionDataSet" targetNamespace="http://tempuri.org/CstDataSMHITAnalyseBI_InterventionDataSet.xsd" xmlns:mstns="http://tempuri.org/CstDataSMHITAnalyseBI_InterventionDataSet.xsd" xmlns="http://tempuri.org/CstDataSMHITAnalyseBI_InterventionDataSet.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="Settings" AppSettingsPropertyName="CstDataSMHITConnectionString" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="CstDataSMHITConnectionString (Settings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.CST.LePoint.Intervention.Properties.Settings.GlobalReference.Default.CstDataSMHITConnectionString" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="View_AnalyseBI_InterventionTableAdapter" GeneratorDataComponentClassName="View_AnalyseBI_InterventionTableAdapter" Name="View_AnalyseBI_Intervention" UserDataComponentName="View_AnalyseBI_InterventionTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="CstDataSMHITConnectionString (Settings)" DbObjectName="CstDataSMHITBeta.dbo.View_AnalyseBI_Intervention" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT        Convention, CClient, RaisonSociale, Etablissement, DatePlanification, DateTemps, MoisLettre, Annee, JourSemaine, Semaine, Equipe, TypeVisite, TypeConvention, 
+                         AutoFacture, Motif, Tache, Evaluation, DateRattachement, NOrdredeTravail, NRattachement, EtatVisite
+FROM            View_AnalyseBI_Intervention</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Convention" DataSetColumn="Convention" />
+              <Mapping SourceColumn="CClient" DataSetColumn="CClient" />
+              <Mapping SourceColumn="RaisonSociale" DataSetColumn="RaisonSociale" />
+              <Mapping SourceColumn="Etablissement" DataSetColumn="Etablissement" />
+              <Mapping SourceColumn="DatePlanification" DataSetColumn="DatePlanification" />
+              <Mapping SourceColumn="DateTemps" DataSetColumn="DateTemps" />
+              <Mapping SourceColumn="MoisLettre" DataSetColumn="MoisLettre" />
+              <Mapping SourceColumn="Annee" DataSetColumn="Annee" />
+              <Mapping SourceColumn="JourSemaine" DataSetColumn="JourSemaine" />
+              <Mapping SourceColumn="Semaine" DataSetColumn="Semaine" />
+              <Mapping SourceColumn="Equipe" DataSetColumn="Equipe" />
+              <Mapping SourceColumn="TypeVisite" DataSetColumn="TypeVisite" />
+              <Mapping SourceColumn="TypeConvention" DataSetColumn="TypeConvention" />
+              <Mapping SourceColumn="AutoFacture" DataSetColumn="AutoFacture" />
+              <Mapping SourceColumn="Motif" DataSetColumn="Motif" />
+              <Mapping SourceColumn="Tache" DataSetColumn="Tache" />
+              <Mapping SourceColumn="Evaluation" DataSetColumn="Evaluation" />
+              <Mapping SourceColumn="DateRattachement" DataSetColumn="DateRattachement" />
+              <Mapping SourceColumn="NOrdredeTravail" DataSetColumn="NOrdredeTravail" />
+              <Mapping SourceColumn="NRattachement" DataSetColumn="NRattachement" />
+              <Mapping SourceColumn="EtatVisite" DataSetColumn="EtatVisite" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+        </Tables>
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="CstDataSMHITAnalyseBI_InterventionDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="True" msprop:Generator_DataSetName="CstDataSMHITAnalyseBI_InterventionDataSet" msprop:Generator_UserDSName="CstDataSMHITAnalyseBI_InterventionDataSet">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="View_AnalyseBI_Intervention" msprop:Generator_TableClassName="View_AnalyseBI_InterventionDataTable" msprop:Generator_TableVarName="tableView_AnalyseBI_Intervention" msprop:Generator_RowChangedName="View_AnalyseBI_InterventionRowChanged" msprop:Generator_TablePropName="View_AnalyseBI_Intervention" msprop:Generator_RowDeletingName="View_AnalyseBI_InterventionRowDeleting" msprop:Generator_RowChangingName="View_AnalyseBI_InterventionRowChanging" msprop:Generator_RowEvHandlerName="View_AnalyseBI_InterventionRowChangeEventHandler" msprop:Generator_RowDeletedName="View_AnalyseBI_InterventionRowDeleted" msprop:Generator_RowClassName="View_AnalyseBI_InterventionRow" msprop:Generator_UserTableName="View_AnalyseBI_Intervention" msprop:Generator_RowEvArgName="View_AnalyseBI_InterventionRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Convention" msprop:Generator_ColumnVarNameInTable="columnConvention" msprop:Generator_ColumnPropNameInRow="Convention" msprop:Generator_ColumnPropNameInTable="ConventionColumn" msprop:Generator_UserColumnName="Convention">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="10" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="CClient" msprop:Generator_ColumnVarNameInTable="columnCClient" msprop:Generator_ColumnPropNameInRow="CClient" msprop:Generator_ColumnPropNameInTable="CClientColumn" msprop:Generator_UserColumnName="CClient" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="10" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="RaisonSociale" msprop:Generator_ColumnVarNameInTable="columnRaisonSociale" msprop:Generator_ColumnPropNameInRow="RaisonSociale" msprop:Generator_ColumnPropNameInTable="RaisonSocialeColumn" msprop:Generator_UserColumnName="RaisonSociale" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Etablissement" msprop:Generator_ColumnVarNameInTable="columnEtablissement" msprop:Generator_ColumnPropNameInRow="Etablissement" msprop:Generator_ColumnPropNameInTable="EtablissementColumn" msprop:Generator_UserColumnName="Etablissement" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="DatePlanification" msprop:Generator_ColumnVarNameInTable="columnDatePlanification" msprop:Generator_ColumnPropNameInRow="DatePlanification" msprop:Generator_ColumnPropNameInTable="DatePlanificationColumn" msprop:Generator_UserColumnName="DatePlanification" type="xs:dateTime" />
+              <xs:element name="DateTemps" msprop:Generator_ColumnVarNameInTable="columnDateTemps" msprop:Generator_ColumnPropNameInRow="DateTemps" msprop:Generator_ColumnPropNameInTable="DateTempsColumn" msprop:Generator_UserColumnName="DateTemps" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="MoisLettre" msprop:Generator_ColumnVarNameInTable="columnMoisLettre" msprop:Generator_ColumnPropNameInRow="MoisLettre" msprop:Generator_ColumnPropNameInTable="MoisLettreColumn" msprop:Generator_UserColumnName="MoisLettre" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Annee" msprop:Generator_ColumnVarNameInTable="columnAnnee" msprop:Generator_ColumnPropNameInRow="Annee" msprop:Generator_ColumnPropNameInTable="AnneeColumn" msprop:Generator_UserColumnName="Annee" type="xs:int" minOccurs="0" />
+              <xs:element name="JourSemaine" msprop:Generator_ColumnVarNameInTable="columnJourSemaine" msprop:Generator_ColumnPropNameInRow="JourSemaine" msprop:Generator_ColumnPropNameInTable="JourSemaineColumn" msprop:Generator_UserColumnName="JourSemaine" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Semaine" msprop:Generator_ColumnVarNameInTable="columnSemaine" msprop:Generator_ColumnPropNameInRow="Semaine" msprop:Generator_ColumnPropNameInTable="SemaineColumn" msprop:Generator_UserColumnName="Semaine" type="xs:int" minOccurs="0" />
+              <xs:element name="Equipe" msdata:ReadOnly="true" msprop:Generator_ColumnVarNameInTable="columnEquipe" msprop:Generator_ColumnPropNameInRow="Equipe" msprop:Generator_ColumnPropNameInTable="EquipeColumn" msprop:Generator_UserColumnName="Equipe" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="TypeVisite" msprop:Generator_ColumnVarNameInTable="columnTypeVisite" msprop:Generator_ColumnPropNameInRow="TypeVisite" msprop:Generator_ColumnPropNameInTable="TypeVisiteColumn" msprop:Generator_UserColumnName="TypeVisite" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="TypeConvention" msprop:Generator_ColumnVarNameInTable="columnTypeConvention" msprop:Generator_ColumnPropNameInRow="TypeConvention" msprop:Generator_ColumnPropNameInTable="TypeConventionColumn" msprop:Generator_UserColumnName="TypeConvention" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="AutoFacture" msdata:ReadOnly="true" msprop:Generator_ColumnVarNameInTable="columnAutoFacture" msprop:Generator_ColumnPropNameInRow="AutoFacture" msprop:Generator_ColumnPropNameInTable="AutoFactureColumn" msprop:Generator_UserColumnName="AutoFacture" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="3" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Motif" msprop:Generator_ColumnVarNameInTable="columnMotif" msprop:Generator_ColumnPropNameInRow="Motif" msprop:Generator_ColumnPropNameInTable="MotifColumn" msprop:Generator_UserColumnName="Motif" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="200" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Tache" msprop:Generator_ColumnVarNameInTable="columnTache" msprop:Generator_ColumnPropNameInRow="Tache" msprop:Generator_ColumnPropNameInTable="TacheColumn" msprop:Generator_UserColumnName="Tache" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="250" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="Evaluation" msprop:Generator_ColumnVarNameInTable="columnEvaluation" msprop:Generator_ColumnPropNameInRow="Evaluation" msprop:Generator_ColumnPropNameInTable="EvaluationColumn" msprop:Generator_UserColumnName="Evaluation" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="DateRattachement" msprop:Generator_ColumnVarNameInTable="columnDateRattachement" msprop:Generator_ColumnPropNameInRow="DateRattachement" msprop:Generator_ColumnPropNameInTable="DateRattachementColumn" msprop:Generator_UserColumnName="DateRattachement" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="NOrdredeTravail" msprop:Generator_ColumnVarNameInTable="columnNOrdredeTravail" msprop:Generator_ColumnPropNameInRow="NOrdredeTravail" msprop:Generator_ColumnPropNameInTable="NOrdredeTravailColumn" msprop:Generator_UserColumnName="NOrdredeTravail" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="NRattachement" msprop:Generator_ColumnVarNameInTable="columnNRattachement" msprop:Generator_ColumnPropNameInRow="NRattachement" msprop:Generator_ColumnPropNameInTable="NRattachementColumn" msprop:Generator_UserColumnName="NRattachement" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="EtatVisite" msdata:ReadOnly="true" msprop:Generator_ColumnVarNameInTable="columnEtatVisite" msprop:Generator_ColumnPropNameInRow="EtatVisite" msprop:Generator_ColumnPropNameInTable="EtatVisiteColumn" msprop:Generator_UserColumnName="EtatVisite" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="10" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

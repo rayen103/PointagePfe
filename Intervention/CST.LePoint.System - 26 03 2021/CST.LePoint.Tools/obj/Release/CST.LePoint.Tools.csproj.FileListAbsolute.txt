@@ -1,0 +1,7 @@
+D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Tools\bin\Release\CST.LePoint.Tools.dll
+D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Tools\bin\Release\CST.LePoint.Tools.pdb
+D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Tools\bin\Release\CST.LePoint.Referentiel.dll
+D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Tools\bin\Release\CST.LePoint.Referentiel.pdb
+D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Tools\obj\Release\CST.LePoint.Tools.csprojResolveAssemblyReference.cache
+D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Tools\obj\Release\CST.LePoint.Tools.dll
+D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Tools\obj\Release\CST.LePoint.Tools.pdb

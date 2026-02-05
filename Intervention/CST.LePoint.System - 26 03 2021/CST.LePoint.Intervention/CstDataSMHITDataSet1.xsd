@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="CstDataSMHITDataSet1" targetNamespace="http://tempuri.org/CstDataSMHITDataSet1.xsd" xmlns:mstns="http://tempuri.org/CstDataSMHITDataSet1.xsd" xmlns="http://tempuri.org/CstDataSMHITDataSet1.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="1" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="Settings" AppSettingsPropertyName="CstDataSTSConnectionString" IsAppSettingsProperty="true" Modifier="Assembly" Name="CstDataSTSConnectionString (Settings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.CST.LePoint.Intervention.Properties.Settings.GlobalReference.Default.CstDataSTSConnectionString" Provider="System.Data.SqlClient" />
+          <Connection AppSettingsObjectName="Settings" AppSettingsPropertyName="CstDataSMHITConnectionString" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="CstDataSMHITConnectionString (Settings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.CST.LePoint.Intervention.Properties.Settings.GlobalReference.Default.CstDataSMHITConnectionString" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables>
+          <TableAdapter BaseClass="System.ComponentModel.Component" DataAccessorModifier="AutoLayout, AnsiClass, Class, Public" DataAccessorName="View_SuiviConventionTableAdapter" GeneratorDataComponentClassName="View_SuiviConventionTableAdapter" Name="View_SuiviConvention" UserDataComponentName="View_SuiviConventionTableAdapter">
+            <MainSource>
+              <DbSource ConnectionRef="CstDataSMHITConnectionString (Settings)" DbObjectName="CstDataSMHITBetaCT.dbo.View_SuiviConvention" DbObjectType="View" FillMethodModifier="Public" FillMethodName="Fill" GenerateMethods="Both" GenerateShortCommands="false" GeneratorGetMethodName="GetData" GeneratorSourceName="Fill" GetMethodModifier="Public" GetMethodName="GetData" QueryType="Rowset" ScalarCallRetval="System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" UseOptimisticConcurrency="false" UserGetMethodName="GetData" UserSourceName="Fill">
+                <SelectCommand>
+                  <DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT        Convention, CClient, RaisonSociale, CArticle, LibArticle, PrixHT, Quantite, Montant, Somme, Etablissement
+FROM            View_SuiviConvention</CommandText>
+                    <Parameters />
+                  </DbCommand>
+                </SelectCommand>
+              </DbSource>
+            </MainSource>
+            <Mappings>
+              <Mapping SourceColumn="Convention" DataSetColumn="Convention" />
+              <Mapping SourceColumn="CClient" DataSetColumn="CClient" />
+              <Mapping SourceColumn="RaisonSociale" DataSetColumn="RaisonSociale" />
+              <Mapping SourceColumn="CArticle" DataSetColumn="CArticle" />
+              <Mapping SourceColumn="LibArticle" DataSetColumn="LibArticle" />
+              <Mapping SourceColumn="PrixHT" DataSetColumn="PrixHT" />
+              <Mapping SourceColumn="Quantite" DataSetColumn="Quantite" />
+              <Mapping SourceColumn="Montant" DataSetColumn="Montant" />
+              <Mapping SourceColumn="Somme" DataSetColumn="Somme" />
+              <Mapping SourceColumn="Etablissement" DataSetColumn="Etablissement" />
+            </Mappings>
+            <Sources />
+          </TableAdapter>
+        </Tables>
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="CstDataSMHITDataSet1" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="True" msprop:Generator_DataSetName="CstDataSMHITDataSet1" msprop:Generator_UserDSName="CstDataSMHITDataSet1">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="View_SuiviConvention" msprop:Generator_TableClassName="View_SuiviConventionDataTable" msprop:Generator_TableVarName="tableView_SuiviConvention" msprop:Generator_RowChangedName="View_SuiviConventionRowChanged" msprop:Generator_TablePropName="View_SuiviConvention" msprop:Generator_RowDeletingName="View_SuiviConventionRowDeleting" msprop:Generator_RowChangingName="View_SuiviConventionRowChanging" msprop:Generator_RowEvHandlerName="View_SuiviConventionRowChangeEventHandler" msprop:Generator_RowDeletedName="View_SuiviConventionRowDeleted" msprop:Generator_RowClassName="View_SuiviConventionRow" msprop:Generator_UserTableName="View_SuiviConvention" msprop:Generator_RowEvArgName="View_SuiviConventionRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Convention" msprop:Generator_ColumnVarNameInTable="columnConvention" msprop:Generator_ColumnPropNameInRow="Convention" msprop:Generator_ColumnPropNameInTable="ConventionColumn" msprop:Generator_UserColumnName="Convention">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="10" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="CClient" msprop:Generator_ColumnVarNameInTable="columnCClient" msprop:Generator_ColumnPropNameInRow="CClient" msprop:Generator_ColumnPropNameInTable="CClientColumn" msprop:Generator_UserColumnName="CClient" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="10" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="RaisonSociale" msprop:Generator_ColumnVarNameInTable="columnRaisonSociale" msprop:Generator_ColumnPropNameInRow="RaisonSociale" msprop:Generator_ColumnPropNameInTable="RaisonSocialeColumn" msprop:Generator_UserColumnName="RaisonSociale" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="100" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="CArticle" msprop:Generator_ColumnVarNameInTable="columnCArticle" msprop:Generator_ColumnPropNameInRow="CArticle" msprop:Generator_ColumnPropNameInTable="CArticleColumn" msprop:Generator_UserColumnName="CArticle">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="60" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="LibArticle" msprop:Generator_ColumnVarNameInTable="columnLibArticle" msprop:Generator_ColumnPropNameInRow="LibArticle" msprop:Generator_ColumnPropNameInTable="LibArticleColumn" msprop:Generator_UserColumnName="LibArticle" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="250" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="PrixHT" msprop:Generator_ColumnVarNameInTable="columnPrixHT" msprop:Generator_ColumnPropNameInRow="PrixHT" msprop:Generator_ColumnPropNameInTable="PrixHTColumn" msprop:Generator_UserColumnName="PrixHT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="Quantite" msprop:Generator_ColumnVarNameInTable="columnQuantite" msprop:Generator_ColumnPropNameInRow="Quantite" msprop:Generator_ColumnPropNameInTable="QuantiteColumn" msprop:Generator_UserColumnName="Quantite" type="xs:decimal" minOccurs="0" />
+              <xs:element name="Montant" msdata:ReadOnly="true" msprop:Generator_ColumnVarNameInTable="columnMontant" msprop:Generator_ColumnPropNameInRow="Montant" msprop:Generator_ColumnPropNameInTable="MontantColumn" msprop:Generator_UserColumnName="Montant" type="xs:decimal" minOccurs="0" />
+              <xs:element name="Somme" msdata:ReadOnly="true" msprop:Generator_ColumnVarNameInTable="columnSomme" msprop:Generator_ColumnPropNameInRow="Somme" msprop:Generator_ColumnPropNameInTable="SommeColumn" msprop:Generator_UserColumnName="Somme" type="xs:decimal" minOccurs="0" />
+              <xs:element name="Etablissement" msprop:Generator_ColumnVarNameInTable="columnEtablissement" msprop:Generator_ColumnPropNameInRow="Etablissement" msprop:Generator_ColumnPropNameInTable="EtablissementColumn" msprop:Generator_UserColumnName="Etablissement" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+    <xs:unique name="Constraint1" msdata:PrimaryKey="true">
+      <xs:selector xpath=".//mstns:View_SuiviConvention" />
+      <xs:field xpath="mstns:Convention" />
+      <xs:field xpath="mstns:CArticle" />
+    </xs:unique>
+  </xs:element>
+</xs:schema>

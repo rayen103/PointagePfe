@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="DSPlanningItineraire" targetNamespace="http://tempuri.org/DSPlanningItineraire.xsd" xmlns:mstns="http://tempuri.org/DSPlanningItineraire.xsd" xmlns="http://tempuri.org/DSPlanningItineraire.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="DSPlanningItineraire" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="DSPlanningItineraire" msprop:Generator_UserDSName="DSPlanningItineraire">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="DataTable1" msprop:Generator_TableClassName="DataTable1DataTable" msprop:Generator_TableVarName="tableDataTable1" msprop:Generator_TablePropName="DataTable1" msprop:Generator_RowDeletingName="DataTable1RowDeleting" msprop:Generator_RowChangingName="DataTable1RowChanging" msprop:Generator_RowEvHandlerName="DataTable1RowChangeEventHandler" msprop:Generator_RowDeletedName="DataTable1RowDeleted" msprop:Generator_UserTableName="DataTable1" msprop:Generator_RowChangedName="DataTable1RowChanged" msprop:Generator_RowEvArgName="DataTable1RowChangeEvent" msprop:Generator_RowClassName="DataTable1Row">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="DatePlanification" msprop:Generator_ColumnVarNameInTable="columnDatePlanification" msprop:Generator_ColumnPropNameInRow="DatePlanification" msprop:Generator_ColumnPropNameInTable="DatePlanificationColumn" msprop:Generator_UserColumnName="DatePlanification" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="Ordre" msprop:Generator_ColumnVarNameInTable="columnOrdre" msprop:Generator_ColumnPropNameInRow="Ordre" msprop:Generator_ColumnPropNameInTable="OrdreColumn" msprop:Generator_UserColumnName="Ordre" type="xs:short" minOccurs="0" />
+              <xs:element name="DTrajetkm" msprop:Generator_ColumnVarNameInTable="columnDTrajetkm" msprop:Generator_ColumnPropNameInRow="DTrajetkm" msprop:Generator_ColumnPropNameInTable="DTrajetkmColumn" msprop:Generator_UserColumnName="DTrajetkm" type="xs:decimal" minOccurs="0" />
+              <xs:element name="TempsTrajet" msprop:Generator_ColumnVarNameInTable="columnTempsTrajet" msprop:Generator_ColumnPropNameInRow="TempsTrajet" msprop:Generator_ColumnPropNameInTable="TempsTrajetColumn" msprop:Generator_UserColumnName="TempsTrajet" type="xs:string" minOccurs="0" />
+              <xs:element name="CDepart" msprop:Generator_ColumnVarNameInTable="columnCDepart" msprop:Generator_ColumnPropNameInRow="CDepart" msprop:Generator_ColumnPropNameInTable="CDepartColumn" msprop:Generator_UserColumnName="CDepart" type="xs:string" minOccurs="0" />
+              <xs:element name="CArrive" msprop:Generator_ColumnVarNameInTable="columnCArrive" msprop:Generator_ColumnPropNameInRow="CArrive" msprop:Generator_ColumnPropNameInTable="CArriveColumn" msprop:Generator_UserColumnName="CArrive" type="xs:string" minOccurs="0" />
+              <xs:element name="HeureDepart" msprop:Generator_ColumnVarNameInTable="columnHeureDepart" msprop:Generator_ColumnPropNameInRow="HeureDepart" msprop:Generator_ColumnPropNameInTable="HeureDepartColumn" msprop:Generator_UserColumnName="HeureDepart" type="xs:string" minOccurs="0" />
+              <xs:element name="HeureArrive" msprop:Generator_ColumnVarNameInTable="columnHeureArrive" msprop:Generator_ColumnPropNameInRow="HeureArrive" msprop:Generator_ColumnPropNameInTable="HeureArriveColumn" msprop:Generator_UserColumnName="HeureArrive" type="xs:string" minOccurs="0" />
+              <xs:element name="CEquipe" msprop:Generator_ColumnVarNameInTable="columnCEquipe" msprop:Generator_ColumnPropNameInRow="CEquipe" msprop:Generator_ColumnPropNameInTable="CEquipeColumn" msprop:Generator_UserColumnName="CEquipe" type="xs:string" minOccurs="0" />
+              <xs:element name="Equipe" msprop:Generator_ColumnVarNameInTable="columnEquipe" msprop:Generator_ColumnPropNameInRow="Equipe" msprop:Generator_ColumnPropNameInTable="EquipeColumn" msprop:Generator_UserColumnName="Equipe" type="xs:string" minOccurs="0" />
+              <xs:element name="CumulTemp" msprop:Generator_ColumnVarNameInTable="columnCumulTemp" msprop:Generator_ColumnPropNameInRow="CumulTemp" msprop:Generator_ColumnPropNameInTable="CumulTempColumn" msprop:Generator_UserColumnName="CumulTemp" type="xs:string" minOccurs="0" />
+              <xs:element name="CumulTrajetkm" msprop:Generator_ColumnVarNameInTable="columnCumulTrajetkm" msprop:Generator_ColumnPropNameInRow="CumulTrajetkm" msprop:Generator_ColumnPropNameInTable="CumulTrajetkmColumn" msprop:Generator_UserColumnName="CumulTrajetkm" type="xs:decimal" minOccurs="0" />
+              <xs:element name="PointDepart" msprop:Generator_ColumnVarNameInTable="columnPointDepart" msprop:Generator_ColumnPropNameInRow="PointDepart" msprop:Generator_ColumnPropNameInTable="PointDepartColumn" msprop:Generator_UserColumnName="PointDepart" type="xs:string" minOccurs="0" />
+              <xs:element name="PointArrive" msprop:Generator_ColumnVarNameInTable="columnPointArrive" msprop:Generator_ColumnPropNameInRow="PointArrive" msprop:Generator_ColumnPropNameInTable="PointArriveColumn" msprop:Generator_UserColumnName="PointArrive" type="xs:string" minOccurs="0" />
+              <xs:element name="DateDepart" msprop:Generator_ColumnVarNameInTable="columnDateDepart" msprop:Generator_ColumnPropNameInRow="DateDepart" msprop:Generator_ColumnPropNameInTable="DateDepartColumn" msprop:Generator_UserColumnName="DateDepart" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="DateArrive" msprop:Generator_ColumnVarNameInTable="columnDateArrive" msprop:Generator_ColumnPropNameInRow="DateArrive" msprop:Generator_ColumnPropNameInTable="DateArriveColumn" msprop:Generator_UserColumnName="DateArrive" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="CumulInter" msprop:Generator_ColumnVarNameInTable="columnCumulInter" msprop:Generator_ColumnPropNameInRow="CumulInter" msprop:Generator_ColumnPropNameInTable="CumulInterColumn" msprop:Generator_UserColumnName="CumulInter" type="xs:string" minOccurs="0" />
+              <xs:element name="CumulTraj" msprop:Generator_ColumnVarNameInTable="columnCumulTraj" msprop:Generator_ColumnPropNameInRow="CumulTraj" msprop:Generator_ColumnPropNameInTable="CumulTrajColumn" msprop:Generator_UserColumnName="CumulTraj" type="xs:string" minOccurs="0" />
+              <xs:element name="CumulPause" msprop:Generator_ColumnVarNameInTable="columnCumulPause" msprop:Generator_ColumnPropNameInRow="CumulPause" msprop:Generator_ColumnPropNameInTable="CumulPauseColumn" msprop:Generator_UserColumnName="CumulPause" type="xs:string" minOccurs="0" />
+              <xs:element name="TempsInterv" msprop:Generator_ColumnVarNameInTable="columnTempsInterv" msprop:Generator_ColumnPropNameInRow="TempsInterv" msprop:Generator_ColumnPropNameInTable="TempsIntervColumn" msprop:Generator_UserColumnName="TempsInterv" type="xs:string" minOccurs="0" />
+              <xs:element name="TempsPause" msprop:Generator_ColumnVarNameInTable="columnTempsPause" msprop:Generator_ColumnPropNameInRow="TempsPause" msprop:Generator_ColumnPropNameInTable="TempsPauseColumn" msprop:Generator_UserColumnName="TempsPause" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

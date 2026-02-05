@@ -1,0 +1,70 @@
+/* Styles pour la grille des établissements */
+.etablissement-grid-header {
+    display: none;
+    @screen sm {
+        display: grid;
+        grid-template-columns: auto 20% 20% 20%;
+    }
+}
+
+.etablissement-grid {
+    display: none;
+    @screen sm {
+        display: grid;
+        grid-template-columns: auto 20% 20% 20%;
+    }
+}
+
+.etablissement-grid-item {
+    display: flex;
+    flex-direction: column;
+    @screen sm {
+        display: grid;
+        grid-template-columns: auto 20% 20% 20%;
+    }
+}
+
+/* Styles responsive */
+@media (max-width: 640px) {
+    /* Ajustements généraux */
+    .form-field {
+        padding: 0.5rem;
+    }
+
+    /* Champs de formulaire */
+    mat-form-field {
+        width: 100% !important;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Boutons */
+    .btn {
+        width: 100%;
+        margin-top: 0.5rem;
+        margin-left: 0 !important;
+    }
+
+    /* Icônes */
+    mat-icon {
+        width: 20px;
+        height: 20px;
+        font-size: 20px;
+    }
+
+    /* Messages flash */
+    .flash-message {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Drawer */
+    mat-drawer {
+        width: 100% !important;
+    }
+
+    /* Conteneur principal */
+    mat-drawer-content {
+        padding: 0.5rem;
+    }
+}

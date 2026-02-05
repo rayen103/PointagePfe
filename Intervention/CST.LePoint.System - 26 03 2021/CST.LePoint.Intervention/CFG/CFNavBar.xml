@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Menus xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+ 
+  
+  <Menu RessourceCaption="Favoris">
+    <Menu RessourceCaption="Circuits" IdEvenement="FormEventCircuitsListe"  RessourceIdIcone="map_24" />
+    <!--<Menu RessourceCaption="Deplacement Client Circuit" IdEvenement="FormEventDeplacementClientCircuit"  RessourceIdIcone="map_24" />
+    <Menu RessourceCaption="PlanificationAutomatiqueModif" IdEvenement="FormPlanificationAutomatiqueModif" RessourceIdIcone="planification_16" />
+    <Menu RessourceCaption="ConventionClient" IdEvenement="FormEventConventionClient" RessourceIdIcone="convention_24" />
+    <Menu RessourceCaption="OrdonnancementdesTournées" IdEvenement="FormAffectationEmpPlaning" RessourceIdIcone="ord_24" />
+    <Menu RessourceCaption="Visites" IdEvenement="FormEventRattachementListe" RessourceIdIcone="visites_24" />-->
+
+    <!--<Menu RessourceCaption="Fiche Rattachement" IdEvenement="FormEventRattachement" RessourceIdIcone="Navbar_Format" />-->
+
+    <!--<Menu RessourceCaption="TransformationBCOT" IdEvenement="FormEventBC_OT" RessourceIdIcone="BC_BL_32"/>-->
+  </Menu>
+  
+</Menus>

@@ -1,0 +1,612 @@
+﻿<XtraSerializer version="1.0" application="PivotGrid">
+  <property name="#LayoutVersion" />
+  <property name="Prefilter" isnull="true" iskey="true">
+    <property name="Criteria" isnull="true" />
+    <property name="Enabled">true</property>
+  </property>
+  <property name="Fields" iskey="true" value="18">
+    <property name="Item1" isnull="true" iskey="true">
+      <property name="Index">0</property>
+      <property name="SortBySummaryInfo" isnull="true" iskey="true">
+        <property name="Conditions" iskey="true" value="0" />
+        <property name="FieldComponentName" />
+      </property>
+      <property name="FilterValues" isnull="true" iskey="true">
+        <property name="Values">~Xtra#Array0, </property>
+        <property name="ValuesCore" iskey="true" value="0" />
+        <property name="DeferFilterString" />
+        <property name="ShowBlanks">true</property>
+        <property name="FilterType">Excluded</property>
+      </property>
+      <property name="SummaryFilter" isnull="true" iskey="true">
+        <property name="StartValue" isnull="true" />
+        <property name="EndValue" isnull="true" />
+        <property name="Mode">LastLevel</property>
+        <property name="RowFieldComponentName" />
+        <property name="ColumnFieldComponentName" />
+      </property>
+      <property name="FieldName">CircuitBus</property>
+      <property name="FieldEditName" />
+      <property name="CustomTotals" iskey="true" value="0" />
+      <property name="ToolTips" isnull="true" iskey="true">
+        <property name="HeaderText" />
+        <property name="ValueText" />
+      </property>
+      <property name="Area">RowArea</property>
+      <property name="AllowedAreas">RowArea, ColumnArea, FilterArea</property>
+      <property name="Name">fieldCircuit_Bus</property>
+      <property name="AreaIndex">4</property>
+      <property name="ActualSortMode">Default</property>
+    </property>
+    <property name="Item2" isnull="true" iskey="true">
+      <property name="Index">1</property>
+      <property name="SortBySummaryInfo" isnull="true" iskey="true">
+        <property name="Conditions" iskey="true" value="0" />
+        <property name="FieldComponentName" />
+      </property>
+      <property name="FilterValues" isnull="true" iskey="true">
+        <property name="Values">~Xtra#Array0, </property>
+        <property name="ValuesCore" iskey="true" value="0" />
+        <property name="DeferFilterString" />
+        <property name="ShowBlanks">true</property>
+        <property name="FilterType">Excluded</property>
+      </property>
+      <property name="SummaryFilter" isnull="true" iskey="true">
+        <property name="StartValue" isnull="true" />
+        <property name="EndValue" isnull="true" />
+        <property name="Mode">LastLevel</property>
+        <property name="RowFieldComponentName" />
+        <property name="ColumnFieldComponentName" />
+      </property>
+      <property name="FieldName">IMEI</property>
+      <property name="FieldEditName" />
+      <property name="CustomTotals" iskey="true" value="0" />
+      <property name="ToolTips" isnull="true" iskey="true">
+        <property name="HeaderText" />
+        <property name="ValueText" />
+      </property>
+      <property name="Area">RowArea</property>
+      <property name="AllowedAreas">RowArea, ColumnArea, FilterArea</property>
+      <property name="Name">fieldIMEI</property>
+      <property name="AreaIndex">5</property>
+      <property name="ActualSortMode">Default</property>
+      <property name="Width">115</property>
+    </property>
+    <property name="Item3" isnull="true" iskey="true">
+      <property name="Index">2</property>
+      <property name="SortBySummaryInfo" isnull="true" iskey="true">
+        <property name="Conditions" iskey="true" value="0" />
+        <property name="FieldComponentName" />
+      </property>
+      <property name="FilterValues" isnull="true" iskey="true">
+        <property name="Values">~Xtra#Array0, </property>
+        <property name="ValuesCore" iskey="true" value="0" />
+        <property name="DeferFilterString" />
+        <property name="ShowBlanks">true</property>
+        <property name="FilterType">Excluded</property>
+      </property>
+      <property name="SummaryFilter" isnull="true" iskey="true">
+        <property name="StartValue" isnull="true" />
+        <property name="EndValue" isnull="true" />
+        <property name="Mode">LastLevel</property>
+        <property name="RowFieldComponentName" />
+        <property name="ColumnFieldComponentName" />
+      </property>
+      <property name="FieldName">N</property>
+      <property name="FieldEditName" />
+      <property name="CustomTotals" iskey="true" value="0" />
+      <property name="ToolTips" isnull="true" iskey="true">
+        <property name="HeaderText" />
+        <property name="ValueText" />
+      </property>
+      <property name="AllowedAreas">FilterArea, DataArea</property>
+      <property name="Name">fieldN</property>
+      <property name="AreaIndex">7</property>
+      <property name="ActualSortMode">Default</property>
+    </property>
+    <property name="Item4" isnull="true" iskey="true">
+      <property name="Index">3</property>
+      <property name="SortBySummaryInfo" isnull="true" iskey="true">
+        <property name="Conditions" iskey="true" value="0" />
+        <property name="FieldComponentName" />
+      </property>
+      <property name="FilterValues" isnull="true" iskey="true">
+        <property name="Values">~Xtra#Array0, </property>
+        <property name="ValuesCore" iskey="true" value="0" />
+        <property name="DeferFilterString" />
+        <property name="ShowBlanks">true</property>
+        <property name="FilterType">Excluded</property>
+      </property>
+      <property name="SummaryFilter" isnull="true" iskey="true">
+        <property name="StartValue" isnull="true" />
+        <property name="EndValue" isnull="true" />
+        <property name="Mode">LastLevel</property>
+        <property name="RowFieldComponentName" />
+        <property name="ColumnFieldComponentName" />
+      </property>
+      <property name="FieldName">Annee</property>
+      <property name="FieldEditName" />
+      <property name="CustomTotals" iskey="true" value="0" />
+      <property name="ToolTips" isnull="true" iskey="true">
+        <property name="HeaderText" />
+        <property name="ValueText" />
+      </property>
+      <property name="AllowedAreas">RowArea, ColumnArea, FilterArea</property>
+      <property name="Name">fieldAnnee1</property>
+      <property name="AreaIndex">4</property>
+      <property name="ActualSortMode">Default</property>
+    </property>
+    <property name="Item5" isnull="true" iskey="true">
+      <property name="Index">4</property>
+      <property name="SortBySummaryInfo" isnull="true" iskey="true">
+        <property name="Conditions" iskey="true" value="0" />
+        <property name="FieldComponentName" />
+      </property>
+      <property name="FilterValues" isnull="true" iskey="true">
+        <property name="Values">~Xtra#Array0, </property>
+        <property name="ValuesCore" iskey="true" value="0" />
+        <property name="DeferFilterString" />
+        <property name="ShowBlanks">true</property>
+        <property name="FilterType">Excluded</property>
+      </property>
+      <property name="SummaryFilter" isnull="true" iskey="true">
+        <property name="StartValue" isnull="true" />
+        <property name="EndValue" isnull="true" />
+        <property name="Mode">LastLevel</property>
+        <property name="RowFieldComponentName" />
+        <property name="ColumnFieldComponentName" />
+      </property>
+      <property name="FieldName">MoisLettre</property>
+      <property name="FieldEditName" />
+      <property name="CustomTotals" iskey="true" value="0" />
+      <property name="ToolTips" isnull="true" iskey="true">
+        <property name="HeaderText" />
+        <property name="ValueText" />
+      </property>
+      <property name="AllowedAreas">RowArea, ColumnArea, FilterArea</property>
+      <property name="Name">MoisLettreField</property>
+      <property name="AreaIndex">0</property>
+      <property name="ActualSortMode">Default</property>
+    </property>
+    <property name="Item6" isnull="true" iskey="true">
+      <property name="Index">5</property>
+      <property name="SortBySummaryInfo" isnull="true" iskey="true">
+        <property name="Conditions" iskey="true" value="0" />
+        <property name="FieldComponentName" />
+      </property>
+      <property name="FilterValues" isnull="true" iskey="true">
+        <property name="Values">~Xtra#Array0, </property>
+        <property name="ValuesCore" iskey="true" value="0" />
+        <property name="DeferFilterString" />
+        <property name="ShowBlanks">true</property>
+        <property name="FilterType">Excluded</property>
+      </property>
+      <property name="SummaryFilter" isnull="true" iskey="true">
+        <property name="StartValue" isnull="true" />
+        <property name="EndValue" isnull="true" />
+        <property name="Mode">LastLevel</property>
+        <property name="RowFieldComponentName" />
+        <property name="ColumnFieldComponentName" />
+      </property>
+      <property name="FieldName">JourSemaine</property>
+      <property name="FieldEditName" />
+      <property name="CustomTotals" iskey="true" value="0" />
+      <property name="ToolTips" isnull="true" iskey="true">
+        <property name="HeaderText" />
+        <property name="ValueText" />
+      </property>
+      <property name="AllowedAreas">RowArea, ColumnArea, FilterArea</property>
+      <property name="Name">JourSemaineField</property>
+      <property name="AreaIndex">1</property>
+      <property name="ActualSortMode">Default</property>
+    </property>
+    <property name="Item7" isnull="true" iskey="true">
+      <property name="Index">6</property>
+      <property name="SortBySummaryInfo" isnull="true" iskey="true">
+        <property name="Conditions" iskey="true" value="0" />
+        <property name="FieldComponentName" />
+      </property>
+      <property name="FilterValues" isnull="true" iskey="true">
+        <property name="Values">~Xtra#Array0, </property>
+        <property name="ValuesCore" iskey="true" value="0" />
+        <property name="DeferFilterString" />
+        <property name="ShowBlanks">true</property>
+        <property name="FilterType">Excluded</property>
+      </property>
+      <property name="SummaryFilter" isnull="true" iskey="true">
+        <property name="StartValue" isnull="true" />
+        <property name="EndValue" isnull="true" />
+        <property name="Mode">LastLevel</property>
+        <property name="RowFieldComponentName" />
+        <property name="ColumnFieldComponentName" />
+      </property>
+      <property name="FieldName">Code_Societe</property>
+      <property name="FieldEditName" />
+      <property name="CustomTotals" iskey="true" value="0" />
+      <property name="ToolTips" isnull="true" iskey="true">
+        <property name="HeaderText" />
+        <property name="ValueText" />
+      </property>
+      <property name="AllowedAreas">RowArea, ColumnArea, FilterArea</property>
+      <property name="Name">Code_SocieteField</property>
+      <property name="AreaIndex">2</property>
+      <property name="ActualSortMode">Default</property>
+    </property>
+    <property name="Item8" isnull="true" iskey="true">
+      <property name="Index">7</property>
+      <property name="SortBySummaryInfo" isnull="true" iskey="true">
+        <property name="Conditions" iskey="true" value="0" />
+        <property name="FieldComponentName" />
+      </property>
+      <property name="FilterValues" isnull="true" iskey="true">
+        <property name="Values">~Xtra#Array0, </property>
+        <property name="ValuesCore" iskey="true" value="0" />
+        <property name="DeferFilterString" />
+        <property name="ShowBlanks">true</property>
+        <property name="FilterType">Excluded</property>
+      </property>
+      <property name="SummaryFilter" isnull="true" iskey="true">
+        <property name="StartValue" isnull="true" />
+        <property name="EndValue" isnull="true" />
+        <property name="Mode">LastLevel</property>
+        <property name="RowFieldComponentName" />
+        <property name="ColumnFieldComponentName" />
+      </property>
+      <property name="FieldName">Capacite_Bus</property>
+      <property name="FieldEditName" />
+      <property name="CustomTotals" iskey="true" value="0" />
+      <property name="ToolTips" isnull="true" iskey="true">
+        <property name="HeaderText" />
+        <property name="ValueText" />
+      </property>
+      <property name="Area">RowArea</property>
+      <property name="AllowedAreas">RowArea, ColumnArea, FilterArea</property>
+      <property name="Name">Capacite_BusField</property>
+      <property name="AreaIndex">2</property>
+      <property name="ActualSortMode">Default</property>
+    </property>
+    <property name="Item9" isnull="true" iskey="true">
+      <property name="Index">8</property>
+      <property name="SortBySummaryInfo" isnull="true" iskey="true">
+        <property name="Conditions" iskey="true" value="0" />
+        <property name="FieldComponentName" />
+      </property>
+      <property name="FilterValues" isnull="true" iskey="true">
+        <property name="Values">~Xtra#Array0, </property>
+        <property name="ValuesCore" iskey="true" value="0" />
+        <property name="DeferFilterString" />
+        <property name="ShowBlanks">true</property>
+        <property name="FilterType">Excluded</property>
+      </property>
+      <property name="SummaryFilter" isnull="true" iskey="true">
+        <property name="StartValue" isnull="true" />
+        <property name="EndValue" isnull="true" />
+        <property name="Mode">LastLevel</property>
+        <property name="RowFieldComponentName" />
+        <property name="ColumnFieldComponentName" />
+      </property>
+      <property name="FieldName">AlleRetour</property>
+      <property name="FieldEditName" />
+      <property name="CustomTotals" iskey="true" value="0" />
+      <property name="ToolTips" isnull="true" iskey="true">
+        <property name="HeaderText" />
+        <property name="ValueText" />
+      </property>
+      <property name="Area">RowArea</property>
+      <property name="AllowedAreas">RowArea, ColumnArea, FilterArea</property>
+      <property name="Name">Alle_RetourField</property>
+      <property name="AreaIndex">6</property>
+      <property name="ActualSortMode">Default</property>
+    </property>
+    <property name="Item10" isnull="true" iskey="true">
+      <property name="Index">9</property>
+      <property name="SortBySummaryInfo" isnull="true" iskey="true">
+        <property name="Conditions" iskey="true" value="0" />
+        <property name="FieldComponentName" />
+      </property>
+      <property name="FilterValues" isnull="true" iskey="true">
+        <property name="Values">~Xtra#Array0, </property>
+        <property name="ValuesCore" iskey="true" value="0" />
+        <property name="DeferFilterString" />
+        <property name="ShowBlanks">true</property>
+        <property name="FilterType">Excluded</property>
+      </property>
+      <property name="SummaryFilter" isnull="true" iskey="true">
+        <property name="StartValue" isnull="true" />
+        <property name="EndValue" isnull="true" />
+        <property name="Mode">LastLevel</property>
+        <property name="RowFieldComponentName" />
+        <property name="ColumnFieldComponentName" />
+      </property>
+      <property name="FieldName">NB_Passage</property>
+      <property name="FieldEditName" />
+      <property name="CustomTotals" iskey="true" value="0" />
+      <property name="ToolTips" isnull="true" iskey="true">
+        <property name="HeaderText" />
+        <property name="ValueText" />
+      </property>
+      <property name="Area">DataArea</property>
+      <property name="Name">NB_PassageField</property>
+      <property name="AreaIndex">0</property>
+      <property name="ActualSortMode">Default</property>
+      <property name="Width">154</property>
+    </property>
+    <property name="Item11" isnull="true" iskey="true">
+      <property name="Index">10</property>
+      <property name="SortBySummaryInfo" isnull="true" iskey="true">
+        <property name="Conditions" iskey="true" value="0" />
+        <property name="FieldComponentName" />
+      </property>
+      <property name="FilterValues" isnull="true" iskey="true">
+        <property name="Values">~Xtra#Array0, </property>
+        <property name="ValuesCore" iskey="true" value="0" />
+        <property name="DeferFilterString" />
+        <property name="ShowBlanks">true</property>
+        <property name="FilterType">Excluded</property>
+      </property>
+      <property name="SummaryFilter" isnull="true" iskey="true">
+        <property name="StartValue" isnull="true" />
+        <property name="EndValue" isnull="true" />
+        <property name="Mode">LastLevel</property>
+        <property name="RowFieldComponentName" />
+        <property name="ColumnFieldComponentName" />
+      </property>
+      <property name="FieldName">DHMS_Collecte</property>
+      <property name="FieldEditName" />
+      <property name="CustomTotals" iskey="true" value="0" />
+      <property name="ToolTips" isnull="true" iskey="true">
+        <property name="HeaderText" />
+        <property name="ValueText" />
+      </property>
+      <property name="Area">RowArea</property>
+      <property name="AllowedAreas">RowArea, ColumnArea, FilterArea</property>
+      <property name="Name">DHMS_CollecteField</property>
+      <property name="AreaIndex">7</property>
+      <property name="ActualSortMode">Default</property>
+      <property name="Width">132</property>
+    </property>
+    <property name="Item12" isnull="true" iskey="true">
+      <property name="Index">11</property>
+      <property name="SortBySummaryInfo" isnull="true" iskey="true">
+        <property name="Conditions" iskey="true" value="0" />
+        <property name="FieldComponentName" />
+      </property>
+      <property name="FilterValues" isnull="true" iskey="true">
+        <property name="Values">~Xtra#Array0, </property>
+        <property name="ValuesCore" iskey="true" value="0" />
+        <property name="DeferFilterString" />
+        <property name="ShowBlanks">true</property>
+        <property name="FilterType">Excluded</property>
+      </property>
+      <property name="SummaryFilter" isnull="true" iskey="true">
+        <property name="StartValue" isnull="true" />
+        <property name="EndValue" isnull="true" />
+        <property name="Mode">LastLevel</property>
+        <property name="RowFieldComponentName" />
+        <property name="ColumnFieldComponentName" />
+      </property>
+      <property name="FieldName">DHMS_Sys_Modem</property>
+      <property name="FieldEditName" />
+      <property name="CustomTotals" iskey="true" value="0" />
+      <property name="ToolTips" isnull="true" iskey="true">
+        <property name="HeaderText" />
+        <property name="ValueText" />
+      </property>
+      <property name="AllowedAreas">RowArea, ColumnArea, FilterArea</property>
+      <property name="Name">DHMS_Sys_ModemField</property>
+      <property name="AreaIndex">3</property>
+      <property name="ActualSortMode">Default</property>
+    </property>
+    <property name="Item13" isnull="true" iskey="true">
+      <property name="Index">12</property>
+      <property name="SortBySummaryInfo" isnull="true" iskey="true">
+        <property name="Conditions" iskey="true" value="0" />
+        <property name="FieldComponentName" />
+      </property>
+      <property name="FilterValues" isnull="true" iskey="true">
+        <property name="Values">~Xtra#Array0, </property>
+        <property name="ValuesCore" iskey="true" value="0" />
+        <property name="DeferFilterString" />
+        <property name="ShowBlanks">true</property>
+        <property name="FilterType">Excluded</property>
+      </property>
+      <property name="SummaryFilter" isnull="true" iskey="true">
+        <property name="StartValue" isnull="true" />
+        <property name="EndValue" isnull="true" />
+        <property name="Mode">LastLevel</property>
+        <property name="RowFieldComponentName" />
+        <property name="ColumnFieldComponentName" />
+      </property>
+      <property name="FieldName">Num_IMM_Bus</property>
+      <property name="FieldEditName" />
+      <property name="CustomTotals" iskey="true" value="0" />
+      <property name="ToolTips" isnull="true" iskey="true">
+        <property name="HeaderText" />
+        <property name="ValueText" />
+      </property>
+      <property name="Area">RowArea</property>
+      <property name="AllowedAreas">RowArea, ColumnArea, FilterArea</property>
+      <property name="Name">Num_IMM_BusField</property>
+      <property name="AreaIndex">0</property>
+      <property name="ActualSortMode">Default</property>
+    </property>
+    <property name="Item14" isnull="true" iskey="true">
+      <property name="Index">13</property>
+      <property name="SortBySummaryInfo" isnull="true" iskey="true">
+        <property name="Conditions" iskey="true" value="0" />
+        <property name="FieldComponentName" />
+      </property>
+      <property name="FilterValues" isnull="true" iskey="true">
+        <property name="Values">~Xtra#Array0, </property>
+        <property name="ValuesCore" iskey="true" value="0" />
+        <property name="DeferFilterString" />
+        <property name="ShowBlanks">true</property>
+        <property name="FilterType">Excluded</property>
+      </property>
+      <property name="SummaryFilter" isnull="true" iskey="true">
+        <property name="StartValue" isnull="true" />
+        <property name="EndValue" isnull="true" />
+        <property name="Mode">LastLevel</property>
+        <property name="RowFieldComponentName" />
+        <property name="ColumnFieldComponentName" />
+      </property>
+      <property name="FieldName">PCCollecte</property>
+      <property name="FieldEditName" />
+      <property name="CustomTotals" iskey="true" value="0" />
+      <property name="ToolTips" isnull="true" iskey="true">
+        <property name="HeaderText" />
+        <property name="ValueText" />
+      </property>
+      <property name="Area">ColumnArea</property>
+      <property name="AllowedAreas">RowArea, ColumnArea, FilterArea</property>
+      <property name="Name">PC_CollecteField</property>
+      <property name="AreaIndex">0</property>
+      <property name="ActualSortMode">Default</property>
+    </property>
+    <property name="Item15" isnull="true" iskey="true">
+      <property name="Index">14</property>
+      <property name="SortBySummaryInfo" isnull="true" iskey="true">
+        <property name="Conditions" iskey="true" value="0" />
+        <property name="FieldComponentName" />
+      </property>
+      <property name="FilterValues" isnull="true" iskey="true">
+        <property name="Values">~Xtra#Array0, </property>
+        <property name="ValuesCore" iskey="true" value="0" />
+        <property name="DeferFilterString" />
+        <property name="ShowBlanks">true</property>
+        <property name="FilterType">Excluded</property>
+      </property>
+      <property name="SummaryFilter" isnull="true" iskey="true">
+        <property name="StartValue" isnull="true" />
+        <property name="EndValue" isnull="true" />
+        <property name="Mode">LastLevel</property>
+        <property name="RowFieldComponentName" />
+        <property name="ColumnFieldComponentName" />
+      </property>
+      <property name="FieldName">Societe</property>
+      <property name="FieldEditName" />
+      <property name="CustomTotals" iskey="true" value="0" />
+      <property name="ToolTips" isnull="true" iskey="true">
+        <property name="HeaderText" />
+        <property name="ValueText" />
+      </property>
+      <property name="AllowedAreas">RowArea, ColumnArea, FilterArea</property>
+      <property name="Name">SocieteField</property>
+      <property name="AreaIndex">5</property>
+      <property name="ActualSortMode">Default</property>
+    </property>
+    <property name="Item16" isnull="true" iskey="true">
+      <property name="Index">15</property>
+      <property name="SortBySummaryInfo" isnull="true" iskey="true">
+        <property name="Conditions" iskey="true" value="0" />
+        <property name="FieldComponentName" />
+      </property>
+      <property name="FilterValues" isnull="true" iskey="true">
+        <property name="Values">~Xtra#Array0, </property>
+        <property name="ValuesCore" iskey="true" value="0" />
+        <property name="DeferFilterString" />
+        <property name="ShowBlanks">true</property>
+        <property name="FilterType">Excluded</property>
+      </property>
+      <property name="SummaryFilter" isnull="true" iskey="true">
+        <property name="StartValue" isnull="true" />
+        <property name="EndValue" isnull="true" />
+        <property name="Mode">LastLevel</property>
+        <property name="RowFieldComponentName" />
+        <property name="ColumnFieldComponentName" />
+      </property>
+      <property name="FieldName">NomSite</property>
+      <property name="FieldEditName" />
+      <property name="CustomTotals" iskey="true" value="0" />
+      <property name="ToolTips" isnull="true" iskey="true">
+        <property name="HeaderText" />
+        <property name="ValueText" />
+      </property>
+      <property name="AllowedAreas">RowArea, ColumnArea, FilterArea</property>
+      <property name="Name">SiteField</property>
+      <property name="AreaIndex">6</property>
+      <property name="ActualSortMode">Default</property>
+    </property>
+    <property name="Item17" isnull="true" iskey="true">
+      <property name="Index">16</property>
+      <property name="SortBySummaryInfo" isnull="true" iskey="true">
+        <property name="Conditions" iskey="true" value="0" />
+        <property name="FieldComponentName" />
+      </property>
+      <property name="FilterValues" isnull="true" iskey="true">
+        <property name="Values">~Xtra#Array0, </property>
+        <property name="ValuesCore" iskey="true" value="0" />
+        <property name="DeferFilterString" />
+        <property name="ShowBlanks">true</property>
+        <property name="FilterType">Excluded</property>
+      </property>
+      <property name="SummaryFilter" isnull="true" iskey="true">
+        <property name="StartValue" isnull="true" />
+        <property name="EndValue" isnull="true" />
+        <property name="Mode">LastLevel</property>
+        <property name="RowFieldComponentName" />
+        <property name="ColumnFieldComponentName" />
+      </property>
+      <property name="FieldName">Chauffeur</property>
+      <property name="FieldEditName" />
+      <property name="CustomTotals" iskey="true" value="0" />
+      <property name="ToolTips" isnull="true" iskey="true">
+        <property name="HeaderText" />
+        <property name="ValueText" />
+      </property>
+      <property name="Area">RowArea</property>
+      <property name="Name">ChauffeurField</property>
+      <property name="AreaIndex">3</property>
+      <property name="ActualSortMode">Default</property>
+      <property name="Width">144</property>
+    </property>
+    <property name="Item18" isnull="true" iskey="true">
+      <property name="Index">17</property>
+      <property name="SortBySummaryInfo" isnull="true" iskey="true">
+        <property name="Conditions" iskey="true" value="0" />
+        <property name="FieldComponentName" />
+      </property>
+      <property name="FilterValues" isnull="true" iskey="true">
+        <property name="Values">~Xtra#Array0, </property>
+        <property name="ValuesCore" iskey="true" value="0" />
+        <property name="DeferFilterString" />
+        <property name="ShowBlanks">true</property>
+        <property name="FilterType">Excluded</property>
+      </property>
+      <property name="SummaryFilter" isnull="true" iskey="true">
+        <property name="StartValue" isnull="true" />
+        <property name="EndValue" isnull="true" />
+        <property name="Mode">LastLevel</property>
+        <property name="RowFieldComponentName" />
+        <property name="ColumnFieldComponentName" />
+      </property>
+      <property name="FieldName">Model_Bus</property>
+      <property name="FieldEditName" />
+      <property name="CustomTotals" iskey="true" value="0" />
+      <property name="ToolTips" isnull="true" iskey="true">
+        <property name="HeaderText" />
+        <property name="ValueText" />
+      </property>
+      <property name="Area">RowArea</property>
+      <property name="Name">Model_BusField</property>
+      <property name="AreaIndex">1</property>
+      <property name="ActualSortMode">Default</property>
+    </property>
+  </property>
+  <property name="OptionsView" isnull="true" iskey="true">
+    <property name="ShowRowGrandTotals">false</property>
+    <property name="ShowColumnGrandTotals">false</property>
+    <property name="ShowRowTotals">false</property>
+    <property name="ShowColumnTotals">false</property>
+  </property>
+  <property name="OptionsPrint" isnull="true" iskey="true">
+    <property name="PrintHorzLines">True</property>
+    <property name="PrintVertLines">True</property>
+    <property name="PrintDataHeaders">False</property>
+    <property name="PrintFilterHeaders">False</property>
+    <property name="PrintColumnHeaders">True</property>
+    <property name="PrintRowHeaders">True</property>
+    <property name="PrintHeadersOnEveryPage">true</property>
+  </property>
+  <property name="Groups" iskey="true" value="0" />
+</XtraSerializer>

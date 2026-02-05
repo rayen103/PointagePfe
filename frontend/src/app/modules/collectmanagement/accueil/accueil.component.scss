@@ -1,0 +1,125 @@
+/*  Fond futuriste ultra-foncé */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    background: linear-gradient(135deg,);
+    font-family: 'Orbitron', sans-serif;
+}
+
+/*  Ajout d’une texture étoilée subtile */
+body::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: url('https://www.transparenttextures.com/patterns/stardust.png');
+    opacity: 0.05; /* Particules très légères */
+    z-index: 0;
+}
+
+/* Effet de halo lumineux très doux */
+body::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(0, 82, 136, 0.3) 0%, rgba(0, 0, 0, 0) 70%);
+    z-index: 0;
+}
+
+/* Canvas pour les particules */
+canvas#particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+}
+
+/*  Conteneur du logo */
+.logo-container {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 250px;
+    height: 250px;
+    perspective: 1200px;
+}
+
+/* Logo holographique */
+.logo {
+    width:300px;
+    height: auto;
+    transition: transform 0.3s ease-out, filter 0.3s ease-out;
+    animation: dance 2s infinite ease-in-out, glow 1.5s infinite alternate;
+    transform-origin: center;
+}
+
+/*  Ondes lumineuses */
+.wave {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: rgba(0, 229, 255, 0.15);
+    border-radius: 50%;
+    animation: pulse 2.5s infinite alternate;
+    filter: blur(40px);
+    z-index: -1;
+}
+
+/*  Halo lumineux */
+.pulse-effect {
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    background: rgba(0, 229, 255, 0.1);
+    border-radius: 50%;
+    animation: glowPulse 3s infinite alternate;
+    filter: blur(60px);
+    z-index: -2;
+}
+
+/*  Effet de danse */
+@keyframes dance {
+    0%, 100% { transform: rotate(0deg) translateY(0); }
+    50% { transform: rotate(3deg) translateY(-10px); }
+}
+
+/* Glow pulsant */
+@keyframes glow {
+    0% { filter: drop-shadow(0px 0px 15px #00e5ff); }
+    100% { filter: drop-shadow(0px 0px 40px #00ffff); }
+}
+
+/* Pulsation de l'onde */
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(1.3); opacity: 0.2; }
+}
+
+/* ⚡ Pulsation du halo */
+@keyframes glowPulse {
+    0% { transform: scale(1); opacity: 0.3; }
+    100% { transform: scale(1.5); opacity: 0.1; }
+}
+/* Empêcher le défilement */
+html, body {
+    overflow: hidden;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Assurer que tous les éléments remplissent bien l'écran */
+canvas#particles {
+    width: 100%;
+    height: 100%;
+}
+

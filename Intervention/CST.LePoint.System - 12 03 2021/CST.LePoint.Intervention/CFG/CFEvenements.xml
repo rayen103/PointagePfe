@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Evenements xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <!-- FORMEVENTULAIRES -->
+  <!--Securite-->
+
+  <Form IdEvenement="FormEventSocieteListe" ResTitreForm="SocieteListe">
+    <NomCompletForm>CST.LePoint.Intervention.DroitsAcces.FrmSociete</NomCompletForm>
+  </Form>
+
+  <Form IdEvenement="FormEventRoleListe" ResTitreForm="RoleListe">
+    <NomCompletForm>CST.LePoint.Intervention.DroitsAcces.FrmRoleListe</NomCompletForm>
+  </Form>
+
+  <Form IdEvenement="FormEventUtilisateurListe" ResTitreForm="UtilisateurListe">
+    <NomCompletForm>CST.LePoint.Intervention.DroitsAcces.FrmUtilisateurListe</NomCompletForm>
+  </Form>
+
+
+
+  <!--Fin Securite-->
+  <!--SECURITE-->
+  <!--<Form IdEvenement="FormEventParamétre" ResTitreForm="Configuration">
+    <NomCompletForm>CST.LePoint.Intervention.DroitsAcces.FrmParametre</NomCompletForm>
+  </Form>-->
+  <!--<Form IdEvenement="FormEventFrmSetup" ResTitreForm="Setup">
+    <NomCompletForm>CST.LePoint.Intervention.Setup.FrmSetup</NomCompletForm>
+  </Form>-->
+
+  <Form IdEvenement="FrmPointCollecteListe" ResTitreForm="PointCollecte">
+    <NomCompletForm>CST.LePoint.Intervention.Rattachements.FrmPointCollecteListe</NomCompletForm>
+  </Form>
+
+  <Form IdEvenement="FormEventEmployeListe" ResTitreForm="Employés">
+    <NomCompletForm>CST.LePoint.Intervention.Rattachements.FrmEmployeListe</NomCompletForm>
+  </Form>
+  <!--<Form IdEvenement="FormEventChargesDiversListe" ResTitreForm="ChargesDiversListe">
+    <NomCompletForm>CST.LePoint.Intervention.Rattachements.FrmChargesDiversListe</NomCompletForm>
+  </Form>-->
+
+  <!--<Form IdEvenement="FormEventChantierListe" ResTitreForm="Chantier">
+    <NomCompletForm>CST.LePoint.Intervention.Rattachements.FrmChantierListe</NomCompletForm>
+  </Form>-->
+  <!--<Form IdEvenement="FormEventConventionClient" ResTitreForm="ConventionClient">
+    <NomCompletForm>CST.LePoint.Intervention.Rattachements.FrmConventionClientListe</NomCompletForm>
+  </Form>-->
+  <!--<Form IdEvenement="FormEventIntervention_BLListe" ResTitreForm="Intervention_BLListe">
+    <NomCompletForm>CST.LePoint.Intervention.Interventions.FrmIntervention_BLListe</NomCompletForm>
+  </Form>-->
+
+  <Form IdEvenement="FrmShift" ResTitreForm="ShiftListe">
+    <NomCompletForm>CST.LePoint.Intervention.Rattachements.FrmShift</NomCompletForm>
+  </Form>
+
+  <Form IdEvenement="FormEventCircuitsListe" ResTitreForm="CircuitNormal">
+    <NomCompletForm>CST.LePoint.Intervention.Rattachements.FrmCircuitListe</NomCompletForm>
+  </Form>
+
+
+  <!--<Form IdEvenement="FrmListeCircuitDirect" ResTitreForm="CircuitDirect">
+    <NomCompletForm>CST.LePoint.Intervention.CircuitDirect.FrmListeCircuitDirect</NomCompletForm>
+  </Form>-->
+
+
+
+  <Form IdEvenement="FormEventCircuit" ResTitreForm="Circuit">
+    <NomCompletForm>CST.LePoint.Intervention.Rattachements.FrmCircuit</NomCompletForm>
+  </Form>
+
+  <Form IdEvenement="FormEventBusTracking" ResTitreForm="BusTracking">
+    <NomCompletForm>CST.LePoint.Intervention.Rattachements.FrmBusTracking</NomCompletForm>
+  </Form>
+
+  <!--<Form IdEvenement="FormEventDeplacementClientCircuit" ResTitreForm="DeplacementClientCircuit">
+    <NomCompletForm>CST.LePoint.Intervention.Rattachements.FrmDeplacementClientCircuit</NomCompletForm>
+  </Form>
+
+  <Form IdEvenement="FormEventEquipeListe" ResTitreForm="EquipeListe">
+    <NomCompletForm>CST.LePoint.Intervention.Rattachements.FrmEquipeListe</NomCompletForm>
+  </Form>-->
+
+  <!--<Form IdEvenement="FormEventOTListe" ResTitreForm="OTListe">
+    <NomCompletForm>CST.LePoint.Intervention.Rattachements.FrmOTListe</NomCompletForm>
+  </Form>
+
+  <Form IdEvenement="FormEventBC_OT" ResTitreForm="BC_OT">
+    <NomCompletForm>CST.LePoint.Intervention.Rattachements.FrmBC_OT</NomCompletForm>
+  </Form>
+  --><!--<Form IdEvenement="FormEventTests" ResTitreForm="Tests">
+    <NomCompletForm>CST.LePoint.Intervention.Rattachements.CalculeMap</NomCompletForm>
+  </Form>--><!--
+  <Form IdEvenement="FormEventValidationPlanif" ResTitreForm="ValidationPlanif">
+    <NomCompletForm>CST.LePoint.Intervention.Rattachements.FrmValidationPlanif</NomCompletForm>
+  </Form>-->
+  <!--FIN SECURITE-->
+
+  <!--SECURITE-->
+
+
+  <!--<Form IdEvenement="FormEventProductiviteListe" ResTitreForm="ProductiviteListe">
+    <NomCompletForm>CST.LePoint.Intervention.Rattachements.FrmSuiviProd</NomCompletForm>
+  </Form>
+  <Form IdEvenement="FormEventVisiteManquante" ResTitreForm="VisiteManquante">
+    <NomCompletForm>CST.LePoint.Intervention.Rattachements.FrmVisiteManquante</NomCompletForm>
+  </Form>
+
+  <Form IdEvenement="FormEventSuiviConvention" ResTitreForm="SuiviConvention">
+    <NomCompletForm>CST.LePoint.Intervention.Rattachements.FrmSuiviConvention</NomCompletForm>
+  </Form>
+  <Form IdEvenement="FormEventSuiviPlanification" ResTitreForm="SuiviPlanification">
+    <NomCompletForm>CST.LePoint.Intervention.Rattachements.FrmSuiviePlanification</NomCompletForm>
+  </Form>-->
+  <!--FIN SECURITE-->
+  <!--Donner-->
+
+  <!--FIN Donner-->
+
+  <!--Analyse-->
+  <Form IdEvenement="FormEventAnalyseBI" ResTitreForm="AnalyseBI">
+    <NomCompletForm>CST.LePoint.Intervention.Rattachements.FrmAnalyseBI</NomCompletForm>
+  </Form>
+  <Form IdEvenement="FormEventAnalyseBITrace" ResTitreForm="AnalyseBITrace">
+    <NomCompletForm>CST.LePoint.Intervention.Rattachements.FrmAnalyseBITrace</NomCompletForm>
+  </Form>
+  <!--<Form IdEvenement="FormEventAnalyseBIIntervention" ResTitreForm="AnalyseBIIntervention">
+    <NomCompletForm>CST.LePoint.Intervention.Rattachements.FrmAnalyseBIIntervention</NomCompletForm>
+  </Form>-->
+  <!--Fin Analyse-->
+
+  <!-- NAVBAR -->
+  <!--<Methode IdEvenement="FormEventRattachement">
+    <Nom>CST.LePoint.Intervention.Rattachements.FrmRattachementListe.Ajouter</Nom>
+  </Methode>-->
+
+  <!--<Methode IdEvenement="FormEventBC_OT" ResTitreMethode="TransformationBCOT">
+    <Nom>CST.LePoint.Intervention.Rattachements.FrmBC_OT</Nom>
+  </Methode>-->
+  <!-- FIN NAVBAR -->
+
+  <!-- MÉTHODES -->
+  <Methode IdEvenement="EventQuitter">
+    <Nom>CST.LePoint.Intervention.FrmMDI.Quitter</Nom>
+  </Methode>
+  <Methode IdEvenement="FormEventAPropos">
+    <Nom>CST.LePoint.Intervention.FrmMDI.APropos</Nom>
+  </Methode>
+  <!-- FIN MÉTHODES -->
+
+</Evenements>

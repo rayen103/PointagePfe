@@ -1,0 +1,1159 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="Navbar_DroitAcces" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_droitacces.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblAdresse" xml:space="preserve">
+    <value>Adresse</value>
+  </data>
+  <data name="TextBtn_Quitter" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="lblFerme" xml:space="preserve">
+    <value>Ferme</value>
+  </data>
+  <data name="Menu_ExportTxt_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_exporttxt_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_ExportTxt_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_exporttxt_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Navbar_client" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_client.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Navbar_banque" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_banque.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Navbar_EditPassword" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_editpassword.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Navbar_configuration_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_configuration_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblDesiderata" xml:space="preserve">
+    <value>Desiderata</value>
+  </data>
+  <data name="frmModePaiementListe_MenuCaption" xml:space="preserve">
+    <value>Modes de Paiement</value>
+  </data>
+  <data name="lblSupprimer" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="lblGroupe" xml:space="preserve">
+    <value>Groupe</value>
+  </data>
+  <data name="lblCommentaireQualites" xml:space="preserve">
+    <value>Commentaire Qualité</value>
+  </data>
+  <data name="Navbar_Devise_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_devise_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_Search_26" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_search_26.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_Download" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_download.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblCompte" xml:space="preserve">
+    <value>Compte</value>
+  </data>
+  <data name="lblCleRIB" xml:space="preserve">
+    <value>Clé R.I.B</value>
+  </data>
+  <data name="lblDateMaj" xml:space="preserve">
+    <value>Date Maj</value>
+  </data>
+  <data name="frmGroupeListe_NavCaption" xml:space="preserve">
+    <value>Gestion des Groupes</value>
+  </data>
+  <data name="lblPrenom" xml:space="preserve">
+    <value>Prénom</value>
+  </data>
+  <data name="Menu_ExportXls_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_exportxls_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_Refresh_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_Refresh_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblListeAutorisation" xml:space="preserve">
+    <value>Autorisations affectées</value>
+  </data>
+  <data name="Navbar_etat" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_etat.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblNumDernierCarnet" xml:space="preserve">
+    <value>N° Dernier Carnet</value>
+  </data>
+  <data name="lblCCommentairePrix" xml:space="preserve">
+    <value>Code Commentaire Prix</value>
+  </data>
+  <data name="Navbar_commande_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_commande_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frmLotFacturesAvoirs_MenuCaption" xml:space="preserve">
+    <value>Edition Lot de Factures/Avoirs</value>
+  </data>
+  <data name="Titre_FrmArticle" xml:space="preserve">
+    <value>Article</value>
+  </data>
+  <data name="lblCommettant" xml:space="preserve">
+    <value>Commettant</value>
+  </data>
+  <data name="lblPwd" xml:space="preserve">
+    <value>Mot de passe</value>
+  </data>
+  <data name="Menu_SaveClose_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_saveclose_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblStatut" xml:space="preserve">
+    <value>Statut Contrat</value>
+  </data>
+  <data name="lblInfoCommettant" xml:space="preserve">
+    <value>Informations Commettants</value>
+  </data>
+  <data name="lblNomForm" xml:space="preserve">
+    <value>Ecran</value>
+  </data>
+  <data name="Menu_Down_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_down_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SousMenuEditionContrat_NavCaption" xml:space="preserve">
+    <value>Edition</value>
+  </data>
+  <data name="lblArticle" xml:space="preserve">
+    <value>Article</value>
+  </data>
+  <data name="Menu_Upload_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_upload_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SousMenuEditionReglementRistourne_NavCaption" xml:space="preserve">
+    <value>Edition</value>
+  </data>
+  <data name="CFMenus" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\CFMenus.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-16</value>
+  </data>
+  <data name="lblCompteProd" xml:space="preserve">
+    <value>Compte Prod.</value>
+  </data>
+  <data name="Menu_Add_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_add_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Titre_FrmFournisseurListe" xml:space="preserve">
+    <value>Liste des Fournisseurs</value>
+  </data>
+  <data name="Menu_Search_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_search_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblCommentaireLogement" xml:space="preserve">
+    <value>Commentaire Logement</value>
+  </data>
+  <data name="Navbar_client_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_client_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="next_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\next_16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblBtnSupprimerLiv" xml:space="preserve">
+    <value>Supprimer Livraison</value>
+  </data>
+  <data name="_37_1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\37-1.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblTauxConvEur" xml:space="preserve">
+    <value>Taux Conversion en Euros</value>
+  </data>
+  <data name="lblNomResponsable" xml:space="preserve">
+    <value>Nom Responsable</value>
+  </data>
+  <data name="SousMenuEditionReglementRistourne_MenuCaption" xml:space="preserve">
+    <value>Edition</value>
+  </data>
+  <data name="Menu_CloseAll_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_closeall_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_Delete_14" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_delete_14.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="GestionDesMouvements" xml:space="preserve">
+    <value>Mouvements</value>
+  </data>
+  <data name="frmModifierMotDePasse_NavCaption" xml:space="preserve">
+    <value>Changer Mot de passe</value>
+  </data>
+  <data name="Titre_frmUtilisateurListe" xml:space="preserve">
+    <value>Liste des Utilisateur</value>
+  </data>
+  <data name="Menu_Gear" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_gear.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_Close" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_close.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_SaveClose" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_saveclose.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="GestiondesVisiteSS" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\GestiondesVisiteSS.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_PrintPreview" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_printpreview.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblN" xml:space="preserve">
+    <value>N°</value>
+  </data>
+  <data name="lblPrixTonne" xml:space="preserve">
+    <value>Prix Tonne </value>
+  </data>
+  <data name="lblLibelle" xml:space="preserve">
+    <value>Libellé</value>
+  </data>
+  <data name="lblNContrat" xml:space="preserve">
+    <value>Numéro Contrat</value>
+  </data>
+  <data name="groupControlInfoLivraisons" xml:space="preserve">
+    <value>Informations Livraisons</value>
+  </data>
+  <data name="Menu_Save" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_save.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblAcheteur" xml:space="preserve">
+    <value>Acheteur</value>
+  </data>
+  <data name="lblDate" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="lblDifference" xml:space="preserve">
+    <value>Différence</value>
+  </data>
+  <data name="lblPassword" xml:space="preserve">
+    <value>Mot de passe</value>
+  </data>
+  <data name="frmListeReleveRistournes_NavCaption" xml:space="preserve">
+    <value>Relevé des Ristournes</value>
+  </data>
+  <data name="Menu_SaveClose_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_saveclose_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblTelephone1" xml:space="preserve">
+    <value>Num Tél 1</value>
+  </data>
+  <data name="frmEditionListeContratResilie_MenuCaptiofrmEditionListeContratResilie_NavCaption" xml:space="preserve">
+    <value>Liste des Contrats Résiliés</value>
+  </data>
+  <data name="InfoMsg_SuppAgenceNonPermis" xml:space="preserve">
+    <value>Cette agence est associée à des clients, vous ne pouvez pas la supprimer!</value>
+  </data>
+  <data name="SousMenuEditionContrat_MenuCaption" xml:space="preserve">
+    <value>Edition</value>
+  </data>
+  <data name="lblCompteComptable" xml:space="preserve">
+    <value>Compte Comptable</value>
+  </data>
+  <data name="CFNavBar" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\cfnavbar.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="frmListeReglementsNonImputes_NavCaption" xml:space="preserve">
+    <value>Liste des Règlements Non Imputés</value>
+  </data>
+  <data name="lblInfoContrat" xml:space="preserve">
+    <value>Informations Contrat</value>
+  </data>
+  <data name="lblSommeQuant" xml:space="preserve">
+    <value>Somme des Quantités</value>
+  </data>
+  <data name="lblDateExig" xml:space="preserve">
+    <value>Date Exig.</value>
+  </data>
+  <data name="Menu_Refresh" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_Refresh.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_PrintPreview_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_printpreview_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblDesideratas" xml:space="preserve">
+    <value>Desideratas</value>
+  </data>
+  <data name="Menu_Add" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_add.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_ExportPdf_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_exportpdf_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblNumeroTel2" xml:space="preserve">
+    <value>Numéro Tél 2</value>
+  </data>
+  <data name="Menu_ExportXlsx" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_exportxlsx.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblCode" xml:space="preserve">
+    <value>Code</value>
+  </data>
+  <data name="frmDroitAcces_NavCaption" xml:space="preserve">
+    <value>Gestion des accès</value>
+  </data>
+  <data name="frmFormatImpression_NavCaption" xml:space="preserve">
+    <value>Format d'impression</value>
+  </data>
+  <data name="Connexion" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\connexion.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblCCommettant" xml:space="preserve">
+    <value>Code</value>
+  </data>
+  <data name="lblMatif" xml:space="preserve">
+    <value>MATIF</value>
+  </data>
+  <data name="Titre_FrmConventionAdmin" xml:space="preserve">
+    <value>Convention Client ( ADMIN )</value>
+  </data>
+  <data name="lblCommentaireQuantites" xml:space="preserve">
+    <value>Commentaire Quantité</value>
+  </data>
+  <data name="InfoMsg_SuppEnregistrement" xml:space="preserve">
+    <value>Êtes vous sûr de vouloir supprimer {0} ?</value>
+  </data>
+  <data name="lblConvEuro" xml:space="preserve">
+    <value>Conv -&gt; Eur</value>
+  </data>
+  <data name="Menu_CloseAll" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_closeall.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Navbar_pays" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_pays.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_ExportXlsx_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_exportxlsx_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblLibArticle" xml:space="preserve">
+    <value>Libellé Article</value>
+  </data>
+  <data name="Titre_FrmRattachement" xml:space="preserve">
+    <value>Fiche Visite</value>
+  </data>
+  <data name="lblCommentaireLivraison" xml:space="preserve">
+    <value>Commentaire Livraison</value>
+  </data>
+  <data name="frmEnvoiMailFacture_NavCaption" xml:space="preserve">
+    <value>Envoi par Email</value>
+  </data>
+  <data name="lblCategorie" xml:space="preserve">
+    <value>Catégorie</value>
+  </data>
+  <data name="lblLibGroupe" xml:space="preserve">
+    <value>Libellé</value>
+  </data>
+  <data name="lblNumeroFax" xml:space="preserve">
+    <value>Numéro Fax</value>
+  </data>
+  <data name="Menu_Down_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_down_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblConfirmPassword" xml:space="preserve">
+    <value>Confirmer votre mot de passe</value>
+  </data>
+  <data name="frmEnvoiMailFacture_MenuCaption" xml:space="preserve">
+    <value>Envoi par Email</value>
+  </data>
+  <data name="Navbar_Format_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_format_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Navbar_impression" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_impression.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblBanque" xml:space="preserve">
+    <value>Banque</value>
+  </data>
+  <data name="Navbar_impression_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_impression_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblCommentaire" xml:space="preserve">
+    <value>Commentaire</value>
+  </data>
+  <data name="lblQuantite" xml:space="preserve">
+    <value>Quantité</value>
+  </data>
+  <data name="frmAbout_MenuCaption" xml:space="preserve">
+    <value>A propos de Courtage Mira</value>
+  </data>
+  <data name="groupControlSaisieLivraisons" xml:space="preserve">
+    <value>Saisie Livraisons</value>
+  </data>
+  <data name="frmModifierMotDePasse_MenuCaption" xml:space="preserve">
+    <value>Changer Mot de passe</value>
+  </data>
+  <data name="lblRetour" xml:space="preserve">
+    <value>Retour</value>
+  </data>
+  <data name="lblModeSuivi" xml:space="preserve">
+    <value>Mode Suivi</value>
+  </data>
+  <data name="lblCreerGroupe" xml:space="preserve">
+    <value>Créer Groupe</value>
+  </data>
+  <data name="Menu_Close_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_close_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frmListeRistournesAvecImputation_NavCaption" xml:space="preserve">
+    <value>Liste des Ristournes Avec Imputation</value>
+  </data>
+  <data name="frmListeReglementsNonImputes_MenuCaption" xml:space="preserve">
+    <value>Liste des Règlements Non Imputés</value>
+  </data>
+  <data name="btnOk" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Navbar_utilisateur_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_utilisateur_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Titre_dialogSelectRole" xml:space="preserve">
+    <value>Ajouter un roles</value>
+  </data>
+  <data name="lblEnlever" xml:space="preserve">
+    <value>Enlever</value>
+  </data>
+  <data name="SousMenuDonneesReferences_MenuCaption" xml:space="preserve">
+    <value>Commentaires</value>
+  </data>
+  <data name="lblPays" xml:space="preserve">
+    <value>Pays</value>
+  </data>
+  <data name="lblCCommentaireQualite" xml:space="preserve">
+    <value>Code Commentaire Qualité</value>
+  </data>
+  <data name="Navbar_DroitAcces_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_droitacces_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblCommentaireQuantite" xml:space="preserve">
+    <value>Commentaire Quantité</value>
+  </data>
+  <data name="lblCDevise" xml:space="preserve">
+    <value>Code</value>
+  </data>
+  <data name="Menu_ExportXls_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_exportxls_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Titre_frmRolesListe" xml:space="preserve">
+    <value>Gestion des Roles</value>
+  </data>
+  <data name="Menu_PrintPreview_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_printpreview_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblModePaiement" xml:space="preserve">
+    <value>Mode de Paiement</value>
+  </data>
+  <data name="lblCompteProduit" xml:space="preserve">
+    <value>Compte Produit</value>
+  </data>
+  <data name="SousMenuEditionFacturation_MenuCaption" xml:space="preserve">
+    <value>Edition</value>
+  </data>
+  <data name="Navbar_EditPassword_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_editpassword_16.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblCCP" xml:space="preserve">
+    <value>CCP</value>
+  </data>
+  <data name="lblRefContratResilie" xml:space="preserve">
+    <value>Réf Contrat Résilié</value>
+  </data>
+  <data name="Navbar_pays_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_pays_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Navbar_modifdesign" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_modifdesign.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblCPostal" xml:space="preserve">
+    <value>Code Postal</value>
+  </data>
+  <data name="Menu_Upload" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_upload.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_Delete_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_delete_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="NomApplication" xml:space="preserve">
+    <value>Le Point - Gestion Intervention</value>
+  </data>
+  <data name="Menu_Print_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_print_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblNumDernierCheque" xml:space="preserve">
+    <value>N° Dernier Chèque</value>
+  </data>
+  <data name="lblModifier" xml:space="preserve">
+    <value>Modifier</value>
+  </data>
+  <data name="Navbar_agence_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_agence_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblTelephone2" xml:space="preserve">
+    <value>Num Tél 2</value>
+  </data>
+  <data name="Navbar_chequeimport_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_chequeimport_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblClient" xml:space="preserve">
+    <value>Client</value>
+  </data>
+  <data name="Titre_FrmChantier" xml:space="preserve">
+    <value>Chantier</value>
+  </data>
+  <data name="Menu_Refresh_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_Refresh_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frmFactureAvoir_MenuCaption" xml:space="preserve">
+    <value>Facture/Avoir</value>
+  </data>
+  <data name="Titre_FrmRattachementl" xml:space="preserve">
+    <value>Visites</value>
+  </data>
+  <data name="Navbar_configuration" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_configuration.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblCAmont" xml:space="preserve">
+    <value>Courtier Amont</value>
+  </data>
+  <data name="Titre_frmUtilisateur" xml:space="preserve">
+    <value>Utilisateur</value>
+  </data>
+  <data name="lblLibCommentaireLogement" xml:space="preserve">
+    <value>Libelle Commentaire de Logement</value>
+  </data>
+  <data name="Menu_Edit" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_edit.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frmEditionListeContratResilie_MenuCaption" xml:space="preserve">
+    <value>Liste des Contrats Résiliés</value>
+  </data>
+  <data name="lblNLivraison" xml:space="preserve">
+    <value>N° Liv.</value>
+  </data>
+  <data name="Menu_Upload_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_upload_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblCCommentaireQuantite" xml:space="preserve">
+    <value>Code Commentaire Quantité</value>
+  </data>
+  <data name="lblAgence" xml:space="preserve">
+    <value>Agence</value>
+  </data>
+  <data name="Menu_Close_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_close_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblAnneeRecolte" xml:space="preserve">
+    <value>Année de Récolte</value>
+  </data>
+  <data name="frmListeRistournesAvecImputation_MenuCaption" xml:space="preserve">
+    <value>Liste des Ristournes Avec Imputation</value>
+  </data>
+  <data name="lblRefBancaire" xml:space="preserve">
+    <value>Réf. Bancaire</value>
+  </data>
+  <data name="Navbar_Format" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_format.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_Add_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_add_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblCommentaireLivraisonCondPart" xml:space="preserve">
+    <value>Commentaire Cond. Part.</value>
+  </data>
+  <data name="Menu_Download_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_download_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="squeeze_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\squeeze_16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_Exit" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_exit.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblNumCompte" xml:space="preserve">
+    <value>N° Compte</value>
+  </data>
+  <data name="Titre_dialogAjouterAutorisation" xml:space="preserve">
+    <value>Ajouter une autorisation</value>
+  </data>
+  <data name="lblNom" xml:space="preserve">
+    <value>Nom</value>
+  </data>
+  <data name="lblInfoArticle" xml:space="preserve">
+    <value>Informations Article</value>
+  </data>
+  <data name="frmDroitAcces_MenuCaption" xml:space="preserve">
+    <value>Gestion des accès</value>
+  </data>
+  <data name="Menu_CreerFormat_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_creerformat_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Navbar_cheque_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_cheque_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="fullscreen" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\fullscreen.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Titre_frmRole" xml:space="preserve">
+    <value>Role</value>
+  </data>
+  <data name="Menu_Add_20" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_add_20.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Navbar_agence" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_agence.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Titre_FrmCircuit" xml:space="preserve">
+    <value>Nouveau Circuit</value>
+  </data>
+  <data name="lblDateMiseAJour" xml:space="preserve">
+    <value>Date Mise à jour</value>
+  </data>
+  <data name="InfoMsg_MAJEnregistrement" xml:space="preserve">
+    <value>Cette enregistrement existe, voulez-vous le mettre à jour ?</value>
+  </data>
+  <data name="Titre_FrmConvention" xml:space="preserve">
+    <value>Convention Client</value>
+  </data>
+  <data name="lblOperationAutorisees" xml:space="preserve">
+    <value>Opération autorisées</value>
+  </data>
+  <data name="lblCAval" xml:space="preserve">
+    <value>Courtier Aval</value>
+  </data>
+  <data name="frmUtilisateurListe_NavCaption" xml:space="preserve">
+    <value>Gestion des Utilisateurs</value>
+  </data>
+  <data name="lblFax" xml:space="preserve">
+    <value>Fax</value>
+  </data>
+  <data name="Menu_Exit_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_exit_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblVille" xml:space="preserve">
+    <value>Ville</value>
+  </data>
+  <data name="Menu_Search_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_search_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblCodePostale" xml:space="preserve">
+    <value>Code postale</value>
+  </data>
+  <data name="lblCCommentaireLivraison" xml:space="preserve">
+    <value>Code Commentaire Livraison</value>
+  </data>
+  <data name="frmSocieteListe_NavCaption" xml:space="preserve">
+    <value>Gestion des Sociétés</value>
+  </data>
+  <data name="Menu_Gear_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_gear_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblLibUniteMesure" xml:space="preserve">
+    <value>Libelle Unite de Mesure</value>
+  </data>
+  <data name="lblTaux" xml:space="preserve">
+    <value>Taux</value>
+  </data>
+  <data name="lblDevise" xml:space="preserve">
+    <value>Devise</value>
+  </data>
+  <data name="Menu_Print_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_print_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Navbar_chequeimport" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_chequeimport.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="CFEvenements" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\CFEvenements.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-16</value>
+  </data>
+  <data name="SousMenuEditionFacturation_NavCaption" xml:space="preserve">
+    <value>Edition</value>
+  </data>
+  <data name="Navbar_etat_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_etat_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblUniteMesure" xml:space="preserve">
+    <value>Unite de Mesure</value>
+  </data>
+  <data name="frmModificationContrat_MenuCaption" xml:space="preserve">
+    <value>Modification des Contrats/Livraisons</value>
+  </data>
+  <data name="lblNbreLivraisons" xml:space="preserve">
+    <value>Nombre de livraisons</value>
+  </data>
+  <data name="MenuAdministration_Caption" xml:space="preserve">
+    <value>Administration</value>
+  </data>
+  <data name="Menu_Accept" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_accept.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frmModePaiementListe_NavCaption" xml:space="preserve">
+    <value>Modes de Paiement</value>
+  </data>
+  <data name="lblAjouter" xml:space="preserve">
+    <value>Ajouter</value>
+  </data>
+  <data name="Error" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\error.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frmSocieteListe_MenuCaption" xml:space="preserve">
+    <value>Gestion des Sociétés</value>
+  </data>
+  <data name="frmGroupeListe_MenuCaption" xml:space="preserve">
+    <value>Gestion des Groupes</value>
+  </data>
+  <data name="lblCodeGroupe" xml:space="preserve">
+    <value>Code</value>
+  </data>
+  <data name="frmRoleListe_NavCaption" xml:space="preserve">
+    <value>Gestion des Roles</value>
+  </data>
+  <data name="lblBtnConfirmerLiv" xml:space="preserve">
+    <value>Confirmer Livraison</value>
+  </data>
+  <data name="Menu_Edit_14" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_edit_14.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblVendeur" xml:space="preserve">
+    <value>Vendeur</value>
+  </data>
+  <data name="frmEditionListeContrat_NavCaption" xml:space="preserve">
+    <value>Liste des Contrats</value>
+  </data>
+  <data name="Menu_Download_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_download_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_About" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_about.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_Search" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_search.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_Down" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_down.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="stretch_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\stretch_16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Titre_FrmBC_OT" xml:space="preserve">
+    <value>Génération OV</value>
+  </data>
+  <data name="Titre_FrmClientListe" xml:space="preserve">
+    <value>Liste Clients</value>
+  </data>
+  <data name="Titre_frmChargesDiversListe" xml:space="preserve">
+    <value>Liste des Charges Divers</value>
+  </data>
+  <data name="Titre_frmAuthentification" xml:space="preserve">
+    <value>Authentification</value>
+  </data>
+  <data name="Menu_Gear_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_gear_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblCArticle" xml:space="preserve">
+    <value>Code Article</value>
+  </data>
+  <data name="Menu_Save_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_save_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblDomiciliationBancaire" xml:space="preserve">
+    <value>Domiciliation Bancaire</value>
+  </data>
+  <data name="lblSaisieCommentaires" xml:space="preserve">
+    <value>Saisie Commentaires</value>
+  </data>
+  <data name="lblIdentifiant" xml:space="preserve">
+    <value>Identifiant</value>
+  </data>
+  <data name="Menu_ExportXls" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_exportxls.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblTelephone" xml:space="preserve">
+    <value>Téléphone</value>
+  </data>
+  <data name="Menu_Up_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_up_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblAddressesEmail" xml:space="preserve">
+    <value>Adresses E-mail</value>
+  </data>
+  <data name="frmModificationContrat_NavCaption" xml:space="preserve">
+    <value>Modification des Contrats/Livraisons</value>
+  </data>
+  <data name="Menu_Print" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_print.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_ExportTxt" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_exporttxt.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_ModifierFormat_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_modifierformat_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblCodePays" xml:space="preserve">
+    <value>Code</value>
+  </data>
+  <data name="lblContact" xml:space="preserve">
+    <value>Contact</value>
+  </data>
+  <data name="lblComplementNom" xml:space="preserve">
+    <value>Complément Nom</value>
+  </data>
+  <data name="lblCodeBanque" xml:space="preserve">
+    <value>Code Banque</value>
+  </data>
+  <data name="Navbar_cheque" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_cheque.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblCreer" xml:space="preserve">
+    <value>Créer</value>
+  </data>
+  <data name="SousMenuDonneesReferences_NavCaption" xml:space="preserve">
+    <value>Commentaires</value>
+  </data>
+  <data name="Menu_Add_14" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_add_14.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblComplementAdresse" xml:space="preserve">
+    <value>Complément Adresse</value>
+  </data>
+  <data name="Menu_Up_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_up_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblRefContratAchVend" xml:space="preserve">
+    <value>Réf Contrat Ach/Vend</value>
+  </data>
+  <data name="frmEtatListe_MenuCaption" xml:space="preserve">
+    <value>Etat</value>
+  </data>
+  <data name="lblCommentairePrix" xml:space="preserve">
+    <value>Commentaire Prix</value>
+  </data>
+  <data name="lblQuantTot" xml:space="preserve">
+    <value>Quantité Totale</value>
+  </data>
+  <data name="lblAutres" xml:space="preserve">
+    <value>Autres</value>
+  </data>
+  <data name="Menu_Edit_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_edit_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblNCompte" xml:space="preserve">
+    <value>Numéro de Compte</value>
+  </data>
+  <data name="lblNTVAIntracommunautaire" xml:space="preserve">
+    <value>Numéro TVA intracommunautaire</value>
+  </data>
+  <data name="lblSoldeComptable" xml:space="preserve">
+    <value>Solde Comptable</value>
+  </data>
+  <data name="Titre_FrmClient" xml:space="preserve">
+    <value>Saisie Client</value>
+  </data>
+  <data name="lblDescription" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="lblNumeroTel1" xml:space="preserve">
+    <value>Numéro Tél 1</value>
+  </data>
+  <data name="lblContrat" xml:space="preserve">
+    <value>Contrat</value>
+  </data>
+  <data name="Navbar_utilisateur" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_utilisateur.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="CstDataConnectionString" xml:space="preserve">
+    <value>Data Source=.\SQL2012;User ID=sa;Password=123;Initial Catalog=cstdata</value>
+  </data>
+  <data name="lblDateLivraison" xml:space="preserve">
+    <value>Date Liv.</value>
+  </data>
+  <data name="Titre_FrmFournisseur" xml:space="preserve">
+    <value>Fournisseur</value>
+  </data>
+  <data name="lblCCommentaireLogement" xml:space="preserve">
+    <value>Commentaire Logement</value>
+  </data>
+  <data name="lblEmail" xml:space="preserve">
+    <value>E-mail</value>
+  </data>
+  <data name="btnAnnuler" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="lblTVAIntro" xml:space="preserve">
+    <value>TVA intr.</value>
+  </data>
+  <data name="lblRolesListe" xml:space="preserve">
+    <value>Liste des roles affectés</value>
+  </data>
+  <data name="Menu_Delete_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_delete_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="InfoMsg_SuppDeviseNonPermis" xml:space="preserve">
+    <value>Cette Devise est associé à des pays, vous ne pouvez pas la supprimer!</value>
+  </data>
+  <data name="lblCodeMP" xml:space="preserve">
+    <value>Code mode de paiement</value>
+  </data>
+  <data name="frmRoleListe_MenuCaption" xml:space="preserve">
+    <value>Gestion des Roles</value>
+  </data>
+  <data name="Navbar_Devise" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_devise.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Titre_dialogModifierAutorisation" xml:space="preserve">
+    <value>Modifier une autorisation</value>
+  </data>
+  <data name="lblNational" xml:space="preserve">
+    <value>National</value>
+  </data>
+  <data name="Navbar_commande" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_commande.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblCodeTVA" xml:space="preserve">
+    <value>Code TVA</value>
+  </data>
+  <data name="Menu_ExportPdf" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_exportpdf.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frmEtatListe_NavCaption" xml:space="preserve">
+    <value>Etat</value>
+  </data>
+  <data name="Menu_Save_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_save_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="prev_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\prev_16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frmEditionListeContrat_MenuCaption" xml:space="preserve">
+    <value>Liste des Contrats</value>
+  </data>
+  <data name="frmUtilisateurListe_MenuCaption" xml:space="preserve">
+    <value>Gestion des Utilisateurs</value>
+  </data>
+  <data name="InfoMsg_SuccesEnregistrement" xml:space="preserve">
+    <value>Enregistrement avec succès</value>
+  </data>
+  <data name="Menu_CloseAll_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_closeall_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_Up" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_up.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="full-screen" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\full-screen.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblUnite" xml:space="preserve">
+    <value>Unité</value>
+  </data>
+  <data name="hand_left" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\hand_left1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Titre_FrmIntervention" xml:space="preserve">
+    <value>Intervention</value>
+  </data>
+  <data name="Navbar_modifdesign_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_modifdesign_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblTauxTVA" xml:space="preserve">
+    <value>Taux TVA</value>
+  </data>
+  <data name="Navbar_banque_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\navbar_banque_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_Edit_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_edit_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_ExportXlsx_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_exportxlsx_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Menu_Delete" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_delete.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TextBtn_Connecter" xml:space="preserve">
+    <value>Se Connecter</value>
+  </data>
+  <data name="frmListeReleveRistournes_MenuCaption" xml:space="preserve">
+    <value>Relevé des Ristournes</value>
+  </data>
+  <data name="About" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\about.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="frmFormatImpression_MenuCaption" xml:space="preserve">
+    <value>Format d'impression</value>
+  </data>
+  <data name="lblAdresseFacturation" xml:space="preserve">
+    <value>Adresse Facuration</value>
+  </data>
+  <data name="lblReleve" xml:space="preserve">
+    <value>Relevé</value>
+  </data>
+  <data name="lblValider" xml:space="preserve">
+    <value>Valider</value>
+  </data>
+  <data name="Menu_ExportPdf_18" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_exportpdf_18.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lblMoyenSuivi" xml:space="preserve">
+    <value>Moyen Suivi</value>
+  </data>
+  <data name="InfoMsg_SuppBanqueNonPermis" xml:space="preserve">
+    <value>Cette banque est associée à des agences, vous ne pouvez pas la supprimer!</value>
+  </data>
+  <data name="Titre_FrmModifOT" xml:space="preserve">
+    <value>Ordre de Visite</value>
+  </data>
+  <data name="lblCodeAgence" xml:space="preserve">
+    <value>Code Agence</value>
+  </data>
+  <data name="lblCGroupe" xml:space="preserve">
+    <value>Code</value>
+  </data>
+  <data name="lblTonInitial" xml:space="preserve">
+    <value>Tonnage Initial</value>
+  </data>
+  <data name="Menu_Exit_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\cfg\images\menu_exit_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="expand" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\expand.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Titre_FrmPointCollecte" xml:space="preserve">
+    <value>Point de Collecte</value>
+  </data>
+  <data name="bus_24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\bus_24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="bus_32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\bus_32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="bus_64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\bus_64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="PC_32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\PC_32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Site_32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Site_32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="bus_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\bus_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="busPin_32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\busPin_32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+</root>

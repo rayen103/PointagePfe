@@ -1,0 +1,191 @@
+<div class="absolute inset-0 min-w-0 overflow-x-hidden overflow-y-auto flex flex-col flex-auto bg-default"  *transloco="let t">
+
+    <mat-drawer-container
+        class="bg-card h-full flex-auto dark:bg-transparent"
+        (backdropClick)="onBackdropClicked()"
+    >
+
+
+        <mat-drawer-content class="flex flex-col px-2 sm:px-6 md:px-8 pb-10 sm:pb-20 bg-default">
+
+            <div class="relative flex flex-row items-center py-8 gap-2" *transloco="let t">
+                <a
+                    class="text-white"
+                    mat-icon-button
+                    [routerLink]="['../']"
+                >
+                    <mat-icon
+                        class="text-hint icon-size-8"
+                        [svgIcon]="'heroicons_outline:arrow-left'"></mat-icon>
+                </a>
+                <!-- Title -->
+                @if(!societe.societeId){
+                    <div class="text-2xl sm:text-4xl font-extrabold tracking-tight">{{ t('New-Company') }}</div>
+                } @else {
+                    <div class="text-2xl sm:text-4xl font-extrabold tracking-tight">{{ t('Edit-Company') }}</div>
+                }
+            </div>
+
+            <!-- Main content -->
+            <div class="flex flex-auto p-6 rounded-2xl bg-white dark:bg-slate-800 shadow-lg">
+
+                <form [formGroup]="societeForm" class="flex flex-col w-full space-y-6">
+
+                    <!-- Image Section -->
+                    <div class="flex flex-col items-center mb-6">
+                        <div
+                            class="relative flex items-center justify-center w-28 h-28 rounded-full border-2 border-dashed border-gray-400 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 overflow-hidden cursor-pointer hover:scale-105 hover:border-primary transition-all duration-300"
+                            matTooltip="Changer le logo"
+                            (click)="societeLogoInput.click()">
+
+                            @if (!societeForm.value?.logoPath && !logoSrc) {
+                                <span class="font-bold text-secondary text-sm">LOGO</span>
+                            } @else if (logoSrc === null && societeForm.value?.logoPath) {
+                                <ng-container *ngIf="('societe/images/'+societeForm.value?.logoPath | securefile | async) as modalPhotoUrl; else noModalPhoto">
+                                    <img alt="" class="absolute w-28 h-28 rounded-full object-cover" [src]="modalPhotoUrl" width="240" height="240">
+                                </ng-container>
+                                <ng-template #noModalPhoto>
+                                    <span class="font-bold text-secondary text-sm">LOGO</span>
+                                </ng-template>
+                            } @else if (logoSrc) {
+                                <img alt="" class="absolute w-28 h-28 rounded-full object-cover" [src]="logoSrc" width="240" height="240">
+                            }
+                        </div>
+                        <input #societeLogoInput class="hidden" type="file" (change)="saveImage($event)" accept=".png, .jpeg, .jpg" />
+                    </div>
+
+                    <!-- Form Fields -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                        <!-- Raison Sociale -->
+                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
+                            <mat-label>{{ t('Company-name') }}</mat-label>
+                            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:building-office-2'" matPrefix></mat-icon>
+                            <input matInput [formControlName]="'nom'" placeholder="Nom de la société">
+                            <mat-error>{{ t('Company-name-is-required!') }}</mat-error>
+                        </mat-form-field>
+
+                        <!-- Matricule Fiscal -->
+                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
+                            <mat-label>{{ t('Tax-Number') }}</mat-label>
+                            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:building-office-2'" matPrefix></mat-icon>
+                            <input matInput [formControlName]="'matriculeFiscal'" placeholder="Matricule fiscal">
+                            <mat-error>{{ t('tax-number-required') }}</mat-error>
+                        </mat-form-field>
+
+                        <!-- RNE -->
+                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
+                            <mat-label>{{ t('RNE') }}</mat-label>
+                            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:building-office-2'" matPrefix></mat-icon>
+                            <input matInput [formControlName]="'rne'" placeholder="Numéro RNE">
+                            <mat-error>{{ t('RNE-required!') }}</mat-error>
+                        </mat-form-field>
+
+                        <!-- Capital -->
+                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
+                            <mat-label>{{ t('Capital') }}</mat-label>
+                            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:building-office-2'" matPrefix></mat-icon>
+                            <input matInput [formControlName]="'capital'" placeholder="Capital social">
+                            <mat-error>{{ t('capital-required') }}</mat-error>
+                        </mat-form-field>
+
+                        <!-- Date Ouverture -->
+                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
+                            <mat-label>{{ t('Opening-Date') }}</mat-label>
+                            <input matInput [matDatepicker]="dateOverture" [formControlName]="'dateOverture'" placeholder="Choisir une date">
+                            <mat-datepicker-toggle matIconSuffix [for]="dateOverture"></mat-datepicker-toggle>
+                            <mat-datepicker #dateOverture></mat-datepicker>
+                            <mat-error>{{ t('Opening-Date-is-required') }}</mat-error>
+                        </mat-form-field>
+
+                        <!-- Téléphone 1 -->
+                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
+                            <mat-label>{{ t('Phone') }} 1</mat-label>
+                            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:phone'" matPrefix></mat-icon>
+                            <input matInput [formControlName]="'telephone1'" placeholder="Téléphone principal">
+                            <mat-error>{{ t('Phone-is-required!') }}</mat-error>
+                        </mat-form-field>
+
+                        <!-- Téléphone 2 -->
+                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
+                            <mat-label>{{ t('Phone') }} 2</mat-label>
+                            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:phone'" matPrefix></mat-icon>
+                            <input matInput [formControlName]="'telephone2'" placeholder="Deuxième téléphone">
+                            <mat-error>{{ t('Phone-is-required!') }}</mat-error>
+                        </mat-form-field>
+
+                        <!-- Fax 1 -->
+                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
+                            <mat-label>{{ t('Fax') }} 1</mat-label>
+                            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:inbox-arrow-down'" matPrefix></mat-icon>
+                            <input matInput [formControlName]="'fax1'" placeholder="Fax principal">
+                            <mat-error>{{ t('Fax-is-required!!') }}</mat-error>
+                        </mat-form-field>
+
+                        <!-- Fax 2 -->
+<!--                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">-->
+<!--                            <mat-label>{{ t('Fax') }} 2</mat-label>-->
+<!--                            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:inbox-arrow-down'" matPrefix></mat-icon>-->
+<!--                            <input matInput [formControlName]="'fax2'" placeholder="Deuxième fax">-->
+<!--                            <mat-error>{{ t('Fax-is-required!!') }}</mat-error>-->
+<!--                        </mat-form-field>-->
+
+                        <!-- Email -->
+                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
+                            <mat-label>{{ t('E-mail') }}</mat-label>
+                            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:envelope'" matPrefix></mat-icon>
+                            <input matInput type="email" [formControlName]="'email'" placeholder="example@email.com">
+                            <mat-error>{{ t('E-mail-is-required!') }}</mat-error>
+                        </mat-form-field>
+
+                        <!-- Adresse -->
+                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
+                            <mat-label>{{ t('Address') }}</mat-label>
+                            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:map-pin'" matPrefix></mat-icon>
+                            <input matInput [formControlName]="'adresse'" placeholder="Adresse complète">
+                        </mat-form-field>
+
+                        <!-- CodeSociete -->
+<!--                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">-->
+<!--                            <mat-label>{{ t('Company-Code') }}</mat-label>-->
+<!--                            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:map-pin'" matPrefix></mat-icon>-->
+<!--                            <input matInput [formControlName]="'codeSociete'" placeholder="Code Societe complète">-->
+<!--                        </mat-form-field>-->
+
+                    </div>
+
+                    <!-- Submit button section -->
+                    <div class="flex flex-col sm:flex-row items-center justify-end gap-4">
+                        @if (flashMessage){
+                            <div class="flex items-center">
+                                @if (flashMessage === 'success'){
+                                    <div class="flex py-2 px-4 bg-green-100 rounded-lg items-center gap-2">
+                                        <mat-icon class="text-green-700" [svgIcon]="'heroicons_outline:check'"></mat-icon>
+                                        <span class="text-green-700 font-bold">Société enregistrée avec succès.</span>
+                                    </div>
+                                }
+                                @if (flashMessage === 'error'){
+                                    <div class="flex py-2 px-4 bg-red-100 rounded-lg items-center gap-2">
+                                        <mat-icon class="text-red-700" [svgIcon]="'feather:x-circle'"></mat-icon>
+                                        <span class="text-red-700 font-bold">Une erreur est survenue, réessayez !</span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        <button
+                            mat-flat-button
+                            color="primary"
+                            class="rounded-xl px-6 py-3 shadow-md hover:shadow-lg transition-all"
+                            (click)="saveSociete()">
+                            <mat-icon [svgIcon]="'feather:save'"></mat-icon>
+                            <span class="ml-2 font-semibold">Enregistrer</span>
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+        </mat-drawer-content>
+    </mat-drawer-container>
+
+</div>

@@ -1,0 +1,222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BC01CE93-78F6-4F5F-A750-925BDBDA549E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CST.LePoint.CtrlLibrary</RootNamespace>
+    <AssemblyName>CST.LePoint.CtrlLibrary</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="CrystalDecisions.CrystalReports.Engine, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
+    <Reference Include="CrystalDecisions.ReportSource, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
+    <Reference Include="CrystalDecisions.Shared, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
+    <Reference Include="CrystalDecisions.Windows.Forms, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Data.v14.1, Version=14.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.PivotGrid.v14.1.Core, Version=14.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Printing.v14.1.Core, Version=14.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Office.v14.1.Core, Version=14.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.RichEdit.v14.1.Core, Version=14.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.Utils.v14.1, Version=14.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraBars.v14.1, Version=14.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraEditors.v14.1, Version=14.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraGrid.v14.1, Version=14.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraLayout.v14.1, Version=14.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraNavBar.v14.1, Version=14.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraPivotGrid.v14.1, Version=14.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraPrinting.v14.1, Version=14.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraTreeList.v14.1, Version=14.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="FlashControlV71, Version=1.0.3187.32366, Culture=neutral, PublicKeyToken=692fbea5521e1304" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CtrlHelperGrid.cs" />
+    <Compile Include="CtrlHelperRpt.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="DevExpressEx\FrmXRViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DevExpressEx\FrmXRViewer.designer.cs">
+      <DependentUpon>FrmXRViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DevExpressEx\RemplisseurNavBar.cs" />
+    <Compile Include="Formula.cs" />
+    <Compile Include="LookAndFeelSettings.cs" />
+    <Compile Include="DevExpressEx\CustomLookupEdit.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DevExpressEx\DateEditEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DevExpressEx\DXReport.cs" />
+    <Compile Include="DevExpressEx\GridControlEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DevExpressEx\GridControlUtils.cs" />
+    <Compile Include="DevExpressEx\MonnaisFormat.cs" />
+    <Compile Include="DevExpressEx\RemplisseurBar.cs" />
+    <Compile Include="DevExpressEx\ValidationUtils.cs" />
+    <Compile Include="GvColumnPropriete.cs" />
+    <Compile Include="NombreTouteLettre.cs" />
+    <Compile Include="Outils\ImageViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Outils\ImageViewer.Designer.cs">
+      <DependentUpon>ImageViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PrintRibbonControllerResources1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PrintRibbonControllerResources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Acces\FrmLogin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Acces\FrmLogin.Designer.cs">
+      <DependentUpon>FrmLogin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CrystalReport\FrmCRViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CrystalReport\FrmCRViewer.Designer.cs">
+      <DependentUpon>FrmCRViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CrystalReport\CRDocument.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Satellites\FrmSatellites.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Satellites\FrmSatellites.designer.cs">
+      <DependentUpon>FrmSatellites.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Satellites\RefSatellite.cs" />
+    <Compile Include="Search\FrmRecherche.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Search\FrmRecherche.Designer.cs">
+      <DependentUpon>FrmRecherche.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Search\HelperRecherche.cs" />
+    <Compile Include="CtrlHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DevExpressEx\FrmXRViewer.resx">
+      <DependentUpon>FrmXRViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Outils\ImageViewer.resx">
+      <DependentUpon>ImageViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PrintRibbonControllerResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>PrintRibbonControllerResources1.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\licenses.licx" />
+    <EmbeddedResource Include="Acces\FrmLogin.resx">
+      <DependentUpon>FrmLogin.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CrystalReport\FrmCRViewer.resx">
+      <DependentUpon>FrmCRViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Satellites\FrmSatellites.resx">
+      <DependentUpon>FrmSatellites.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Search\FrmRecherche.resx">
+      <DependentUpon>FrmRecherche.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CST.LePoint.Referentiel\CST.LePoint.Referentiel.csproj">
+      <Project>{49a25ff5-108d-4545-a637-f3fdb0d31699}</Project>
+      <Name>CST.LePoint.Referentiel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CST.LePoint.Securite\CST.LePoint.Securite.csproj">
+      <Project>{e140ed8b-329f-49ee-a023-57df22035cd1}</Project>
+      <Name>CST.LePoint.Securite</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CST.LePoint.Stock.Metier\CST.LePoint.Stock.Metier.csproj">
+      <Project>{176ad56b-7abb-4591-9963-b7bde090e974}</Project>
+      <Name>CST.LePoint.Stock.Metier</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CST.LePoint.Stock.Referentiel\CST.LePoint.Stock.Referentiel.csproj">
+      <Project>{05b1a67d-60ef-41d0-b684-41b6be592b88}</Project>
+      <Name>CST.LePoint.Stock.Referentiel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CST.LePoint.Tiers.Metier\CST.LePoint.Tiers.Metier.csproj">
+      <Project>{151975b3-3ed3-4378-87e8-35922e1e4608}</Project>
+      <Name>CST.LePoint.Tiers.Metier</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CST.LePoint.Tiers.Referentiel\CST.LePoint.Tiers.Referentiel.csproj">
+      <Project>{48b9b5bf-3d10-427b-ae9c-82d0c1932ee8}</Project>
+      <Name>CST.LePoint.Tiers.Referentiel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CST.LePoint.Tools\CST.LePoint.Tools.csproj">
+      <Project>{b0c1dd35-77c2-43cd-a498-aa9ca4ef1ee4}</Project>
+      <Name>CST.LePoint.Tools</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Acces\loginacces.png" />
+    <None Include="Resources\loginacces.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
