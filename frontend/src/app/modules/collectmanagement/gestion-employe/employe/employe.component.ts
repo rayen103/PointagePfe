@@ -81,6 +81,7 @@ export class EmployeComponent implements OnInit, OnDestroy {
     roleNavigation: RoleNavigation;
     societe: Societe[] = [];
     filteredSocietes$: Observable<Societe[]>;
+    isViewMode: boolean = false; // To distinguish view mode from edit mode
 
 
     constructor(
@@ -211,7 +212,7 @@ export class EmployeComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Toggle Employe details
+     * Toggle Employe details (read-only view)
      *
      * @param employeId
      */
@@ -233,6 +234,40 @@ export class EmployeComponent implements OnInit, OnDestroy {
                 // Fill the form
                 this.selectedEmployeForm.patchValue(employe);
 
+                // Set to view mode
+                this.isViewMode = true;
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+    }
+
+    /**
+     * Edit Employe - opens details in edit mode
+     *
+     * @param employeId
+     */
+    editEmploye(employeId: string): void {
+        // If the employee is already selected in edit mode...
+        if (this.selectedEmploye && this.selectedEmploye.employeId === employeId && !this.isViewMode) {
+            // Close the details
+            this.closeDetails();
+            return;
+        }
+
+        // Get the employe by id
+        this._employeService.GetEmployeById(employeId)
+            .subscribe((employe) => {
+
+                // Set the selected employe
+                this.selectedEmploye = employe;
+
+                // Fill the form
+                this.selectedEmployeForm.patchValue(employe);
+
+                // Set to edit mode
+                this.isViewMode = false;
+
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
@@ -243,6 +278,7 @@ export class EmployeComponent implements OnInit, OnDestroy {
      */
     closeDetails(): void {
         this.selectedEmploye = null;
+        this.isViewMode = false;
         // Mark for check
         this._changeDetectorRef.markForCheck();
     }
