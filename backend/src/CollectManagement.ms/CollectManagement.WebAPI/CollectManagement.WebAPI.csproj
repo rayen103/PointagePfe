@@ -30,6 +30,7 @@
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Exec Command="chmod +x node_modules/.bin/tailwindcss 2>/dev/null || true" Condition="'$(OS)' != 'Windows_NT'" />
         <Exec Command="npm run build:css" />
     </Target>
 

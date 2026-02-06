@@ -109,6 +109,9 @@ export const appRoutes: Route[] = [
                     {path:'role-utilisateur',
                         data:{navigationId:'fichier.role-utilisateur'} ,
                         loadChildren:() => import('app/modules/collectmanagement/gestion-utilisateur/role-utilisateur/role-utilisateur.routes')},
+                    {path:'employe',
+                        data:{navigationId:'fichier.employe'} ,
+                        loadChildren:() => import('app/modules/collectmanagement/gestion-employe/employe/employe.routes')},
                 ]},
 
 
