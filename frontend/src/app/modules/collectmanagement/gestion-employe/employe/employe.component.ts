@@ -234,11 +234,8 @@ export class EmployeComponent implements OnInit, OnDestroy {
                 this.selectedEmploye = employe;
                 this.isViewMode = true; // View mode
 
-                // Fill the form
+                // Fill the form (for when switching to edit mode)
                 this.selectedEmployeForm.patchValue(employe);
-                
-                // Disable all form controls in view mode
-                this.selectedEmployeForm.disable();
 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
