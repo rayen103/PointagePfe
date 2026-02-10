@@ -81,6 +81,7 @@ export class EmployeComponent implements OnInit, OnDestroy {
     roleNavigation: RoleNavigation;
     societe: Societe[] = [];
     filteredSocietes$: Observable<Societe[]>;
+    isViewMode: boolean = false; // To distinguish between view and edit mode
 
 
     constructor(
@@ -211,12 +212,12 @@ export class EmployeComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Toggle Employe details
+     * Toggle Employe details (view mode - read-only)
      *
      * @param employeId
      */
     toggleDetails(employeId: string): void {
-        // If the product is already selected...
+        // If the employe is already selected...
         if (this.selectedEmploye && this.selectedEmploye.employeId === employeId) {
             // Close the details
             this.closeDetails();
@@ -229,6 +230,36 @@ export class EmployeComponent implements OnInit, OnDestroy {
 
                 // Set the selected employe
                 this.selectedEmploye = employe;
+                this.isViewMode = true; // View mode
+
+                // Fill the form
+                this.selectedEmployeForm.patchValue(employe);
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+    }
+
+    /**
+     * Edit Employe - opens details in edit mode
+     *
+     * @param employeId
+     */
+    editEmploye(employeId: string): void {
+        // If the employe is already selected in edit mode...
+        if (this.selectedEmploye && this.selectedEmploye.employeId === employeId && !this.isViewMode) {
+            // Close the details
+            this.closeDetails();
+            return;
+        }
+
+        // Get the employe by id
+        this._employeService.GetEmployeById(employeId)
+            .subscribe((employe) => {
+
+                // Set the selected employe
+                this.selectedEmploye = employe;
+                this.isViewMode = false; // Edit mode
 
                 // Fill the form
                 this.selectedEmployeForm.patchValue(employe);
@@ -243,6 +274,7 @@ export class EmployeComponent implements OnInit, OnDestroy {
      */
     closeDetails(): void {
         this.selectedEmploye = null;
+        this.isViewMode = false;
         // Mark for check
         this._changeDetectorRef.markForCheck();
     }

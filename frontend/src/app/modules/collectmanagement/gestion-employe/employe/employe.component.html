@@ -80,13 +80,41 @@
 
                                 <!-- Details & delete button -->
                                 <div class="flex items-center justify-end gap-2">
-                                    <button class="leading-6" mat-icon-button (click)="$event.stopPropagation(); toggleDetails(employe.employeId)">
-                                        <mat-icon class="text-hint" [svgIcon]="selectedEmploye?.employeId === employe.employeId ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'" ></mat-icon>
+                                    <!-- View button -->
+                                    <button
+                                        mat-icon-button
+                                        (click)="$event.stopPropagation(); toggleDetails(employe.employeId)"
+                                        class="!w-6 !h-6 sm:!w-8 sm:!h-8">
+                                        <mat-icon
+                                            class="text-hint text-xs sm:text-sm lg:text-base"
+                                            [svgIcon]="selectedEmploye?.employeId === employe.employeId ? 'heroicons_solid:chevron-up' : 'remove_red_eye'">
+                                        </mat-icon>
                                     </button>
 
+                                    <!-- Edit button -->
+                                    @if(hasActionPermission(FuseNavigationAction.Edit)){
+                                        <button
+                                            mat-icon-button
+                                            (click)="$event.stopPropagation(); editEmploye(employe.employeId)"
+                                            class="!w-6 !h-6 sm:!w-8 sm:!h-8">
+                                            <mat-icon
+                                                class="text-hint text-xs sm:text-sm lg:text-base"
+                                                [svgIcon]="'edit_road'">
+                                            </mat-icon>
+                                        </button>
+                                    }
+
+                                    <!-- Delete button -->
                                     @if(hasActionPermission(FuseNavigationAction.Delete)){
-                                        <button class="ml-4 leading-6" mat-icon-button [color]="'warn'" (click)="$event.stopPropagation(); deleteSelectedEmploye(employe)">
-                                            <mat-icon class="text-hint" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                                        <button
+                                            mat-icon-button
+                                            [color]="'warn'"
+                                            (click)="$event.stopPropagation(); deleteSelectedEmploye(employe)"
+                                            class="!w-6 !h-6 sm:!w-8 sm:!h-8">
+                                            <mat-icon
+                                                class="text-hint text-xs sm:text-sm lg:text-base"
+                                                [svgIcon]="'heroicons_outline:trash'">
+                                            </mat-icon>
                                         </button>
                                     }
                                 </div>
@@ -118,17 +146,17 @@
                                     <!-- Matricule -->
                                     <mat-form-field class="w-1/3 fuse-mat-dense">
                                         <mat-label>{{ t('ID-Number') }}</mat-label>
-                                        <input matInput [formControlName]="'matricule'">
+                                        <input matInput [formControlName]="'matricule'" [readonly]="isViewMode">
                                     </mat-form-field>
 
                                     <mat-form-field class="w-1/3 fuse-mat-dense">
                                         <mat-label>{{ t('RFID') }}</mat-label>
-                                        <input matInput [formControlName]="'rfid'">
+                                        <input matInput [formControlName]="'rfid'" [readonly]="isViewMode">
                                     </mat-form-field>
 
                                     <mat-form-field class="w-1/3 fuse-mat-dense">
                                         <mat-label>{{ t('Name') }}</mat-label>
-                                        <input matInput [formControlName]="'nom'">
+                                        <input matInput [formControlName]="'nom'" [readonly]="isViewMode">
                                     </mat-form-field>
 
                                 </div>
@@ -137,17 +165,17 @@
 
                                     <mat-form-field class="w-1/3 fuse-mat-dense">
                                         <mat-label>{{ t('First-Name') }}</mat-label>
-                                        <input matInput [formControlName]="'prenom'">
+                                        <input matInput [formControlName]="'prenom'" [readonly]="isViewMode">
                                     </mat-form-field>
 
                                     <mat-form-field class="w-1/3 fuse-mat-dense">
                                         <mat-label>{{ t('Circuit') }}</mat-label>
-                                        <input matInput [formControlName]="'codeCircuit'">
+                                        <input matInput [formControlName]="'codeCircuit'" [readonly]="isViewMode">
                                     </mat-form-field>
 
                                     <mat-form-field class="w-1/3 fuse-mat-dense">
                                         <mat-label>{{ t('Collection-Point') }}</mat-label>
-                                        <input matInput [formControlName]="'codePointCollecte'">
+                                        <input matInput [formControlName]="'codePointCollecte'" [readonly]="isViewMode">
                                     </mat-form-field>
 
                                 </div>
@@ -156,17 +184,17 @@
 
                                     <mat-form-field class="w-1/3 fuse-mat-dense">
                                         <mat-label>{{ t('Shift') }}</mat-label>
-                                        <input matInput [formControlName]="'codeShift'">
+                                        <input matInput [formControlName]="'codeShift'" [readonly]="isViewMode">
                                     </mat-form-field>
 
                                     <mat-form-field class="w-1/3 fuse-mat-dense">
                                         <mat-label>{{ t('Address') }}</mat-label>
-                                        <input matInput [formControlName]="'adresse'">
+                                        <input matInput [formControlName]="'adresse'" [readonly]="isViewMode">
                                     </mat-form-field>
 
                                     <mat-form-field class="w-1/3 fuse-mat-dense">
                                         <mat-label>{{ t('Governorate') }}</mat-label>
-                                        <input matInput [formControlName]="'codeGouvernorat'">
+                                        <input matInput [formControlName]="'codeGouvernorat'" [readonly]="isViewMode">
                                     </mat-form-field>
 
                                 </div>
@@ -175,7 +203,7 @@
 
                                     <mat-form-field class="w-1/3 fuse-mat-dense">
                                         <mat-label>{{ t('Region') }}</mat-label>
-                                        <input matInput [formControlName]="'codeRegion'">
+                                        <input matInput [formControlName]="'codeRegion'" [readonly]="isViewMode">
                                     </mat-form-field>
 
                                     <mat-form-field class="w-1/3 fuse-mat-dense">
@@ -186,6 +214,7 @@
                                             [formControlName]="'societeId'"
                                             [matAutocomplete]="autoSociete"
                                             placeholder="Rechercher une société..."
+                                            [readonly]="isViewMode"
                                         />
 
                                         <mat-autocomplete
@@ -203,8 +232,8 @@
 
                             </div>
 
-                            @if( (hasActionPermission(FuseNavigationAction.Edit) && employe.employeId !== 'new') ||
-                            (hasActionPermission(FuseNavigationAction.Add) && employe.employeId === 'new')){
+                            @if( !isViewMode && ((hasActionPermission(FuseNavigationAction.Edit) && employe.employeId !== 'new') ||
+                            (hasActionPermission(FuseNavigationAction.Add) && employe.employeId === 'new'))){
                                 <div class="flex justify-end w-full border-t gap-4 px-8 py-4">
 
                                     @if (selectedEmployeForm.invalid) {
