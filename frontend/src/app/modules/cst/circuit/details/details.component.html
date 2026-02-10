@@ -1,0 +1,135 @@
+<div class="absolute inset-0 flex flex-col min-w-0 overflow-hidden" *transloco="let t">
+
+    <!-- Header -->
+    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+        <!-- Title -->
+        <div class="text-4xl font-extrabold tracking-tight">
+            {{isNewCircuit ? t('Add-Circuit') : t('Edit-Circuit')}}
+        </div>
+        <!-- Actions -->
+        <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+            <!-- Back button -->
+            <button
+                class="ml-4"
+                mat-flat-button
+                (click)="onBackdropClicked()">
+                <mat-icon [svgIcon]="'heroicons_outline:arrow-left'"></mat-icon>
+                <span class="ml-2">{{ t('Back') }}</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="flex flex-auto overflow-y-auto">
+        <div class="flex flex-col flex-auto p-6 md:p-8">
+
+            <!-- Flash message -->
+            @if(flashMessage){
+                <div class="mb-6" *transloco="let t">
+                    @if(flashMessage === 'success'){
+                        <div class="p-4 bg-green-100 dark:bg-green-800 rounded text-green-800 dark:text-green-100">
+                            {{t('Success-message')}}
+                        </div>
+                    }
+                    @if(flashMessage === 'error'){
+                        <div class="p-4 bg-red-100 dark:bg-red-800 rounded text-red-800 dark:text-red-100">
+                            {{t('Error-message')}}
+                        </div>
+                    }
+                </div>
+            }
+
+            <!-- Form -->
+            <form
+                class="flex flex-col"
+                [formGroup]="circuitForm"
+                #circuitFormDirective="ngForm">
+
+                <mat-card class="p-6">
+                    <mat-card-content>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+                            <!-- Code Circuit -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Circuit-Code') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:identification'"></mat-icon>
+                                <input
+                                    matInput
+                                    formControlName="codeCircuit"
+                                    [placeholder]="t('Enter-circuit-code')">
+                                @if(circuitForm.get('codeCircuit').hasError('required')){
+                                    <mat-error>{{ t('Code-required') }}</mat-error>
+                                }
+                            </mat-form-field>
+
+                            <!-- Libelle Circuit -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Circuit-Label') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:tag'"></mat-icon>
+                                <input
+                                    matInput
+                                    formControlName="libelleCircuit"
+                                    [placeholder]="t('Enter-circuit-label')">
+                            </mat-form-field>
+
+                            <!-- Description -->
+                            <mat-form-field class="w-full sm:col-span-2">
+                                <mat-label>{{ t('Description') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:document-text'"></mat-icon>
+                                <textarea
+                                    matInput
+                                    formControlName="description"
+                                    [placeholder]="t('Enter-description')"
+                                    rows="4"></textarea>
+                            </mat-form-field>
+
+                            <!-- Societe ID (hidden for now, should be populated from context) -->
+                            <input type="hidden" formControlName="societeId" value="00000000-0000-0000-0000-000000000000">
+
+                            <!-- Is Active -->
+                            <div class="flex items-center">
+                                <mat-slide-toggle
+                                    formControlName="isActive"
+                                    [color]="'primary'">
+                                    {{ t('Active') }}
+                                </mat-slide-toggle>
+                            </div>
+
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+
+                <!-- Actions -->
+                <div class="flex items-center justify-end mt-6 gap-4">
+                    <button
+                        mat-button
+                        type="button"
+                        (click)="onBackdropClicked()">
+                        {{ t('Cancel') }}
+                    </button>
+                    <button
+                        mat-flat-button
+                        type="button"
+                        [color]="'primary'"
+                        [disabled]="circuitForm.invalid"
+                        (click)="saveCircuit()">
+                        <mat-icon [svgIcon]="'heroicons_outline:check'"></mat-icon>
+                        <span class="ml-2">{{ t('Save') }}</span>
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
