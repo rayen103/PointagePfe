@@ -1,22 +1,22 @@
 .employe-grid {
-    grid-template-columns: 20% 20% 15% 15% 15% 15%;
+    grid-template-columns: 15% 18% 15% 13% 13% 26%;
 
     @screen sm {
-        grid-template-columns: 20% 20% 15% 15% 15% 15%;
+        grid-template-columns: 15% 18% 15% 13% 13% 26%;
     }
 
     @screen md {
-        grid-template-columns: 20% 20% 15% 15% 15% 15%;
+        grid-template-columns: 15% 18% 15% 13% 13% 26%;
     }
 
     @screen lg {
-        grid-template-columns: 20% 20% 15% 15% 15% 15%;
+        grid-template-columns: 15% 18% 15% 13% 13% 26%;
     }
 }
 
 @media (max-width: 600px) {
     .employe-grid {
-        grid-template-columns: 20% 20% 15% 15% 15% 15%;
+        grid-template-columns: 15% 18% 15% 13% 13% 26%;
     }
 
     .button-container1 {

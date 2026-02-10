@@ -53,7 +53,7 @@
                             <div [mat-sort-header]="'prenom'">{{ t('First-Name') }}</div>
                             <div>{{ t('RFID') }}</div>
                             <div>{{ t('Circuit') }}</div>
-                            <div></div>
+                            <div class="text-center">{{ t('Actions') }}</div>
                         </div>
                         <!-- Rows -->
                         @for ( employe of employes;track trackByFn($index,employe)){
@@ -146,17 +146,17 @@
                                     <!-- Matricule -->
                                     <mat-form-field class="w-1/3 fuse-mat-dense">
                                         <mat-label>{{ t('ID-Number') }}</mat-label>
-                                        <input matInput [formControlName]="'matricule'" [readonly]="isViewMode">
+                                        <input matInput [formControlName]="'matricule'" [readonly]="isViewMode" [disabled]="isViewMode">
                                     </mat-form-field>
 
                                     <mat-form-field class="w-1/3 fuse-mat-dense">
                                         <mat-label>{{ t('RFID') }}</mat-label>
-                                        <input matInput [formControlName]="'rfid'" [readonly]="isViewMode">
+                                        <input matInput [formControlName]="'rfid'" [readonly]="isViewMode" [disabled]="isViewMode">
                                     </mat-form-field>
 
                                     <mat-form-field class="w-1/3 fuse-mat-dense">
                                         <mat-label>{{ t('Name') }}</mat-label>
-                                        <input matInput [formControlName]="'nom'" [readonly]="isViewMode">
+                                        <input matInput [formControlName]="'nom'" [readonly]="isViewMode" [disabled]="isViewMode">
                                     </mat-form-field>
 
                                 </div>
@@ -165,17 +165,17 @@
 
                                     <mat-form-field class="w-1/3 fuse-mat-dense">
                                         <mat-label>{{ t('First-Name') }}</mat-label>
-                                        <input matInput [formControlName]="'prenom'" [readonly]="isViewMode">
+                                        <input matInput [formControlName]="'prenom'" [readonly]="isViewMode" [disabled]="isViewMode">
                                     </mat-form-field>
 
                                     <mat-form-field class="w-1/3 fuse-mat-dense">
                                         <mat-label>{{ t('Circuit') }}</mat-label>
-                                        <input matInput [formControlName]="'codeCircuit'" [readonly]="isViewMode">
+                                        <input matInput [formControlName]="'codeCircuit'" [readonly]="isViewMode" [disabled]="isViewMode">
                                     </mat-form-field>
 
                                     <mat-form-field class="w-1/3 fuse-mat-dense">
                                         <mat-label>{{ t('Collection-Point') }}</mat-label>
-                                        <input matInput [formControlName]="'codePointCollecte'" [readonly]="isViewMode">
+                                        <input matInput [formControlName]="'codePointCollecte'" [readonly]="isViewMode" [disabled]="isViewMode">
                                     </mat-form-field>
 
                                 </div>
@@ -184,17 +184,17 @@
 
                                     <mat-form-field class="w-1/3 fuse-mat-dense">
                                         <mat-label>{{ t('Shift') }}</mat-label>
-                                        <input matInput [formControlName]="'codeShift'" [readonly]="isViewMode">
+                                        <input matInput [formControlName]="'codeShift'" [readonly]="isViewMode" [disabled]="isViewMode">
                                     </mat-form-field>
 
                                     <mat-form-field class="w-1/3 fuse-mat-dense">
                                         <mat-label>{{ t('Address') }}</mat-label>
-                                        <input matInput [formControlName]="'adresse'" [readonly]="isViewMode">
+                                        <input matInput [formControlName]="'adresse'" [readonly]="isViewMode" [disabled]="isViewMode">
                                     </mat-form-field>
 
                                     <mat-form-field class="w-1/3 fuse-mat-dense">
                                         <mat-label>{{ t('Governorate') }}</mat-label>
-                                        <input matInput [formControlName]="'codeGouvernorat'" [readonly]="isViewMode">
+                                        <input matInput [formControlName]="'codeGouvernorat'" [readonly]="isViewMode" [disabled]="isViewMode">
                                     </mat-form-field>
 
                                 </div>
@@ -203,7 +203,7 @@
 
                                     <mat-form-field class="w-1/3 fuse-mat-dense">
                                         <mat-label>{{ t('Region') }}</mat-label>
-                                        <input matInput [formControlName]="'codeRegion'" [readonly]="isViewMode">
+                                        <input matInput [formControlName]="'codeRegion'" [readonly]="isViewMode" [disabled]="isViewMode">
                                     </mat-form-field>
 
                                     <mat-form-field class="w-1/3 fuse-mat-dense">
@@ -215,6 +215,7 @@
                                             [matAutocomplete]="autoSociete"
                                             placeholder="Rechercher une société..."
                                             [readonly]="isViewMode"
+                                            [disabled]="isViewMode"
                                         />
 
                                         <mat-autocomplete

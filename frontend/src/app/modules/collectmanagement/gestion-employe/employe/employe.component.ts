@@ -206,7 +206,9 @@ export class EmployeComponent implements OnInit, OnDestroy {
 
         this._employeService.CreateNewEmploye().subscribe((newEmploye) => {
             this.selectedEmploye = newEmploye;
+            this.isViewMode = false; // Edit mode for new employee
             this.selectedEmployeForm.patchValue(newEmploye);
+            this.selectedEmployeForm.enable(); // Enable form for new employee
             this._changeDetectorRef.markForCheck();
         });
     }
@@ -234,6 +236,9 @@ export class EmployeComponent implements OnInit, OnDestroy {
 
                 // Fill the form
                 this.selectedEmployeForm.patchValue(employe);
+                
+                // Disable all form controls in view mode
+                this.selectedEmployeForm.disable();
 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -263,6 +268,9 @@ export class EmployeComponent implements OnInit, OnDestroy {
 
                 // Fill the form
                 this.selectedEmployeForm.patchValue(employe);
+                
+                // Enable all form controls in edit mode
+                this.selectedEmployeForm.enable();
 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
