@@ -81,6 +81,7 @@ export class EmployeComponent implements OnInit, OnDestroy {
     roleNavigation: RoleNavigation;
     societe: Societe[] = [];
     filteredSocietes$: Observable<Societe[]>;
+    isViewMode: boolean = false; // To distinguish between view and edit mode
 
 
     constructor(
@@ -205,18 +206,20 @@ export class EmployeComponent implements OnInit, OnDestroy {
 
         this._employeService.CreateNewEmploye().subscribe((newEmploye) => {
             this.selectedEmploye = newEmploye;
+            this.isViewMode = false; // Edit mode for new employee
             this.selectedEmployeForm.patchValue(newEmploye);
+            this.selectedEmployeForm.enable(); // Enable form for new employee
             this._changeDetectorRef.markForCheck();
         });
     }
 
     /**
-     * Toggle Employe details
+     * Toggle Employe details (view mode - read-only)
      *
      * @param employeId
      */
     toggleDetails(employeId: string): void {
-        // If the product is already selected...
+        // If the employe is already selected...
         if (this.selectedEmploye && this.selectedEmploye.employeId === employeId) {
             // Close the details
             this.closeDetails();
@@ -229,9 +232,42 @@ export class EmployeComponent implements OnInit, OnDestroy {
 
                 // Set the selected employe
                 this.selectedEmploye = employe;
+                this.isViewMode = true; // View mode
+
+                // Fill the form (for when switching to edit mode)
+                this.selectedEmployeForm.patchValue(employe);
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+    }
+
+    /**
+     * Edit Employe - opens details in edit mode
+     *
+     * @param employeId
+     */
+    editEmploye(employeId: string): void {
+        // If the employe is already selected in edit mode...
+        if (this.selectedEmploye && this.selectedEmploye.employeId === employeId && !this.isViewMode) {
+            // Close the details
+            this.closeDetails();
+            return;
+        }
+
+        // Get the employe by id
+        this._employeService.GetEmployeById(employeId)
+            .subscribe((employe) => {
+
+                // Set the selected employe
+                this.selectedEmploye = employe;
+                this.isViewMode = false; // Edit mode
 
                 // Fill the form
                 this.selectedEmployeForm.patchValue(employe);
+                
+                // Enable all form controls in edit mode
+                this.selectedEmployeForm.enable();
 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -243,8 +279,33 @@ export class EmployeComponent implements OnInit, OnDestroy {
      */
     closeDetails(): void {
         this.selectedEmploye = null;
+        this.isViewMode = false;
         // Mark for check
         this._changeDetectorRef.markForCheck();
+    }
+
+    /**
+     * Handle view button click - prevents event propagation
+     */
+    onViewClick(event: Event, employeId: string): void {
+        event.stopPropagation();
+        this.toggleDetails(employeId);
+    }
+
+    /**
+     * Handle edit button click - prevents event propagation
+     */
+    onEditClick(event: Event, employeId: string): void {
+        event.stopPropagation();
+        this.editEmploye(employeId);
+    }
+
+    /**
+     * Handle delete button click - prevents event propagation
+     */
+    onDeleteClick(event: Event, employe: Employe): void {
+        event.stopPropagation();
+        this.deleteSelectedEmploye(employe);
     }
 
     /**
