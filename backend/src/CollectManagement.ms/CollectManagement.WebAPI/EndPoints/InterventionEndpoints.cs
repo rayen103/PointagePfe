@@ -65,12 +65,12 @@ public class InterventionEndpoints : ICarterModule
     }
 
     private static async Task<IResult> DeleteIntervention(
-        [FromQuery] [Required] Ulid interventionId,
+        [FromRoute] [Required] Ulid id,
         ISender sender,
         CancellationToken cancellationToken)
     {
         await sender
-            .Send(new DeleteInterventionCommand(interventionId.ToString()), cancellationToken)
+            .Send(new DeleteInterventionCommand(id.ToString()), cancellationToken)
             .ConfigureAwait(false);
 
         return Results.Ok(new ApiResponse<bool>(true));

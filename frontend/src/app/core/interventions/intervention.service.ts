@@ -12,7 +12,7 @@ export class InterventionService {
     private _intervention: BehaviorSubject<Intervention | null> = new BehaviorSubject(null);
     private _interventionsLength: BehaviorSubject<number | null> = new BehaviorSubject(0);
 
-    constructor(private _apiservice: ApiService) {}
+    constructor(private _apiService: ApiService) {}
 
     get interventions$(): Observable<Intervention[]> {
         return this._interventions.asObservable();
@@ -33,7 +33,7 @@ export class InterventionService {
                search: string = '')
         : Observable<PagedIntervention>
     {
-        return this._apiservice.Get<PagedIntervention>("intervention/list",
+        return this._apiService.Get<PagedIntervention>("intervention/list",
             {
                 params: { search: search || '', sort, order, page, size}
             })
@@ -49,7 +49,7 @@ export class InterventionService {
     CreateNewIntervention(): Observable<Intervention> {
         const newIntervention: Intervention = {
             interventionId: 'new',
-            numeroIntervention: null,
+            numeroIntervention: '',
             description: null,
             dateIntervention: new Date().toISOString(),
             typeIntervention: null,
@@ -61,21 +61,21 @@ export class InterventionService {
     }
 
     AddIntervention(intervention: Intervention): Observable<Intervention> {
-        return this._apiservice.Post<Intervention>("intervention/add", intervention).pipe(
+        return this._apiService.Post<Intervention>("intervention/add", intervention).pipe(
             map((v) => {
                 const newIntervention = v.data;
                 this._interventions.next([newIntervention, ...this._interventions.value]);
                 return newIntervention;
             }),
             catchError(error => {
-                console.error('Erreur lors de la création de l\'intervention', error);
+                console.error('Error creating intervention', error);
                 throw error;
             })
         );
     }
 
     UpdateIntervention(intervention: Intervention): Observable<boolean> {
-        return this._apiservice.Patch<boolean>("intervention/update", intervention).pipe(
+        return this._apiService.Patch<boolean>("intervention/update", intervention).pipe(
             map((r) => {
                 if (r.success) {
                     this._interventions.next(this._interventions.value.map(i =>
@@ -88,7 +88,7 @@ export class InterventionService {
     }
 
     DeleteIntervention(intervention: { interventionId: string }): Observable<boolean> {
-        return this._apiservice.Post<Intervention>("intervention/" + intervention.interventionId + "/delete", null).pipe(
+        return this._apiService.Post<Intervention>("intervention/" + intervention.interventionId + "/delete", null).pipe(
             map((v) => {
                 this._interventions.next(this._interventions.value.filter(item => item.interventionId !== intervention.interventionId));
                 return v.success;
@@ -96,8 +96,11 @@ export class InterventionService {
         );
     }
 
-    GetInterventionById(Id: string): Observable<Intervention> {
-        const index = this._interventions.value?.findIndex(x => x.interventionId === Id);
+    GetInterventionById(id: string): Observable<Intervention> {
+        const index = this._interventions.value?.findIndex(x => x.interventionId === id);
+        if (index === -1) {
+            return of(null);
+        }
         return of(this._interventions.value[index])
     }
 }
