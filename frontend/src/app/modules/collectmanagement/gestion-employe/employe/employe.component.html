@@ -83,7 +83,7 @@
                                     <!-- View button -->
                                     <button
                                         mat-icon-button
-                                        (click)="$event.stopPropagation(); toggleDetails(employe.employeId)"
+                                        (click)="onViewClick($event, employe.employeId)"
                                         class="!w-6 !h-6 sm:!w-8 sm:!h-8">
                                         <mat-icon
                                             class="text-hint text-xs sm:text-sm lg:text-base"
@@ -95,7 +95,7 @@
                                     @if(hasActionPermission(FuseNavigationAction.Edit)){
                                         <button
                                             mat-icon-button
-                                            (click)="$event.stopPropagation(); editEmploye(employe.employeId)"
+                                            (click)="onEditClick($event, employe.employeId)"
                                             class="!w-6 !h-6 sm:!w-8 sm:!h-8">
                                             <mat-icon
                                                 class="text-hint text-xs sm:text-sm lg:text-base"
@@ -109,7 +109,7 @@
                                         <button
                                             mat-icon-button
                                             [color]="'warn'"
-                                            (click)="$event.stopPropagation(); deleteSelectedEmploye(employe)"
+                                            (click)="onDeleteClick($event, employe)"
                                             class="!w-6 !h-6 sm:!w-8 sm:!h-8">
                                             <mat-icon
                                                 class="text-hint text-xs sm:text-sm lg:text-base"

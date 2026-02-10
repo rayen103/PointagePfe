@@ -285,6 +285,30 @@ export class EmployeComponent implements OnInit, OnDestroy {
     }
 
     /**
+     * Handle view button click - prevents event propagation
+     */
+    onViewClick(event: Event, employeId: string): void {
+        event.stopPropagation();
+        this.toggleDetails(employeId);
+    }
+
+    /**
+     * Handle edit button click - prevents event propagation
+     */
+    onEditClick(event: Event, employeId: string): void {
+        event.stopPropagation();
+        this.editEmploye(employeId);
+    }
+
+    /**
+     * Handle delete button click - prevents event propagation
+     */
+    onDeleteClick(event: Event, employe: Employe): void {
+        event.stopPropagation();
+        this.deleteSelectedEmploye(employe);
+    }
+
+    /**
      * Update the selected employe using the form data
      */
     SaveSelectedEmploye(): void {
