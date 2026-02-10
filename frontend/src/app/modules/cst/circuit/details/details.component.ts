@@ -23,7 +23,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { fuseAnimations } from '../../../../../@fuse/animations';
 import { Circuit } from '../../../../core/circuit/circuit.model';
-import { catchError, of, Subject, takeUntil } from 'rxjs';
+import { catchError, EMPTY, of, Subject, takeUntil } from 'rxjs';
 import { CircuitService } from '../../../../core/circuit/circuit.service';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
@@ -119,16 +119,17 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         }
         const circuit = this.circuitForm.getRawValue() as Circuit;
 
-        if (!this.circuit.circuitId) {
+        if (!this.circuit?.circuitId) {
             this._circuitService
                 .AddCircuit(circuit)
                 .pipe(
                     catchError((error) => {
+                        console.error('Error adding circuit:', error);
                         this.showFlashMessage('error');
-                        return of(error)
+                        return EMPTY;
                     })
                 )
-                .subscribe(() => {
+                .subscribe((response) => {
                     this.showFlashMessage('success');
                     // Navigate back to list after successful creation
                     setTimeout(() => {
@@ -141,6 +142,13 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
 
         this._circuitService
             .UpdateCircuit(circuit)
+            .pipe(
+                catchError((error) => {
+                    console.error('Error updating circuit:', error);
+                    this.showFlashMessage('error');
+                    return EMPTY;
+                })
+            )
             .subscribe((val) => {
                 if (val) {
                     this.showFlashMessage('success');
