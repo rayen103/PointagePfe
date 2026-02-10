@@ -34,6 +34,14 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 link : '/fichier/role-utilisateur',
                 action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
             },
+            {
+                id   : 'fichier.circuit',
+                title: 'Circuit',
+                type : 'basic',
+                icon : 'mat_outline:route',
+                link : '/fichier/circuit',
+                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+            },
         ]
     },
 
