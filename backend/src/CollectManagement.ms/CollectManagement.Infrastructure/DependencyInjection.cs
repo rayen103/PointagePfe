@@ -5,6 +5,7 @@ using CollectManagement.Application.Exceptions;
 using CollectManagement.Application.Interfaces.Authentification;
 using CollectManagement.Application.Interfaces.Repositories;
 using CollectManagement.Application.Interfaces.Repositories.Employes;
+using CollectManagement.Application.Interfaces.Repositories.Interventions;
 using CollectManagement.Application.Interfaces.Repositories.Societes;
 using CollectManagement.Application.Interfaces.Repositories.Utilisateurs;
 using CollectManagement.Application.Interfaces.Services;
@@ -16,6 +17,7 @@ using CollectManagement.Infrastructure.Persistence;
 using CollectManagement.Infrastructure.Persistence.Context;
 using CollectManagement.Infrastructure.Persistence.Repositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.EmployeRepositories;
+using CollectManagement.Infrastructure.Persistence.Repositories.InterventionRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.SocieteRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.UtilisateurRepositories;
 using CollectManagement.Infrastructure.PuppeteerConfig;
@@ -98,6 +100,7 @@ public static class DependencyInjection
         services.AddScoped<ISocieteRepository, SocieteRepository>();
         services.AddScoped<IRoleUtilisateurRepository, RoleUtilisateurRepository>();
         services.AddScoped<IEmployeRepository, EmployeRepository>();
+        services.AddScoped<IInterventionRepository, InterventionRepository>();
 
 
         
