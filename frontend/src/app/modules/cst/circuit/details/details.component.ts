@@ -26,6 +26,7 @@ import { Circuit } from '../../../../core/circuit/circuit.model';
 import { catchError, EMPTY, of, Subject, takeUntil } from 'rxjs';
 import { CircuitService } from '../../../../core/circuit/circuit.service';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { UserService } from '../../../../core/user/user.service';
 
 @Component({
   selector: 'app-details',
@@ -68,7 +69,8 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         private _router: Router,
         private formBuilder: FormBuilder,
         private _circuitService: CircuitService,
-        private _changeDetectorRef: ChangeDetectorRef
+        private _changeDetectorRef: ChangeDetectorRef,
+        private _userService: UserService
     ) { }
 
     ngOnInit(): void {
@@ -81,6 +83,15 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
             isActive: [true],
             societeId: ['', Validators.required],
         });
+
+        // Get current user's societeId
+        this._userService.user$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((user) => {
+                if (user?.societeId) {
+                    this.circuitForm.patchValue({ societeId: user.societeId });
+                }
+            });
 
         this._circuitService.circuit$
             .pipe(takeUntil(this._unsubscribeAll))
