@@ -6,6 +6,7 @@ using CollectManagement.Application.Interfaces.Authentification;
 using CollectManagement.Application.Interfaces.Repositories;
 using CollectManagement.Application.Interfaces.Repositories.Circuits;
 using CollectManagement.Application.Interfaces.Repositories.Employes;
+using CollectManagement.Application.Interfaces.Repositories.Equipes;
 using CollectManagement.Application.Interfaces.Repositories.PointsCollecte;
 using CollectManagement.Application.Interfaces.Repositories.Societes;
 using CollectManagement.Application.Interfaces.Repositories.Utilisateurs;
@@ -19,6 +20,7 @@ using CollectManagement.Infrastructure.Persistence.Context;
 using CollectManagement.Infrastructure.Persistence.Repositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.CircuitRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.EmployeRepositories;
+using CollectManagement.Infrastructure.Persistence.Repositories.EquipeRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.PointCollecteRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.SocieteRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.UtilisateurRepositories;
@@ -104,6 +106,7 @@ public static class DependencyInjection
         services.AddScoped<IEmployeRepository, EmployeRepository>();
         services.AddScoped<ICircuitRepository, CircuitRepository>();
         services.AddScoped<IPointCollecteRepository, PointCollecteRepository>();
+        services.AddScoped<IEquipeRepository, EquipeRepository>();
 
 
         
