@@ -1,0 +1,208 @@
+<div class="absolute inset-0 flex flex-col min-w-0 overflow-hidden" *transloco="let t">
+
+    <!-- Header -->
+    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+        <!-- Title -->
+        <div class="text-4xl font-extrabold tracking-tight">
+            {{isNewEquipe ? t('Add-Equipe') : t('Edit-Equipe')}}
+        </div>
+        <!-- Actions -->
+        <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+            <!-- Back button -->
+            <button
+                class="ml-4"
+                mat-flat-button
+                (click)="onBackdropClicked()">
+                <mat-icon [svgIcon]="'heroicons_outline:arrow-left'"></mat-icon>
+                <span class="ml-2">{{ t('Back') }}</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="flex flex-auto overflow-y-auto">
+        <div class="flex flex-col flex-auto p-6 md:p-8">
+
+            <!-- Flash message -->
+            @if(flashMessage){
+                <div class="mb-6" *transloco="let t">
+                    @if(flashMessage === 'success'){
+                        <div class="p-4 bg-green-100 dark:bg-green-800 rounded text-green-800 dark:text-green-100">
+                            {{t('Success-message')}}
+                        </div>
+                    }
+                    @if(flashMessage === 'error'){
+                        <div class="p-4 bg-red-100 dark:bg-red-800 rounded text-red-800 dark:text-red-100">
+                            {{t('Error-message')}}
+                        </div>
+                    }
+                </div>
+            }
+
+            <!-- Form -->
+            <form
+                class="flex flex-col"
+                [formGroup]="equipeForm"
+                #equipeFormDirective="ngForm">
+
+                <mat-card class="p-6">
+                    <mat-card-content>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+                            <!-- Code Equipe -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Equipe-Code') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:identification'"></mat-icon>
+                                <input
+                                    matInput
+                                    formControlName="codeEquipe"
+                                    [placeholder]="t('Enter-equipe-code')">
+                                @if(equipeForm.get('codeEquipe').hasError('required')){
+                                    <mat-error>{{ t('Code-required') }}</mat-error>
+                                }
+                            </mat-form-field>
+
+                            <!-- Libelle Equipe -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Equipe-Label') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:tag'"></mat-icon>
+                                <input
+                                    matInput
+                                    formControlName="libelleEquipe"
+                                    [placeholder]="t('Enter-equipe-label')">
+                            </mat-form-field>
+
+                            <!-- Responsable -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Responsable') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:user'"></mat-icon>
+                                <input
+                                    matInput
+                                    formControlName="responsable"
+                                    [placeholder]="t('Enter-responsable')">
+                            </mat-form-field>
+
+                            <!-- Code Vehicule -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Vehicle-Code') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:truck'"></mat-icon>
+                                <input
+                                    matInput
+                                    formControlName="codeVehicule"
+                                    [placeholder]="t('Enter-vehicle-code')">
+                            </mat-form-field>
+
+                            <!-- Code Client -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Client-Code') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:user-group'"></mat-icon>
+                                <input
+                                    matInput
+                                    formControlName="codeClient"
+                                    [placeholder]="t('Enter-client-code')">
+                            </mat-form-field>
+
+                            <!-- Code Entrepot -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Entrepot-Code') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:building-storefront'"></mat-icon>
+                                <input
+                                    matInput
+                                    formControlName="codeEntrepot"
+                                    [placeholder]="t('Enter-entrepot-code')">
+                            </mat-form-field>
+
+                            <!-- Code Tarif -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Tarif-Code') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:currency-dollar'"></mat-icon>
+                                <input
+                                    matInput
+                                    formControlName="codeTarif"
+                                    [placeholder]="t('Enter-tarif-code')">
+                            </mat-form-field>
+
+                            <!-- Code Fournisseur -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Fournisseur-Code') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:briefcase'"></mat-icon>
+                                <input
+                                    matInput
+                                    formControlName="codeFournisseur"
+                                    [placeholder]="t('Enter-fournisseur-code')">
+                            </mat-form-field>
+
+                            <!-- Societe ID (hidden, populated from user context) -->
+                            <input type="hidden" formControlName="societeId">
+
+                            <!-- Is Internal -->
+                            <div class="flex items-center">
+                                <mat-slide-toggle
+                                    formControlName="isInternal"
+                                    [color]="'primary'">
+                                    {{ t('Internal') }}
+                                </mat-slide-toggle>
+                            </div>
+
+                            <!-- Is Active -->
+                            <div class="flex items-center">
+                                <mat-slide-toggle
+                                    formControlName="isActive"
+                                    [color]="'primary'">
+                                    {{ t('Active') }}
+                                </mat-slide-toggle>
+                            </div>
+
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+
+                <!-- Actions -->
+                <div class="flex items-center justify-end mt-6 gap-4">
+                    <button
+                        mat-button
+                        type="button"
+                        (click)="onBackdropClicked()">
+                        {{ t('Cancel') }}
+                    </button>
+                    <button
+                        mat-flat-button
+                        type="button"
+                        [color]="'primary'"
+                        [disabled]="equipeForm.invalid"
+                        (click)="saveEquipe()">
+                        <mat-icon [svgIcon]="'heroicons_outline:check'"></mat-icon>
+                        <span class="ml-2">{{ t('Save') }}</span>
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
