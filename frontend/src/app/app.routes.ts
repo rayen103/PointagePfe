@@ -112,9 +112,6 @@ export const appRoutes: Route[] = [
                     {path:'employe',
                         data:{navigationId:'fichier.employe'} ,
                         loadChildren:() => import('app/modules/collectmanagement/gestion-employe/employe/employe.routes')},
-                    {path:'circuit',
-                        data:{navigationId:'fichier.circuit'} ,
-                        loadChildren:() => import('./modules/cst/circuit/circuit.routes')},
                 ]},
 
 
