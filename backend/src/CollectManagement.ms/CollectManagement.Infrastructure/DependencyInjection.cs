@@ -4,12 +4,7 @@ using CollectManagement.Application.Common;
 using CollectManagement.Application.Exceptions;
 using CollectManagement.Application.Interfaces.Authentification;
 using CollectManagement.Application.Interfaces.Repositories;
-using CollectManagement.Application.Interfaces.Repositories.Circuits;
 using CollectManagement.Application.Interfaces.Repositories.Employes;
-using CollectManagement.Application.Interfaces.Repositories.Equipes;
-using CollectManagement.Application.Interfaces.Repositories.OrdresTravail;
-using CollectManagement.Application.Interfaces.Repositories.PointsCollecte;
-using CollectManagement.Application.Interfaces.Repositories.Rattachements;
 using CollectManagement.Application.Interfaces.Repositories.Societes;
 using CollectManagement.Application.Interfaces.Repositories.Utilisateurs;
 using CollectManagement.Application.Interfaces.Services;
@@ -20,12 +15,7 @@ using CollectManagement.Infrastructure.Interceptors;
 using CollectManagement.Infrastructure.Persistence;
 using CollectManagement.Infrastructure.Persistence.Context;
 using CollectManagement.Infrastructure.Persistence.Repositories;
-using CollectManagement.Infrastructure.Persistence.Repositories.CircuitRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.EmployeRepositories;
-using CollectManagement.Infrastructure.Persistence.Repositories.EquipeRepositories;
-using CollectManagement.Infrastructure.Persistence.Repositories.OrdreTravailRepositories;
-using CollectManagement.Infrastructure.Persistence.Repositories.PointCollecteRepositories;
-using CollectManagement.Infrastructure.Persistence.Repositories.RattachementRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.SocieteRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.UtilisateurRepositories;
 using CollectManagement.Infrastructure.PuppeteerConfig;
@@ -108,11 +98,6 @@ public static class DependencyInjection
         services.AddScoped<ISocieteRepository, SocieteRepository>();
         services.AddScoped<IRoleUtilisateurRepository, RoleUtilisateurRepository>();
         services.AddScoped<IEmployeRepository, EmployeRepository>();
-        services.AddScoped<ICircuitRepository, CircuitRepository>();
-        services.AddScoped<IPointCollecteRepository, PointCollecteRepository>();
-        services.AddScoped<IEquipeRepository, EquipeRepository>();
-        services.AddScoped<IOrdreTravailRepository, OrdreTravailRepository>();
-        services.AddScoped<IRattachementRepository, RattachementRepository>();
 
 
         

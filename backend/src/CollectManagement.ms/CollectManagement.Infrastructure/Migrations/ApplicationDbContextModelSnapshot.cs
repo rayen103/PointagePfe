@@ -22,421 +22,6 @@ namespace CollectManagement.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("CollectManagement.Domain.Circuits.Circuit", b =>
-                {
-                    b.Property<Guid>("CircuitId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CodeCircuit")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime?>("DateInsertion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateModification")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("InsererPar")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<string>("LibelleCircuit")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("ModifierPar")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("SocieteId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("CircuitId");
-
-                    b.HasIndex("SocieteId");
-
-                    b.ToTable("Circuit", (string)null);
-                });
-
-            modelBuilder.Entity("CollectManagement.Domain.Employes.Employe", b =>
-                {
-                    b.Property<Guid>("EmployeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Adresse")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("CodeCircuit")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("CodeGouvernorat")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("CodePointCollecte")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("CodeRegion")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("CodeShift")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime?>("DateInsertion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateModification")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("InsererPar")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Matricule")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("ModifierPar")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nom")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Prenom")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("RFID")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<Guid>("SocieteId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("EmployeId");
-
-                    b.HasIndex("SocieteId");
-
-                    b.ToTable("Employe", (string)null);
-                });
-
-            modelBuilder.Entity("CollectManagement.Domain.Equipes.Equipe", b =>
-                {
-                    b.Property<Guid>("EquipeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CodeClient")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("CodeEntrepot")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("CodeEquipe")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("CodeFournisseur")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("CodeTarif")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("CodeVehicule")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime?>("DateInsertion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateModification")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("InsererPar")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<bool>("IsInternal")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("LibelleEquipe")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("ModifierPar")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Responsable")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<Guid>("SocieteId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("EquipeId");
-
-                    b.HasIndex("SocieteId");
-
-                    b.ToTable("Equipe", (string)null);
-                });
-
-            modelBuilder.Entity("CollectManagement.Domain.OrdresTravail.OrdreTravail", b =>
-                {
-                    b.Property<Guid>("OrdreTravailId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CodeClient")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("CodeEquipe")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("CodeVehicule")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime?>("DateCreation")
-                        .HasColumnType("date");
-
-                    b.Property<DateTime?>("DateInsertion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateModification")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("EtatOT")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("InsererPar")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<string>("Libelle")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("ModifierPar")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("Montant")
-                        .HasColumnType("decimal(18,3)");
-
-                    b.Property<string>("NumeroBonCommande")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("NumeroChantier")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("NumeroConvention")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("NumeroOrdreTravail")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<Guid>("SocieteId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("OrdreTravailId");
-
-                    b.HasIndex("SocieteId");
-
-                    b.ToTable("OrdreTravail", (string)null);
-                });
-
-            modelBuilder.Entity("CollectManagement.Domain.PointsCollecte.PointCollecte", b =>
-                {
-                    b.Property<Guid>("PointCollecteId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CodeGouvernorat")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("CodePointCollecte")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("CodeRegion")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime?>("DateInsertion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateModification")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("InsererPar")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<decimal?>("Latitude")
-                        .HasColumnType("decimal(18,10)");
-
-                    b.Property<string>("LibellePointCollecte")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<decimal?>("Longitude")
-                        .HasColumnType("decimal(18,10)");
-
-                    b.Property<string>("ModifierPar")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("SocieteId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("PointCollecteId");
-
-                    b.HasIndex("SocieteId");
-
-                    b.ToTable("PointCollecte", (string)null);
-                });
-
-            modelBuilder.Entity("CollectManagement.Domain.Rattachements.Rattachement", b =>
-                {
-                    b.Property<Guid>("RattachementId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CodeClient")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<decimal?>("Cout")
-                        .HasColumnType("decimal(18,3)");
-
-                    b.Property<DateTime?>("DateCloture")
-                        .HasColumnType("date");
-
-                    b.Property<DateTime?>("DateInsertion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateModification")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DateRattachement")
-                        .HasColumnType("date");
-
-                    b.Property<string>("Emplacement")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Exercice")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("HeureDebut")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("HeureFin")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("InsererPar")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<bool>("IsInternal")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("ModifierPar")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nature")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("NumeroChantier")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("NumeroRattachement")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Reference")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Remarque")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Responsable")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<Guid>("SocieteId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Status")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Type")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("RattachementId");
-
-                    b.HasIndex("SocieteId");
-
-                    b.ToTable("Rattachement", (string)null);
-                });
-
             modelBuilder.Entity("CollectManagement.Domain.Societes.Societe", b =>
                 {
                     b.Property<Guid>("SocieteId")
@@ -511,7 +96,7 @@ namespace CollectManagement.Infrastructure.Migrations
 
                     b.HasKey("SocieteId");
 
-                    b.ToTable("Societe", (string)null);
+                    b.ToTable("Societe");
                 });
 
             modelBuilder.Entity("CollectManagement.Domain.Utilisateurs.Entities.RoleUtilisateur", b =>
@@ -537,7 +122,7 @@ namespace CollectManagement.Infrastructure.Migrations
 
                     b.HasKey("RoleUtilisateurId");
 
-                    b.ToTable("RoleUtilisateur", (string)null);
+                    b.ToTable("RoleUtilisateur");
                 });
 
             modelBuilder.Entity("CollectManagement.Domain.Utilisateurs.Utilisateur", b =>
@@ -599,78 +184,12 @@ namespace CollectManagement.Infrastructure.Migrations
 
                     b.HasIndex("SocieteId");
 
-                    b.ToTable("Utilisateur", (string)null);
-                });
-
-            modelBuilder.Entity("CollectManagement.Domain.Circuits.Circuit", b =>
-                {
-                    b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
-                        .WithMany()
-                        .HasForeignKey("SocieteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Societe");
-                });
-
-            modelBuilder.Entity("CollectManagement.Domain.Employes.Employe", b =>
-                {
-                    b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
-                        .WithMany()
-                        .HasForeignKey("SocieteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Societe");
-                });
-
-            modelBuilder.Entity("CollectManagement.Domain.Equipes.Equipe", b =>
-                {
-                    b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
-                        .WithMany()
-                        .HasForeignKey("SocieteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Societe");
-                });
-
-            modelBuilder.Entity("CollectManagement.Domain.OrdresTravail.OrdreTravail", b =>
-                {
-                    b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
-                        .WithMany()
-                        .HasForeignKey("SocieteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Societe");
-                });
-
-            modelBuilder.Entity("CollectManagement.Domain.PointsCollecte.PointCollecte", b =>
-                {
-                    b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
-                        .WithMany()
-                        .HasForeignKey("SocieteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Societe");
-                });
-
-            modelBuilder.Entity("CollectManagement.Domain.Rattachements.Rattachement", b =>
-                {
-                    b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
-                        .WithMany()
-                        .HasForeignKey("SocieteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Societe");
+                    b.ToTable("Utilisateur");
                 });
 
             modelBuilder.Entity("CollectManagement.Domain.Utilisateurs.Entities.RoleUtilisateur", b =>
                 {
-                    b.OwnsMany("CollectManagement.Domain.Utilisateurs.Entities.RoleUtilisateur.Navigations#CollectManagement.Domain.Utilisateurs.Entities.Navigation", "Navigations", b1 =>
+                    b.OwnsMany("CollectManagement.Domain.Utilisateurs.Entities.Navigation", "Navigations", b1 =>
                         {
                             b1.Property<string>("NavigationId")
                                 .HasColumnType("nvarchar(50)");
@@ -686,12 +205,12 @@ namespace CollectManagement.Infrastructure.Migrations
 
                             b1.HasIndex("RoleUtilisateurId");
 
-                            b1.ToTable("Navigation", (string)null);
+                            b1.ToTable("Navigation");
 
                             b1.WithOwner()
                                 .HasForeignKey("RoleUtilisateurId");
 
-                            b1.OwnsMany("CollectManagement.Domain.Utilisateurs.Entities.RoleUtilisateur.Navigations#CollectManagement.Domain.Utilisateurs.Entities.Navigation.Sections#CollectManagement.Domain.Utilisateurs.Entities.NavigationSection", "Sections", b2 =>
+                            b1.OwnsMany("CollectManagement.Domain.Utilisateurs.Entities.NavigationSection", "Sections", b2 =>
                                 {
                                     b2.Property<string>("SectionId")
                                         .HasColumnType("nvarchar(50)");
@@ -711,7 +230,7 @@ namespace CollectManagement.Infrastructure.Migrations
 
                                     b2.HasIndex("NavigationId", "NavigationRoleUtilisateurId");
 
-                                    b2.ToTable("NavigationSection", (string)null);
+                                    b2.ToTable("NavigationSection");
 
                                     b2.WithOwner()
                                         .HasForeignKey("NavigationId", "NavigationRoleUtilisateurId");
