@@ -35,35 +35,6 @@ const ordreTravailResolver = (
         );
 };
 
-/**
- * Can deactivate OrdreTravail
- *
- * @param component
- * @param currentRoute
- * @param currentState
- * @param nextState
- */
-
-const canDeactivateOrdreTravail = (
-    currentRoute: ActivatedRouteSnapshot,
-    currentState: RouterStateSnapshot,
-    nextState: RouterStateSnapshot
-) => {
-    // Get the next route
-    let nextRoute: ActivatedRouteSnapshot = nextState.root;
-
-    while (nextRoute.firstChild) {
-        nextRoute = nextRoute.firstChild;
-    }
-
-    // If we are navigating to another ordre travail...
-    if (nextState.url.endsWith('/ordretravail/' + nextRoute.paramMap.get('id'))) {
-        // Just navigate
-        return true;
-    }
-
-};
-
 export default [
     {
         path: '',

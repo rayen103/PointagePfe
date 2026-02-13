@@ -35,35 +35,6 @@ const rattachementResolver = (
         );
 };
 
-/**
- * Can deactivate Rattachement
- *
- * @param component
- * @param currentRoute
- * @param currentState
- * @param nextState
- */
-
-const canDeactivateRattachement = (
-    currentRoute: ActivatedRouteSnapshot,
-    currentState: RouterStateSnapshot,
-    nextState: RouterStateSnapshot
-) => {
-    // Get the next route
-    let nextRoute: ActivatedRouteSnapshot = nextState.root;
-
-    while (nextRoute.firstChild) {
-        nextRoute = nextRoute.firstChild;
-    }
-
-    // If we are navigating to another rattachement...
-    if (nextState.url.endsWith('/rattachement/' + nextRoute.paramMap.get('id'))) {
-        // Just navigate
-        return true;
-    }
-
-};
-
 export default [
     {
         path: '',

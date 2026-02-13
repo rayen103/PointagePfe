@@ -35,35 +35,6 @@ const equipeResolver = (
         );
 };
 
-/**
- * Can deactivate Equipe
- *
- * @param component
- * @param currentRoute
- * @param currentState
- * @param nextState
- */
-
-const canDeactivateEquipe = (
-    currentRoute: ActivatedRouteSnapshot,
-    currentState: RouterStateSnapshot,
-    nextState: RouterStateSnapshot
-) => {
-    // Get the next route
-    let nextRoute: ActivatedRouteSnapshot = nextState.root;
-
-    while (nextRoute.firstChild) {
-        nextRoute = nextRoute.firstChild;
-    }
-
-    // If we are navigating to another equipe...
-    if (nextState.url.endsWith('/equipe/' + nextRoute.paramMap.get('id'))) {
-        // Just navigate
-        return true;
-    }
-
-};
-
 export default [
     {
         path: '',

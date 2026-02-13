@@ -35,35 +35,6 @@ const pointCollecteResolver = (
         );
 };
 
-/**
- * Can deactivate PointCollecte
- *
- * @param component
- * @param currentRoute
- * @param currentState
- * @param nextState
- */
-
-const canDeactivatePointCollecte = (
-    currentRoute: ActivatedRouteSnapshot,
-    currentState: RouterStateSnapshot,
-    nextState: RouterStateSnapshot
-) => {
-    // Get the next route
-    let nextRoute: ActivatedRouteSnapshot = nextState.root;
-
-    while (nextRoute.firstChild) {
-        nextRoute = nextRoute.firstChild;
-    }
-
-    // If we are navigating to another pointcollecte...
-    if (nextState.url.endsWith('/pointcollecte/' + nextRoute.paramMap.get('id'))) {
-        // Just navigate
-        return true;
-    }
-
-};
-
 export default [
     {
         path: '',
