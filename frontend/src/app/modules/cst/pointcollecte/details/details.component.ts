@@ -1,5 +1,4 @@
 import {
-    AfterViewInit,
     ChangeDetectionStrategy, ChangeDetectorRef,
     Component,
     OnDestroy,
@@ -55,7 +54,7 @@ import { UserService } from '../../../../core/user/user.service';
     changeDetection: ChangeDetectionStrategy.OnPush,
     animations: fuseAnimations,
 })
-export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
+export class DetailsComponent implements OnInit, OnDestroy {
     @ViewChild('pointCollecteFormDirective') pointCollecteFormDirective: FormGroupDirective;
     pointCollecteForm: UntypedFormGroup;
     isNewPointCollecte: boolean = false;
@@ -184,9 +183,5 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
     ngOnDestroy(): void {
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
-    }
-
-    ngAfterViewInit(): void {
-
     }
 }

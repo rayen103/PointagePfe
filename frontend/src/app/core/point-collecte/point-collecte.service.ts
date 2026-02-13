@@ -87,7 +87,7 @@ export class PointCollecteService {
                     }
 
                     const index = this._pointsCollecte.value
-                        .findIndex(item => item.pointCollecteId === pointCollecte.pointCollecteId) ?? -1;
+                        .findIndex(item => item.pointCollecteId === pointCollecte.pointCollecteId);
 
                     if (index > -1) {
                         this._pointsCollecte.value[index] = pointCollecte;

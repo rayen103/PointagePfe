@@ -63,7 +63,7 @@
                         <!-- Rows -->
                         @if(pointCollecte$ | async; as pointsCollecte){
                             @for(pointCollecte of pointsCollecte; track pointCollecte.pointCollecteId || $index){
-                                <div class="pointcollecte-grid-item sm:pointcollecte-grid grid sm:grid-cols-7 grid-cols-1 gap-2 sm:gap-4 p-3 sm:py-0.5"
+                                <div class="pointcollecte-grid-item sm:pointcollecte-grid grid sm:grid-cols-6 grid-cols-1 gap-2 sm:gap-4 p-3 sm:py-0.5"
                                      [ngClass]="{'border-b dark:border-b-slate-700': $index+1 !== pointsCollecte.length}">
 
                                     <!-- Mobile label + value -->

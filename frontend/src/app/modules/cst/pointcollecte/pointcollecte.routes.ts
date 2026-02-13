@@ -57,7 +57,7 @@ const canDeactivatePointCollecte = (
     }
 
     // If we are navigating to another pointcollecte...
-    if (!nextState.url.endsWith('/pointcollecte/' + nextRoute.paramMap.get('id'))) {
+    if (nextState.url.endsWith('/pointcollecte/' + nextRoute.paramMap.get('id'))) {
         // Just navigate
         return true;
     }
