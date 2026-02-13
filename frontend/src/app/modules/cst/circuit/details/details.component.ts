@@ -88,17 +88,36 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         this._userService.user$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((user) => {
+                console.log('UserService user data:', user);
                 if (user?.societeId) {
+                    console.log('Setting societeId from user:', user.societeId);
                     this.circuitForm.patchValue({ societeId: user.societeId });
+                } else {
+                    console.warn('User does not have societeId!', user);
                 }
             });
 
         this._circuitService.circuit$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((circuit) => {
+                console.log('CircuitService circuit data:', circuit);
                 this.circuit = circuit;
                 this.isNewCircuit = !circuit?.circuitId;
-                this.circuitForm.patchValue(circuit);
+                
+                // Don't overwrite societeId if it's already set from UserService
+                // This prevents the empty societeId from new circuit data from overwriting the user's societeId
+                if (circuit.societeId) {
+                    console.log('Circuit has societeId, patching all data');
+                    // If circuit has a societeId (editing existing), use all circuit data
+                    this.circuitForm.patchValue(circuit);
+                } else {
+                    console.log('Circuit has no societeId, preserving form societeId');
+                    // If circuit doesn't have societeId (new circuit), patch without societeId to preserve UserService value
+                    const { societeId, ...circuitWithoutSocieteId } = circuit;
+                    this.circuitForm.patchValue(circuitWithoutSocieteId);
+                }
+                
+                console.log('Form societeId after patch:', this.circuitForm.get('societeId').value);
 
                 this._changeDetectorRef.markForCheck();
             });

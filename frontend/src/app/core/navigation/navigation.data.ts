@@ -38,7 +38,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 id   : 'fichier.circuit',
                 title: 'Circuit',
                 type : 'basic',
-                icon : 'mat_outline:route',
+                icon : 'mat_outline:alt_route',
                 link : '/fichier/circuit',
                 action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
             },
