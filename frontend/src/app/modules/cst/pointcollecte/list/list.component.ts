@@ -84,8 +84,8 @@ export class ListComponent implements OnInit, OnDestroy {
     }
 
     getPointsCollecte() {
-        return this._pointCollecteService.GetPointCollecte(
-            (this._paginator?.pageIndex | 0) + 1,
+        return this._pointCollecteService.GetPointsCollecte(
+            (this._paginator?.pageIndex ?? 0) + 1,
             this._paginator?.pageSize,
             this._sort?.active,
             this._sort?.direction,
@@ -215,7 +215,7 @@ export class ListComponent implements OnInit, OnDestroy {
      * @param item
      */
     trackByFn(index: number, item: any): any {
-        return item.id || index;
+        return item.pointCollecteId || index;
     }
 
     /**

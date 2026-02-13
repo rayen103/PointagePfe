@@ -64,13 +64,10 @@ export class PointCollecteService {
     }
 
     AddPointCollecte(pointCollecte: PointCollecte): Observable<PointCollecte> {
-        console.log('AddPointCollecte - Sending request:', pointCollecte);
         return this._apiservice.Post<PointCollecte>("pointcollecte/add", pointCollecte)
             .pipe(
                 map((r) => {
-                    console.log('AddPointCollecte - Response received:', r);
                     if (!r.success) {
-                        console.error('AddPointCollecte - Response indicates failure:', r.message, r);
                         throw new Error(r.message || 'Failed to create point collecte');
                     }
                     pointCollecte.pointCollecteId = r.data.pointCollecteId;

@@ -91,36 +91,27 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         this._userService.user$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((user) => {
-                console.log('UserService user data:', user);
                 if (user?.societeId) {
-                    console.log('Setting societeId from user:', user.societeId);
                     this.pointCollecteForm.patchValue({ societeId: user.societeId });
-                } else {
-                    console.warn('User does not have societeId!', user);
                 }
             });
 
         this._pointCollecteService.pointCollecte$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((pointCollecte) => {
-                console.log('PointCollecteService pointCollecte data:', pointCollecte);
                 this.pointCollecte = pointCollecte;
                 this.isNewPointCollecte = !pointCollecte?.pointCollecteId;
                 
                 // Don't overwrite societeId if it's already set from UserService
                 // This prevents the empty societeId from new pointCollecte data from overwriting the user's societeId
                 if (pointCollecte.societeId) {
-                    console.log('PointCollecte has societeId, patching all data');
                     // If pointCollecte has a societeId (editing existing), use all pointCollecte data
                     this.pointCollecteForm.patchValue(pointCollecte);
                 } else {
-                    console.log('PointCollecte has no societeId, preserving form societeId');
                     // If pointCollecte doesn't have societeId (new pointCollecte), patch without societeId to preserve UserService value
                     const { societeId, ...pointCollecteWithoutSocieteId } = pointCollecte;
                     this.pointCollecteForm.patchValue(pointCollecteWithoutSocieteId);
                 }
-                
-                console.log('Form societeId after patch:', this.pointCollecteForm.get('societeId').value);
 
                 this._changeDetectorRef.markForCheck();
             });
@@ -146,31 +137,21 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
 
     savePointCollecte(): void {
         if (this.pointCollecteForm.invalid) {
-            console.log('Form is invalid:', this.pointCollecteForm.errors);
-            console.log('Form values:', this.pointCollecteForm.value);
-            console.log('Form controls status:', {
-                codePointCollecte: this.pointCollecteForm.get('codePointCollecte')?.errors,
-                societeId: this.pointCollecteForm.get('societeId')?.errors,
-            });
-            // Show an error message
             this.showFlashMessage('error');
             return;
         }
         const pointCollecte = this.pointCollecteForm.getRawValue() as PointCollecte;
-        console.log('Saving pointCollecte:', pointCollecte);
 
         if (!this.pointCollecte?.pointCollecteId) {
             this._pointCollecteService
                 .AddPointCollecte(pointCollecte)
                 .pipe(
                     catchError((error) => {
-                        console.error('Error adding pointCollecte:', error);
                         this.showFlashMessage('error');
                         return EMPTY;
                     })
                 )
                 .subscribe((response) => {
-                    console.log('PointCollecte added successfully:', response);
                     this.showFlashMessage('success');
                     // Navigate back to list after successful creation
                     setTimeout(() => {
@@ -185,7 +166,6 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
             .UpdatePointCollecte(pointCollecte)
             .pipe(
                 catchError((error) => {
-                    console.error('Error updating pointCollecte:', error);
                     this.showFlashMessage('error');
                     return EMPTY;
                 })
