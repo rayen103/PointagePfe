@@ -4,6 +4,7 @@ using CollectManagement.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CollectManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260210142325_AddAllSixEntities")]
+    partial class AddAllSixEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -64,7 +67,7 @@ namespace CollectManagement.Infrastructure.Migrations
 
                     b.HasIndex("SocieteId");
 
-                    b.ToTable("Circuit", (string)null);
+                    b.ToTable("Circuit");
                 });
 
             modelBuilder.Entity("CollectManagement.Domain.Employes.Employe", b =>
@@ -134,7 +137,7 @@ namespace CollectManagement.Infrastructure.Migrations
 
                     b.HasIndex("SocieteId");
 
-                    b.ToTable("Employe", (string)null);
+                    b.ToTable("Employe");
                 });
 
             modelBuilder.Entity("CollectManagement.Domain.Equipes.Equipe", b =>
@@ -204,7 +207,7 @@ namespace CollectManagement.Infrastructure.Migrations
 
                     b.HasIndex("SocieteId");
 
-                    b.ToTable("Equipe", (string)null);
+                    b.ToTable("Equipe");
                 });
 
             modelBuilder.Entity("CollectManagement.Domain.OrdresTravail.OrdreTravail", b =>
@@ -279,7 +282,7 @@ namespace CollectManagement.Infrastructure.Migrations
 
                     b.HasIndex("SocieteId");
 
-                    b.ToTable("OrdreTravail", (string)null);
+                    b.ToTable("OrdreTravail");
                 });
 
             modelBuilder.Entity("CollectManagement.Domain.PointsCollecte.PointCollecte", b =>
@@ -335,7 +338,7 @@ namespace CollectManagement.Infrastructure.Migrations
 
                     b.HasIndex("SocieteId");
 
-                    b.ToTable("PointCollecte", (string)null);
+                    b.ToTable("PointCollecte");
                 });
 
             modelBuilder.Entity("CollectManagement.Domain.Rattachements.Rattachement", b =>
@@ -434,7 +437,7 @@ namespace CollectManagement.Infrastructure.Migrations
 
                     b.HasIndex("SocieteId");
 
-                    b.ToTable("Rattachement", (string)null);
+                    b.ToTable("Rattachement");
                 });
 
             modelBuilder.Entity("CollectManagement.Domain.Societes.Societe", b =>
@@ -511,7 +514,7 @@ namespace CollectManagement.Infrastructure.Migrations
 
                     b.HasKey("SocieteId");
 
-                    b.ToTable("Societe", (string)null);
+                    b.ToTable("Societe");
                 });
 
             modelBuilder.Entity("CollectManagement.Domain.Utilisateurs.Entities.RoleUtilisateur", b =>
@@ -537,7 +540,7 @@ namespace CollectManagement.Infrastructure.Migrations
 
                     b.HasKey("RoleUtilisateurId");
 
-                    b.ToTable("RoleUtilisateur", (string)null);
+                    b.ToTable("RoleUtilisateur");
                 });
 
             modelBuilder.Entity("CollectManagement.Domain.Utilisateurs.Utilisateur", b =>
@@ -599,7 +602,7 @@ namespace CollectManagement.Infrastructure.Migrations
 
                     b.HasIndex("SocieteId");
 
-                    b.ToTable("Utilisateur", (string)null);
+                    b.ToTable("Utilisateur");
                 });
 
             modelBuilder.Entity("CollectManagement.Domain.Circuits.Circuit", b =>
@@ -670,7 +673,7 @@ namespace CollectManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("CollectManagement.Domain.Utilisateurs.Entities.RoleUtilisateur", b =>
                 {
-                    b.OwnsMany("CollectManagement.Domain.Utilisateurs.Entities.RoleUtilisateur.Navigations#CollectManagement.Domain.Utilisateurs.Entities.Navigation", "Navigations", b1 =>
+                    b.OwnsMany("CollectManagement.Domain.Utilisateurs.Entities.Navigation", "Navigations", b1 =>
                         {
                             b1.Property<string>("NavigationId")
                                 .HasColumnType("nvarchar(50)");
@@ -686,12 +689,12 @@ namespace CollectManagement.Infrastructure.Migrations
 
                             b1.HasIndex("RoleUtilisateurId");
 
-                            b1.ToTable("Navigation", (string)null);
+                            b1.ToTable("Navigation");
 
                             b1.WithOwner()
                                 .HasForeignKey("RoleUtilisateurId");
 
-                            b1.OwnsMany("CollectManagement.Domain.Utilisateurs.Entities.RoleUtilisateur.Navigations#CollectManagement.Domain.Utilisateurs.Entities.Navigation.Sections#CollectManagement.Domain.Utilisateurs.Entities.NavigationSection", "Sections", b2 =>
+                            b1.OwnsMany("CollectManagement.Domain.Utilisateurs.Entities.NavigationSection", "Sections", b2 =>
                                 {
                                     b2.Property<string>("SectionId")
                                         .HasColumnType("nvarchar(50)");
@@ -711,7 +714,7 @@ namespace CollectManagement.Infrastructure.Migrations
 
                                     b2.HasIndex("NavigationId", "NavigationRoleUtilisateurId");
 
-                                    b2.ToTable("NavigationSection", (string)null);
+                                    b2.ToTable("NavigationSection");
 
                                     b2.WithOwner()
                                         .HasForeignKey("NavigationId", "NavigationRoleUtilisateurId");
