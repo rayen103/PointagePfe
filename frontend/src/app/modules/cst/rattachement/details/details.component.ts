@@ -113,7 +113,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
             .subscribe((rattachement) => {
                 this.rattachement = rattachement;
                 this.isNewRattachement = !rattachement?.rattachementId;
-                
+
                 // Don't overwrite societeId if it's already set from UserService
                 // This prevents the empty societeId from new rattachement data from overwriting the user's societeId
                 if (rattachement.societeId) {
