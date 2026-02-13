@@ -61,11 +61,14 @@ export class CircuitService {
     }
 
     AddCircuit(circuit: Circuit): Observable<Circuit> {
+        console.log('AddCircuit - Sending request:', circuit);
         return this._apiservice.Post<Circuit>("circuit/add", circuit)
             .pipe(
                 map((r) => {
+                    console.log('AddCircuit - Response received:', r);
                     if (!r.success) {
-                        throw new Error(r.message);
+                        console.error('AddCircuit - Response indicates failure:', r.message, r);
+                        throw new Error(r.message || 'Failed to create circuit');
                     }
                     circuit.circuitId = r.data.circuitId;
                     this._circuits.next([r.data, ...this._circuits.value ?? []])

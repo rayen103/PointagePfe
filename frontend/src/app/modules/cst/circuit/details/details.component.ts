@@ -124,11 +124,18 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
 
     saveCircuit(): void {
         if (this.circuitForm.invalid) {
+            console.log('Form is invalid:', this.circuitForm.errors);
+            console.log('Form values:', this.circuitForm.value);
+            console.log('Form controls status:', {
+                codeCircuit: this.circuitForm.get('codeCircuit')?.errors,
+                societeId: this.circuitForm.get('societeId')?.errors,
+            });
             // Show an error message
             this.showFlashMessage('error');
             return;
         }
         const circuit = this.circuitForm.getRawValue() as Circuit;
+        console.log('Saving circuit:', circuit);
 
         if (!this.circuit?.circuitId) {
             this._circuitService
@@ -141,6 +148,7 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                     })
                 )
                 .subscribe((response) => {
+                    console.log('Circuit added successfully:', response);
                     this.showFlashMessage('success');
                     // Navigate back to list after successful creation
                     setTimeout(() => {
