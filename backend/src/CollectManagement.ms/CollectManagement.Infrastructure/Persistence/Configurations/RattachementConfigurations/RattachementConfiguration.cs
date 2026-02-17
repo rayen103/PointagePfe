@@ -19,7 +19,7 @@ public class RattachementConfiguration : IEntityTypeConfiguration<Rattachement>
             .IsRequired();
 
         builder.Property(p => p.Exercice)
-            .HasMaxLength(20);
+            .IsRequired(false);
 
         builder.Property(p => p.DateRattachement)
             .HasColumnType("date")
@@ -48,10 +48,10 @@ public class RattachementConfiguration : IEntityTypeConfiguration<Rattachement>
             .HasMaxLength(100);
 
         builder.Property(p => p.HeureDebut)
-            .HasMaxLength(10);
+            .HasColumnType("time");
 
         builder.Property(p => p.HeureFin)
-            .HasMaxLength(10);
+            .HasColumnType("time");
 
         builder.Property(p => p.Emplacement)
             .HasMaxLength(200);

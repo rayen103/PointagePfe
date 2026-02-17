@@ -11,7 +11,7 @@ public class Rattachement : AuditableEntity
     
     public string NumeroRattachement { get; private set; }
     
-    public string? Exercice { get; private set; }
+    public int? Exercice { get; private set; }
     
     public DateTime DateRattachement { get; private set; }
     
@@ -29,9 +29,9 @@ public class Rattachement : AuditableEntity
     
     public string? Responsable { get; private set; }
     
-    public string? HeureDebut { get; private set; }
+    public TimeSpan? HeureDebut { get; private set; }
     
-    public string? HeureFin { get; private set; }
+    public TimeSpan? HeureFin { get; private set; }
     
     public string? Emplacement { get; private set; }
     
@@ -52,7 +52,7 @@ public class Rattachement : AuditableEntity
     private Rattachement(
         RattachementId rattachementId,
         string numeroRattachement,
-        string? exercice,
+        int? exercice,
         DateTime dateRattachement,
         string? numeroChantier,
         string? codeClient,
@@ -61,8 +61,8 @@ public class Rattachement : AuditableEntity
         string? type,
         string? nature,
         string? responsable,
-        string? heureDebut,
-        string? heureFin,
+        TimeSpan? heureDebut,
+        TimeSpan? heureFin,
         string? emplacement,
         string? reference,
         string? status,
@@ -96,7 +96,7 @@ public class Rattachement : AuditableEntity
     public static Rattachement Create(
         RattachementId rattachementId,
         string numeroRattachement,
-        string? exercice,
+        int? exercice,
         DateTime dateRattachement,
         string? numeroChantier,
         string? codeClient,
@@ -105,8 +105,8 @@ public class Rattachement : AuditableEntity
         string? type,
         string? nature,
         string? responsable,
-        string? heureDebut,
-        string? heureFin,
+        TimeSpan? heureDebut,
+        TimeSpan? heureFin,
         string? emplacement,
         string? reference,
         string? status,
@@ -140,7 +140,7 @@ public class Rattachement : AuditableEntity
 
     public void Update(
         string numeroRattachement,
-        string? exercice,
+        int? exercice,
         DateTime dateRattachement,
         string? numeroChantier,
         string? codeClient,
@@ -149,8 +149,8 @@ public class Rattachement : AuditableEntity
         string? type,
         string? nature,
         string? responsable,
-        string? heureDebut,
-        string? heureFin,
+        TimeSpan? heureDebut,
+        TimeSpan? heureFin,
         string? emplacement,
         string? reference,
         string? status,
@@ -181,7 +181,7 @@ public class Rattachement : AuditableEntity
     public static Rattachement QueryCreate(
         RattachementId rattachementId,
         string numeroRattachement,
-        string? exercice,
+        int? exercice,
         DateTime dateRattachement,
         string? numeroChantier,
         string? codeClient,
@@ -190,8 +190,8 @@ public class Rattachement : AuditableEntity
         string? type,
         string? nature,
         string? responsable,
-        string? heureDebut,
-        string? heureFin,
+        TimeSpan? heureDebut,
+        TimeSpan? heureFin,
         string? emplacement,
         string? reference,
         string? status,
