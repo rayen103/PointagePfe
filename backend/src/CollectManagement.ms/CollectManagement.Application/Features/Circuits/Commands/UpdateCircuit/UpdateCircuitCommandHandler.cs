@@ -29,7 +29,9 @@ public class UpdateCircuitCommandHandler
             request.CodeCircuit,
             request.LibelleCircuit,
             request.Description,
-            request.IsActive
+            request.IsActive,
+            request.Latitude,
+            request.Longitude
         );
 
         await _circuitRepository

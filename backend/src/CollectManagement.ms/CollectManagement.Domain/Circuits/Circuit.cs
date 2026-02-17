@@ -15,6 +15,10 @@ public class Circuit : AuditableEntity
     
     public string? Description { get; private set; }
     
+    public double? Latitude { get; private set; }
+    
+    public double? Longitude { get; private set; }
+    
     public bool IsActive { get; private set; } = true;
     
     public SocieteId SocieteId { get; private set; }
@@ -27,7 +31,9 @@ public class Circuit : AuditableEntity
         string? libelleCircuit,
         string? description,
         bool isActive,
-        SocieteId societeId)
+        SocieteId societeId,
+        double? latitude = null,
+        double? longitude = null)
     {
         CircuitId = circuitId;
         CodeCircuit = codeCircuit;
@@ -35,6 +41,8 @@ public class Circuit : AuditableEntity
         Description = description;
         IsActive = isActive;
         SocieteId = societeId;
+        Latitude = latitude;
+        Longitude = longitude;
     }
 
     public static Circuit Create(
@@ -43,7 +51,9 @@ public class Circuit : AuditableEntity
         string? libelleCircuit,
         string? description,
         bool isActive,
-        SocieteId societeId)
+        SocieteId societeId,
+        double? latitude = null,
+        double? longitude = null)
     {
         return new Circuit(
             circuitId,
@@ -51,19 +61,25 @@ public class Circuit : AuditableEntity
             libelleCircuit,
             description,
             isActive,
-            societeId);
+            societeId,
+            latitude,
+            longitude);
     }
 
     public void Update(
         string codeCircuit,
         string? libelleCircuit,
         string? description,
-        bool isActive)
+        bool isActive,
+        double? latitude = null,
+        double? longitude = null)
     {
         CodeCircuit = codeCircuit;
         LibelleCircuit = libelleCircuit;
         Description = description;
         IsActive = isActive;
+        Latitude = latitude;
+        Longitude = longitude;
     }
     
     public static Circuit QueryCreate(
@@ -72,7 +88,9 @@ public class Circuit : AuditableEntity
         string? libelleCircuit,
         string? description,
         bool isActive,
-        SocieteId societeId)
+        SocieteId societeId,
+        double? latitude = null,
+        double? longitude = null)
     {
         return new Circuit(
             circuitId,
@@ -80,7 +98,9 @@ public class Circuit : AuditableEntity
             libelleCircuit,
             description,
             isActive,
-            societeId);
+            societeId,
+            latitude,
+            longitude);
     }
 
 #pragma warning disable CS8618

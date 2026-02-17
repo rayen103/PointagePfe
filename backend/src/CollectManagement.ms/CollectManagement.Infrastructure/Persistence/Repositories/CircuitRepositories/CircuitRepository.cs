@@ -55,7 +55,9 @@ public class CircuitRepository : RepositoryBase<Circuit>, ICircuitRepository
                 c.LibelleCircuit,
                 c.Description,
                 c.IsActive,
-                c.SocieteId
+                c.SocieteId,
+                c.Latitude,
+                c.Longitude
             ))
             .ToListAsync(cancellationToken: cancellationToken)
             .ConfigureAwait(false);
@@ -75,7 +77,9 @@ public class CircuitRepository : RepositoryBase<Circuit>, ICircuitRepository
                 c.LibelleCircuit,
                 c.Description,
                 c.IsActive,
-                c.SocieteId
+                c.SocieteId,
+                c.Latitude,
+                c.Longitude
             ))
             .FirstOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
@@ -91,6 +95,8 @@ public class CircuitRepository : RepositoryBase<Circuit>, ICircuitRepository
                     .SetProperty(p => p.CodeCircuit, circuit.CodeCircuit)
                     .SetProperty(p => p.LibelleCircuit, circuit.LibelleCircuit)
                     .SetProperty(p => p.Description, circuit.Description)
+                    .SetProperty(p => p.Latitude, circuit.Latitude)
+                    .SetProperty(p => p.Longitude, circuit.Longitude)
                     .SetProperty(p => p.IsActive, circuit.IsActive),
                 cancellationToken)
             .ConfigureAwait(false);
