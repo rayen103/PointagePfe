@@ -5,6 +5,27 @@
         <div class="text-2xl sm:text-4xl font-extrabold tracking-tight">{{ t('Circuits') }}</div>
         <!-- Actions -->
         <div class="button-container flex flex-col sm:flex-row items-end sm:items-center w-full sm:w-auto mt-4 sm:mt-0 sm:ml-4">
+            <!-- View toggle buttons -->
+            <div class="flex border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden mr-4">
+                <button
+                    mat-button
+                    class="!rounded-none"
+                    [class.bg-primary]="!showMapView"
+                    [class.text-white]="!showMapView"
+                    (click)="showMapView = false">
+                    <mat-icon [svgIcon]="'heroicons_outline:view-list'"></mat-icon>
+                    <span class="ml-1 hidden sm:inline">{{ t('List') }}</span>
+                </button>
+                <button
+                    mat-button
+                    class="!rounded-none"
+                    [class.bg-primary]="showMapView"
+                    [class.text-white]="showMapView"
+                    (click)="toggleMapView()">
+                    <mat-icon [svgIcon]="'heroicons_outline:map'"></mat-icon>
+                    <span class="ml-1 hidden sm:inline">{{ t('Map') }}</span>
+                </button>
+            </div>
             <!-- Search -->
             <mat-form-field
                 class="fuse-mat-dense w-full sm:min-w-64"
@@ -37,7 +58,37 @@
     <!-- Main -->
     <div class="flex flex-auto">
 
+        <!-- Map view -->
+        @if(showMapView){
+            <div class="relative flex flex-col flex-auto sm:mb-18 overflow-hidden px-4 sm:px-8 pt-4 sm:pt-8 rounded-lg bg-card">
+                @if(mapLocations.length > 0){
+                    <div class="mb-4 p-4 bg-blue-50 dark:bg-blue-900 rounded-lg">
+                        <div class="flex items-center">
+                            <mat-icon class="text-blue-600 dark:text-blue-300 mr-2" [svgIcon]="'heroicons_outline:information-circle'"></mat-icon>
+                            <span class="text-sm">
+                                {{ t('Showing') }} {{mapLocations.length}} {{ t('circuits-with-location') }}
+                                @if(circuitsLength - mapLocations.length > 0){
+                                    <span class="text-gray-600 dark:text-gray-400">
+                                        ({{circuitsLength - mapLocations.length}} {{ t('without-location') }})
+                                    </span>
+                                }
+                            </span>
+                        </div>
+                    </div>
+                    <app-map-viewer
+                        [locations]="mapLocations"
+                        [height]="'calc(100vh - 300px)'">
+                    </app-map-viewer>
+                }@else{
+                    <div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">
+                        {{ t('No-circuits-with-location-found') }}
+                    </div>
+                }
+            </div>
+        }
+
         <!-- Circuit list -->
+        @if(!showMapView){
         <div class="relative flex flex-col flex-auto sm:mb-18 overflow-hidden px-4 sm:px-8 pt-4 sm:pt-8 rounded-lg bg-card">
             @if(circuit$ | async; as circuits){
                 @if(circuits.length > 0){
@@ -190,5 +241,6 @@
                 }
             }
         </div>
+        }
     </div>
 </div>
