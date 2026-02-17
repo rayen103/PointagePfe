@@ -5,5 +5,7 @@ public record UpdateCircuitCommand(
     string CodeCircuit,
     string? LibelleCircuit,
     string? Description,
+    double? Latitude,
+    double? Longitude,
     bool IsActive
 ) : IRequest<UpdateCircuitResponse>;

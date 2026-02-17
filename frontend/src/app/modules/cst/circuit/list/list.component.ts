@@ -25,6 +25,7 @@ import { CircuitService } from '../../../../core/circuit/circuit.service';
 import { FuseConfirmationService } from '../../../../../@fuse/services/confirmation';
 import { RoleNavigation } from '../../../../core/role-utilisateur/role-utilisateur.model';
 import { FuseNavigationAction } from '../../../../../@fuse/components/navigation';
+import { MapViewerComponent, MapLocation } from '../../../../shared/components/map-viewer/map-viewer.component';
 
 @Component({
   selector: 'app-list',
@@ -41,6 +42,7 @@ import { FuseNavigationAction } from '../../../../../@fuse/components/navigation
         MatPaginatorModule,
         TranslocoModule,
         RouterLink,
+        MapViewerComponent,
     ],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
@@ -62,6 +64,8 @@ export class ListComponent implements OnInit, OnDestroy {
     roleNavigation: RoleNavigation;
     selectedCircuit: Circuit | null = null;
     isViewMode: boolean = false;
+    showMapView: boolean = false; // Toggle between list and map view
+    mapLocations: MapLocation[] = []; // Locations for map display
 
     constructor(
         private _circuitService: CircuitService,
@@ -108,6 +112,15 @@ export class ListComponent implements OnInit, OnDestroy {
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
+        
+        // Subscribe to circuits to update map locations
+        this.circuit$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((circuits) => {
+                this.updateMapLocations(circuits);
+                this._changeDetectorRef.markForCheck();
+            });
+        
         this.searchInputControl.valueChanges
             .pipe(
                 switchMap((query) => {
@@ -119,6 +132,30 @@ export class ListComponent implements OnInit, OnDestroy {
                 })
             )
             .subscribe();
+    }
+
+    /**
+     * Update map locations from circuits
+     */
+    private updateMapLocations(circuits: Circuit[]): void {
+        this.mapLocations = circuits
+            .filter(c => c.latitude != null && c.longitude != null)
+            .map(c => ({
+                id: c.circuitId,
+                name: c.codeCircuit + (c.libelleCircuit ? ` - ${c.libelleCircuit}` : ''),
+                latitude: c.latitude!,
+                longitude: c.longitude!,
+                isActive: c.isActive,
+                description: c.description,
+            }));
+    }
+
+    /**
+     * Toggle between list and map view
+     */
+    toggleMapView(): void {
+        this.showMapView = !this.showMapView;
+        this._changeDetectorRef.markForCheck();
     }
 
     /**

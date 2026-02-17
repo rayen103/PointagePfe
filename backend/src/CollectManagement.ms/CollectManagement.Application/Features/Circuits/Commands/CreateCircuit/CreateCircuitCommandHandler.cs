@@ -30,7 +30,9 @@ public class CreateCircuitCommandHandler
             request.LibelleCircuit,
             request.Description,
             request.IsActive,
-            societeId
+            societeId,
+            request.Latitude,
+            request.Longitude
         );
 
         await _circuitRepository
