@@ -27,6 +27,14 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
             },
             {
+                id   : 'fichier.employe',
+                title: 'Employe',
+                type : 'basic',
+                icon : 'mat_outline:badge',
+                link : '/fichier/employe',
+                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+            },
+            {
                 id   : 'fichier.role-utilisateur',
                 title: 'Role',
                 type : 'basic',
