@@ -3,6 +3,8 @@ export interface Circuit {
     codeCircuit: string;
     libelleCircuit?: string;
     description?: string;
+    latitude?: number;
+    longitude?: number;
     isActive: boolean;
     societeId: string;
 }

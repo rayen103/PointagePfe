@@ -27,6 +27,7 @@ import { catchError, EMPTY, of, Subject, takeUntil } from 'rxjs';
 import { CircuitService } from '../../../../core/circuit/circuit.service';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UserService } from '../../../../core/user/user.service';
+import { MapPickerComponent } from '../../../../shared/components/map-picker/map-picker.component';
 
 @Component({
   selector: 'app-details',
@@ -48,6 +49,7 @@ import { UserService } from '../../../../core/user/user.service';
         MatSlideToggleModule,
         TranslocoModule,
         RouterLink,
+        MapPickerComponent,
     ],
   templateUrl: './details.component.html',
   styleUrl: './details.component.scss',
@@ -80,6 +82,8 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
             codeCircuit: ['', Validators.required],
             libelleCircuit: [''],
             description: [''],
+            latitude: [null],
+            longitude: [null],
             isActive: [true],
             societeId: ['', Validators.required],
         });
@@ -196,6 +200,14 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                 this.showFlashMessage('error');
             });
 
+    }
+
+    onLocationChange(location: { latitude: number; longitude: number }): void {
+        this.circuitForm.patchValue({
+            latitude: location.latitude,
+            longitude: location.longitude,
+        });
+        this._changeDetectorRef.markForCheck();
     }
 
     ngOnDestroy(): void {
