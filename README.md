@@ -128,6 +128,7 @@ npm install
 npm start
 ```
 
+📖 **Step-by-step checklist**: See [`TROUBLESHOOTING_CHECKLIST.md`](./TROUBLESHOOTING_CHECKLIST.md)  
 📖 **Full troubleshooting guide**: See [`DEPLOYMENT_GUIDE.md`](./DEPLOYMENT_GUIDE.md)
 
 ### ❌ Problem: "Map not displaying"
@@ -212,6 +213,8 @@ cd ../backend && dotnet restore
 
 ## Documentation
 
+- [`README.md`](./README.md) - This file - Project overview and quick start
+- [`TROUBLESHOOTING_CHECKLIST.md`](./TROUBLESHOOTING_CHECKLIST.md) - **START HERE** for "no changes after merge" issues
 - [`DEPLOYMENT_GUIDE.md`](./DEPLOYMENT_GUIDE.md) - Complete deployment and troubleshooting guide
 - [`MAP_FEATURE_SETUP.md`](./MAP_FEATURE_SETUP.md) - Detailed map feature documentation
 - [`frontend/README.md`](./frontend/README.md) - Frontend-specific documentation
