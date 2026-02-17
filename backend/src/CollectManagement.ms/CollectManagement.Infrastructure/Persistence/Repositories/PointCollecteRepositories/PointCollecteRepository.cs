@@ -37,11 +37,11 @@ public class PointCollecteRepository : RepositoryBase<PointCollecte>, IPointColl
 
         if (prop is not null && order == "asc")
             orderBy = where.OrderBy(o =>
-                EF.Property<PointCollecte>(o, prop.DisplayName));
+                EF.Property<PointCollecte>(o, prop.Name));
 
         if (prop is not null && order == "desc")
             orderBy = where.OrderByDescending(o =>
-                EF.Property<PointCollecte>(o, prop.DisplayName));
+                EF.Property<PointCollecte>(o, prop.Name));
 
         var countAsync = await where
             .CountAsync(cancellationToken)

@@ -2,7 +2,7 @@ namespace CollectManagement.Application.Features.Rattachements.Commands.CreateRa
 
 public record CreateRattachementCommand(
     string NumeroRattachement,
-    string? Exercice,
+    int? Exercice,
     DateTime DateRattachement,
     string? NumeroChantier,
     string? CodeClient,
@@ -11,8 +11,8 @@ public record CreateRattachementCommand(
     string? Type,
     string? Nature,
     string? Responsable,
-    string? HeureDebut,
-    string? HeureFin,
+    TimeSpan? HeureDebut,
+    TimeSpan? HeureFin,
     string? Emplacement,
     string? Reference,
     string? Status,

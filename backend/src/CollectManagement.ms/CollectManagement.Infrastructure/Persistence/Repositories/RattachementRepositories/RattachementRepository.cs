@@ -38,11 +38,11 @@ public class RattachementRepository : RepositoryBase<Rattachement>, IRattachemen
 
         if (prop is not null && order == "asc")
             orderBy = where.OrderBy(o =>
-                EF.Property<Rattachement>(o, prop.DisplayName));
+                EF.Property<Rattachement>(o, prop.Name));
 
         if (prop is not null && order == "desc")
             orderBy = where.OrderByDescending(o =>
-                EF.Property<Rattachement>(o, prop.DisplayName));
+                EF.Property<Rattachement>(o, prop.Name));
 
         var countAsync = await where
             .CountAsync(cancellationToken)

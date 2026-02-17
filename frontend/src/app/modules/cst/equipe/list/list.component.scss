@@ -1,0 +1,17 @@
+.equipe-grid {
+    grid-template-columns: 48px auto;
+
+    @screen sm {
+        grid-template-columns: 1fr 2fr 1fr 1fr 120px 100px;
+    }
+}
+
+.equipe-grid-header {
+    grid-template-columns: 1fr 2fr 1fr 1fr 120px 100px;
+}
+
+.equipe-grid-item {
+    &:hover {
+        @apply bg-gray-50 dark:bg-hover;
+    }
+}

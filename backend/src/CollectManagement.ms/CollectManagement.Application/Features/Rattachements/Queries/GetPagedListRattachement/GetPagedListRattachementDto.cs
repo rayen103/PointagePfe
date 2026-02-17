@@ -4,7 +4,7 @@ public class GetPagedListRattachementDto
 {
     public Ulid RattachementId { get; set; }
     public string NumeroRattachement { get; set; } = string.Empty;
-    public string? Exercice { get; set; }
+    public int? Exercice { get; set; }
     public DateTime DateRattachement { get; set; }
     public string? NumeroChantier { get; set; }
     public string? CodeClient { get; set; }

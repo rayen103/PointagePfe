@@ -1,0 +1,368 @@
+<div class="absolute inset-0 flex flex-col min-w-0 overflow-hidden" *transloco="let t">
+
+    <!-- Header -->
+    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+        <!-- Title -->
+        <div class="text-4xl font-extrabold tracking-tight">
+            {{isNewRattachement ? t('Add-Rattachement') : t('Edit-Rattachement')}}
+        </div>
+        <!-- Actions -->
+        <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+            <!-- Back button -->
+            <button
+                class="ml-4"
+                mat-flat-button
+                (click)="onBackdropClicked()">
+                <mat-icon [svgIcon]="'heroicons_outline:arrow-left'"></mat-icon>
+                <span class="ml-2">{{ t('Back') }}</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="flex flex-auto overflow-y-auto">
+        <div class="flex flex-col flex-auto p-6 md:p-8">
+
+            <!-- Flash message -->
+            @if(flashMessage){
+                <div class="mb-6" *transloco="let t">
+                    @if(flashMessage === 'success'){
+                        <div class="p-4 bg-green-100 dark:bg-green-800 rounded text-green-800 dark:text-green-100">
+                            {{t('Success-message')}}
+                        </div>
+                    }
+                    @if(flashMessage === 'error'){
+                        <div class="p-4 bg-red-100 dark:bg-red-800 rounded text-red-800 dark:text-red-100">
+                            {{t('Error-message')}}
+                        </div>
+                    }
+                </div>
+            }
+
+            <!-- Form -->
+            <form
+                class="flex flex-col"
+                [formGroup]="rattachementForm"
+                #rattachementFormDirective="ngForm">
+
+                <!-- Basic Information Section -->
+                <mat-expansion-panel class="mb-6" [expanded]="true">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <mat-icon class="mr-2" [svgIcon]="'heroicons_outline:information-circle'"></mat-icon>
+                            {{ t('Basic-Information') }}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-4">
+                        <!-- Numero Rattachement -->
+                        <mat-form-field class="w-full">
+                            <mat-label>{{ t('Numero-Rattachement') }}</mat-label>
+                            <mat-icon
+                                class="icon-size-5"
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:identification'"></mat-icon>
+                            <input
+                                matInput
+                                formControlName="numeroRattachement"
+                                [placeholder]="t('Enter-numero-rattachement')">
+                            @if(rattachementForm.get('numeroRattachement').hasError('required')){
+                                <mat-error>{{ t('Numero-required') }}</mat-error>
+                            }
+                        </mat-form-field>
+
+                        <!-- Exercice -->
+                        <mat-form-field class="w-full">
+                            <mat-label>{{ t('Exercice') }}</mat-label>
+                            <mat-icon
+                                class="icon-size-5"
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:calendar'"></mat-icon>
+                            <input
+                                matInput
+                                formControlName="exercice"
+                                [placeholder]="t('Enter-exercice')">
+                        </mat-form-field>
+
+                        <!-- Date Rattachement -->
+                        <mat-form-field class="w-full">
+                            <mat-label>{{ t('Date-Rattachement') }}</mat-label>
+                            <mat-icon
+                                class="icon-size-5"
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:calendar-days'"></mat-icon>
+                            <input
+                                matInput
+                                [matDatepicker]="dateRattachementPicker"
+                                formControlName="dateRattachement"
+                                [placeholder]="t('Select-date')">
+                            <mat-datepicker-toggle matSuffix [for]="dateRattachementPicker"></mat-datepicker-toggle>
+                            <mat-datepicker #dateRattachementPicker></mat-datepicker>
+                            @if(rattachementForm.get('dateRattachement').hasError('required')){
+                                <mat-error>{{ t('Date-required') }}</mat-error>
+                            }
+                        </mat-form-field>
+
+                        <!-- Date Cloture -->
+                        <mat-form-field class="w-full">
+                            <mat-label>{{ t('Date-Cloture') }}</mat-label>
+                            <mat-icon
+                                class="icon-size-5"
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:calendar-days'"></mat-icon>
+                            <input
+                                matInput
+                                [matDatepicker]="dateCloturePicker"
+                                formControlName="dateCloture"
+                                [placeholder]="t('Select-date')">
+                            <mat-datepicker-toggle matSuffix [for]="dateCloturePicker"></mat-datepicker-toggle>
+                            <mat-datepicker #dateCloturePicker></mat-datepicker>
+                        </mat-form-field>
+
+                        <!-- Status -->
+                        <mat-form-field class="w-full">
+                            <mat-label>{{ t('Status-Field') }}</mat-label>
+                            <mat-icon
+                                class="icon-size-5"
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:tag'"></mat-icon>
+                            <input
+                                matInput
+                                formControlName="status"
+                                [placeholder]="t('Enter-status')">
+                        </mat-form-field>
+
+                        <!-- Reference -->
+                        <mat-form-field class="w-full">
+                            <mat-label>{{ t('Reference') }}</mat-label>
+                            <mat-icon
+                                class="icon-size-5"
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:hashtag'"></mat-icon>
+                            <input
+                                matInput
+                                formControlName="reference"
+                                [placeholder]="t('Enter-reference')">
+                        </mat-form-field>
+                    </div>
+                </mat-expansion-panel>
+
+                <!-- Project Information Section -->
+                <mat-expansion-panel class="mb-6">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <mat-icon class="mr-2" [svgIcon]="'heroicons_outline:building-office'"></mat-icon>
+                            {{ t('Project-Information') }}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-4">
+                        <!-- Numero Chantier -->
+                        <mat-form-field class="w-full">
+                            <mat-label>{{ t('Numero-Chantier') }}</mat-label>
+                            <mat-icon
+                                class="icon-size-5"
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:building-office-2'"></mat-icon>
+                            <input
+                                matInput
+                                formControlName="numeroChantier"
+                                [placeholder]="t('Enter-numero-chantier')">
+                        </mat-form-field>
+
+                        <!-- Code Client -->
+                        <mat-form-field class="w-full">
+                            <mat-label>{{ t('Code-Client') }}</mat-label>
+                            <mat-icon
+                                class="icon-size-5"
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:user-group'"></mat-icon>
+                            <input
+                                matInput
+                                formControlName="codeClient"
+                                [placeholder]="t('Enter-code-client')">
+                        </mat-form-field>
+
+                        <!-- Type -->
+                        <mat-form-field class="w-full">
+                            <mat-label>{{ t('Type') }}</mat-label>
+                            <mat-icon
+                                class="icon-size-5"
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:squares-2x2'"></mat-icon>
+                            <input
+                                matInput
+                                formControlName="type"
+                                [placeholder]="t('Enter-type')">
+                        </mat-form-field>
+
+                        <!-- Nature -->
+                        <mat-form-field class="w-full">
+                            <mat-label>{{ t('Nature') }}</mat-label>
+                            <mat-icon
+                                class="icon-size-5"
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:document-text'"></mat-icon>
+                            <input
+                                matInput
+                                formControlName="nature"
+                                [placeholder]="t('Enter-nature')">
+                        </mat-form-field>
+
+                        <!-- Emplacement -->
+                        <mat-form-field class="w-full">
+                            <mat-label>{{ t('Emplacement') }}</mat-label>
+                            <mat-icon
+                                class="icon-size-5"
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:map-pin'"></mat-icon>
+                            <input
+                                matInput
+                                formControlName="emplacement"
+                                [placeholder]="t('Enter-emplacement')">
+                        </mat-form-field>
+
+                        <!-- Responsable -->
+                        <mat-form-field class="w-full">
+                            <mat-label>{{ t('Responsable') }}</mat-label>
+                            <mat-icon
+                                class="icon-size-5"
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:user'"></mat-icon>
+                            <input
+                                matInput
+                                formControlName="responsable"
+                                [placeholder]="t('Enter-responsable')">
+                        </mat-form-field>
+                    </div>
+                </mat-expansion-panel>
+
+                <!-- Time & Cost Section -->
+                <mat-expansion-panel class="mb-6">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <mat-icon class="mr-2" [svgIcon]="'heroicons_outline:clock'"></mat-icon>
+                            {{ t('Time-Cost-Information') }}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-4">
+                        <!-- Heure Debut -->
+                        <mat-form-field class="w-full">
+                            <mat-label>{{ t('Heure-Debut') }}</mat-label>
+                            <mat-icon
+                                class="icon-size-5"
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:clock'"></mat-icon>
+                            <input
+                                matInput
+                                type="time"
+                                formControlName="heureDebut"
+                                [placeholder]="t('Enter-heure-debut')">
+                        </mat-form-field>
+
+                        <!-- Heure Fin -->
+                        <mat-form-field class="w-full">
+                            <mat-label>{{ t('Heure-Fin') }}</mat-label>
+                            <mat-icon
+                                class="icon-size-5"
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:clock'"></mat-icon>
+                            <input
+                                matInput
+                                type="time"
+                                formControlName="heureFin"
+                                [placeholder]="t('Enter-heure-fin')">
+                        </mat-form-field>
+
+                        <!-- Cout -->
+                        <mat-form-field class="w-full">
+                            <mat-label>{{ t('Cout') }}</mat-label>
+                            <mat-icon
+                                class="icon-size-5"
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:currency-dollar'"></mat-icon>
+                            <input
+                                matInput
+                                type="number"
+                                step="0.01"
+                                formControlName="cout"
+                                [placeholder]="t('Enter-cout')">
+                        </mat-form-field>
+                    </div>
+                </mat-expansion-panel>
+
+                <!-- Additional Information Section -->
+                <mat-expansion-panel class="mb-6">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <mat-icon class="mr-2" [svgIcon]="'heroicons_outline:document-text'"></mat-icon>
+                            {{ t('Additional-Information') }}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="grid grid-cols-1 gap-6 p-4">
+                        <!-- Remarque -->
+                        <mat-form-field class="w-full">
+                            <mat-label>{{ t('Remarque') }}</mat-label>
+                            <mat-icon
+                                class="icon-size-5"
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:chat-bubble-left-ellipsis'"></mat-icon>
+                            <textarea
+                                matInput
+                                formControlName="remarque"
+                                rows="4"
+                                [placeholder]="t('Enter-remarque')"></textarea>
+                        </mat-form-field>
+
+                        <!-- Societe ID (hidden, populated from user context) -->
+                        <input type="hidden" formControlName="societeId">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <!-- Is Internal -->
+                            <div class="flex items-center">
+                                <mat-slide-toggle
+                                    formControlName="isInternal"
+                                    [color]="'primary'">
+                                    {{ t('Internal') }}
+                                </mat-slide-toggle>
+                            </div>
+
+                            <!-- Is Active -->
+                            <div class="flex items-center">
+                                <mat-slide-toggle
+                                    formControlName="isActive"
+                                    [color]="'primary'">
+                                    {{ t('Active') }}
+                                </mat-slide-toggle>
+                            </div>
+                        </div>
+                    </div>
+                </mat-expansion-panel>
+
+                <!-- Actions -->
+                <div class="flex items-center justify-end mt-6 gap-4">
+                    <button
+                        mat-button
+                        type="button"
+                        (click)="onBackdropClicked()">
+                        {{ t('Cancel') }}
+                    </button>
+                    <button
+                        mat-flat-button
+                        type="button"
+                        [color]="'primary'"
+                        [disabled]="rattachementForm.invalid"
+                        (click)="saveRattachement()">
+                        <mat-icon [svgIcon]="'heroicons_outline:check'"></mat-icon>
+                        <span class="ml-2">{{ t('Save') }}</span>
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>

@@ -115,6 +115,18 @@ export const appRoutes: Route[] = [
                     {path:'circuit',
                         data:{navigationId:'fichier.circuit'} ,
                         loadChildren:() => import('./modules/cst/circuit/circuit.routes')},
+                    {path:'pointcollecte',
+                        data:{navigationId:'fichier.pointcollecte'} ,
+                        loadChildren:() => import('./modules/cst/pointcollecte/pointcollecte.routes')},
+                    {path:'equipe',
+                        data:{navigationId:'fichier.equipe'} ,
+                        loadChildren:() => import('./modules/cst/equipe/equipe.routes')},
+                    {path:'ordretravail',
+                        data:{navigationId:'fichier.ordretravail'} ,
+                        loadChildren:() => import('./modules/cst/ordretravail/ordretravail.routes')},
+                    {path:'rattachement',
+                        data:{navigationId:'fichier.rattachement'} ,
+                        loadChildren:() => import('./modules/cst/rattachement/rattachement.routes')},
                 ]},
 
 

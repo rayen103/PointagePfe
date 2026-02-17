@@ -1,5 +1,6 @@
 using CollectManagement.Domain.OrdresTravail;
 using CollectManagement.Domain.OrdresTravail.ValueObjects;
+using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Infrastructure.Persistence.Configurations.OrdreTravailConfigurations;
 
@@ -50,6 +51,11 @@ public class OrdreTravailConfiguration : IEntityTypeConfiguration<OrdreTravail>
         builder.Property(p => p.IsActive)
             .HasDefaultValue(true)
             .IsRequired();
+        
+        builder.Property(p => p.SocieteId)
+            .HasConversion(
+                c => c.Value.ToGuid(),
+                value => new SocieteId(new Ulid(value)));
 
         builder.HasOne(c => c.Societe)
             .WithMany()

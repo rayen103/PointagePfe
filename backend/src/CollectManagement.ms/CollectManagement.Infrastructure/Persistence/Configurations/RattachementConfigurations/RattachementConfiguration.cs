@@ -1,5 +1,6 @@
 using CollectManagement.Domain.Rattachements;
 using CollectManagement.Domain.Rattachements.ValueObjects;
+using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Infrastructure.Persistence.Configurations.RattachementConfigurations;
 
@@ -18,7 +19,7 @@ public class RattachementConfiguration : IEntityTypeConfiguration<Rattachement>
             .IsRequired();
 
         builder.Property(p => p.Exercice)
-            .HasMaxLength(20);
+            .IsRequired(false);
 
         builder.Property(p => p.DateRattachement)
             .HasColumnType("date")
@@ -47,10 +48,10 @@ public class RattachementConfiguration : IEntityTypeConfiguration<Rattachement>
             .HasMaxLength(100);
 
         builder.Property(p => p.HeureDebut)
-            .HasMaxLength(10);
+            .HasColumnType("time");
 
         builder.Property(p => p.HeureFin)
-            .HasMaxLength(10);
+            .HasColumnType("time");
 
         builder.Property(p => p.Emplacement)
             .HasMaxLength(200);
@@ -70,6 +71,11 @@ public class RattachementConfiguration : IEntityTypeConfiguration<Rattachement>
         builder.Property(p => p.IsActive)
             .HasDefaultValue(true)
             .IsRequired();
+        
+        builder.Property(p => p.SocieteId)
+            .HasConversion(
+                c => c.Value.ToGuid(),
+                value => new SocieteId(new Ulid(value)));
 
         builder.HasOne(c => c.Societe)
             .WithMany()

@@ -1,5 +1,6 @@
 using CollectManagement.Domain.PointsCollecte;
 using CollectManagement.Domain.PointsCollecte.ValueObjects;
+using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Infrastructure.Persistence.Configurations.PointCollecteConfigurations;
 
@@ -36,6 +37,11 @@ public class PointCollecteConfiguration : IEntityTypeConfiguration<PointCollecte
         builder.Property(p => p.IsActive)
             .HasDefaultValue(true)
             .IsRequired();
+        
+        builder.Property(p => p.SocieteId)
+            .HasConversion(
+                c => c.Value.ToGuid(),
+                value => new SocieteId(new Ulid(value)));
 
         builder.HasOne(c => c.Societe)
             .WithMany()

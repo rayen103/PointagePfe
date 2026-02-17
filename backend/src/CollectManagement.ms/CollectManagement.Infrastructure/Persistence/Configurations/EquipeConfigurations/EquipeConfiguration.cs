@@ -1,5 +1,6 @@
 using CollectManagement.Domain.Equipes;
 using CollectManagement.Domain.Equipes.ValueObjects;
+using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Infrastructure.Persistence.Configurations.EquipeConfigurations;
 
@@ -45,6 +46,11 @@ public class EquipeConfiguration : IEntityTypeConfiguration<Equipe>
         builder.Property(p => p.IsActive)
             .HasDefaultValue(true)
             .IsRequired();
+        
+        builder.Property(p => p.SocieteId)
+            .HasConversion(
+                c => c.Value.ToGuid(),
+                value => new SocieteId(new Ulid(value)));
 
         builder.HasOne(c => c.Societe)
             .WithMany()
