@@ -1,5 +1,6 @@
 using CollectManagement.Domain.Rattachements;
 using CollectManagement.Domain.Rattachements.ValueObjects;
+using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Infrastructure.Persistence.Configurations.RattachementConfigurations;
 
@@ -7,6 +8,8 @@ public class RattachementConfiguration : IEntityTypeConfiguration<Rattachement>
 {
     public void Configure(EntityTypeBuilder<Rattachement> builder)
     {
+        builder.ToTable("GP_Rattachement");
+        
         builder.HasKey(c => c.RattachementId);
 
         builder.Property(c => c.RattachementId)
@@ -14,6 +17,7 @@ public class RattachementConfiguration : IEntityTypeConfiguration<Rattachement>
                 value => new RattachementId(new Ulid(value)));
 
         builder.Property(p => p.NumeroRattachement)
+            .HasColumnName("NRattachement")
             .HasMaxLength(50)
             .IsRequired();
 
@@ -25,12 +29,15 @@ public class RattachementConfiguration : IEntityTypeConfiguration<Rattachement>
             .IsRequired();
 
         builder.Property(p => p.NumeroChantier)
+            .HasColumnName("NChantier")
             .HasMaxLength(50);
 
         builder.Property(p => p.CodeClient)
+            .HasColumnName("CClient")
             .HasMaxLength(50);
 
         builder.Property(p => p.IsInternal)
+            .HasColumnName("BInterne")
             .HasDefaultValue(false)
             .IsRequired();
 
@@ -59,6 +66,7 @@ public class RattachementConfiguration : IEntityTypeConfiguration<Rattachement>
             .HasMaxLength(100);
 
         builder.Property(p => p.Status)
+            .HasColumnName("Cloture")
             .HasMaxLength(50);
 
         builder.Property(p => p.DateCloture)
@@ -68,8 +76,14 @@ public class RattachementConfiguration : IEntityTypeConfiguration<Rattachement>
             .HasMaxLength(500);
 
         builder.Property(p => p.IsActive)
+            .HasColumnName("BActif")
             .HasDefaultValue(true)
             .IsRequired();
+        
+        builder.Property(p => p.SocieteId)
+            .HasConversion(
+                c => c.Value.ToGuid(),
+                value => new SocieteId(new Ulid(value)));
 
         builder.HasOne(c => c.Societe)
             .WithMany()
