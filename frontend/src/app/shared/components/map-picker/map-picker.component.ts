@@ -9,7 +9,7 @@ import {
     ViewEncapsulation,
 } from '@angular/core';
 import * as L from 'leaflet';
-import { ControlPosition, LatLng, Map, Marker, TileLayer } from 'leaflet';
+import { LatLng, Map, Marker } from 'leaflet';
 
 @Component({
     selector: 'app-map-picker',
@@ -68,14 +68,7 @@ export class MapPickerComponent implements AfterViewInit, OnDestroy {
                 .addTo(this.map)
                 .bindPopup('Circuit Location');
 
-            // Update coordinates when marker is dragged
-            this.marker.on('dragend', (event) => {
-                const position = event.target.getLatLng();
-                this.locationChange.emit({
-                    latitude: position.lat,
-                    longitude: position.lng,
-                });
-            });
+            this.setupMarkerDragHandler(this.marker);
         }
 
         // Add click event to place/move marker
@@ -91,20 +84,23 @@ export class MapPickerComponent implements AfterViewInit, OnDestroy {
                     .addTo(this.map!)
                     .bindPopup('Circuit Location');
 
-                // Update coordinates when marker is dragged
-                this.marker.on('dragend', (dragEvent) => {
-                    const position = dragEvent.target.getLatLng();
-                    this.locationChange.emit({
-                        latitude: position.lat,
-                        longitude: position.lng,
-                    });
-                });
+                this.setupMarkerDragHandler(this.marker);
             }
 
             // Emit the location change
             this.locationChange.emit({
                 latitude: lat,
                 longitude: lng,
+            });
+        });
+    }
+
+    private setupMarkerDragHandler(marker: Marker): void {
+        marker.on('dragend', (event) => {
+            const position = event.target.getLatLng();
+            this.locationChange.emit({
+                latitude: position.lat,
+                longitude: position.lng,
             });
         });
     }
