@@ -38,11 +38,11 @@ public class OrdreTravailRepository : RepositoryBase<OrdreTravail>, IOrdreTravai
 
         if (prop is not null && order == "asc")
             orderBy = where.OrderBy(o =>
-                EF.Property<OrdreTravail>(o, prop.DisplayName));
+                EF.Property<OrdreTravail>(o, prop.Name));
 
         if (prop is not null && order == "desc")
             orderBy = where.OrderByDescending(o =>
-                EF.Property<OrdreTravail>(o, prop.DisplayName));
+                EF.Property<OrdreTravail>(o, prop.Name));
 
         var countAsync = await where
             .CountAsync(cancellationToken)

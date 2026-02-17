@@ -37,11 +37,11 @@ public class EquipeRepository : RepositoryBase<Equipe>, IEquipeRepository
 
         if (prop is not null && order == "asc")
             orderBy = where.OrderBy(o =>
-                EF.Property<Equipe>(o, prop.DisplayName));
+                EF.Property<Equipe>(o, prop.Name));
 
         if (prop is not null && order == "desc")
             orderBy = where.OrderByDescending(o =>
-                EF.Property<Equipe>(o, prop.DisplayName));
+                EF.Property<Equipe>(o, prop.Name));
 
         var countAsync = await where
             .CountAsync(cancellationToken)
