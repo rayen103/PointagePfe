@@ -1,7 +1,7 @@
 # Navigation Fix - Missing Menu Items
 
 ## Problem
-When clicking on navbar items (Circuit, Point de Collecte, Equipe, Ordre de Travail, Rattachement), nothing happened - the application didn't navigate to those modules.
+When clicking on navbar items (Point de Collecte, Equipe, Ordre de Travail, Rattachement), nothing happened - the application didn't navigate to those modules. Note: Circuit was working correctly - only these four items were missing.
 
 ## Root Cause
 The navigation menu items were missing from the navigation data file (`navigation.data.ts`). While the routes were properly configured in `app.routes.ts`, the actual menu items weren't defined in the navigation array that populates the sidebar menu.
