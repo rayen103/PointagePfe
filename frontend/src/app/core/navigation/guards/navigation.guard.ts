@@ -12,7 +12,6 @@ export const navigationGuard: CanActivateFn | CanActivateChildFn = async (route,
     const userService = inject(UserService);
     const router: Router = inject(Router);
     const user = await firstValueFrom(userService.user$);
-    console.log(user);
     if (user?.navigations.length === 0){
         return true;
     }

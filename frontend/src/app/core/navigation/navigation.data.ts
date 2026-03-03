@@ -27,6 +27,14 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
             },
             {
+                id   : 'fichier.employe',
+                title: 'Employe',
+                type : 'basic',
+                icon : 'mat_outline:badge',
+                link : '/fichier/employe',
+                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+            },
+            {
                 id   : 'fichier.role-utilisateur',
                 title: 'Role',
                 type : 'basic',
@@ -40,6 +48,38 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
                 icon : 'mat_outline:alt_route',
                 link : '/fichier/circuit',
+                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+            },
+            {
+                id   : 'fichier.pointcollecte',
+                title: 'Point de Collecte',
+                type : 'basic',
+                icon : 'mat_outline:location_on',
+                link : '/fichier/pointcollecte',
+                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+            },
+            {
+                id   : 'fichier.equipe',
+                title: 'Equipe',
+                type : 'basic',
+                icon : 'mat_outline:groups',
+                link : '/fichier/equipe',
+                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+            },
+            {
+                id   : 'fichier.ordretravail',
+                title: 'Ordre de Travail',
+                type : 'basic',
+                icon : 'mat_outline:assignment',
+                link : '/fichier/ordretravail',
+                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+            },
+            {
+                id   : 'fichier.rattachement',
+                title: 'Rattachement',
+                type : 'basic',
+                icon : 'mat_outline:link',
+                link : '/fichier/rattachement',
                 action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
             },
         ]
