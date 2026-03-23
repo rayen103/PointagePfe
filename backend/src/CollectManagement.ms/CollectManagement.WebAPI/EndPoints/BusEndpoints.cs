@@ -76,7 +76,7 @@ public class BusEndpoints : ICarterModule
         return Results.Ok(new ApiResponse<bool>(true));
     }
 
-    public async static Task<IResult> OneBus(
+    public static async Task<IResult> OneBus(
         [Required] Ulid id,
         ISender sender,
         CancellationToken cancellationToken)
