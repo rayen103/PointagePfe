@@ -76,7 +76,7 @@ public class ShiftEndpoints : ICarterModule
         return Results.Ok(new ApiResponse<bool>(true));
     }
 
-    public async static Task<IResult> OneShift(
+    public static async Task<IResult> OneShift(
         [Required] Ulid id,
         ISender sender,
         CancellationToken cancellationToken)
