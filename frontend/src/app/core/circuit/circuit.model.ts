@@ -7,6 +7,11 @@ export interface Circuit {
     longitude?: number;
     isActive: boolean;
     societeId: string;
+    codePCDepart?: string;
+    codePCArrivee?: string;
+    distanceKm?: number;
+    dureeMinutes?: number;
+    couleur?: string;
 }
 
 export interface PagedCircuit {

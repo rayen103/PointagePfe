@@ -82,6 +82,22 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 link : '/fichier/rattachement',
                 action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
             },
+            {
+                id   : 'fichier.shift',
+                title: 'Shift',
+                type : 'basic',
+                icon : 'mat_outline:schedule',
+                link : '/fichier/shift',
+                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+            },
+            {
+                id   : 'fichier.bus',
+                title: 'Bus',
+                type : 'basic',
+                icon : 'mat_outline:directions_bus',
+                link : '/fichier/bus',
+                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+            },
         ]
     },
 

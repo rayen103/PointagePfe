@@ -1,0 +1,17 @@
+.shift-grid {
+    grid-template-columns: 48px auto;
+
+    @screen sm {
+        grid-template-columns: 1fr 2fr 1fr 80px 80px 100px 100px;
+    }
+}
+
+.shift-grid-header {
+    grid-template-columns: 1fr 2fr 1fr 80px 80px 100px 100px;
+}
+
+.shift-grid-item {
+    &:hover {
+        @apply bg-gray-50 dark:bg-hover;
+    }
+}

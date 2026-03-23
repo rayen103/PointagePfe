@@ -127,6 +127,12 @@ export const appRoutes: Route[] = [
                     {path:'rattachement',
                         data:{navigationId:'fichier.rattachement'} ,
                         loadChildren:() => import('./modules/cst/rattachement/rattachement.routes')},
+                    {path:'shift',
+                        data:{navigationId:'fichier.shift'},
+                        loadChildren:() => import('./modules/cst/shift/shift.routes')},
+                    {path:'bus',
+                        data:{navigationId:'fichier.bus'},
+                        loadChildren:() => import('./modules/cst/bus/bus.routes')},
                 ]},
 
 

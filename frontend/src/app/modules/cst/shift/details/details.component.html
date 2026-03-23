@@ -1,0 +1,162 @@
+<div class="absolute inset-0 flex flex-col min-w-0 overflow-hidden" *transloco="let t">
+
+    <!-- Header -->
+    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+        <!-- Title -->
+        <div class="text-4xl font-extrabold tracking-tight">
+            {{isNewShift ? t('Add-Shift') : t('Edit-Shift')}}
+        </div>
+        <!-- Actions -->
+        <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+            <!-- Back button -->
+            <button
+                class="ml-4"
+                mat-flat-button
+                (click)="onBackdropClicked()">
+                <mat-icon [svgIcon]="'heroicons_outline:arrow-left'"></mat-icon>
+                <span class="ml-2">{{ t('Back') }}</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="flex flex-auto overflow-y-auto">
+        <div class="flex flex-col flex-auto p-6 md:p-8">
+
+            <!-- Flash message -->
+            @if(flashMessage){
+                <div class="mb-6" *transloco="let t">
+                    @if(flashMessage === 'success'){
+                        <div class="p-4 bg-green-100 dark:bg-green-800 rounded text-green-800 dark:text-green-100">
+                            {{t('Success-message')}}
+                        </div>
+                    }
+                    @if(flashMessage === 'error'){
+                        <div class="p-4 bg-red-100 dark:bg-red-800 rounded text-red-800 dark:text-red-100">
+                            {{t('Error-message')}}
+                        </div>
+                    }
+                </div>
+            }
+
+            <!-- Form -->
+            <form
+                class="flex flex-col"
+                [formGroup]="shiftForm"
+                #shiftFormDirective="ngForm">
+
+                <mat-card class="p-6">
+                    <mat-card-content>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+                            <!-- Code Shift -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Shift-Code') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:identification'"></mat-icon>
+                                <input
+                                    matInput
+                                    formControlName="codeShift"
+                                    [placeholder]="t('Enter-shift-code')">
+                                @if(shiftForm.get('codeShift').hasError('required')){
+                                    <mat-error>{{ t('Code-required') }}</mat-error>
+                                }
+                            </mat-form-field>
+
+                            <!-- Libelle Shift -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Shift-Label') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:tag'"></mat-icon>
+                                <input
+                                    matInput
+                                    formControlName="libelleShift"
+                                    [placeholder]="t('Enter-shift-label')">
+                            </mat-form-field>
+
+                            <!-- Jour Semaine -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Day-of-Week') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:calendar'"></mat-icon>
+                                <mat-select formControlName="jourSemaine">
+                                    <mat-option value="">-</mat-option>
+                                    @for(jour of joursSemaine; track jour){
+                                        <mat-option [value]="jour">{{jour}}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+
+                            <!-- Heure Debut -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Start-Time') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:clock'"></mat-icon>
+                                <input
+                                    matInput
+                                    formControlName="heureDebut"
+                                    placeholder="HH:mm">
+                            </mat-form-field>
+
+                            <!-- Heure Fin -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('End-Time') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:clock'"></mat-icon>
+                                <input
+                                    matInput
+                                    formControlName="heureFin"
+                                    placeholder="HH:mm">
+                            </mat-form-field>
+
+                            <!-- Societe ID (hidden, populated from user context) -->
+                            <input type="hidden" formControlName="societeId">
+
+                            <!-- Is Active -->
+                            <div class="flex items-center">
+                                <mat-slide-toggle
+                                    formControlName="isActive"
+                                    [color]="'primary'">
+                                    {{ t('Active') }}
+                                </mat-slide-toggle>
+                            </div>
+
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+
+                <!-- Actions -->
+                <div class="flex items-center justify-end mt-6 gap-4">
+                    <button
+                        mat-button
+                        type="button"
+                        (click)="onBackdropClicked()">
+                        {{ t('Cancel') }}
+                    </button>
+                    <button
+                        mat-flat-button
+                        type="button"
+                        [color]="'primary'"
+                        [disabled]="shiftForm.invalid"
+                        (click)="saveShift()">
+                        <mat-icon [svgIcon]="'heroicons_outline:check'"></mat-icon>
+                        <span class="ml-2">{{ t('Save') }}</span>
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
