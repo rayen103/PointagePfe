@@ -59,7 +59,7 @@ public class OrdreTravailDetailEndpoints : ICarterModule
     }
 
     private static async Task<IResult> DeleteOrdreTravailDetail(
-        [FromQuery] [Required] Ulid id,
+        [FromRoute] [Required] Ulid id,
         ISender sender,
         CancellationToken cancellationToken)
     {

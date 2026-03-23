@@ -65,12 +65,12 @@ public class CircuitEndpoints : ICarterModule
     }
 
     private static async Task<IResult> DeleteCircuit(
-        [FromQuery] [Required] Ulid circuitId,
+        [FromRoute] [Required] Ulid id,
         ISender sender,
         CancellationToken cancellationToken)
     {
         await sender
-            .Send(new DeleteCircuitCommand(circuitId), cancellationToken)
+            .Send(new DeleteCircuitCommand(id), cancellationToken)
             .ConfigureAwait(false);
 
         return Results.Ok(new ApiResponse<bool>(true));

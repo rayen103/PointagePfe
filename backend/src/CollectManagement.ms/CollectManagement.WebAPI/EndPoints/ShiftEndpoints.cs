@@ -65,12 +65,12 @@ public class ShiftEndpoints : ICarterModule
     }
 
     private static async Task<IResult> DeleteShift(
-        [FromQuery] [Required] Ulid shiftId,
+        [FromRoute] [Required] Ulid id,
         ISender sender,
         CancellationToken cancellationToken)
     {
         await sender
-            .Send(new DeleteShiftCommand(shiftId), cancellationToken)
+            .Send(new DeleteShiftCommand(id), cancellationToken)
             .ConfigureAwait(false);
 
         return Results.Ok(new ApiResponse<bool>(true));

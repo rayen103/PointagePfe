@@ -65,12 +65,12 @@ public class RattachementEndpoints : ICarterModule
     }
 
     private static async Task<IResult> DeleteRattachement(
-        [FromQuery] [Required] Ulid rattachementId,
+        [FromRoute] [Required] Ulid id,
         ISender sender,
         CancellationToken cancellationToken)
     {
         await sender
-            .Send(new DeleteRattachementCommand(rattachementId), cancellationToken)
+            .Send(new DeleteRattachementCommand(id), cancellationToken)
             .ConfigureAwait(false);
 
         return Results.Ok(new ApiResponse<bool>(true));

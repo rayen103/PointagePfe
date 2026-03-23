@@ -59,7 +59,7 @@ public class CircuitPointCollecteEndpoints : ICarterModule
     }
 
     private static async Task<IResult> DeleteCircuitPointCollecte(
-        [FromQuery] [Required] Ulid id,
+        [FromRoute] [Required] Ulid id,
         ISender sender,
         CancellationToken cancellationToken)
     {

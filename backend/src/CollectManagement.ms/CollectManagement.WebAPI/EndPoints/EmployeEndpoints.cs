@@ -65,12 +65,12 @@ public class EmployeEndpoints : ICarterModule
     }
 
     private static async Task<IResult> DeleteEmploye(
-        [FromQuery] [Required] Ulid employeId,
+        [FromRoute] [Required] Ulid id,
         ISender sender,
         CancellationToken cancellationToken)
     {
         await sender
-            .Send(new DeleteEmployeCommand(employeId.ToString()), cancellationToken)
+            .Send(new DeleteEmployeCommand(id.ToString()), cancellationToken)
             .ConfigureAwait(false);
 
         return Results.Ok(new ApiResponse<bool>(true));

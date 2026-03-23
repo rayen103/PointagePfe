@@ -22,7 +22,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { fuseAnimations } from '../../../../../@fuse/animations';
 import { OrdreTravail } from '../../../../core/ordre-travail/ordre-travail.model';
-import { catchError, EMPTY, of, Subject, takeUntil } from 'rxjs';
+import { OrdreTravailDetail } from '../../../../core/ordre-travail/ordre-travail-detail.model';
+import { OrdreTravailDetailService } from '../../../../core/ordre-travail/ordre-travail-detail.service';
+import { catchError, EMPTY, Subject, takeUntil } from 'rxjs';
 import { OrdreTravailService } from '../../../../core/ordre-travail/ordre-travail.service';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UserService } from '../../../../core/user/user.service';
@@ -57,8 +59,10 @@ import { UserService } from '../../../../core/user/user.service';
 export class DetailsComponent implements OnInit, OnDestroy {
     @ViewChild('ordreTravailFormDirective') ordreTravailFormDirective: FormGroupDirective;
     ordreTravailForm: UntypedFormGroup;
+    newDetailForm: UntypedFormGroup;
     isNewOrdreTravail: boolean = false;
     ordreTravail: OrdreTravail;
+    ordreTravailDetails: OrdreTravailDetail[] = [];
     flashMessage: 'success' | 'error' | null = null;
     isLoading: boolean = false;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
@@ -68,6 +72,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
         private _router: Router,
         private formBuilder: FormBuilder,
         private _ordreTravailService: OrdreTravailService,
+        private _ordreTravailDetailService: OrdreTravailDetailService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _userService: UserService
     ) { }
@@ -89,6 +94,17 @@ export class DetailsComponent implements OnInit, OnDestroy {
             libelle: [''],
             isActive: [true],
             societeId: ['', Validators.required],
+        });
+
+        this.newDetailForm = this.formBuilder.group({
+            codeArticle: ['', Validators.required],
+            libelleArticle: [''],
+            codeEntrepot: [''],
+            codeUnite: [''],
+            quantite: [null],
+            prixUnitaireHT: [null],
+            tauxTVA: [null],
+            montant: [null],
         });
 
         // Get current user's societeId
@@ -118,6 +134,22 @@ export class DetailsComponent implements OnInit, OnDestroy {
                 }
 
                 this._changeDetectorRef.markForCheck();
+            });
+
+        // Load line items for existing records
+        this._ordreTravailService.ordreTravail$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((ordreTravail) => {
+                if (ordreTravail?.ordreTravailId) {
+                    this._ordreTravailDetailService.getByOrdreTravail(ordreTravail.ordreTravailId)
+                        .pipe(takeUntil(this._unsubscribeAll))
+                        .subscribe((details) => {
+                            this.ordreTravailDetails = details ?? [];
+                            this._changeDetectorRef.markForCheck();
+                        });
+                } else {
+                    this.ordreTravailDetails = [];
+                }
             });
 
     }
@@ -183,6 +215,48 @@ export class DetailsComponent implements OnInit, OnDestroy {
                 this.showFlashMessage('error');
             });
 
+    }
+
+    addDetail(): void {
+        if (this.newDetailForm.invalid || !this.ordreTravail?.ordreTravailId) {
+            return;
+        }
+        const detail = {
+            ordreTravailId: this.ordreTravail.ordreTravailId,
+            ...this.newDetailForm.getRawValue(),
+        };
+        this._ordreTravailDetailService.add(detail)
+            .pipe(
+                catchError(() => {
+                    this.showFlashMessage('error');
+                    return EMPTY;
+                })
+            )
+            .subscribe((created) => {
+                if (created) {
+                    this.ordreTravailDetails = [...this.ordreTravailDetails, created];
+                    this.newDetailForm.reset();
+                    this._changeDetectorRef.markForCheck();
+                }
+            });
+    }
+
+    removeDetail(id: string): void {
+        this._ordreTravailDetailService.delete(id)
+            .pipe(
+                catchError(() => {
+                    this.showFlashMessage('error');
+                    return EMPTY;
+                })
+            )
+            .subscribe((success) => {
+                if (success) {
+                    this.ordreTravailDetails = this.ordreTravailDetails.filter(
+                        d => d.ordreTravailDetailId !== id
+                    );
+                    this._changeDetectorRef.markForCheck();
+                }
+            });
     }
 
     ngOnDestroy(): void {

@@ -65,12 +65,12 @@ public class BusEndpoints : ICarterModule
     }
 
     private static async Task<IResult> DeleteBus(
-        [FromQuery] [Required] Ulid busId,
+        [FromRoute] [Required] Ulid id,
         ISender sender,
         CancellationToken cancellationToken)
     {
         await sender
-            .Send(new DeleteBusCommand(busId), cancellationToken)
+            .Send(new DeleteBusCommand(id), cancellationToken)
             .ConfigureAwait(false);
 
         return Results.Ok(new ApiResponse<bool>(true));
