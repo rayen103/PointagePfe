@@ -61,10 +61,5 @@ public class OrdreTravailConfiguration : IEntityTypeConfiguration<OrdreTravail>
             .WithMany()
             .HasForeignKey(c => c.SocieteId)
             .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasMany(c => c.OrdreTravailDetails)
-            .WithOne()
-            .HasForeignKey(x => x.OrdreTravailId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }
