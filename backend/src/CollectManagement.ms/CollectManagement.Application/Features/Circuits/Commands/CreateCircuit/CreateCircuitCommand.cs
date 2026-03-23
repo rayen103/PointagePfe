@@ -7,5 +7,10 @@ public record CreateCircuitCommand(
     double? Latitude,
     double? Longitude,
     bool IsActive,
-    Ulid SocieteId
+    Ulid SocieteId,
+    string? CodePCDepart,
+    string? CodePCArrivee,
+    decimal? DistanceKm,
+    int? DureeMinutes,
+    string? Couleur
 ) : IRequest<CreateCircuitResponse>;

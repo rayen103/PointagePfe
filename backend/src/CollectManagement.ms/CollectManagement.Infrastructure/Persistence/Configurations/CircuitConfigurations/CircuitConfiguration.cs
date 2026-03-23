@@ -27,6 +27,18 @@ public class CircuitConfiguration : IEntityTypeConfiguration<Circuit>
             .HasDefaultValue(true)
             .IsRequired();
 
+        builder.Property(p => p.CodePCDepart)
+            .HasMaxLength(50);
+
+        builder.Property(p => p.CodePCArrivee)
+            .HasMaxLength(50);
+
+        builder.Property(p => p.DistanceKm)
+            .HasPrecision(10, 2);
+
+        builder.Property(p => p.Couleur)
+            .HasMaxLength(20);
+
         builder.HasOne(c => c.Societe)
             .WithMany()
             .HasForeignKey(c => c.SocieteId)

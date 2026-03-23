@@ -32,7 +32,12 @@ public class CreateCircuitCommandHandler
             request.IsActive,
             societeId,
             request.Latitude,
-            request.Longitude
+            request.Longitude,
+            request.CodePCDepart,
+            request.CodePCArrivee,
+            request.DistanceKm,
+            request.DureeMinutes,
+            request.Couleur
         );
 
         await _circuitRepository

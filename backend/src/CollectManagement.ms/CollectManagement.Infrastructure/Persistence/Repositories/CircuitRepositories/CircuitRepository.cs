@@ -57,7 +57,12 @@ public class CircuitRepository : RepositoryBase<Circuit>, ICircuitRepository
                 c.IsActive,
                 c.SocieteId,
                 c.Latitude,
-                c.Longitude
+                c.Longitude,
+                c.CodePCDepart,
+                c.CodePCArrivee,
+                c.DistanceKm,
+                c.DureeMinutes,
+                c.Couleur
             ))
             .ToListAsync(cancellationToken: cancellationToken)
             .ConfigureAwait(false);
@@ -79,7 +84,12 @@ public class CircuitRepository : RepositoryBase<Circuit>, ICircuitRepository
                 c.IsActive,
                 c.SocieteId,
                 c.Latitude,
-                c.Longitude
+                c.Longitude,
+                c.CodePCDepart,
+                c.CodePCArrivee,
+                c.DistanceKm,
+                c.DureeMinutes,
+                c.Couleur
             ))
             .FirstOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
@@ -97,7 +107,12 @@ public class CircuitRepository : RepositoryBase<Circuit>, ICircuitRepository
                     .SetProperty(p => p.Description, circuit.Description)
                     .SetProperty(p => p.Latitude, circuit.Latitude)
                     .SetProperty(p => p.Longitude, circuit.Longitude)
-                    .SetProperty(p => p.IsActive, circuit.IsActive),
+                    .SetProperty(p => p.IsActive, circuit.IsActive)
+                    .SetProperty(p => p.CodePCDepart, circuit.CodePCDepart)
+                    .SetProperty(p => p.CodePCArrivee, circuit.CodePCArrivee)
+                    .SetProperty(p => p.DistanceKm, circuit.DistanceKm)
+                    .SetProperty(p => p.DureeMinutes, circuit.DureeMinutes)
+                    .SetProperty(p => p.Couleur, circuit.Couleur),
                 cancellationToken)
             .ConfigureAwait(false);
     }
