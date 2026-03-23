@@ -8,6 +8,7 @@ using CollectManagement.Application.Interfaces.Repositories.Circuits;
 using CollectManagement.Application.Interfaces.Repositories.Employes;
 using CollectManagement.Application.Interfaces.Repositories.Equipes;
 using CollectManagement.Application.Interfaces.Repositories.OrdresTravail;
+using CollectManagement.Application.Interfaces.Repositories.Shifts;
 using CollectManagement.Application.Interfaces.Repositories.PointsCollecte;
 using CollectManagement.Application.Interfaces.Repositories.Rattachements;
 using CollectManagement.Application.Interfaces.Repositories.Societes;
@@ -24,6 +25,7 @@ using CollectManagement.Infrastructure.Persistence.Repositories.CircuitRepositor
 using CollectManagement.Infrastructure.Persistence.Repositories.EmployeRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.EquipeRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.OrdreTravailRepositories;
+using CollectManagement.Infrastructure.Persistence.Repositories.ShiftRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.PointCollecteRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.RattachementRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.SocieteRepositories;
@@ -113,6 +115,7 @@ public static class DependencyInjection
         services.AddScoped<IEquipeRepository, EquipeRepository>();
         services.AddScoped<IOrdreTravailRepository, OrdreTravailRepository>();
         services.AddScoped<IRattachementRepository, RattachementRepository>();
+        services.AddScoped<IShiftRepository, ShiftRepository>();
 
 
         
