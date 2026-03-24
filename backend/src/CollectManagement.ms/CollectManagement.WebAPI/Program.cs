@@ -1,7 +1,9 @@
 using Carter;
 using CollectManagement.Application;
 using CollectManagement.Infrastructure;
+using CollectManagement.Infrastructure.Persistence.Context;
 using CollectManagement.WebAPI;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Serilog;
 
@@ -22,6 +24,12 @@ builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));
 
 var app = builder.Build();
+
+// Apply any pending EF Core migrations automatically on startup
+using (var scope = app.Services.CreateScope())
+{
+    scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.Migrate();
+}
 
 //Handle exceptions priority it's important
 app.UseExceptionHandler((_) => { });
