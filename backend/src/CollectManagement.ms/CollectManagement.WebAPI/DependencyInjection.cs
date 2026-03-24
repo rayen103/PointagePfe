@@ -1,5 +1,6 @@
 ﻿
 using Carter;
+using CollectManagement.WebAPI.Common.Converters;
 using Microsoft.OpenApi.Models;
 
 namespace CollectManagement.WebAPI;
@@ -12,7 +13,14 @@ public static class DependencyInjection
         services.AddEndpointsApiExplorer();
         services.AddSwagger();
         services.AddCarter();
-        
+
+        // Support "HH:mm" / "HH:mm:ss" TimeSpan values sent by the Angular frontend
+        services.ConfigureHttpJsonOptions(o =>
+        {
+            o.SerializerOptions.Converters.Add(new TimeSpanJsonConverter());
+            o.SerializerOptions.Converters.Add(new NullableTimeSpanJsonConverter());
+        });
+
         return services;
     }
     
