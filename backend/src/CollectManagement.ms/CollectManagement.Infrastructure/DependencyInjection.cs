@@ -125,6 +125,8 @@ public static class DependencyInjection
         services.AddScoped<IOrdreTravailRepository, OrdreTravailRepository>();
         services.AddScoped<IOrdreTravailDetailRepository, OrdreTravailDetailRepository>();
         services.AddScoped<IRattachementRepository, RattachementRepository>();
+        services.AddScoped<IRattachementEmployeRepository, RattachementEmployeRepository>();
+        services.AddScoped<IRattachementArticleRepository, RattachementArticleRepository>();
         services.AddScoped<IShiftRepository, ShiftRepository>();
         services.AddScoped<IBusRepository, BusRepository>();
         services.AddScoped<IChantierRepository, ChantierRepository>();

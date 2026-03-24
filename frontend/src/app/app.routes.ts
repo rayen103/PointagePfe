@@ -136,6 +136,12 @@ export const appRoutes: Route[] = [
                     {path:'chantier',
                         data:{navigationId:'fichier.chantier'},
                         loadChildren:() => import('./modules/cst/chantier/chantier.routes')},
+                    {path:'rattachement-employe',
+                        data:{navigationId:'fichier.rattachement-employe'},
+                        loadChildren:() => import('./modules/cst/rattachement-employe/rattachement-employe.routes')},
+                    {path:'rattachement-article',
+                        data:{navigationId:'fichier.rattachement-article'},
+                        loadChildren:() => import('./modules/cst/rattachement-article/rattachement-article.routes')},
                 ]},
 
 
