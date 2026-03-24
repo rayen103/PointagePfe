@@ -133,6 +133,9 @@ export const appRoutes: Route[] = [
                     {path:'bus',
                         data:{navigationId:'fichier.bus'},
                         loadChildren:() => import('./modules/cst/bus/bus.routes')},
+                    {path:'chantier',
+                        data:{navigationId:'fichier.chantier'},
+                        loadChildren:() => import('./modules/cst/chantier/chantier.routes')},
                 ]},
 
 

@@ -98,6 +98,14 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 link : '/fichier/bus',
                 action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
             },
+            {
+                id   : 'fichier.chantier',
+                title: 'Chantier',
+                type : 'basic',
+                icon : 'mat_outline:construction',
+                link : '/fichier/chantier',
+                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+            },
         ]
     },
 
