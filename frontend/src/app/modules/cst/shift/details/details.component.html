@@ -96,29 +96,35 @@
                             <!-- Heure Debut -->
                             <mat-form-field class="w-full">
                                 <mat-label>{{ t('Start-Time') }}</mat-label>
-                                <mat-icon
-                                    class="icon-size-5"
-                                    matPrefix
-                                    [svgIcon]="'heroicons_solid:clock'"></mat-icon>
                                 <input
                                     matInput
-                                    type="time"
+                                    [ngxMatTimepicker]="heureDebutPicker"
                                     formControlName="heureDebut"
-                                    placeholder="HH:mm">
+                                    [format]="24"
+                                    placeholder="HH:mm"
+                                    readonly>
+                                <mat-icon
+                                    class="icon-size-5 cursor-pointer"
+                                    matSuffix
+                                    (click)="heureDebutPicker.open()">schedule</mat-icon>
+                                <ngx-mat-timepicker #heureDebutPicker></ngx-mat-timepicker>
                             </mat-form-field>
 
                             <!-- Heure Fin -->
                             <mat-form-field class="w-full">
                                 <mat-label>{{ t('End-Time') }}</mat-label>
-                                <mat-icon
-                                    class="icon-size-5"
-                                    matPrefix
-                                    [svgIcon]="'heroicons_solid:clock'"></mat-icon>
                                 <input
                                     matInput
-                                    type="time"
+                                    [ngxMatTimepicker]="heureFinPicker"
                                     formControlName="heureFin"
-                                    placeholder="HH:mm">
+                                    [format]="24"
+                                    placeholder="HH:mm"
+                                    readonly>
+                                <mat-icon
+                                    class="icon-size-5 cursor-pointer"
+                                    matSuffix
+                                    (click)="heureFinPicker.open()">schedule</mat-icon>
+                                <ngx-mat-timepicker #heureFinPicker></ngx-mat-timepicker>
                             </mat-form-field>
 
                             <!-- Societe ID (hidden, populated from user context) -->

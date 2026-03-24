@@ -26,6 +26,7 @@ import { catchError, EMPTY, Subject, takeUntil } from 'rxjs';
 import { ShiftService } from '../../../../core/shift/shift.service';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UserService } from '../../../../core/user/user.service';
+import { NgxMatTimepickerModule } from 'ngx-mat-timepicker';
 
 @Component({
   selector: 'app-details',
@@ -47,6 +48,7 @@ import { UserService } from '../../../../core/user/user.service';
         MatSlideToggleModule,
         TranslocoModule,
         RouterLink,
+        NgxMatTimepickerModule,
     ],
   templateUrl: './details.component.html',
   styleUrl: './details.component.scss',

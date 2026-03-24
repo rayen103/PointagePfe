@@ -31,7 +31,7 @@ public class TimeSpanJsonConverter : JsonConverter<TimeSpan>
     }
 
     public override void Write(Utf8JsonWriter writer, TimeSpan value, JsonSerializerOptions options)
-        => writer.WriteStringValue(value.ToString(@"hh\:mm\:ss"));
+        => writer.WriteStringValue(value.ToString(@"hh\:mm"));
 }
 
 public class NullableTimeSpanJsonConverter : JsonConverter<TimeSpan?>
