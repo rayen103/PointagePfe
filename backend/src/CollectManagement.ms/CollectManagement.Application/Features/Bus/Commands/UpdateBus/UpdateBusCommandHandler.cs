@@ -32,7 +32,9 @@ public class UpdateBusCommandHandler
             request.Capacite,
             request.CodeCircuit,
             request.AppSagem,
-            request.IsActive
+            request.IsActive,
+            request.Latitude,
+            request.Longitude
         );
 
         await _busRepository

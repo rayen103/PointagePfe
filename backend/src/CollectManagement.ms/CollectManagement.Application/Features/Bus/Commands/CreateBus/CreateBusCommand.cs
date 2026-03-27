@@ -8,5 +8,7 @@ public record CreateBusCommand(
     string? CodeCircuit,
     bool AppSagem,
     bool IsActive,
+    double? Latitude,
+    double? Longitude,
     Ulid SocieteId
 ) : IRequest<CreateBusResponse>;

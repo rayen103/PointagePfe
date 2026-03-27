@@ -37,6 +37,10 @@ public class BusConfiguration : IEntityTypeConfiguration<Bus>
             .HasDefaultValue(true)
             .IsRequired();
 
+        builder.Property(p => p.Latitude);
+
+        builder.Property(p => p.Longitude);
+
         builder.Property(p => p.SocieteId)
             .HasConversion(
                 c => c.Value.ToGuid(),

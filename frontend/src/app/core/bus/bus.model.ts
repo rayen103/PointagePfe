@@ -7,6 +7,8 @@ export interface Bus {
     codeCircuit?: string;
     appSagem: boolean;
     isActive: boolean;
+    latitude?: number;
+    longitude?: number;
     societeId: string;
 }
 

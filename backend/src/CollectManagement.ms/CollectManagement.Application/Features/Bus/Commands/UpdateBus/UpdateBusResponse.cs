@@ -10,4 +10,6 @@ public class UpdateBusResponse
     public string? CodeCircuit { get; set; }
     public bool AppSagem { get; set; }
     public bool IsActive { get; set; }
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
 }

@@ -1,4 +1,5 @@
 using CollectManagement.Domain.Common;
+using CollectManagement.Domain.Employes.Enums;
 using CollectManagement.Domain.Employes.ValueObjects;
 using CollectManagement.Domain.Societes;
 using CollectManagement.Domain.Societes.ValueObjects;
@@ -17,9 +18,13 @@ public class Employe : AuditableEntity
     
     public string Prenom { get; private set; }
     
+    public TypeEmploye TypeEmploye { get; private set; }
+    
     public string? CodeCircuit { get; private set; }
     
     public string? CodePointCollecte { get; private set; }
+    
+    public string? CodeBus { get; private set; }
     
     public string? CodeShift { get; private set; }
     
@@ -28,6 +33,10 @@ public class Employe : AuditableEntity
     public string? CodeGouvernorat { get; private set; }
     
     public string? CodeRegion { get; private set; }
+    
+    public double? Latitude { get; private set; }
+    
+    public double? Longitude { get; private set; }
     
     public SocieteId SocieteId { get; private set; }
     
@@ -39,12 +48,16 @@ public class Employe : AuditableEntity
         string? rfid,
         string nom,
         string prenom,
+        TypeEmploye typeEmploye,
         string? codeCircuit,
         string? codePointCollecte,
+        string? codeBus,
         string? codeShift,
         string? adresse,
         string? codeGouvernorat,
         string? codeRegion,
+        double? latitude,
+        double? longitude,
         SocieteId societeId)
     {
         EmployeId = employeId;
@@ -52,12 +65,16 @@ public class Employe : AuditableEntity
         RFID = rfid;
         Nom = nom;
         Prenom = prenom;
+        TypeEmploye = typeEmploye;
         CodeCircuit = codeCircuit;
         CodePointCollecte = codePointCollecte;
+        CodeBus = codeBus;
         CodeShift = codeShift;
         Adresse = adresse;
         CodeGouvernorat = codeGouvernorat;
         CodeRegion = codeRegion;
+        Latitude = latitude;
+        Longitude = longitude;
         SocieteId = societeId;
     }
 
@@ -67,12 +84,16 @@ public class Employe : AuditableEntity
         string? rfid,
         string nom,
         string prenom,
+        TypeEmploye typeEmploye,
         string? codeCircuit,
         string? codePointCollecte,
+        string? codeBus,
         string? codeShift,
         string? adresse,
         string? codeGouvernorat,
         string? codeRegion,
+        double? latitude,
+        double? longitude,
         SocieteId societeId)
     {
         return new Employe(
@@ -81,12 +102,16 @@ public class Employe : AuditableEntity
             rfid,
             nom,
             prenom,
+            typeEmploye,
             codeCircuit,
             codePointCollecte,
+            codeBus,
             codeShift,
             adresse,
             codeGouvernorat,
             codeRegion,
+            latitude,
+            longitude,
             societeId);
     }
 
@@ -95,24 +120,32 @@ public class Employe : AuditableEntity
         string? rfid,
         string nom,
         string prenom,
+        TypeEmploye typeEmploye,
         string? codeCircuit,
         string? codePointCollecte,
+        string? codeBus,
         string? codeShift,
         string? adresse,
         string? codeGouvernorat,
         string? codeRegion,
+        double? latitude,
+        double? longitude,
         SocieteId societeId)
     {
         Matricule = matricule;
         RFID = rfid;
         Nom = nom;
         Prenom = prenom;
+        TypeEmploye = typeEmploye;
         CodeCircuit = codeCircuit;
         CodePointCollecte = codePointCollecte;
+        CodeBus = codeBus;
         CodeShift = codeShift;
         Adresse = adresse;
         CodeGouvernorat = codeGouvernorat;
         CodeRegion = codeRegion;
+        Latitude = latitude;
+        Longitude = longitude;
         SocieteId = societeId;
     }
 
@@ -122,12 +155,16 @@ public class Employe : AuditableEntity
         string? rfid,
         string nom,
         string prenom,
+        TypeEmploye typeEmploye,
         string? codeCircuit,
         string? codePointCollecte,
+        string? codeBus,
         string? codeShift,
         string? adresse,
         string? codeGouvernorat,
         string? codeRegion,
+        double? latitude,
+        double? longitude,
         SocieteId societeId)
     {
         return new Employe(
@@ -136,12 +173,16 @@ public class Employe : AuditableEntity
             rfid,
             nom,
             prenom,
+            typeEmploye,
             codeCircuit,
             codePointCollecte,
+            codeBus,
             codeShift,
             adresse,
             codeGouvernorat,
             codeRegion,
+            latitude,
+            longitude,
             societeId);
     }
 

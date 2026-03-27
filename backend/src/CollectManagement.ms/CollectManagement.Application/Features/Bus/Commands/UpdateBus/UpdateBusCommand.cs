@@ -8,5 +8,7 @@ public record UpdateBusCommand(
     int? Capacite,
     string? CodeCircuit,
     bool AppSagem,
-    bool IsActive
+    bool IsActive,
+    double? Latitude,
+    double? Longitude
 ) : IRequest<UpdateBusResponse>;

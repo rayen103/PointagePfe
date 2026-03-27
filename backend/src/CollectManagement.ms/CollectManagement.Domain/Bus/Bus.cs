@@ -23,6 +23,10 @@ public class Bus : AuditableEntity
 
     public bool IsActive { get; private set; } = true;
 
+    public double? Latitude { get; private set; }
+
+    public double? Longitude { get; private set; }
+
     public SocieteId SocieteId { get; private set; }
 
     public Societe? Societe { get; private set; }
@@ -36,6 +40,8 @@ public class Bus : AuditableEntity
         string? codeCircuit,
         bool appSagem,
         bool isActive,
+        double? latitude,
+        double? longitude,
         SocieteId societeId)
     {
         BusId = busId;
@@ -46,6 +52,8 @@ public class Bus : AuditableEntity
         CodeCircuit = codeCircuit;
         AppSagem = appSagem;
         IsActive = isActive;
+        Latitude = latitude;
+        Longitude = longitude;
         SocieteId = societeId;
     }
 
@@ -58,6 +66,8 @@ public class Bus : AuditableEntity
         string? codeCircuit,
         bool appSagem,
         bool isActive,
+        double? latitude,
+        double? longitude,
         SocieteId societeId)
     {
         return new Bus(
@@ -69,6 +79,8 @@ public class Bus : AuditableEntity
             codeCircuit,
             appSagem,
             isActive,
+            latitude,
+            longitude,
             societeId);
     }
 
@@ -79,7 +91,9 @@ public class Bus : AuditableEntity
         int? capacite,
         string? codeCircuit,
         bool appSagem,
-        bool isActive)
+        bool isActive,
+        double? latitude,
+        double? longitude)
     {
         NumeroIMM = numeroIMM;
         ModelBus = modelBus;
@@ -88,6 +102,8 @@ public class Bus : AuditableEntity
         CodeCircuit = codeCircuit;
         AppSagem = appSagem;
         IsActive = isActive;
+        Latitude = latitude;
+        Longitude = longitude;
     }
 
     public static Bus QueryCreate(
@@ -99,6 +115,8 @@ public class Bus : AuditableEntity
         string? codeCircuit,
         bool appSagem,
         bool isActive,
+        double? latitude,
+        double? longitude,
         SocieteId societeId)
     {
         return new Bus(
@@ -110,6 +128,8 @@ public class Bus : AuditableEntity
             codeCircuit,
             appSagem,
             isActive,
+            latitude,
+            longitude,
             societeId);
     }
 

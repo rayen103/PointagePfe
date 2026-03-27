@@ -61,12 +61,16 @@ export class EmployeService {
             rfid: null,
             nom: null,
             prenom: null,
+            typeEmploye: 'EmployeSimple',
             codeCircuit: null,
             codePointCollecte: null,
+            codeBus: null,
             codeShift: null,
             adresse: null,
             codeGouvernorat: null,
             codeRegion: null,
+            latitude: null,
+            longitude: null,
             societeId: '',
         };
         this._employes.next([newEmploye, ...this._employes.value]);

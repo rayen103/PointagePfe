@@ -137,12 +137,16 @@ export class EmployeComponent implements OnInit, OnDestroy {
             rfid: [''],
             nom: ['', [Validators.required]],
             prenom: ['', [Validators.required]],
+            typeEmploye: ['EmployeSimple', [Validators.required]],
             codeCircuit: [''],
             codePointCollecte: [''],
+            codeBus: [''],
             codeShift: [''],
             adresse: [''],
             codeGouvernorat: [''],
             codeRegion: [''],
+            latitude: [null],
+            longitude: [null],
             societeId: ['', [Validators.required]]
         });
 

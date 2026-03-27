@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using CollectManagement.Application.Interfaces.Repositories.Employes;
 using CollectManagement.Domain.Employes;
+using CollectManagement.Domain.Employes.Enums;
 using CollectManagement.Domain.Employes.ValueObjects;
 using CollectManagement.Infrastructure.Persistence.Context;
 
@@ -57,12 +58,16 @@ public class EmployeRepository : RepositoryBase<Employe>, IEmployeRepository
                 c.RFID,
                 c.Nom,
                 c.Prenom,
+                c.TypeEmploye,
                 c.CodeCircuit,
                 c.CodePointCollecte,
+                c.CodeBus,
                 c.CodeShift,
                 c.Adresse,
                 c.CodeGouvernorat,
                 c.CodeRegion,
+                c.Latitude,
+                c.Longitude,
                 c.SocieteId
             ))
             .ToListAsync(cancellationToken: cancellationToken)

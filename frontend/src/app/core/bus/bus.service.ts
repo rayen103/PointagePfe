@@ -56,6 +56,8 @@ export class BusService {
             codeCircuit: '',
             appSagem: false,
             isActive: true,
+            latitude: null,
+            longitude: null,
             societeId: ''
         };
         this._bus.next(newBus);

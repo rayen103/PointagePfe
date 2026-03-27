@@ -57,6 +57,8 @@ public class BusRepository : RepositoryBase<Bus>, IBusRepository
                 c.CodeCircuit,
                 c.AppSagem,
                 c.IsActive,
+                c.Latitude,
+                c.Longitude,
                 c.SocieteId
             ))
             .ToListAsync(cancellationToken: cancellationToken)
@@ -80,6 +82,8 @@ public class BusRepository : RepositoryBase<Bus>, IBusRepository
                 c.CodeCircuit,
                 c.AppSagem,
                 c.IsActive,
+                c.Latitude,
+                c.Longitude,
                 c.SocieteId
             ))
             .FirstOrDefaultAsync(cancellationToken)
@@ -99,7 +103,9 @@ public class BusRepository : RepositoryBase<Bus>, IBusRepository
                     .SetProperty(p => p.Capacite, bus.Capacite)
                     .SetProperty(p => p.CodeCircuit, bus.CodeCircuit)
                     .SetProperty(p => p.AppSagem, bus.AppSagem)
-                    .SetProperty(p => p.IsActive, bus.IsActive),
+                    .SetProperty(p => p.IsActive, bus.IsActive)
+                    .SetProperty(p => p.Latitude, bus.Latitude)
+                    .SetProperty(p => p.Longitude, bus.Longitude),
                 cancellationToken)
             .ConfigureAwait(false);
     }

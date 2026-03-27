@@ -32,6 +32,8 @@ public class CreateBusCommandHandler
             request.CodeCircuit,
             request.AppSagem,
             request.IsActive,
+            request.Latitude,
+            request.Longitude,
             societeId);
 
         await _busRepository

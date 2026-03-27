@@ -1,4 +1,5 @@
 using CollectManagement.Domain.Employes;
+using CollectManagement.Domain.Employes.Enums;
 using CollectManagement.Domain.Employes.ValueObjects;
 using CollectManagement.Domain.Societes.ValueObjects;
 
@@ -33,10 +34,19 @@ public class EmployeConfiguration : IEntityTypeConfiguration<Employe>
             .HasMaxLength(100)
             .IsRequired();
 
+        builder.Property(p => p.TypeEmploye)
+            .HasConversion(v => v.ToString(), v => Enum.Parse<TypeEmploye>(v))
+            .HasMaxLength(20)
+            .IsRequired()
+            .HasDefaultValue(TypeEmploye.EmployeSimple);
+
         builder.Property(p => p.CodeCircuit)
             .HasMaxLength(50);
 
         builder.Property(p => p.CodePointCollecte)
+            .HasMaxLength(50);
+
+        builder.Property(p => p.CodeBus)
             .HasMaxLength(50);
 
         builder.Property(p => p.CodeShift)
@@ -50,6 +60,10 @@ public class EmployeConfiguration : IEntityTypeConfiguration<Employe>
 
         builder.Property(p => p.CodeRegion)
             .HasMaxLength(50);
+
+        builder.Property(p => p.Latitude);
+
+        builder.Property(p => p.Longitude);
 
         // Foreign key relationship with Societe
         builder.HasOne(e => e.Societe)

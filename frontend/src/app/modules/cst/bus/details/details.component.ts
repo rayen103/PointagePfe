@@ -1,4 +1,5 @@
 import {
+    AfterViewInit,
     ChangeDetectionStrategy, ChangeDetectorRef,
     Component,
     OnDestroy,
@@ -26,6 +27,7 @@ import { catchError, EMPTY, Subject, takeUntil } from 'rxjs';
 import { BusService } from '../../../../core/bus/bus.service';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UserService } from '../../../../core/user/user.service';
+import { MapPickerComponent } from '../../../../shared/components/map-picker/map-picker.component';
 
 @Component({
   selector: 'app-details',
@@ -47,6 +49,7 @@ import { UserService } from '../../../../core/user/user.service';
         MatSlideToggleModule,
         TranslocoModule,
         RouterLink,
+        MapPickerComponent,
     ],
   templateUrl: './details.component.html',
   styleUrl: './details.component.scss',
@@ -54,13 +57,15 @@ import { UserService } from '../../../../core/user/user.service';
     changeDetection: ChangeDetectionStrategy.OnPush,
     animations: fuseAnimations,
 })
-export class DetailsComponent implements OnInit, OnDestroy {
+export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
     @ViewChild('busFormDirective') busFormDirective: FormGroupDirective;
     busForm: UntypedFormGroup;
     isNewBus: boolean = false;
     bus: Bus;
     flashMessage: 'success' | 'error' | null = null;
     isLoading: boolean = false;
+    mapLatitude: number | null = null;
+    mapLongitude: number | null = null;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     constructor(
@@ -71,6 +76,10 @@ export class DetailsComponent implements OnInit, OnDestroy {
         private _changeDetectorRef: ChangeDetectorRef,
         private _userService: UserService
     ) { }
+
+    ngAfterViewInit(): void {
+        // no-op: map picker initializes itself
+    }
 
     ngOnInit(): void {
 
@@ -83,6 +92,8 @@ export class DetailsComponent implements OnInit, OnDestroy {
             codeCircuit: [''],
             appSagem: [false],
             isActive: [true],
+            latitude: [null],
+            longitude: [null],
             societeId: ['', Validators.required],
         });
 
@@ -106,6 +117,9 @@ export class DetailsComponent implements OnInit, OnDestroy {
                     const { societeId, ...busWithoutSocieteId } = bus;
                     this.busForm.patchValue(busWithoutSocieteId);
                 }
+
+                this.mapLatitude = bus.latitude ?? null;
+                this.mapLongitude = bus.longitude ?? null;
 
                 this._changeDetectorRef.markForCheck();
             });
@@ -169,6 +183,12 @@ export class DetailsComponent implements OnInit, OnDestroy {
                 this.showFlashMessage('error');
             });
 
+    }
+
+    onLocationChange(event: { latitude: number; longitude: number }): void {
+        this.busForm.patchValue({ latitude: event.latitude, longitude: event.longitude });
+        this.mapLatitude = event.latitude;
+        this.mapLongitude = event.longitude;
     }
 
     ngOnDestroy(): void {
