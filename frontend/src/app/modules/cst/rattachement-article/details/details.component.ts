@@ -23,7 +23,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { fuseAnimations } from '../../../../../@fuse/animations';
 import { RattachementArticle } from '../../../../core/rattachement-article/rattachement-article.model';
-import { catchError, EMPTY, Subject, takeUntil } from 'rxjs';
+import { catchError, EMPTY, Observable, Subject, takeUntil } from 'rxjs';
 import { RattachementArticleService } from '../../../../core/rattachement-article/rattachement-article.service';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UserService } from '../../../../core/user/user.service';
@@ -113,7 +113,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
         this.isLoading = true;
         const formValue = this.rattachementArticleForm.getRawValue();
 
-        const save$ = this.isNewRattachementArticle
+        const save$: Observable<any> = this.isNewRattachementArticle
             ? this._rattachementArticleService.AddRattachementArticle(formValue)
             : this._rattachementArticleService.UpdateRattachementArticle(formValue);
 
