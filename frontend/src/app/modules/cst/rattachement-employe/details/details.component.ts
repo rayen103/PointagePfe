@@ -23,7 +23,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { fuseAnimations } from '../../../../../@fuse/animations';
 import { RattachementEmploye } from '../../../../core/rattachement-employe/rattachement-employe.model';
-import { catchError, EMPTY, Subject, takeUntil } from 'rxjs';
+import { catchError, EMPTY, Observable, Subject, takeUntil } from 'rxjs';
 import { RattachementEmployeService } from '../../../../core/rattachement-employe/rattachement-employe.service';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UserService } from '../../../../core/user/user.service';
@@ -115,7 +115,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
         this.isLoading = true;
         const formValue = this.rattachementEmployeForm.getRawValue();
 
-        const save$ = this.isNewRattachementEmploye
+        const save$: Observable<any> = this.isNewRattachementEmploye
             ? this._rattachementEmployeService.AddRattachementEmploye(formValue)
             : this._rattachementEmployeService.UpdateRattachementEmploye(formValue);
 
