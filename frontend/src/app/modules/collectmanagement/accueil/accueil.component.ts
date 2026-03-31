@@ -1,134 +1,264 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, Renderer2 } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { RouterLink } from '@angular/router';
+import {
+    ApexAxisChartSeries,
+    ApexChart,
+    ApexDataLabels,
+    ApexFill,
+    ApexGrid,
+    ApexLegend,
+    ApexNonAxisChartSeries,
+    ApexPlotOptions,
+    ApexStroke,
+    ApexTooltip,
+    ApexXAxis,
+    NgApexchartsModule,
+} from 'ng-apexcharts';
+import { BehaviorSubject, map, Observable, shareReplay, startWith, Subject, switchMap, tap } from 'rxjs';
+import { DashboardAxisChart, DashboardData, DashboardPieChart, DashboardQuickAction } from './dashboard.models';
+import { DashboardService } from './dashboard.service';
 
-@Component({
-  selector: 'app-accueil',
-  standalone: true,
-  imports: [],
-  templateUrl: './accueil.component.html',
-  styleUrl: './accueil.component.scss'
-})
-export class AccueilComponent implements AfterViewInit, OnDestroy {
-    private particlesArray: Particle[] = [];
-    private numberOfParticles = 120;
-    private ctx!: CanvasRenderingContext2D;
-    private canvas!: HTMLCanvasElement;
-    private mouseMoveListener!: () => void;
+type AxisChartOptions = {
+    series: ApexAxisChartSeries;
+    chart: ApexChart;
+    xaxis: ApexXAxis;
+    dataLabels: ApexDataLabels;
+    plotOptions?: ApexPlotOptions;
+    grid: ApexGrid;
+    colors: string[];
+    legend: ApexLegend;
+    tooltip: ApexTooltip;
+    stroke?: ApexStroke;
+    fill?: ApexFill;
+};
 
-    constructor(private el: ElementRef, private renderer: Renderer2) {}
+type PieChartOptions = {
+    series: ApexNonAxisChartSeries;
+    chart: ApexChart;
+    labels: string[];
+    dataLabels: ApexDataLabels;
+    legend: ApexLegend;
+    colors: string[];
+    tooltip: ApexTooltip;
+    stroke?: ApexStroke;
+};
 
-    ngAfterViewInit() {
-        // Récupération des éléments
-        this.canvas = this.el.nativeElement.querySelector("#particles");
-        this.ctx = this.canvas.getContext("2d")!;
-        this.resizeCanvas();
-
-        // Initialisation des particules
-        this.initParticles();
-        this.animateParticles();
-        this.drawConnections();
-
-        // Ajout de l'écouteur de mouvement de la souris
-        this.mouseMoveListener = this.renderer.listen('window', 'mousemove', (event: MouseEvent) => {
-            this.handleMouseMove(event);
-        });
-
-        // Ajout de l'écouteur de redimensionnement de la fenêtre
-        window.addEventListener("resize", () => this.resizeCanvas());
-    }
-
-    ngOnDestroy() {
-        // Suppression des écouteurs d'événements pour éviter les fuites de mémoire
-        if (this.mouseMoveListener) {
-            this.mouseMoveListener();
-        }
-        window.removeEventListener("resize", () => this.resizeCanvas());
-    }
-
-    //  Redimensionner le canvas pour s'adapter à la fenêtre
-    private resizeCanvas() {
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
-    }
-
-    //Initialiser les particules
-    private initParticles() {
-        this.particlesArray = [];
-        for (let i = 0; i < this.numberOfParticles; i++) {
-            this.particlesArray.push(new Particle(this.canvas));
-        }
-    }
-
-    // Animation des particules
-    private animateParticles() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.particlesArray.forEach(particle => {
-            particle.update();
-            particle.draw(this.ctx);
-        });
-        requestAnimationFrame(() => this.animateParticles());
-    }
-
-    // Dessiner les connexions entre les particules
-    private drawConnections() {
-        this.ctx.strokeStyle = "#00e5ff";
-        this.ctx.lineWidth = 0.5;
-
-        for (let i = 0; i < this.particlesArray.length; i++) {
-            for (let j = i + 1; j < this.particlesArray.length; j++) {
-                const p1 = this.particlesArray[i];
-                const p2 = this.particlesArray[j];
-                const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-
-                if (dist < 100) {
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(p1.x, p1.y);
-                    this.ctx.lineTo(p2.x, p2.y);
-                    this.ctx.stroke();
-                }
-            }
-        }
-        requestAnimationFrame(() => this.drawConnections());
-    }
-
-    // Effet interactif avec la souris
-    private handleMouseMove(event: MouseEvent) {
-        const logo = this.el.nativeElement.querySelector(".logo-container");
-        const moveX = (event.clientX - window.innerWidth / 2) * 0.02;
-        const moveY = (event.clientY - window.innerHeight / 2) * 0.02;
-        this.renderer.setStyle(logo, 'transform', `rotateY(${moveX}deg) rotateX(${moveY}deg)`);
-    }
+interface DashboardViewModel {
+    data: DashboardData;
+    barChartOptions: AxisChartOptions;
+    lineChartOptions: AxisChartOptions;
+    pieChartOptions: PieChartOptions;
+    doughnutChartOptions: PieChartOptions;
+    hasBarData: boolean;
+    hasLineData: boolean;
+    hasPieData: boolean;
+    hasDoughnutData: boolean;
 }
 
-// Classe de particule
-class Particle {
-    x: number;
-    y: number;
-    size: number;
-    speedX: number;
-    speedY: number;
-    canvas: HTMLCanvasElement;
+@Component({
+    selector: 'app-accueil',
+    standalone: true,
+    imports: [
+        CommonModule,
+        RouterLink,
+        MatButtonModule,
+        MatIconModule,
+        MatProgressBarModule,
+        MatProgressSpinnerModule,
+        NgApexchartsModule,
+    ],
+    templateUrl: './accueil.component.html',
+    styleUrl: './accueil.component.scss',
+    encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class AccueilComponent {
+    readonly isLoading$ = new BehaviorSubject<boolean>(true);
+    readonly quickActions: DashboardQuickAction[] = [
+        {
+            id: 'create-bus',
+            title: 'Créer un bus',
+            description: 'Ajouter un véhicule à la flotte',
+            icon: 'mat_outline:directions_bus',
+            link: '/fichier/bus/ajouter',
+        },
+        {
+            id: 'create-circuit',
+            title: 'Créer un circuit',
+            description: 'Définir un nouveau trajet',
+            icon: 'mat_outline:alt_route',
+            link: '/fichier/circuit/ajouter',
+        },
+        {
+            id: 'create-ordre',
+            title: 'Nouvel ordre',
+            description: 'Planifier une intervention',
+            icon: 'mat_outline:assignment',
+            link: '/fichier/ordretravail/ajouter',
+        },
+        {
+            id: 'manage-users',
+            title: 'Gérer les utilisateurs',
+            description: 'Accès et rôles',
+            icon: 'mat_outline:group',
+            link: '/fichier/utilisateur',
+        },
+        {
+            id: 'manage-employes',
+            title: 'Gérer les employés',
+            description: 'Effectifs et équipes',
+            icon: 'mat_outline:badge',
+            link: '/fichier/employe',
+        },
+        {
+            id: 'manage-rattachements',
+            title: 'Rattachements',
+            description: 'Suivi des rattachements',
+            icon: 'mat_outline:link',
+            link: '/fichier/rattachement',
+        },
+    ];
 
-    constructor(canvas: HTMLCanvasElement) {
-        this.canvas = canvas;
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 3 + 1;
-        this.speedX = Math.random() * 1.5 - 0.75;
-        this.speedY = Math.random() * 1.5 - 0.75;
+    readonly viewModel$: Observable<DashboardViewModel>;
+
+    private readonly _refresh$ = new Subject<void>();
+
+    constructor(private _dashboardService: DashboardService) {
+        this.viewModel$ = this._refresh$.pipe(
+            startWith(void 0),
+            tap(() => this.isLoading$.next(true)),
+            switchMap(() => this._dashboardService.getDashboardData()),
+            map((data) => this._buildViewModel(data)),
+            tap(() => this.isLoading$.next(false)),
+            shareReplay({ bufferSize: 1, refCount: true })
+        );
     }
 
-    update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        if (this.x > this.canvas.width || this.x < 0) this.speedX *= -1;
-        if (this.y > this.canvas.height || this.y < 0) this.speedY *= -1;
+    refresh(): void {
+        this._refresh$.next();
     }
 
-    draw(ctx: CanvasRenderingContext2D) {
-        ctx.fillStyle = "#00e5ff";
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.closePath();
-        ctx.fill();
+    private _buildViewModel(data: DashboardData): DashboardViewModel {
+        const barChartOptions = this._buildAxisChartOptions(data.charts.bar, 'bar', ['#6366f1']);
+        const lineChartOptions = this._buildAxisChartOptions(data.charts.line, 'line', ['#0ea5e9', '#f97316']);
+        const pieChartOptions = this._buildPieChartOptions(data.charts.pie, 'pie', [
+            '#22c55e',
+            '#f97316',
+            '#6366f1',
+            '#14b8a6',
+        ]);
+        const doughnutChartOptions = this._buildPieChartOptions(data.charts.doughnut, 'donut', ['#10b981', '#ef4444']);
+
+        return {
+            data,
+            barChartOptions,
+            lineChartOptions,
+            pieChartOptions,
+            doughnutChartOptions,
+            hasBarData: this._hasAxisData(data.charts.bar),
+            hasLineData: this._hasAxisData(data.charts.line),
+            hasPieData: this._hasPieData(data.charts.pie),
+            hasDoughnutData: this._hasPieData(data.charts.doughnut),
+        };
+    }
+
+    private _hasAxisData(chart: DashboardAxisChart): boolean {
+        return chart.series.some((series) => series.data.some((value) => value > 0));
+    }
+
+    private _hasPieData(chart: DashboardPieChart): boolean {
+        return chart.series.some((value) => value > 0);
+    }
+
+    private _buildAxisChartOptions(
+        chart: DashboardAxisChart,
+        type: 'bar' | 'line',
+        colors: string[]
+    ): AxisChartOptions {
+        return {
+            series: chart.series,
+            chart: {
+                type,
+                height: 280,
+                toolbar: { show: false },
+                sparkline: { enabled: false },
+            },
+            xaxis: {
+                categories: chart.labels,
+                labels: {
+                    style: {
+                        colors: '#94a3b8',
+                        fontSize: '12px',
+                    },
+                },
+            },
+            dataLabels: { enabled: false },
+            plotOptions:
+                type === 'bar'
+                    ? {
+                          bar: {
+                              columnWidth: '48%',
+                              borderRadius: 6,
+                          },
+                      }
+                    : undefined,
+            grid: {
+                borderColor: 'rgba(148, 163, 184, 0.2)',
+                strokeDashArray: 4,
+            },
+            colors,
+            legend: {
+                show: type === 'line',
+                position: 'top',
+                horizontalAlign: 'left',
+                labels: { colors: '#94a3b8' },
+            },
+            tooltip: { theme: 'light' },
+            stroke:
+                type === 'line'
+                    ? {
+                          curve: 'smooth',
+                          width: 3,
+                      }
+                    : undefined,
+            fill:
+                type === 'line'
+                    ? {
+                          type: 'solid',
+                          opacity: 0.15,
+                      }
+                    : undefined,
+        };
+    }
+
+    private _buildPieChartOptions(
+        chart: DashboardPieChart,
+        type: 'pie' | 'donut',
+        colors: string[]
+    ): PieChartOptions {
+        return {
+            series: chart.series,
+            chart: {
+                type,
+                height: 280,
+                toolbar: { show: false },
+            },
+            labels: chart.labels,
+            dataLabels: { enabled: false },
+            legend: {
+                position: 'bottom',
+                labels: { colors: '#94a3b8' },
+            },
+            colors,
+            tooltip: { theme: 'light' },
+            stroke: {
+                width: 2,
+            },
+        };
     }
 }
