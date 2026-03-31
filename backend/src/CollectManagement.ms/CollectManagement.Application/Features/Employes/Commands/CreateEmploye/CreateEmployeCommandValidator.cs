@@ -24,6 +24,8 @@ public class CreateEmployeCommandValidator : AbstractValidator<CreateEmployeComm
         RuleFor(r => r.SocieteId)
             .NotEmpty()
             .NotNull()
-            .WithMessage("SocieteId is required.");
+            .WithMessage("SocieteId is required.")
+            .Must(value => string.IsNullOrWhiteSpace(value) || Ulid.TryParse(value, out _))
+            .WithMessage("SocieteId must be a valid ULID.");
     }
 }
