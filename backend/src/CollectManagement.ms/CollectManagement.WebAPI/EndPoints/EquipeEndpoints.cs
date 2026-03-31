@@ -65,12 +65,12 @@ public class EquipeEndpoints : ICarterModule
     }
 
     private static async Task<IResult> DeleteEquipe(
-        [FromQuery] [Required] Ulid equipeId,
+        [FromRoute] [Required] Ulid id,
         ISender sender,
         CancellationToken cancellationToken)
     {
         await sender
-            .Send(new DeleteEquipeCommand(equipeId), cancellationToken)
+            .Send(new DeleteEquipeCommand(id), cancellationToken)
             .ConfigureAwait(false);
 
         return Results.Ok(new ApiResponse<bool>(true));

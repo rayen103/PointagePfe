@@ -21,9 +21,21 @@ public class Circuit : AuditableEntity
     
     public bool IsActive { get; private set; } = true;
     
+    public string? CodePCDepart { get; private set; }
+
+    public string? CodePCArrivee { get; private set; }
+
+    public decimal? DistanceKm { get; private set; }
+
+    public int? DureeMinutes { get; private set; }
+
+    public string? Couleur { get; private set; }
+
     public SocieteId SocieteId { get; private set; }
     
     public Societe? Societe { get; private set; }
+
+    public ICollection<CircuitPointCollecte>? CircuitPointsCollecte { get; private set; }
 
     private Circuit(
         CircuitId circuitId,
@@ -33,7 +45,12 @@ public class Circuit : AuditableEntity
         bool isActive,
         SocieteId societeId,
         double? latitude = null,
-        double? longitude = null)
+        double? longitude = null,
+        string? codePCDepart = null,
+        string? codePCArrivee = null,
+        decimal? distanceKm = null,
+        int? dureeMinutes = null,
+        string? couleur = null)
     {
         CircuitId = circuitId;
         CodeCircuit = codeCircuit;
@@ -43,6 +60,11 @@ public class Circuit : AuditableEntity
         SocieteId = societeId;
         Latitude = latitude;
         Longitude = longitude;
+        CodePCDepart = codePCDepart;
+        CodePCArrivee = codePCArrivee;
+        DistanceKm = distanceKm;
+        DureeMinutes = dureeMinutes;
+        Couleur = couleur;
     }
 
     public static Circuit Create(
@@ -53,7 +75,12 @@ public class Circuit : AuditableEntity
         bool isActive,
         SocieteId societeId,
         double? latitude = null,
-        double? longitude = null)
+        double? longitude = null,
+        string? codePCDepart = null,
+        string? codePCArrivee = null,
+        decimal? distanceKm = null,
+        int? dureeMinutes = null,
+        string? couleur = null)
     {
         return new Circuit(
             circuitId,
@@ -63,7 +90,12 @@ public class Circuit : AuditableEntity
             isActive,
             societeId,
             latitude,
-            longitude);
+            longitude,
+            codePCDepart,
+            codePCArrivee,
+            distanceKm,
+            dureeMinutes,
+            couleur);
     }
 
     public void Update(
@@ -72,7 +104,12 @@ public class Circuit : AuditableEntity
         string? description,
         bool isActive,
         double? latitude = null,
-        double? longitude = null)
+        double? longitude = null,
+        string? codePCDepart = null,
+        string? codePCArrivee = null,
+        decimal? distanceKm = null,
+        int? dureeMinutes = null,
+        string? couleur = null)
     {
         CodeCircuit = codeCircuit;
         LibelleCircuit = libelleCircuit;
@@ -80,6 +117,11 @@ public class Circuit : AuditableEntity
         IsActive = isActive;
         Latitude = latitude;
         Longitude = longitude;
+        CodePCDepart = codePCDepart;
+        CodePCArrivee = codePCArrivee;
+        DistanceKm = distanceKm;
+        DureeMinutes = dureeMinutes;
+        Couleur = couleur;
     }
     
     public static Circuit QueryCreate(
@@ -90,7 +132,12 @@ public class Circuit : AuditableEntity
         bool isActive,
         SocieteId societeId,
         double? latitude = null,
-        double? longitude = null)
+        double? longitude = null,
+        string? codePCDepart = null,
+        string? codePCArrivee = null,
+        decimal? distanceKm = null,
+        int? dureeMinutes = null,
+        string? couleur = null)
     {
         return new Circuit(
             circuitId,
@@ -100,7 +147,12 @@ public class Circuit : AuditableEntity
             isActive,
             societeId,
             latitude,
-            longitude);
+            longitude,
+            codePCDepart,
+            codePCArrivee,
+            distanceKm,
+            dureeMinutes,
+            couleur);
     }
 
 #pragma warning disable CS8618

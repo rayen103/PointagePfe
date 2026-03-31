@@ -10,4 +10,9 @@ public class GetOneCircuitDto
     public double? Longitude { get; set; }
     public bool IsActive { get; set; }
     public Ulid SocieteId { get; set; }
+    public string? CodePCDepart { get; set; }
+    public string? CodePCArrivee { get; set; }
+    public decimal? DistanceKm { get; set; }
+    public int? DureeMinutes { get; set; }
+    public string? Couleur { get; set; }
 }

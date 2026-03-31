@@ -37,6 +37,8 @@ public class OrdreTravail : AuditableEntity
     
     public Societe? Societe { get; private set; }
 
+    public ICollection<OrdreTravailDetail>? OrdreTravailDetails { get; private set; }
+
     private OrdreTravail(
         OrdreTravailId ordreTravailId,
         string numeroOrdreTravail,

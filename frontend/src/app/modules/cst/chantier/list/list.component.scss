@@ -1,0 +1,12 @@
+.chantier-grid {
+    grid-template-columns: 48px auto;
+    @screen sm {
+        grid-template-columns: 1fr 2fr 1fr 1fr 100px 100px;
+    }
+}
+.chantier-grid-header {
+    grid-template-columns: 1fr 2fr 1fr 1fr 100px 100px;
+}
+.chantier-grid-item {
+    &:hover { @apply bg-gray-50 dark:bg-hover; }
+}

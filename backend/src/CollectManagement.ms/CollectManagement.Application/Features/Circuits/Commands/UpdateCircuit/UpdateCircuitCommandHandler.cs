@@ -31,7 +31,12 @@ public class UpdateCircuitCommandHandler
             request.Description,
             request.IsActive,
             request.Latitude,
-            request.Longitude
+            request.Longitude,
+            request.CodePCDepart,
+            request.CodePCArrivee,
+            request.DistanceKm,
+            request.DureeMinutes,
+            request.Couleur
         );
 
         await _circuitRepository

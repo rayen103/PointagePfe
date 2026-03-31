@@ -237,6 +237,155 @@
 
             </form>
 
+            <!-- Line Items section — only for existing orders -->
+            @if(!isNewOrdreTravail){
+                <mat-card class="p-6 mt-6">
+                    <mat-card-header class="mb-4">
+                        <mat-card-title>{{ t('Ordre-Travail-Details') }}</mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+
+                        <!-- Details table -->
+                        @if(ordreTravailDetails.length > 0){
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm">
+                                    <thead>
+                                        <tr class="border-b text-hint font-semibold">
+                                            <th class="text-left py-2 pr-4">{{ t('Code-Article') }}</th>
+                                            <th class="text-left py-2 pr-4">{{ t('Libelle-Article') }}</th>
+                                            <th class="text-left py-2 pr-4">{{ t('Code-Entrepot') }}</th>
+                                            <th class="text-left py-2 pr-4">{{ t('Code-Unite') }}</th>
+                                            <th class="text-right py-2 pr-4">{{ t('Quantite') }}</th>
+                                            <th class="text-right py-2 pr-4">{{ t('Prix-Unitaire-HT') }}</th>
+                                            <th class="text-right py-2 pr-4">{{ t('Taux-TVA') }}</th>
+                                            <th class="text-right py-2 pr-4">{{ t('Montant') }}</th>
+                                            <th class="text-center py-2"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for(detail of ordreTravailDetails; track detail.ordreTravailDetailId){
+                                            <tr class="border-b dark:border-slate-700">
+                                                <td class="py-2 pr-4 font-medium">{{ detail.codeArticle }}</td>
+                                                <td class="py-2 pr-4">{{ detail.libelleArticle || '-' }}</td>
+                                                <td class="py-2 pr-4">{{ detail.codeEntrepot || '-' }}</td>
+                                                <td class="py-2 pr-4">{{ detail.codeUnite || '-' }}</td>
+                                                <td class="py-2 pr-4 text-right">{{ detail.quantite ?? '-' }}</td>
+                                                <td class="py-2 pr-4 text-right">{{ detail.prixUnitaireHT ?? '-' }}</td>
+                                                <td class="py-2 pr-4 text-right">{{ detail.tauxTVA ?? '-' }}</td>
+                                                <td class="py-2 pr-4 text-right">{{ detail.montant ?? '-' }}</td>
+                                                <td class="py-2 text-center">
+                                                    <button
+                                                        mat-icon-button
+                                                        [color]="'warn'"
+                                                        type="button"
+                                                        (click)="removeDetail(detail.ordreTravailDetailId)">
+                                                        <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        } @else {
+                            <p class="text-hint text-sm mb-4">{{ t('No-details') }}</p>
+                        }
+
+                        <!-- Add detail inline form -->
+                        <form [formGroup]="newDetailForm" class="mt-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+                                <!-- Code Article -->
+                                <mat-form-field class="w-full">
+                                    <mat-label>{{ t('Code-Article') }}</mat-label>
+                                    <input
+                                        matInput
+                                        formControlName="codeArticle"
+                                        [placeholder]="t('Enter-code-article')">
+                                    @if(newDetailForm.get('codeArticle').hasError('required')){
+                                        <mat-error>{{ t('Code-required') }}</mat-error>
+                                    }
+                                </mat-form-field>
+
+                                <!-- Libelle Article -->
+                                <mat-form-field class="w-full">
+                                    <mat-label>{{ t('Libelle-Article') }}</mat-label>
+                                    <input
+                                        matInput
+                                        formControlName="libelleArticle"
+                                        [placeholder]="t('Enter-libelle-article')">
+                                </mat-form-field>
+
+                                <!-- Code Entrepot -->
+                                <mat-form-field class="w-full">
+                                    <mat-label>{{ t('Code-Entrepot') }}</mat-label>
+                                    <input
+                                        matInput
+                                        formControlName="codeEntrepot"
+                                        [placeholder]="t('Enter-code-entrepot')">
+                                </mat-form-field>
+
+                                <!-- Code Unite -->
+                                <mat-form-field class="w-full">
+                                    <mat-label>{{ t('Code-Unite') }}</mat-label>
+                                    <input
+                                        matInput
+                                        formControlName="codeUnite"
+                                        [placeholder]="t('Enter-code-unite')">
+                                </mat-form-field>
+
+                                <!-- Quantite -->
+                                <mat-form-field class="w-full">
+                                    <mat-label>{{ t('Quantite') }}</mat-label>
+                                    <input
+                                        matInput
+                                        type="number"
+                                        step="0.001"
+                                        formControlName="quantite"
+                                        [placeholder]="t('Enter-quantite')">
+                                </mat-form-field>
+
+                                <!-- Prix Unitaire HT -->
+                                <mat-form-field class="w-full">
+                                    <mat-label>{{ t('Prix-Unitaire-HT') }}</mat-label>
+                                    <input
+                                        matInput
+                                        type="number"
+                                        step="0.01"
+                                        formControlName="prixUnitaireHT"
+                                        [placeholder]="t('Enter-prix-unitaire')">
+                                </mat-form-field>
+
+                                <!-- Taux TVA -->
+                                <mat-form-field class="w-full">
+                                    <mat-label>{{ t('Taux-TVA') }}</mat-label>
+                                    <input
+                                        matInput
+                                        type="number"
+                                        step="0.01"
+                                        formControlName="tauxTVA"
+                                        [placeholder]="t('Enter-taux-tva')">
+                                </mat-form-field>
+
+                            </div>
+
+                            <div class="flex justify-end mt-2">
+                                <button
+                                    mat-flat-button
+                                    type="button"
+                                    [color]="'primary'"
+                                    [disabled]="newDetailForm.invalid"
+                                    (click)="addDetail()">
+                                    <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                                    <span class="ml-2">{{ t('Add-Detail') }}</span>
+                                </button>
+                            </div>
+                        </form>
+
+                    </mat-card-content>
+                </mat-card>
+            }
+
         </div>
     </div>
 

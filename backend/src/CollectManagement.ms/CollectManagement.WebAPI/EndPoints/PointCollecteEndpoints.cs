@@ -65,12 +65,12 @@ public class PointCollecteEndpoints : ICarterModule
     }
 
     private static async Task<IResult> DeletePointCollecte(
-        [FromQuery] [Required] Ulid pointCollecteId,
+        [FromRoute] [Required] Ulid id,
         ISender sender,
         CancellationToken cancellationToken)
     {
         await sender
-            .Send(new DeletePointCollecteCommand(pointCollecteId), cancellationToken)
+            .Send(new DeletePointCollecteCommand(id), cancellationToken)
             .ConfigureAwait(false);
 
         return Results.Ok(new ApiResponse<bool>(true));

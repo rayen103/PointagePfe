@@ -1,3 +1,5 @@
+using CollectManagement.Domain.Employes.Enums;
+
 namespace CollectManagement.Application.Features.Employes.Queries.GetOneEmploye;
 
 public record GetOneEmployeResponse(
@@ -6,11 +8,15 @@ public record GetOneEmployeResponse(
     string? RFID,
     string Nom,
     string Prenom,
+    TypeEmploye TypeEmploye,
     string? CodeCircuit,
     string? CodePointCollecte,
+    string? CodeBus,
     string? CodeShift,
     string? Adresse,
     string? CodeGouvernorat,
     string? CodeRegion,
+    double? Latitude,
+    double? Longitude,
     string SocieteId
 );

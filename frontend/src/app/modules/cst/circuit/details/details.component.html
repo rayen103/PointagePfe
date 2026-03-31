@@ -120,6 +120,73 @@
                                     [placeholder]="t('Enter-longitude')">
                             </mat-form-field>
 
+                            <!-- Code PC Départ -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Code-PC-Depart') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:play'"></mat-icon>
+                                <input
+                                    matInput
+                                    formControlName="codePCDepart"
+                                    [placeholder]="t('Enter-code-pc-depart')">
+                            </mat-form-field>
+
+                            <!-- Code PC Arrivée -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Code-PC-Arrivee') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:stop'"></mat-icon>
+                                <input
+                                    matInput
+                                    formControlName="codePCArrivee"
+                                    [placeholder]="t('Enter-code-pc-arrivee')">
+                            </mat-form-field>
+
+                            <!-- Distance (km) -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Distance-Km') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:arrow-right'"></mat-icon>
+                                <input
+                                    matInput
+                                    type="number"
+                                    formControlName="distanceKm"
+                                    [placeholder]="t('Enter-distance-km')">
+                            </mat-form-field>
+
+                            <!-- Durée (minutes) -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Duree-Minutes') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:clock'"></mat-icon>
+                                <input
+                                    matInput
+                                    type="number"
+                                    formControlName="dureeMinutes"
+                                    [placeholder]="t('Enter-duree-minutes')">
+                            </mat-form-field>
+
+                            <!-- Couleur -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Couleur') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:swatch'"></mat-icon>
+                                <input
+                                    matInput
+                                    formControlName="couleur"
+                                    [placeholder]="t('Enter-couleur')">
+                            </mat-form-field>
+
                             <!-- Societe ID (hidden, populated from user context) -->
                             <input type="hidden" formControlName="societeId">
 
@@ -172,6 +239,108 @@
                 </div>
 
             </form>
+
+            <!-- Waypoints section — only for existing circuits -->
+            @if(!isNewCircuit){
+                <mat-card class="p-6 mt-6">
+                    <mat-card-header class="mb-4">
+                        <mat-card-title>{{ t('Circuit-Points-Collecte') }}</mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+
+                        <!-- Waypoints table -->
+                        @if(circuitPoints.length > 0){
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm">
+                                    <thead>
+                                        <tr class="border-b text-hint font-semibold">
+                                            <th class="text-left py-2 pr-4">{{ t('Ordre') }}</th>
+                                            <th class="text-left py-2 pr-4">{{ t('Code') }}</th>
+                                            <th class="text-left py-2 pr-4">{{ t('Label') }}</th>
+                                            <th class="text-left py-2 pr-4">{{ t('Latitude') }}</th>
+                                            <th class="text-left py-2 pr-4">{{ t('Longitude') }}</th>
+                                            <th class="text-center py-2"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for(point of circuitPoints; track point.circuitPointCollecteId){
+                                            <tr class="border-b dark:border-slate-700">
+                                                <td class="py-2 pr-4">{{ point.ordre ?? '-' }}</td>
+                                                <td class="py-2 pr-4 font-medium">{{ point.codePointCollecte }}</td>
+                                                <td class="py-2 pr-4">{{ point.libellePointCollecte || '-' }}</td>
+                                                <td class="py-2 pr-4">{{ point.latitude ?? '-' }}</td>
+                                                <td class="py-2 pr-4">{{ point.longitude ?? '-' }}</td>
+                                                <td class="py-2 text-center">
+                                                    <button
+                                                        mat-icon-button
+                                                        [color]="'warn'"
+                                                        type="button"
+                                                        (click)="removeWaypoint(point.circuitPointCollecteId)">
+                                                        <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        } @else {
+                            <p class="text-hint text-sm mb-4">{{ t('No-waypoints') }}</p>
+                        }
+
+                        <!-- Add waypoint inline form -->
+                        <form [formGroup]="newPointForm" class="mt-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+                                <!-- Code Point Collecte -->
+                                <mat-form-field class="w-full">
+                                    <mat-label>{{ t('Code-Point-Collecte') }}</mat-label>
+                                    <input
+                                        matInput
+                                        formControlName="codePointCollecte"
+                                        [placeholder]="t('Enter-code-point-collecte')">
+                                    @if(newPointForm.get('codePointCollecte').hasError('required')){
+                                        <mat-error>{{ t('Code-required') }}</mat-error>
+                                    }
+                                </mat-form-field>
+
+                                <!-- Libelle -->
+                                <mat-form-field class="w-full">
+                                    <mat-label>{{ t('Label') }}</mat-label>
+                                    <input
+                                        matInput
+                                        formControlName="libellePointCollecte"
+                                        [placeholder]="t('Enter-circuit-label')">
+                                </mat-form-field>
+
+                                <!-- Ordre -->
+                                <mat-form-field class="w-full">
+                                    <mat-label>{{ t('Ordre') }}</mat-label>
+                                    <input
+                                        matInput
+                                        type="number"
+                                        formControlName="ordre"
+                                        [placeholder]="t('Enter-ordre')">
+                                </mat-form-field>
+
+                            </div>
+
+                            <div class="flex justify-end mt-2">
+                                <button
+                                    mat-flat-button
+                                    type="button"
+                                    [color]="'primary'"
+                                    [disabled]="newPointForm.invalid"
+                                    (click)="addWaypoint()">
+                                    <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                                    <span class="ml-2">{{ t('Add-Waypoint') }}</span>
+                                </button>
+                            </div>
+                        </form>
+
+                    </mat-card-content>
+                </mat-card>
+            }
 
         </div>
     </div>

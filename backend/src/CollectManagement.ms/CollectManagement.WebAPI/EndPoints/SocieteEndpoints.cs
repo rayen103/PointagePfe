@@ -67,12 +67,12 @@ public class SocieteEndpoints :ICarterModule
     }
 
     private static async Task<IResult> DeleteSociete(
-        [FromQuery] [Required] Ulid societeId,
+        [FromRoute] [Required] Ulid id,
         ISender sender,
         CancellationToken cancellationToken)
     {
         await sender
-            .Send(new DeleteSocieteCommand(societeId), cancellationToken)
+            .Send(new DeleteSocieteCommand(id), cancellationToken)
             .ConfigureAwait(false);
         
         return Results.Ok(new ApiResponse<bool>(true));

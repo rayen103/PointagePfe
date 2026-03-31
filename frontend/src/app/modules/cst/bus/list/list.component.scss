@@ -1,0 +1,17 @@
+.bus-grid {
+    grid-template-columns: 48px auto;
+
+    @screen sm {
+        grid-template-columns: 1fr 2fr 1fr 80px 120px 100px;
+    }
+}
+
+.bus-grid-header {
+    grid-template-columns: 1fr 2fr 1fr 80px 120px 100px;
+}
+
+.bus-grid-item {
+    &:hover {
+        @apply bg-gray-50 dark:bg-hover;
+    }
+}

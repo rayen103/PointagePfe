@@ -29,12 +29,16 @@ public class CreateEmployeCommandHandler : IRequestHandler<CreateEmployeCommand,
             request.RFID,
             request.Nom,
             request.Prenom,
+            request.TypeEmploye,
             request.CodeCircuit,
             request.CodePointCollecte,
+            request.CodeBus,
             request.CodeShift,
             request.Adresse,
             request.CodeGouvernorat,
             request.CodeRegion,
+            request.Latitude,
+            request.Longitude,
             societeId
         );
 

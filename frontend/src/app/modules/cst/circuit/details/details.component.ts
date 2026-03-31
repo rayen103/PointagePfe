@@ -23,11 +23,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { fuseAnimations } from '../../../../../@fuse/animations';
 import { Circuit } from '../../../../core/circuit/circuit.model';
+import { CircuitPointCollecte } from '../../../../core/circuit/circuit-point-collecte.model';
+import { CircuitPointCollecteService } from '../../../../core/circuit/circuit-point-collecte.service';
 import { catchError, EMPTY, of, Subject, takeUntil } from 'rxjs';
 import { CircuitService } from '../../../../core/circuit/circuit.service';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UserService } from '../../../../core/user/user.service';
 import { MapPickerComponent } from '../../../../shared/components/map-picker/map-picker.component';
+import { MatTableModule } from '@angular/material/table';
 
 @Component({
   selector: 'app-details',
@@ -50,6 +53,7 @@ import { MapPickerComponent } from '../../../../shared/components/map-picker/map
         TranslocoModule,
         RouterLink,
         MapPickerComponent,
+        MatTableModule,
     ],
   templateUrl: './details.component.html',
   styleUrl: './details.component.scss',
@@ -60,8 +64,10 @@ import { MapPickerComponent } from '../../../../shared/components/map-picker/map
 export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
     @ViewChild('circuitFormDirective') circuitFormDirective: FormGroupDirective;
     circuitForm: UntypedFormGroup;
+    newPointForm: UntypedFormGroup;
     isNewCircuit: boolean = false;
     circuit: Circuit;
+    circuitPoints: CircuitPointCollecte[] = [];
     flashMessage: 'success' | 'error' | null = null;
     isLoading: boolean = false;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
@@ -71,6 +77,7 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         private _router: Router,
         private formBuilder: FormBuilder,
         private _circuitService: CircuitService,
+        private _circuitPointCollecteService: CircuitPointCollecteService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _userService: UserService
     ) { }
@@ -86,6 +93,19 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
             longitude: [null],
             isActive: [true],
             societeId: ['', Validators.required],
+            codePCDepart: [''],
+            codePCArrivee: [''],
+            distanceKm: [null],
+            dureeMinutes: [null],
+            couleur: [''],
+        });
+
+        this.newPointForm = this.formBuilder.group({
+            codePointCollecte: ['', Validators.required],
+            libellePointCollecte: [''],
+            ordre: [null],
+            latitude: [null],
+            longitude: [null],
         });
 
         // Get current user's societeId
@@ -124,6 +144,22 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                 console.log('Form societeId after patch:', this.circuitForm.get('societeId').value);
 
                 this._changeDetectorRef.markForCheck();
+            });
+
+        // Load waypoints for existing circuits
+        this._circuitService.circuit$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((circuit) => {
+                if (circuit?.circuitId) {
+                    this._circuitPointCollecteService.getByCircuit(circuit.circuitId)
+                        .pipe(takeUntil(this._unsubscribeAll))
+                        .subscribe((points) => {
+                            this.circuitPoints = points ?? [];
+                            this._changeDetectorRef.markForCheck();
+                        });
+                } else {
+                    this.circuitPoints = [];
+                }
             });
 
     }
@@ -208,6 +244,47 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
             longitude: location.longitude,
         });
         this._changeDetectorRef.markForCheck();
+    }
+
+    addWaypoint(): void {
+        if (this.newPointForm.invalid || !this.circuit?.circuitId) {
+            return;
+        }
+        const point: CircuitPointCollecte = {
+            circuitPointCollecteId: null,
+            circuitId: this.circuit.circuitId,
+            ...this.newPointForm.getRawValue(),
+        };
+        this._circuitPointCollecteService.add(point)
+            .pipe(
+                catchError(() => {
+                    this.showFlashMessage('error');
+                    return EMPTY;
+                })
+            )
+            .subscribe((created) => {
+                if (created) {
+                    this.circuitPoints = [...this.circuitPoints, created];
+                    this.newPointForm.reset();
+                    this._changeDetectorRef.markForCheck();
+                }
+            });
+    }
+
+    removeWaypoint(id: string): void {
+        this._circuitPointCollecteService.delete(id)
+            .pipe(
+                catchError(() => {
+                    this.showFlashMessage('error');
+                    return EMPTY;
+                })
+            )
+            .subscribe((success) => {
+                if (success) {
+                    this.circuitPoints = this.circuitPoints.filter(p => p.circuitPointCollecteId !== id);
+                    this._changeDetectorRef.markForCheck();
+                }
+            });
     }
 
     ngOnDestroy(): void {

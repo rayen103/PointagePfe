@@ -65,12 +65,12 @@ public class OrdreTravailEndpoints : ICarterModule
     }
 
     private static async Task<IResult> DeleteOrdreTravail(
-        [FromQuery] [Required] Ulid ordreTravailId,
+        [FromRoute] [Required] Ulid id,
         ISender sender,
         CancellationToken cancellationToken)
     {
         await sender
-            .Send(new DeleteOrdreTravailCommand(ordreTravailId), cancellationToken)
+            .Send(new DeleteOrdreTravailCommand(id), cancellationToken)
             .ConfigureAwait(false);
 
         return Results.Ok(new ApiResponse<bool>(true));

@@ -1,5 +1,7 @@
 ﻿
 using Carter;
+using CollectManagement.Domain.Employes.Enums;
+using CollectManagement.WebAPI.Common.Converters;
 using Microsoft.OpenApi.Models;
 
 namespace CollectManagement.WebAPI;
@@ -12,7 +14,15 @@ public static class DependencyInjection
         services.AddEndpointsApiExplorer();
         services.AddSwagger();
         services.AddCarter();
-        
+
+        // Support "HH:mm" / "HH:mm:ss" TimeSpan values sent by the Angular frontend
+        services.ConfigureHttpJsonOptions(o =>
+        {
+            o.SerializerOptions.Converters.Add(new TimeSpanJsonConverter());
+            o.SerializerOptions.Converters.Add(new NullableTimeSpanJsonConverter());
+            o.SerializerOptions.Converters.Add(new StringOrNumberEnumConverter<TypeEmploye>());
+        });
+
         return services;
     }
     

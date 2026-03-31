@@ -22,6 +22,144 @@ namespace CollectManagement.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("CollectManagement.Domain.Bus.Bus", b =>
+                {
+                    b.Property<Guid>("BusId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("AppSagem")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<int?>("Capacite")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CodeCircuit")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("DateInsertion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModification")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("IMEI")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("InsererPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("float");
+
+                    b.Property<string>("ModelBus")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ModifierPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NumeroIMM")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("SocieteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("BusId");
+
+                    b.HasIndex("SocieteId");
+
+                    b.ToTable("Bus");
+                });
+
+            modelBuilder.Entity("CollectManagement.Domain.Chantiers.Chantier", b =>
+                {
+                    b.Property<Guid>("ChantierId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Adresse")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("CodeClient")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("DateDebut")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateFin")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateInsertion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModification")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InsererPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("LibelleChantier")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ModifierPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("MontantHT")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("MontantTTC")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Nature")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("NumeroChantier")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Responsable")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("SocieteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("ChantierId");
+
+                    b.HasIndex("SocieteId");
+
+                    b.ToTable("Chantier");
+                });
+
             modelBuilder.Entity("CollectManagement.Domain.Circuits.Circuit", b =>
                 {
                     b.Property<Guid>("CircuitId")
@@ -32,6 +170,18 @@ namespace CollectManagement.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("CodePCArrivee")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("CodePCDepart")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Couleur")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<DateTime?>("DateInsertion")
                         .HasColumnType("datetime2");
 
@@ -41,6 +191,13 @@ namespace CollectManagement.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal?>("DistanceKm")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<int?>("DureeMinutes")
+                        .HasColumnType("int");
 
                     b.Property<string>("InsererPar")
                         .HasColumnType("nvarchar(max)");
@@ -73,6 +230,53 @@ namespace CollectManagement.Infrastructure.Migrations
                     b.ToTable("Circuit");
                 });
 
+            modelBuilder.Entity("CollectManagement.Domain.Circuits.CircuitPointCollecte", b =>
+                {
+                    b.Property<Guid>("CircuitPointCollecteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CircuitId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CodePointCollecte")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("DateInsertion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModification")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InsererPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("Latitude")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("decimal(18,6)");
+
+                    b.Property<string>("LibellePointCollecte")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<decimal?>("Longitude")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("decimal(18,6)");
+
+                    b.Property<string>("ModifierPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Ordre")
+                        .HasColumnType("int");
+
+                    b.HasKey("CircuitPointCollecteId");
+
+                    b.HasIndex("CircuitId");
+
+                    b.ToTable("CircuitPointCollecte");
+                });
+
             modelBuilder.Entity("CollectManagement.Domain.Employes.Employe", b =>
                 {
                     b.Property<Guid>("EmployeId")
@@ -81,6 +285,10 @@ namespace CollectManagement.Infrastructure.Migrations
                     b.Property<string>("Adresse")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("CodeBus")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("CodeCircuit")
                         .HasMaxLength(50)
@@ -111,6 +319,12 @@ namespace CollectManagement.Infrastructure.Migrations
                     b.Property<string>("InsererPar")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("float");
+
                     b.Property<string>("Matricule")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -135,6 +349,13 @@ namespace CollectManagement.Infrastructure.Migrations
 
                     b.Property<Guid>("SocieteId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TypeEmploye")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("EmployeSimple");
 
                     b.HasKey("EmployeId");
 
@@ -288,6 +509,66 @@ namespace CollectManagement.Infrastructure.Migrations
                     b.ToTable("OrdreTravail");
                 });
 
+            modelBuilder.Entity("CollectManagement.Domain.OrdresTravail.OrdreTravailDetail", b =>
+                {
+                    b.Property<Guid>("OrdreTravailDetailId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CodeArticle")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("CodeEntrepot")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("CodeUnite")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("DateInsertion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModification")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InsererPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LibelleArticle")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ModifierPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("Montant")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<Guid>("OrdreTravailId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("PrixUnitaireHT")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal?>("Quantite")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal?>("TauxTVA")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.HasKey("OrdreTravailDetailId");
+
+                    b.HasIndex("OrdreTravailId");
+
+                    b.ToTable("OrdreTravailDetail");
+                });
+
             modelBuilder.Entity("CollectManagement.Domain.PointsCollecte.PointCollecte", b =>
                 {
                     b.Property<Guid>("PointCollecteId")
@@ -438,6 +719,202 @@ namespace CollectManagement.Infrastructure.Migrations
                     b.HasIndex("SocieteId");
 
                     b.ToTable("Rattachement");
+                });
+
+            modelBuilder.Entity("CollectManagement.Domain.Rattachements.RattachementArticle", b =>
+                {
+                    b.Property<Guid>("RattachementArticleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CodeArticle")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("CodeEntrepot")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("CodeUnite")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("DateBonLivraison")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime?>("DateInsertion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModification")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InsererPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Libelle")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ModifierPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NumeroBonLivraison")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal?>("PrixRevient")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal?>("Quantite")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<Guid>("RattachementId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SocieteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("TauxTVA")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("TypeRattachement")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("RattachementArticleId");
+
+                    b.HasIndex("RattachementId");
+
+                    b.HasIndex("SocieteId");
+
+                    b.ToTable("RattachementArticle");
+                });
+
+            modelBuilder.Entity("CollectManagement.Domain.Rattachements.RattachementEmploye", b =>
+                {
+                    b.Property<Guid>("RattachementEmployeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("Cout")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<decimal?>("CoutGlobal")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<DateTime?>("DateDebut")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime?>("DateFin")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime?>("DateInsertion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModification")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("HeureDebut")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan?>("HeureFin")
+                        .HasColumnType("time");
+
+                    b.Property<string>("InsererPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Matricule")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ModifierPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NomPrenom")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal?>("NombreHeure")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<Guid>("RattachementId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SocieteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TypeRattachement")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("RattachementEmployeId");
+
+                    b.HasIndex("RattachementId");
+
+                    b.HasIndex("SocieteId");
+
+                    b.ToTable("RattachementEmploye");
+                });
+
+            modelBuilder.Entity("CollectManagement.Domain.Shifts.Shift", b =>
+                {
+                    b.Property<Guid>("ShiftId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CodeShift")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("DateInsertion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModification")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan?>("HeureDebut")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan?>("HeureFin")
+                        .HasColumnType("time");
+
+                    b.Property<string>("InsererPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("JourSemaine")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("LibelleShift")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ModifierPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SocieteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ShiftId");
+
+                    b.HasIndex("SocieteId");
+
+                    b.ToTable("Shift");
                 });
 
             modelBuilder.Entity("CollectManagement.Domain.Societes.Societe", b =>
@@ -605,6 +1082,28 @@ namespace CollectManagement.Infrastructure.Migrations
                     b.ToTable("Utilisateur");
                 });
 
+            modelBuilder.Entity("CollectManagement.Domain.Bus.Bus", b =>
+                {
+                    b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
+                        .WithMany()
+                        .HasForeignKey("SocieteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Societe");
+                });
+
+            modelBuilder.Entity("CollectManagement.Domain.Chantiers.Chantier", b =>
+                {
+                    b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
+                        .WithMany()
+                        .HasForeignKey("SocieteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Societe");
+                });
+
             modelBuilder.Entity("CollectManagement.Domain.Circuits.Circuit", b =>
                 {
                     b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
@@ -614,6 +1113,15 @@ namespace CollectManagement.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Societe");
+                });
+
+            modelBuilder.Entity("CollectManagement.Domain.Circuits.CircuitPointCollecte", b =>
+                {
+                    b.HasOne("CollectManagement.Domain.Circuits.Circuit", null)
+                        .WithMany("CircuitPointsCollecte")
+                        .HasForeignKey("CircuitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("CollectManagement.Domain.Employes.Employe", b =>
@@ -649,6 +1157,15 @@ namespace CollectManagement.Infrastructure.Migrations
                     b.Navigation("Societe");
                 });
 
+            modelBuilder.Entity("CollectManagement.Domain.OrdresTravail.OrdreTravailDetail", b =>
+                {
+                    b.HasOne("CollectManagement.Domain.OrdresTravail.OrdreTravail", null)
+                        .WithMany("OrdreTravailDetails")
+                        .HasForeignKey("OrdreTravailId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("CollectManagement.Domain.PointsCollecte.PointCollecte", b =>
                 {
                     b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
@@ -661,6 +1178,55 @@ namespace CollectManagement.Infrastructure.Migrations
                 });
 
             modelBuilder.Entity("CollectManagement.Domain.Rattachements.Rattachement", b =>
+                {
+                    b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
+                        .WithMany()
+                        .HasForeignKey("SocieteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Societe");
+                });
+
+            modelBuilder.Entity("CollectManagement.Domain.Rattachements.RattachementArticle", b =>
+                {
+                    b.HasOne("CollectManagement.Domain.Rattachements.Rattachement", "Rattachement")
+                        .WithMany()
+                        .HasForeignKey("RattachementId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
+                        .WithMany()
+                        .HasForeignKey("SocieteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Rattachement");
+
+                    b.Navigation("Societe");
+                });
+
+            modelBuilder.Entity("CollectManagement.Domain.Rattachements.RattachementEmploye", b =>
+                {
+                    b.HasOne("CollectManagement.Domain.Rattachements.Rattachement", "Rattachement")
+                        .WithMany()
+                        .HasForeignKey("RattachementId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
+                        .WithMany()
+                        .HasForeignKey("SocieteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Rattachement");
+
+                    b.Navigation("Societe");
+                });
+
+            modelBuilder.Entity("CollectManagement.Domain.Shifts.Shift", b =>
                 {
                     b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
                         .WithMany()
@@ -742,6 +1308,16 @@ namespace CollectManagement.Infrastructure.Migrations
                     b.Navigation("RoleUtilisateur");
 
                     b.Navigation("Societe");
+                });
+
+            modelBuilder.Entity("CollectManagement.Domain.Circuits.Circuit", b =>
+                {
+                    b.Navigation("CircuitPointsCollecte");
+                });
+
+            modelBuilder.Entity("CollectManagement.Domain.OrdresTravail.OrdreTravail", b =>
+                {
+                    b.Navigation("OrdreTravailDetails");
                 });
 #pragma warning restore 612, 618
         }

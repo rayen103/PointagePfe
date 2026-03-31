@@ -7,5 +7,10 @@ public record UpdateCircuitCommand(
     string? Description,
     double? Latitude,
     double? Longitude,
-    bool IsActive
+    bool IsActive,
+    string? CodePCDepart,
+    string? CodePCArrivee,
+    decimal? DistanceKm,
+    int? DureeMinutes,
+    string? Couleur
 ) : IRequest<UpdateCircuitResponse>;

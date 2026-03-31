@@ -27,6 +27,7 @@ import { RattachementService } from '../../../../core/rattachement/rattachement.
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UserService } from '../../../../core/user/user.service';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { NgxMatTimepickerModule } from 'ngx-mat-timepicker';
 
 @Component({
   selector: 'app-details',
@@ -49,6 +50,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
         MatExpansionModule,
         TranslocoModule,
         RouterLink,
+        NgxMatTimepickerModule,
     ],
   templateUrl: './details.component.html',
   styleUrl: './details.component.scss',
