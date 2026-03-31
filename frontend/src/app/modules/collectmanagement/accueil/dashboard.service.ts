@@ -26,6 +26,12 @@ import {
     providedIn: 'root',
 })
 export class DashboardService {
+    private readonly DASHBOARD_FETCH_LIMIT = 200;
+    private readonly DEFAULT_ACTIVITY_LIMIT = 5;
+    private readonly ACTIVE_RATE_THRESHOLD = 80;
+    private readonly FALLBACK_NEW_ORDER_LABEL = 'Nouvelle intervention';
+    private readonly FALLBACK_RECENT_UPDATE_LABEL = 'Mise à jour récente';
+
     constructor(
         private _utilisateurService: UtilisateurService,
         private _employeService: EmployeService,
@@ -37,12 +43,12 @@ export class DashboardService {
 
     getDashboardData(): Observable<DashboardData> {
         return forkJoin({
-            utilisateurs: this._utilisateurService.GetUtilisateur(1, 1),
-            employes: this._employeService.GetEmploye(1, 1000),
-            buses: this._busService.GetBuses(1, 1000),
-            circuits: this._circuitService.GetCircuit(1, 1000),
-            ordresTravail: this._ordreTravailService.GetOrdresTravail(1, 200),
-            rattachements: this._rattachementService.GetRattachements(1, 200),
+            utilisateurs: this._utilisateurService.GetUtilisateur(1, this.DASHBOARD_FETCH_LIMIT),
+            employes: this._employeService.GetEmploye(1, this.DASHBOARD_FETCH_LIMIT),
+            buses: this._busService.GetBuses(1, this.DASHBOARD_FETCH_LIMIT),
+            circuits: this._circuitService.GetCircuit(1, this.DASHBOARD_FETCH_LIMIT),
+            ordresTravail: this._ordreTravailService.GetOrdresTravail(1, this.DASHBOARD_FETCH_LIMIT),
+            rattachements: this._rattachementService.GetRattachements(1, this.DASHBOARD_FETCH_LIMIT),
         }).pipe(
             map((payload) => this._buildDashboardData(payload)),
             catchError(() =>
@@ -63,28 +69,32 @@ export class DashboardService {
         ordresTravail: PagedOrdreTravail;
         rattachements: PagedRattachement;
     }): DashboardData {
-        const totalUsers = payload.utilisateurs?.length ?? 0;
-        const totalEmployees = payload.employes?.total ?? 0;
-        const totalBuses = payload.buses?.totalCount ?? 0;
-        const totalCircuits = payload.circuits?.totalCount ?? 0;
-        const totalOrdresTravail = payload.ordresTravail?.totalCount ?? 0;
-        const totalRattachements = payload.rattachements?.totalCount ?? 0;
-
+        const utilisateurs = payload.utilisateurs?.utilisateurs ?? [];
+        const employes = payload.employes?.employes ?? [];
         const buses = payload.buses?.buses ?? [];
         const circuits = payload.circuits?.circuits ?? [];
-        const employes = payload.employes?.employes ?? [];
         const ordresTravail = payload.ordresTravail?.ordresTravail ?? [];
         const rattachements = payload.rattachements?.rattachements ?? [];
+
+        const totalUsers = this._resolveTotal(payload.utilisateurs?.length, utilisateurs);
+        const totalEmployees = this._resolveTotal(payload.employes?.total, employes);
+        const totalBuses = this._resolveTotal(payload.buses?.totalCount, buses);
+        const totalCircuits = this._resolveTotal(payload.circuits?.totalCount, circuits);
+        const totalOrdresTravail = this._resolveTotal(payload.ordresTravail?.totalCount, ordresTravail);
+        const totalRattachements = this._resolveTotal(payload.rattachements?.totalCount, rattachements);
 
         const activeBuses = buses.filter((bus) => bus.isActive).length;
         const inactiveBuses = buses.length - activeBuses;
         const activeCircuits = circuits.filter((circuit) => circuit.isActive).length;
         const inactiveCircuits = circuits.length - activeCircuits;
-        const activeEntities = activeBuses + activeCircuits;
-        const inactiveEntities = inactiveBuses + inactiveCircuits;
+        const hasFullBusData = totalBuses === 0 || buses.length >= totalBuses;
+        const hasFullCircuitData = totalCircuits === 0 || circuits.length >= totalCircuits;
+        const canComputeFleetStatus = hasFullBusData && hasFullCircuitData;
+        const activeEntities = canComputeFleetStatus ? activeBuses + activeCircuits : 0;
+        const inactiveEntities = canComputeFleetStatus ? inactiveBuses + inactiveCircuits : 0;
 
-        const busActiveRate = this._percentage(activeBuses, buses.length);
-        const circuitActiveRate = this._percentage(activeCircuits, circuits.length);
+        const busActiveRate = hasFullBusData ? this._percentage(activeBuses, totalBuses) : 0;
+        const circuitActiveRate = hasFullCircuitData ? this._percentage(activeCircuits, totalCircuits) : 0;
 
         const kpis: DashboardKpi[] = [
             {
@@ -107,11 +117,11 @@ export class DashboardService {
                 value: totalBuses,
                 icon: 'mat_outline:directions_bus',
                 color: '#7c3aed',
-                change: buses.length
+                change: hasFullBusData && buses.length
                     ? {
                           value: busActiveRate,
                           label: 'Actifs',
-                          isPositive: busActiveRate >= 80,
+                          isPositive: busActiveRate >= this.ACTIVE_RATE_THRESHOLD,
                       }
                     : undefined,
             },
@@ -121,11 +131,11 @@ export class DashboardService {
                 value: totalCircuits,
                 icon: 'mat_outline:alt_route',
                 color: '#f97316',
-                change: circuits.length
+                change: hasFullCircuitData && circuits.length
                     ? {
                           value: circuitActiveRate,
                           label: 'Actifs',
-                          isPositive: circuitActiveRate >= 80,
+                          isPositive: circuitActiveRate >= this.ACTIVE_RATE_THRESHOLD,
                       }
                     : undefined,
             },
@@ -163,10 +173,12 @@ export class DashboardService {
         };
 
         const pieChart = this._buildEmployeDistribution(employes);
-        const doughnutChart: DashboardPieChart = {
-            labels: ['Actifs', 'Inactifs'],
-            series: [activeEntities, inactiveEntities],
-        };
+        const doughnutChart: DashboardPieChart = canComputeFleetStatus
+            ? {
+                  labels: ['Actifs', 'Inactifs'],
+                  series: [activeEntities, inactiveEntities],
+              }
+            : { labels: [], series: [] };
 
         const monthBuckets = this._buildMonthBuckets(6);
         const lineChart: DashboardAxisChart = {
@@ -187,7 +199,7 @@ export class DashboardService {
             (item, date, index) => ({
                 id: item.ordreTravailId ?? `ordre-${index}`,
                 title: `Ordre ${item.numeroOrdreTravail}`,
-                description: item.libelle || item.numeroChantier || 'Nouvelle intervention',
+                description: item.libelle ?? item.numeroChantier ?? this.FALLBACK_NEW_ORDER_LABEL,
                 date,
                 icon: 'mat_outline:assignment',
                 type: 'created',
@@ -200,7 +212,7 @@ export class DashboardService {
             (item, date, index) => ({
                 id: item.rattachementId ?? `rattachement-${index}`,
                 title: `Rattachement ${item.numeroRattachement}`,
-                description: item.status || item.type || 'Mise à jour récente',
+                description: item.status ?? item.type ?? this.FALLBACK_RECENT_UPDATE_LABEL,
                 date,
                 icon: 'mat_outline:link',
                 type: 'updated',
@@ -210,16 +222,24 @@ export class DashboardService {
         const systemActivity: DashboardActivityItem[] = [
             {
                 id: 'bus-availability',
-                title: `${activeBuses} bus actifs sur ${totalBuses}`,
-                description: 'Disponibilité de la flotte',
+                title: hasFullBusData
+                    ? `${activeBuses} bus actifs sur ${totalBuses}`
+                    : `${activeBuses} bus actifs (échantillon ${buses.length}/${totalBuses})`,
+                description: hasFullBusData
+                    ? 'Disponibilité de la flotte'
+                    : 'Aperçu basé sur un échantillon',
                 date: new Date(),
                 icon: 'mat_outline:directions_bus',
                 type: 'system',
             },
             {
                 id: 'circuit-availability',
-                title: `${activeCircuits} circuits actifs sur ${totalCircuits}`,
-                description: 'Trajets opérationnels',
+                title: hasFullCircuitData
+                    ? `${activeCircuits} circuits actifs sur ${totalCircuits}`
+                    : `${activeCircuits} circuits actifs (échantillon ${circuits.length}/${totalCircuits})`,
+                description: hasFullCircuitData
+                    ? 'Trajets opérationnels'
+                    : 'Aperçu basé sur un échantillon',
                 date: new Date(),
                 icon: 'mat_outline:alt_route',
                 type: 'system',
@@ -285,7 +305,7 @@ export class DashboardService {
                 return;
             }
 
-            const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+            const key = this._formatMonthKey(date);
             if (bucketMap.has(key)) {
                 bucketMap.set(key, (bucketMap.get(key) ?? 0) + 1);
             }
@@ -303,7 +323,7 @@ export class DashboardService {
 
         for (let offset = monthCount - 1; offset >= 0; offset -= 1) {
             const date = new Date(now.getFullYear(), now.getMonth() - offset, 1);
-            const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+            const key = this._formatMonthKey(date);
             const label = date.toLocaleString('fr-FR', { month: 'short', year: 'numeric' });
             buckets.push({ key, label });
         }
@@ -315,7 +335,7 @@ export class DashboardService {
         items: T[],
         getDate: (item: T) => Date | string | null | undefined,
         mapItem: (item: T, date: Date, index: number) => DashboardActivityItem,
-        limit: number = 5
+        limit: number = this.DEFAULT_ACTIVITY_LIMIT
     ): DashboardActivityItem[] {
         return items
             .map((item, index) => ({
@@ -348,6 +368,18 @@ export class DashboardService {
         }
 
         return Math.round((part / total) * 100);
+    }
+
+    private _resolveTotal<T>(total: number | null | undefined, items: T[]): number {
+        if (typeof total === 'number') {
+            return total;
+        }
+
+        return items.length;
+    }
+
+    private _formatMonthKey(date: Date): string {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
     }
 
     private _buildEmptyDashboardData(errorMessage?: string): DashboardData {

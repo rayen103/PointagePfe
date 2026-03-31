@@ -78,6 +78,13 @@ interface DashboardViewModel {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccueilComponent {
+    private readonly CHART_COLORS = {
+        bar: ['#6366f1'],
+        line: ['#0ea5e9', '#f97316'],
+        pie: ['#22c55e', '#f97316', '#6366f1', '#14b8a6'],
+        doughnut: ['#10b981', '#ef4444'],
+    };
+
     readonly isLoading$ = new BehaviorSubject<boolean>(true);
     readonly quickActions: DashboardQuickAction[] = [
         {
@@ -144,15 +151,14 @@ export class AccueilComponent {
     }
 
     private _buildViewModel(data: DashboardData): DashboardViewModel {
-        const barChartOptions = this._buildAxisChartOptions(data.charts.bar, 'bar', ['#6366f1']);
-        const lineChartOptions = this._buildAxisChartOptions(data.charts.line, 'line', ['#0ea5e9', '#f97316']);
-        const pieChartOptions = this._buildPieChartOptions(data.charts.pie, 'pie', [
-            '#22c55e',
-            '#f97316',
-            '#6366f1',
-            '#14b8a6',
-        ]);
-        const doughnutChartOptions = this._buildPieChartOptions(data.charts.doughnut, 'donut', ['#10b981', '#ef4444']);
+        const barChartOptions = this._buildAxisChartOptions(data.charts.bar, 'bar', this.CHART_COLORS.bar);
+        const lineChartOptions = this._buildAxisChartOptions(data.charts.line, 'line', this.CHART_COLORS.line);
+        const pieChartOptions = this._buildPieChartOptions(data.charts.pie, 'pie', this.CHART_COLORS.pie);
+        const doughnutChartOptions = this._buildPieChartOptions(
+            data.charts.doughnut,
+            'donut',
+            this.CHART_COLORS.doughnut
+        );
 
         return {
             data,
