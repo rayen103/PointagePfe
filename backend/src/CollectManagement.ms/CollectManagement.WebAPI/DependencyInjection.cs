@@ -1,5 +1,6 @@
 ﻿
 using Carter;
+using CollectManagement.Domain.Employes.Enums;
 using CollectManagement.WebAPI.Common.Converters;
 using Microsoft.OpenApi.Models;
 
@@ -19,6 +20,7 @@ public static class DependencyInjection
         {
             o.SerializerOptions.Converters.Add(new TimeSpanJsonConverter());
             o.SerializerOptions.Converters.Add(new NullableTimeSpanJsonConverter());
+            o.SerializerOptions.Converters.Add(new StringOrNumberEnumConverter<TypeEmploye>());
         });
 
         return services;
