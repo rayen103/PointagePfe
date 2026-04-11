@@ -1,22 +1,280 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<div class="dashboard-page flex flex-col flex-auto min-w-0 bg-default">
+    <div class="dashboard-header flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-4 sm:px-6 md:px-8 pt-6">
+        <div>
+            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Tableau de bord</h1>
+            <div class="text-sm text-secondary">
+                Vue d'ensemble en temps réel de vos opérations
+            </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+            <button
+                mat-stroked-button
+                (click)="refresh()"
+                aria-label="Actualiser le tableau de bord"
+                [attr.aria-busy]="(isLoading$ | async) ? true : null"
+                [disabled]="isLoading$ | async">
+                <mat-icon [svgIcon]="'mat_outline:refresh'"></mat-icon>
+                <span class="ml-2">Actualiser</span>
+            </button>
+            <button mat-flat-button color="primary" routerLink="/fichier/utilisateur">
+                <mat-icon [svgIcon]="'mat_outline:group'"></mat-icon>
+                <span class="ml-2">Gérer les utilisateurs</span>
+            </button>
+        </div>
+    </div>
 
-</head>
-<body>
+    @if (isLoading$ | async) {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
 
-<!-- Canvas pour les particules et les connexions -->
-<canvas id="particles"></canvas>
+    <div class="dashboard-content px-4 sm:px-6 md:px-8 pb-10 pt-6">
+        @if (viewModel$ | async; as vm) {
+            @if (vm.data.errorMessage) {
+                <div class="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                    {{ vm.data.errorMessage }}
+                </div>
+            }
 
-<!-- Conteneur du logo -->
-<div class="logo-container">
-    <div class="wave"></div> <!-- Ondes lumineuses -->
-    <img src="images/logo/logo.svg" alt="Logo Industrie 4.0" class="logo">
-    <div class="pulse-effect"></div> <!-- Effet de halo -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-4">
+                @if (vm.data.kpis.length > 0) {
+                    @for (kpi of vm.data.kpis; track kpi.id) {
+                        <div class="kpi-card bg-card p-4 flex items-center gap-4" [style.--kpi-color]="kpi.color">
+                            <div class="kpi-icon">
+                                <mat-icon [svgIcon]="kpi.icon"></mat-icon>
+                            </div>
+                            <div class="flex-1">
+                                <div class="text-sm text-secondary">{{ kpi.title }}</div>
+                                <div class="text-2xl font-semibold">{{ kpi.value | number }}</div>
+                                @if (kpi.change) {
+                                    <div
+                                        class="kpi-delta"
+                                        [class.kpi-delta--positive]="kpi.change.isPositive"
+                                        [class.kpi-delta--negative]="!kpi.change.isPositive">
+                                        <mat-icon
+                                            [svgIcon]="kpi.change.isPositive ? 'mat_outline:trending_up' : 'mat_outline:trending_down'"
+                                            class="icon-size-4">
+                                        </mat-icon>
+                                        <span>{{ kpi.change.value }}%</span>
+                                        <span class="text-secondary">{{ kpi.change.label }}</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                } @else {
+                    <div class="empty-state col-span-full">Aucune statistique disponible.</div>
+                }
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-6">
+                <div class="chart-card bg-card p-4">
+                    <div class="flex items-start justify-between mb-3">
+                        <div>
+                            <div class="text-lg font-semibold">Comparaison des entités</div>
+                            <div class="text-sm text-secondary">Vue globale des volumes</div>
+                        </div>
+                    </div>
+                    @if (vm.hasBarData) {
+                        <apx-chart
+                            [series]="vm.barChartOptions.series"
+                            [chart]="vm.barChartOptions.chart"
+                            [xaxis]="vm.barChartOptions.xaxis"
+                            [plotOptions]="vm.barChartOptions.plotOptions"
+                            [dataLabels]="vm.barChartOptions.dataLabels"
+                            [grid]="vm.barChartOptions.grid"
+                            [colors]="vm.barChartOptions.colors"
+                            [legend]="vm.barChartOptions.legend"
+                            [tooltip]="vm.barChartOptions.tooltip">
+                        </apx-chart>
+                    } @else {
+                        <div class="empty-state">Aucune donnée disponible.</div>
+                    }
+                </div>
+
+                <div class="chart-card bg-card p-4">
+                    <div class="flex items-start justify-between mb-3">
+                        <div>
+                            <div class="text-lg font-semibold">Répartition des employés</div>
+                            <div class="text-sm text-secondary">Types et profils</div>
+                        </div>
+                    </div>
+                    @if (vm.hasPieData) {
+                        <apx-chart
+                            [series]="vm.pieChartOptions.series"
+                            [chart]="vm.pieChartOptions.chart"
+                            [labels]="vm.pieChartOptions.labels"
+                            [dataLabels]="vm.pieChartOptions.dataLabels"
+                            [legend]="vm.pieChartOptions.legend"
+                            [colors]="vm.pieChartOptions.colors"
+                            [tooltip]="vm.pieChartOptions.tooltip"
+                            [stroke]="vm.pieChartOptions.stroke">
+                        </apx-chart>
+                    } @else {
+                        <div class="empty-state">Aucune donnée disponible.</div>
+                    }
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-6">
+                <div class="chart-card bg-card p-4">
+                    <div class="flex items-start justify-between mb-3">
+                        <div>
+                            <div class="text-lg font-semibold">Activité mensuelle</div>
+                            <div class="text-sm text-secondary">Ordres et rattachements</div>
+                        </div>
+                    </div>
+                    @if (vm.hasLineData) {
+                        <apx-chart
+                            [series]="vm.lineChartOptions.series"
+                            [chart]="vm.lineChartOptions.chart"
+                            [xaxis]="vm.lineChartOptions.xaxis"
+                            [dataLabels]="vm.lineChartOptions.dataLabels"
+                            [grid]="vm.lineChartOptions.grid"
+                            [colors]="vm.lineChartOptions.colors"
+                            [legend]="vm.lineChartOptions.legend"
+                            [tooltip]="vm.lineChartOptions.tooltip"
+                            [stroke]="vm.lineChartOptions.stroke"
+                            [fill]="vm.lineChartOptions.fill">
+                        </apx-chart>
+                    } @else {
+                        <div class="empty-state">Aucune donnée disponible.</div>
+                    }
+                </div>
+
+                <div class="chart-card bg-card p-4">
+                    <div class="flex items-start justify-between mb-3">
+                        <div>
+                            <div class="text-lg font-semibold">Actifs vs inactifs</div>
+                            <div class="text-sm text-secondary">Parc & trajets</div>
+                        </div>
+                    </div>
+                    @if (vm.hasDoughnutData) {
+                        <apx-chart
+                            [series]="vm.doughnutChartOptions.series"
+                            [chart]="vm.doughnutChartOptions.chart"
+                            [labels]="vm.doughnutChartOptions.labels"
+                            [dataLabels]="vm.doughnutChartOptions.dataLabels"
+                            [legend]="vm.doughnutChartOptions.legend"
+                            [colors]="vm.doughnutChartOptions.colors"
+                            [tooltip]="vm.doughnutChartOptions.tooltip"
+                            [stroke]="vm.doughnutChartOptions.stroke">
+                        </apx-chart>
+                    } @else {
+                        <div class="empty-state">Aucune donnée disponible.</div>
+                    }
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 mt-6">
+                <div class="bg-card p-4 xl:col-span-2">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <div>
+                            <div class="text-lg font-semibold">Activité récente</div>
+                            <div class="text-sm text-secondary">Créations, mises à jour et état du système</div>
+                        </div>
+                        <div class="text-xs text-secondary">
+                            Mis à jour {{ vm.data.lastUpdated | date: 'dd MMM, HH:mm' }}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                        <div>
+                            <div class="text-sm font-semibold">Créations récentes</div>
+                            <div class="space-y-3 mt-3">
+                                @if (vm.data.recentCreated.length > 0) {
+                                    @for (item of vm.data.recentCreated; track item.id) {
+                                        <div class="activity-item hover:bg-gray-50/60 dark:hover:bg-white/5">
+                                            <div class="flex items-start gap-3">
+                                                <mat-icon [svgIcon]="item.icon" class="icon-size-5 text-primary"></mat-icon>
+                                                <div class="flex-1">
+                                                    <div class="text-sm font-semibold">{{ item.title }}</div>
+                                                    <div class="text-xs text-secondary">{{ item.description }}</div>
+                                                    <div class="text-xs text-secondary mt-1">
+                                                        {{ item.date | date: 'dd MMM, HH:mm' }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                } @else {
+                                    <div class="empty-state text-xs">Aucune création récente.</div>
+                                }
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="text-sm font-semibold">Mises à jour</div>
+                            <div class="space-y-3 mt-3">
+                                @if (vm.data.recentUpdated.length > 0) {
+                                    @for (item of vm.data.recentUpdated; track item.id) {
+                                        <div class="activity-item hover:bg-gray-50/60 dark:hover:bg-white/5">
+                                            <div class="flex items-start gap-3">
+                                                <mat-icon [svgIcon]="item.icon" class="icon-size-5 text-accent"></mat-icon>
+                                                <div class="flex-1">
+                                                    <div class="text-sm font-semibold">{{ item.title }}</div>
+                                                    <div class="text-xs text-secondary">{{ item.description }}</div>
+                                                    <div class="text-xs text-secondary mt-1">
+                                                        {{ item.date | date: 'dd MMM, HH:mm' }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                } @else {
+                                    <div class="empty-state text-xs">Aucune mise à jour récente.</div>
+                                }
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="text-sm font-semibold">État du système</div>
+                            <div class="space-y-3 mt-3">
+                                @if (vm.data.systemActivity.length > 0) {
+                                    @for (item of vm.data.systemActivity; track item.id) {
+                                        <div class="activity-item hover:bg-gray-50/60 dark:hover:bg-white/5">
+                                            <div class="flex items-start gap-3">
+                                                <mat-icon [svgIcon]="item.icon" class="icon-size-5 text-primary"></mat-icon>
+                                                <div class="flex-1">
+                                                    <div class="text-sm font-semibold">{{ item.title }}</div>
+                                                    <div class="text-xs text-secondary">{{ item.description }}</div>
+                                                    <div class="text-xs text-secondary mt-1">
+                                                        {{ item.date | date: 'dd MMM, HH:mm' }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                } @else {
+                                    <div class="empty-state text-xs">Aucune activité disponible.</div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-card p-4">
+                    <div class="text-lg font-semibold">Actions rapides</div>
+                    <div class="text-sm text-secondary">Raccourcis vers les tâches clés</div>
+
+                    <div class="grid gap-3 mt-4">
+                        @for (action of quickActions; track action.id) {
+                            <button class="quick-action w-full" mat-stroked-button [routerLink]="action.link">
+                                <mat-icon [svgIcon]="action.icon"></mat-icon>
+                                <div class="ml-3 text-left">
+                                    <div class="font-semibold">{{ action.title }}</div>
+                                    <div class="text-xs text-secondary">{{ action.description }}</div>
+                                </div>
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (isLoading$ | async) {
+        <div class="loading-overlay">
+            <mat-progress-spinner diameter="48" mode="indeterminate"></mat-progress-spinner>
+        </div>
+    }
 </div>
-
-<script src="script.js"></script>
-</body>
-</html>
