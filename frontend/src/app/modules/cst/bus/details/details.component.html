@@ -122,9 +122,10 @@
                                             }
                                         </mat-option>
                                     }
-                                    @if(busForm.get('codeCircuit')?.value && !hasExistingCircuit(busForm.get('codeCircuit')?.value)){
-                                        <mat-option [value]="busForm.get('codeCircuit')?.value">
-                                            {{ busForm.get('codeCircuit')?.value }}
+                                    @let selectedCodeCircuit = busForm.get('codeCircuit')?.value;
+                                    @if(selectedCodeCircuit && !hasExistingCircuit(selectedCodeCircuit)){
+                                        <mat-option [value]="selectedCodeCircuit">
+                                            {{ selectedCodeCircuit }}
                                         </mat-option>
                                     }
                                 </mat-select>
