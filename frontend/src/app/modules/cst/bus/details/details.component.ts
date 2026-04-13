@@ -23,7 +23,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { fuseAnimations } from '../../../../../@fuse/animations';
 import { Bus } from '../../../../core/bus/bus.model';
-import { catchError, EMPTY, of, Subject, switchMap, takeUntil, distinctUntilChanged, startWith } from 'rxjs';
+import { catchError, EMPTY, Observable, of, Subject, switchMap, takeUntil, distinctUntilChanged, startWith, map, take } from 'rxjs';
 import { BusService } from '../../../../core/bus/bus.service';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UserService } from '../../../../core/user/user.service';
@@ -121,7 +121,7 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                         this.circuits = user?.societeId
                             ? allCircuits.filter((c) => c.societeId === user.societeId)
                             : allCircuits;
-                        this.onCircuitChanged(this.busForm.get('codeCircuit')?.value);
+                        this.refreshSelectedCircuitRoute();
                         this._changeDetectorRef.markForCheck();
                     });
             });
@@ -131,6 +131,7 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                 startWith(this.busForm.get('codeCircuit')?.value),
                 distinctUntilChanged(),
                 switchMap((codeCircuit: string | null) => this.onCircuitChanged(codeCircuit)),
+                catchError(() => of([])),
                 takeUntil(this._unsubscribeAll)
             )
             .subscribe((routePoints) => {
@@ -232,7 +233,7 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         return this.circuits.some((circuit) => circuit.codeCircuit === codeCircuit);
     }
 
-    private onCircuitChanged(codeCircuit: string | null | undefined) {
+    private onCircuitChanged(codeCircuit: string | null | undefined): Observable<MapRoutePoint[]> {
         if (!codeCircuit) {
             this.departurePoint = '';
             this.arrivalPoint = '';
@@ -250,7 +251,7 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         return this._circuitPointCollecteService.getByCircuit(selectedCircuit.circuitId)
             .pipe(
                 catchError(() => of([])),
-                switchMap((points) => {
+                map((points) => {
                     const orderedPoints = [...points]
                         .sort((a, b) => (a.ordre ?? 0) - (b.ordre ?? 0))
                         .filter((p) => p.latitude != null && p.longitude != null)
@@ -261,22 +262,39 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                         }));
 
                     if (orderedPoints.length > 0) {
-                        return of(orderedPoints);
+                        return orderedPoints;
                     }
 
                     if (selectedCircuit.latitude != null && selectedCircuit.longitude != null) {
-                        return of([
+                        return [
                             {
                                 latitude: selectedCircuit.latitude,
                                 longitude: selectedCircuit.longitude,
                                 label: selectedCircuit.codeCircuit,
                             },
-                        ]);
+                        ];
                     }
 
-                    return of<MapRoutePoint[]>([]);
+                    return [];
                 })
             );
+    }
+
+    private refreshSelectedCircuitRoute(): void {
+        const codeCircuitControl = this.busForm.get('codeCircuit');
+        if (!codeCircuitControl) {
+            return;
+        }
+
+        this.onCircuitChanged(codeCircuitControl.value)
+            .pipe(
+                take(1),
+                catchError(() => of([]))
+            )
+            .subscribe((routePoints) => {
+                this.circuitRoutePoints = routePoints;
+                this._changeDetectorRef.markForCheck();
+            });
     }
 
     ngOnDestroy(): void {

@@ -28,6 +28,7 @@ export interface MapRoutePoint {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
+    private static nextMapId = 0;
     @Input() latitude: number | null = 36.8065; // Default to Tunis, Tunisia
     @Input() longitude: number | null = 10.1815;
     @Input() zoom: number = 7; // Show Tunisia
@@ -35,7 +36,7 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
     @Input() routePoints: MapRoutePoint[] = [];
     @Output() locationChange = new EventEmitter<{ latitude: number; longitude: number }>();
 
-    readonly mapElementId: string = `map-picker-${Math.random().toString(36).slice(2, 10)}`;
+    readonly mapElementId: string = `map-picker-${MapPickerComponent.nextMapId++}`;
     private map: Map | null = null;
     private marker: Marker | null = null;
     private routeMarkers: Marker[] = [];
@@ -192,7 +193,9 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
             boundsPoints.push(this.marker.getLatLng());
         }
 
-        this.map.fitBounds(L.latLngBounds(boundsPoints), { padding: [40, 40], maxZoom: 14 });
+        if (boundsPoints.length > 0) {
+            this.map.fitBounds(L.latLngBounds(boundsPoints), { padding: [40, 40], maxZoom: 14 });
+        }
     }
 
     private createRouteMarkerIcon(index: number, total: number): L.Icon {
