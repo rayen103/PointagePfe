@@ -130,7 +130,14 @@
                                 <input
                                     matInput
                                     formControlName="codePCDepart"
+                                    (blur)="locateAddressesOnMap()"
                                     [placeholder]="t('Enter-code-pc-depart')">
+                                @if(circuitForm.get('codePCDepart')?.hasError('required')){
+                                    <mat-error>{{ t('Code-PC-Depart') }} is required</mat-error>
+                                }
+                                @if(circuitForm.get('codePCDepart')?.hasError('addressNotFound')){
+                                    <mat-error>Departure address not found on map</mat-error>
+                                }
                             </mat-form-field>
 
                             <!-- Code PC Arrivée -->
@@ -143,8 +150,28 @@
                                 <input
                                     matInput
                                     formControlName="codePCArrivee"
+                                    (blur)="locateAddressesOnMap()"
                                     [placeholder]="t('Enter-code-pc-arrivee')">
+                                @if(circuitForm.get('codePCArrivee')?.hasError('required')){
+                                    <mat-error>{{ t('Code-PC-Arrivee') }} is required</mat-error>
+                                }
+                                @if(circuitForm.get('codePCArrivee')?.hasError('addressNotFound')){
+                                    <mat-error>Arrival address not found on map</mat-error>
+                                }
                             </mat-form-field>
+
+                            <div class="w-full sm:col-span-2 flex justify-end">
+                                <button
+                                    mat-stroked-button
+                                    type="button"
+                                    [disabled]="isGeocodingAddresses"
+                                    (click)="locateAddressesOnMap()">
+                                    <mat-icon [svgIcon]="'heroicons_outline:map-pin'"></mat-icon>
+                                    <span class="ml-2">
+                                        {{ isGeocodingAddresses ? 'Searching addresses...' : 'Show addresses on map' }}
+                                    </span>
+                                </button>
+                            </div>
 
                             <!-- Distance (km) -->
                             <mat-form-field class="w-full">
@@ -213,6 +240,7 @@
                         <app-map-picker
                             [latitude]="circuitForm.get('latitude')?.value"
                             [longitude]="circuitForm.get('longitude')?.value"
+                            [routePoints]="circuitRoutePoints"
                             [height]="'400px'"
                             (locationChange)="onLocationChange($event)">
                         </app-map-picker>

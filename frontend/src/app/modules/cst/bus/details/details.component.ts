@@ -23,7 +23,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { fuseAnimations } from '../../../../../@fuse/animations';
 import { Bus } from '../../../../core/bus/bus.model';
-import { catchError, EMPTY, Observable, of, Subject, switchMap, takeUntil, distinctUntilChanged, startWith, map, take } from 'rxjs';
+import { catchError, EMPTY, Observable, of, Subject, switchMap, takeUntil, distinctUntilChanged, startWith, map, take, forkJoin } from 'rxjs';
 import { BusService } from '../../../../core/bus/bus.service';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UserService } from '../../../../core/user/user.service';
@@ -31,6 +31,7 @@ import { MapPickerComponent, MapRoutePoint } from '../../../../shared/components
 import { Circuit } from '../../../../core/circuit/circuit.model';
 import { CircuitService } from '../../../../core/circuit/circuit.service';
 import { CircuitPointCollecteService } from '../../../../core/circuit/circuit-point-collecte.service';
+import { MapGeocodingService } from '../../../../core/common/map-geocoding.service';
 
 @Component({
   selector: 'app-details',
@@ -82,6 +83,7 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         private _busService: BusService,
         private _circuitService: CircuitService,
         private _circuitPointCollecteService: CircuitPointCollecteService,
+        private _mapGeocodingService: MapGeocodingService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _userService: UserService
     ) { }
@@ -251,7 +253,7 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         return this._circuitPointCollecteService.getByCircuit(selectedCircuit.circuitId)
             .pipe(
                 catchError(() => of([])),
-                map((points) => {
+                switchMap((points) => {
                     const orderedPoints = [...points]
                         .sort((a, b) => (a.ordre ?? 0) - (b.ordre ?? 0))
                         .filter((p) => p.latitude != null && p.longitude != null)
@@ -261,21 +263,56 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                             label: point.libellePointCollecte || point.codePointCollecte,
                         }));
 
-                    if (orderedPoints.length > 0) {
-                        return orderedPoints;
-                    }
+                    const departureAddress = (selectedCircuit.codePCDepart ?? '').trim();
+                    const arrivalAddress = (selectedCircuit.codePCArrivee ?? '').trim();
+                    const departure$ = departureAddress
+                        ? this._mapGeocodingService.searchAddress(departureAddress)
+                        : of(null);
+                    const arrival$ = arrivalAddress
+                        ? this._mapGeocodingService.searchAddress(arrivalAddress)
+                        : of(null);
 
-                    if (selectedCircuit.latitude != null && selectedCircuit.longitude != null) {
-                        return [
-                            {
-                                latitude: selectedCircuit.latitude,
-                                longitude: selectedCircuit.longitude,
-                                label: selectedCircuit.codeCircuit,
-                            },
-                        ];
-                    }
+                    return forkJoin({
+                        departure: departure$,
+                        arrival: arrival$,
+                    }).pipe(
+                        map(({ departure, arrival }) => {
+                            const routePoints: MapRoutePoint[] = [];
+                            if (departure) {
+                                routePoints.push({
+                                    latitude: departure.latitude,
+                                    longitude: departure.longitude,
+                                    label: `Departure: ${departureAddress}`,
+                                });
+                            }
 
-                    return [];
+                            routePoints.push(...orderedPoints);
+
+                            if (arrival) {
+                                routePoints.push({
+                                    latitude: arrival.latitude,
+                                    longitude: arrival.longitude,
+                                    label: `Arrival: ${arrivalAddress}`,
+                                });
+                            }
+
+                            if (routePoints.length > 0) {
+                                return routePoints;
+                            }
+
+                            if (selectedCircuit.latitude != null && selectedCircuit.longitude != null) {
+                                return [
+                                    {
+                                        latitude: selectedCircuit.latitude,
+                                        longitude: selectedCircuit.longitude,
+                                        label: selectedCircuit.codeCircuit,
+                                    },
+                                ];
+                            }
+
+                            return [];
+                        })
+                    );
                 })
             );
     }
