@@ -113,7 +113,7 @@
                                     matPrefix
                                     [svgIcon]="'heroicons_solid:map'"></mat-icon>
                                 <mat-select formControlName="codeCircuit">
-                                    <mat-option [value]="''">No circuit</mat-option>
+                                    <mat-option [value]="''">No Circuit</mat-option>
                                     @for (circuit of circuits; track circuit.circuitId) {
                                         <mat-option [value]="circuit.codeCircuit">
                                             {{ circuit.codeCircuit }}
@@ -122,11 +122,10 @@
                                             }
                                         </mat-option>
                                     }
-                                    @let selectedCodeCircuit = busForm.get('codeCircuit')?.value;
-                                    @if (selectedCodeCircuit && !hasExistingCircuit(selectedCodeCircuit)) {
-                                        <mat-option disabled>— Current value —</mat-option>
-                                        <mat-option [value]="selectedCodeCircuit">
-                                            {{ selectedCodeCircuit }}
+                                    @if (busForm.get('codeCircuit')?.value && !hasExistingCircuit(busForm.get('codeCircuit')?.value)) {
+                                        <mat-option disabled>— Current Value —</mat-option>
+                                        <mat-option [value]="busForm.get('codeCircuit')?.value">
+                                            {{ busForm.get('codeCircuit')?.value }}
                                         </mat-option>
                                     }
                                 </mat-select>
