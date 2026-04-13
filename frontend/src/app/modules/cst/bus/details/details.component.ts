@@ -23,13 +23,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { fuseAnimations } from '../../../../../@fuse/animations';
 import { Bus } from '../../../../core/bus/bus.model';
-import { catchError, EMPTY, Subject, takeUntil } from 'rxjs';
+import { catchError, EMPTY, of, Subject, switchMap, takeUntil, distinctUntilChanged, startWith } from 'rxjs';
 import { BusService } from '../../../../core/bus/bus.service';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UserService } from '../../../../core/user/user.service';
-import { MapPickerComponent } from '../../../../shared/components/map-picker/map-picker.component';
+import { MapPickerComponent, MapRoutePoint } from '../../../../shared/components/map-picker/map-picker.component';
 import { Circuit } from '../../../../core/circuit/circuit.model';
 import { CircuitService } from '../../../../core/circuit/circuit.service';
+import { CircuitPointCollecteService } from '../../../../core/circuit/circuit-point-collecte.service';
 
 @Component({
   selector: 'app-details',
@@ -69,6 +70,9 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
     mapLatitude: number | null = null;
     mapLongitude: number | null = null;
     circuits: Circuit[] = [];
+    departurePoint: string = '';
+    arrivalPoint: string = '';
+    circuitRoutePoints: MapRoutePoint[] = [];
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     constructor(
@@ -77,6 +81,7 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         private formBuilder: FormBuilder,
         private _busService: BusService,
         private _circuitService: CircuitService,
+        private _circuitPointCollecteService: CircuitPointCollecteService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _userService: UserService
     ) { }
@@ -116,8 +121,21 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                         this.circuits = user?.societeId
                             ? allCircuits.filter((c) => c.societeId === user.societeId)
                             : allCircuits;
+                        this.onCircuitChanged(this.busForm.get('codeCircuit')?.value);
                         this._changeDetectorRef.markForCheck();
                     });
+            });
+
+        this.busForm.get('codeCircuit')?.valueChanges
+            .pipe(
+                startWith(this.busForm.get('codeCircuit')?.value),
+                distinctUntilChanged(),
+                switchMap((codeCircuit: string | null) => this.onCircuitChanged(codeCircuit)),
+                takeUntil(this._unsubscribeAll)
+            )
+            .subscribe((routePoints) => {
+                this.circuitRoutePoints = routePoints;
+                this._changeDetectorRef.markForCheck();
             });
 
         this._busService.bus$
@@ -212,6 +230,53 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         }
 
         return this.circuits.some((circuit) => circuit.codeCircuit === codeCircuit);
+    }
+
+    private onCircuitChanged(codeCircuit: string | null | undefined) {
+        if (!codeCircuit) {
+            this.departurePoint = '';
+            this.arrivalPoint = '';
+            return of<MapRoutePoint[]>([]);
+        }
+
+        const selectedCircuit = this.circuits.find((circuit) => circuit.codeCircuit === codeCircuit);
+        this.departurePoint = selectedCircuit?.codePCDepart ?? '';
+        this.arrivalPoint = selectedCircuit?.codePCArrivee ?? '';
+
+        if (!selectedCircuit?.circuitId) {
+            return of<MapRoutePoint[]>([]);
+        }
+
+        return this._circuitPointCollecteService.getByCircuit(selectedCircuit.circuitId)
+            .pipe(
+                catchError(() => of([])),
+                switchMap((points) => {
+                    const orderedPoints = [...points]
+                        .sort((a, b) => (a.ordre ?? 0) - (b.ordre ?? 0))
+                        .filter((p) => p.latitude != null && p.longitude != null)
+                        .map((point) => ({
+                            latitude: point.latitude!,
+                            longitude: point.longitude!,
+                            label: point.libellePointCollecte || point.codePointCollecte,
+                        }));
+
+                    if (orderedPoints.length > 0) {
+                        return of(orderedPoints);
+                    }
+
+                    if (selectedCircuit.latitude != null && selectedCircuit.longitude != null) {
+                        return of([
+                            {
+                                latitude: selectedCircuit.latitude,
+                                longitude: selectedCircuit.longitude,
+                                label: selectedCircuit.codeCircuit,
+                            },
+                        ]);
+                    }
+
+                    return of<MapRoutePoint[]>([]);
+                })
+            );
     }
 
     ngOnDestroy(): void {

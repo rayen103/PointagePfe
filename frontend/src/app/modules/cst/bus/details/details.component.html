@@ -131,6 +131,32 @@
                                 </mat-select>
                             </mat-form-field>
 
+                            <!-- Departure Point -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Departure-Point') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:arrow-up-circle'"></mat-icon>
+                                <input
+                                    matInput
+                                    [value]="departurePoint || '-'"
+                                    readonly>
+                            </mat-form-field>
+
+                            <!-- Arrival Point -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Arrival-Point') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:arrow-down-circle'"></mat-icon>
+                                <input
+                                    matInput
+                                    [value]="arrivalPoint || '-'"
+                                    readonly>
+                            </mat-form-field>
+
                             <!-- Societe ID (hidden, populated from user context) -->
                             <input type="hidden" formControlName="societeId">
 
@@ -188,6 +214,7 @@
                             <app-map-picker
                                 [latitude]="mapLatitude"
                                 [longitude]="mapLongitude"
+                                [routePoints]="circuitRoutePoints"
                                 height="350px"
                                 (locationChange)="onLocationChange($event)">
                             </app-map-picker>
