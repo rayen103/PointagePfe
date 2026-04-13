@@ -117,13 +117,13 @@
                                     @for (circuit of circuits; track circuit.circuitId) {
                                         <mat-option [value]="circuit.codeCircuit">
                                             {{ circuit.codeCircuit }}
-                                            @if(circuit.libelleCircuit){
+                                            @if (circuit.libelleCircuit) {
                                                 - {{ circuit.libelleCircuit }}
                                             }
                                         </mat-option>
                                     }
                                     @let selectedCodeCircuit = busForm.get('codeCircuit')?.value;
-                                    @if(selectedCodeCircuit && !hasExistingCircuit(selectedCodeCircuit)){
+                                    @if (selectedCodeCircuit && !hasExistingCircuit(selectedCodeCircuit)) {
                                         <mat-option [value]="selectedCodeCircuit">
                                             {{ selectedCodeCircuit }}
                                         </mat-option>
