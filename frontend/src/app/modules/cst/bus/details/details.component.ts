@@ -28,6 +28,8 @@ import { BusService } from '../../../../core/bus/bus.service';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UserService } from '../../../../core/user/user.service';
 import { MapPickerComponent } from '../../../../shared/components/map-picker/map-picker.component';
+import { Circuit } from '../../../../core/circuit/circuit.model';
+import { CircuitService } from '../../../../core/circuit/circuit.service';
 
 @Component({
   selector: 'app-details',
@@ -66,6 +68,7 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
     isLoading: boolean = false;
     mapLatitude: number | null = null;
     mapLongitude: number | null = null;
+    circuits: Circuit[] = [];
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     constructor(
@@ -73,6 +76,7 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         private _router: Router,
         private formBuilder: FormBuilder,
         private _busService: BusService,
+        private _circuitService: CircuitService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _userService: UserService
     ) { }
@@ -103,6 +107,17 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                 if (user?.societeId) {
                     this.busForm.patchValue({ societeId: user.societeId });
                 }
+
+                this._circuitService
+                    .GetCircuit()
+                    .pipe(takeUntil(this._unsubscribeAll))
+                    .subscribe((pagedCircuits) => {
+                        const allCircuits = pagedCircuits?.circuits ?? [];
+                        this.circuits = user?.societeId
+                            ? allCircuits.filter((c) => c.societeId === user.societeId)
+                            : allCircuits;
+                        this._changeDetectorRef.markForCheck();
+                    });
             });
 
         this._busService.bus$
@@ -189,6 +204,14 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         this.busForm.patchValue({ latitude: event.latitude, longitude: event.longitude });
         this.mapLatitude = event.latitude;
         this.mapLongitude = event.longitude;
+    }
+
+    hasExistingCircuit(codeCircuit: string | null | undefined): boolean {
+        if (!codeCircuit) {
+            return false;
+        }
+
+        return this.circuits.some((circuit) => circuit.codeCircuit === codeCircuit);
     }
 
     ngOnDestroy(): void {

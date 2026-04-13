@@ -112,10 +112,22 @@
                                     class="icon-size-5"
                                     matPrefix
                                     [svgIcon]="'heroicons_solid:map'"></mat-icon>
-                                <input
-                                    matInput
-                                    formControlName="codeCircuit"
-                                    [placeholder]="t('Enter-circuit-code')">
+                                <mat-select formControlName="codeCircuit">
+                                    <mat-option [value]="''">-</mat-option>
+                                    @for (circuit of circuits; track circuit.circuitId) {
+                                        <mat-option [value]="circuit.codeCircuit">
+                                            {{ circuit.codeCircuit }}
+                                            @if(circuit.libelleCircuit){
+                                                - {{ circuit.libelleCircuit }}
+                                            }
+                                        </mat-option>
+                                    }
+                                    @if(busForm.get('codeCircuit')?.value && !hasExistingCircuit(busForm.get('codeCircuit')?.value)){
+                                        <mat-option [value]="busForm.get('codeCircuit')?.value">
+                                            {{ busForm.get('codeCircuit')?.value }}
+                                        </mat-option>
+                                    }
+                                </mat-select>
                             </mat-form-field>
 
                             <!-- Societe ID (hidden, populated from user context) -->
