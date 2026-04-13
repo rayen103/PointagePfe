@@ -158,6 +158,7 @@ export class ListComponent implements OnInit, OnDestroy {
                 baseLocations.push({
                     id: `${circuit.circuitId}-base`,
                     circuitId: circuit.circuitId,
+                    pointType: 'base',
                     name: `${circuit.codeCircuit}${circuit.libelleCircuit ? ` - ${circuit.libelleCircuit}` : ''}`,
                     latitude: circuit.latitude,
                     longitude: circuit.longitude,
@@ -185,6 +186,7 @@ export class ListComponent implements OnInit, OnDestroy {
                         baseLocations.push({
                             id: `${circuit.circuitId}-depart`,
                             circuitId: circuit.circuitId,
+                            pointType: 'departure',
                             name: `${circuit.codeCircuit} - Departure`,
                             latitude: departure.latitude,
                             longitude: departure.longitude,
@@ -197,6 +199,7 @@ export class ListComponent implements OnInit, OnDestroy {
                         baseLocations.push({
                             id: `${circuit.circuitId}-arrivee`,
                             circuitId: circuit.circuitId,
+                            pointType: 'arrival',
                             name: `${circuit.codeCircuit} - Arrival`,
                             latitude: arrival.latitude,
                             longitude: arrival.longitude,

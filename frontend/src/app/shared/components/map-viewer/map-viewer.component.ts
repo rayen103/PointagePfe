@@ -9,11 +9,14 @@ import {
     ViewEncapsulation,
 } from '@angular/core';
 import * as L from 'leaflet';
-import { Map, Marker } from 'leaflet';
+import { Map as LeafletMap, Marker, Polyline } from 'leaflet';
+
+export type MapPointType = 'base' | 'departure' | 'arrival';
 
 export interface MapLocation {
     id: string;
     circuitId?: string;
+    pointType?: MapPointType;
     name: string;
     latitude: number;
     longitude: number;
@@ -34,8 +37,9 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
     @Input() height: string = '600px';
     @Input() zoom: number = 7;
 
-    private map: Map | null = null;
+    private map: LeafletMap | null = null;
     private markers: Marker[] = [];
+    private routeLines: Polyline[] = [];
 
     ngAfterViewInit(): void {
         this.initMap();
@@ -74,6 +78,8 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
         // Clear existing markers
         this.markers.forEach(marker => marker.remove());
         this.markers = [];
+        this.routeLines.forEach((line) => line.remove());
+        this.routeLines = [];
 
         // Filter locations with valid coordinates
         const validLocations = this.locations.filter(
@@ -86,7 +92,7 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
 
         // Add markers for each location
         validLocations.forEach(location => {
-            const icon = this.createMarkerIcon(location.isActive);
+            const icon = this.createMarkerIcon(location);
             
             const marker = L.marker([location.latitude, location.longitude], { icon })
                 .addTo(this.map!)
@@ -94,6 +100,8 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
 
             this.markers.push(marker);
         });
+
+        this.drawCircuitRoutes(validLocations);
 
         // Fit map bounds to show all markers
         if (validLocations.length > 0) {
@@ -104,14 +112,55 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
         }
     }
 
-    private createMarkerIcon(isActive?: boolean): L.Icon {
-        // Color-code markers based on active status
-        const color = isActive === false ? 'red' : 'green';
-        
-        // Use different marker colors
-        const iconUrl = isActive === false
-            ? 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png'
-            : 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png';
+    private drawCircuitRoutes(validLocations: MapLocation[]): void {
+        if (!this.map) {
+            return;
+        }
+
+        const locationsByCircuit = new Map<string, MapLocation[]>();
+        validLocations.forEach((location) => {
+            if (!location.circuitId) {
+                return;
+            }
+
+            const circuitLocations = locationsByCircuit.get(location.circuitId) ?? [];
+            circuitLocations.push(location);
+            locationsByCircuit.set(location.circuitId, circuitLocations);
+        });
+
+        locationsByCircuit.forEach((locations) => {
+            const departure = locations.find((location) => location.pointType === 'departure');
+            const arrival = locations.find((location) => location.pointType === 'arrival');
+
+            if (!departure || !arrival) {
+                return;
+            }
+
+            const routeLine = L.polyline(
+                [
+                    [departure.latitude, departure.longitude],
+                    [arrival.latitude, arrival.longitude],
+                ],
+                {
+                    color: '#2563eb',
+                    weight: 3,
+                    opacity: 0.8,
+                }
+            ).addTo(this.map!);
+
+            this.routeLines.push(routeLine);
+        });
+    }
+
+    private createMarkerIcon(location: MapLocation): L.Icon {
+        let iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png';
+        if (location.pointType === 'arrival') {
+            iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png';
+        } else if (location.pointType === 'base') {
+            iconUrl = location.isActive === false
+                ? 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-grey.png'
+                : 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png';
+        }
 
         return L.icon({
             iconUrl: iconUrl,
@@ -145,6 +194,9 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        this.routeLines.forEach((line) => line.remove());
+        this.routeLines = [];
+
         if (this.map) {
             this.map.remove();
             this.map = null;
