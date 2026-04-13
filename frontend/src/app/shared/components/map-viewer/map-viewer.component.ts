@@ -13,6 +13,7 @@ import { Map, Marker } from 'leaflet';
 
 export interface MapLocation {
     id: string;
+    circuitId?: string;
     name: string;
     latitude: number;
     longitude: number;

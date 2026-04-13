@@ -66,10 +66,10 @@
                         <div class="flex items-center">
                             <mat-icon class="text-blue-600 dark:text-blue-300 mr-2" [svgIcon]="'heroicons_outline:information-circle'"></mat-icon>
                             <span class="text-sm">
-                                {{ t('Showing') }} {{mapLocations.length}} {{ t('circuits-with-location') }}
-                                @if(circuitsLength - mapLocations.length > 0){
+                                {{ t('Showing') }} {{mapCircuitsWithLocations}} {{ t('circuits-with-location') }}
+                                @if(circuitsLength - mapCircuitsWithLocations > 0){
                                     <span class="text-gray-600 dark:text-gray-400">
-                                        ({{circuitsLength - mapLocations.length}} {{ t('without-location') }})
+                                        ({{circuitsLength - mapCircuitsWithLocations}} {{ t('without-location') }})
                                     </span>
                                 }
                             </span>

@@ -19,13 +19,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { fuseAnimations } from '../../../../../@fuse/animations';
-import { map, Observable, Subject, switchMap, takeUntil } from 'rxjs';
+import { forkJoin, map, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { Circuit } from '../../../../core/circuit/circuit.model';
 import { CircuitService } from '../../../../core/circuit/circuit.service';
 import { FuseConfirmationService } from '../../../../../@fuse/services/confirmation';
 import { RoleNavigation } from '../../../../core/role-utilisateur/role-utilisateur.model';
 import { FuseNavigationAction } from '../../../../../@fuse/components/navigation';
 import { MapViewerComponent, MapLocation } from '../../../../shared/components/map-viewer/map-viewer.component';
+import { MapGeocodingService } from '../../../../core/common/map-geocoding.service';
 
 @Component({
   selector: 'app-list',
@@ -66,9 +67,11 @@ export class ListComponent implements OnInit, OnDestroy {
     isViewMode: boolean = false;
     showMapView: boolean = false; // Toggle between list and map view
     mapLocations: MapLocation[] = []; // Locations for map display
+    mapCircuitsWithLocations: number = 0;
 
     constructor(
         private _circuitService: CircuitService,
+        private _mapGeocodingService: MapGeocodingService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseConfirmationService: FuseConfirmationService
     ) {}
@@ -115,9 +118,15 @@ export class ListComponent implements OnInit, OnDestroy {
         
         // Subscribe to circuits to update map locations
         this.circuit$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((circuits) => {
-                this.updateMapLocations(circuits);
+            .pipe(
+                switchMap((circuits) => this.buildMapLocations(circuits)),
+                takeUntil(this._unsubscribeAll)
+            )
+            .subscribe((mapLocations) => {
+                this.mapLocations = mapLocations;
+                this.mapCircuitsWithLocations = new Set(
+                    mapLocations.map((location) => location.circuitId ?? location.id)
+                ).size;
                 this._changeDetectorRef.markForCheck();
             });
         
@@ -137,17 +146,73 @@ export class ListComponent implements OnInit, OnDestroy {
     /**
      * Update map locations from circuits
      */
-    private updateMapLocations(circuits: Circuit[]): void {
-        this.mapLocations = circuits
-            .filter(c => c.latitude != null && c.longitude != null)
-            .map(c => ({
-                id: c.circuitId,
-                name: c.codeCircuit + (c.libelleCircuit ? ` - ${c.libelleCircuit}` : ''),
-                latitude: c.latitude!,
-                longitude: c.longitude!,
-                isActive: c.isActive,
-                description: c.description,
-            }));
+    private buildMapLocations(circuits: Circuit[]): Observable<MapLocation[]> {
+        if (!circuits?.length) {
+            return of([]);
+        }
+
+        const perCircuitLocations$ = circuits.map((circuit) => {
+            const baseLocations: MapLocation[] = [];
+
+            if (circuit.latitude != null && circuit.longitude != null) {
+                baseLocations.push({
+                    id: `${circuit.circuitId}-base`,
+                    circuitId: circuit.circuitId,
+                    name: `${circuit.codeCircuit}${circuit.libelleCircuit ? ` - ${circuit.libelleCircuit}` : ''}`,
+                    latitude: circuit.latitude,
+                    longitude: circuit.longitude,
+                    isActive: circuit.isActive,
+                    description: circuit.description,
+                });
+            }
+
+            const departureAddress = (circuit.codePCDepart ?? '').trim();
+            const arrivalAddress = (circuit.codePCArrivee ?? '').trim();
+
+            const departure$ = departureAddress
+                ? this._mapGeocodingService.searchAddress(departureAddress)
+                : of(null);
+            const arrival$ = arrivalAddress
+                ? this._mapGeocodingService.searchAddress(arrivalAddress)
+                : of(null);
+
+            return forkJoin({
+                departure: departure$,
+                arrival: arrival$,
+            }).pipe(
+                map(({ departure, arrival }) => {
+                    if (departure) {
+                        baseLocations.push({
+                            id: `${circuit.circuitId}-depart`,
+                            circuitId: circuit.circuitId,
+                            name: `${circuit.codeCircuit} - Departure`,
+                            latitude: departure.latitude,
+                            longitude: departure.longitude,
+                            isActive: circuit.isActive,
+                            description: departureAddress,
+                        });
+                    }
+
+                    if (arrival) {
+                        baseLocations.push({
+                            id: `${circuit.circuitId}-arrivee`,
+                            circuitId: circuit.circuitId,
+                            name: `${circuit.codeCircuit} - Arrival`,
+                            latitude: arrival.latitude,
+                            longitude: arrival.longitude,
+                            isActive: circuit.isActive,
+                            description: arrivalAddress,
+                        });
+                    }
+
+                    return baseLocations;
+                })
+            );
+        });
+
+        return forkJoin(perCircuitLocations$).pipe(
+            map((locationsPerCircuit) => locationsPerCircuit.flat())
+        );
     }
 
     /**
