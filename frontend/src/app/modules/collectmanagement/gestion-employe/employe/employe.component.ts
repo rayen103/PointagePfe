@@ -147,7 +147,7 @@ export class EmployeComponent implements OnInit, OnDestroy {
             codeRegion: ['', [Validators.maxLength(50)]],
             latitude: [null, [Validators.min(-90), Validators.max(90)]],
             longitude: [null, [Validators.min(-180), Validators.max(180)]],
-            societeId: ['', [Validators.required, Validators.pattern(/^[0-9A-HJKMNP-TV-Z]{26}$/i)]]
+            societeId: ['', [Validators.required]]
         });
 
         this.filteredSocietes$ = this.selectedEmployeForm.get('societeId')!.valueChanges.pipe(

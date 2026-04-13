@@ -353,16 +353,22 @@
                                         <mat-form-field class="w-1/3 fuse-mat-dense">
                                             <mat-label>{{ t('Latitude') }}</mat-label>
                                             <input matInput type="number" [formControlName]="'latitude'">
-                                            @if (selectedEmployeForm.get('latitude')?.hasError('min') || selectedEmployeForm.get('latitude')?.hasError('max')) {
-                                                <mat-error>{{ t('Latitude') }} must be between -90 and 90.</mat-error>
+                                            @if (selectedEmployeForm.get('latitude')?.hasError('min')) {
+                                                <mat-error>{{ t('Latitude') }} must be greater than or equal to -90.</mat-error>
+                                            }
+                                            @if (selectedEmployeForm.get('latitude')?.hasError('max')) {
+                                                <mat-error>{{ t('Latitude') }} must be less than or equal to 90.</mat-error>
                                             }
                                         </mat-form-field>
 
                                         <mat-form-field class="w-1/3 fuse-mat-dense">
                                             <mat-label>{{ t('Longitude') }}</mat-label>
                                             <input matInput type="number" [formControlName]="'longitude'">
-                                            @if (selectedEmployeForm.get('longitude')?.hasError('min') || selectedEmployeForm.get('longitude')?.hasError('max')) {
-                                                <mat-error>{{ t('Longitude') }} must be between -180 and 180.</mat-error>
+                                            @if (selectedEmployeForm.get('longitude')?.hasError('min')) {
+                                                <mat-error>{{ t('Longitude') }} must be greater than or equal to -180.</mat-error>
+                                            }
+                                            @if (selectedEmployeForm.get('longitude')?.hasError('max')) {
+                                                <mat-error>{{ t('Longitude') }} must be less than or equal to 180.</mat-error>
                                             }
                                         </mat-form-field>
 
@@ -377,9 +383,6 @@
                                             />
                                             @if (selectedEmployeForm.get('societeId')?.hasError('required')) {
                                                 <mat-error>{{ t('Company') }} is required.</mat-error>
-                                            }
-                                            @if (selectedEmployeForm.get('societeId')?.hasError('pattern')) {
-                                                <mat-error>{{ t('Company') }} must be selected from the list.</mat-error>
                                             }
 
                                             <mat-autocomplete
