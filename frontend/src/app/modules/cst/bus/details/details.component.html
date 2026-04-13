@@ -113,7 +113,7 @@
                                     matPrefix
                                     [svgIcon]="'heroicons_solid:map'"></mat-icon>
                                 <mat-select formControlName="codeCircuit">
-                                    <mat-option [value]="''">No Circuit</mat-option>
+                                    <mat-option [value]="''">{{ t('No-Circuit') }}</mat-option>
                                     @for (circuit of circuits; track circuit.circuitId) {
                                         <mat-option [value]="circuit.codeCircuit">
                                             {{ circuit.codeCircuit }}

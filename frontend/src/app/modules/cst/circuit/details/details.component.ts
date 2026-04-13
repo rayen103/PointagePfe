@@ -350,14 +350,14 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                     ? {
                         latitude: departure.latitude,
                         longitude: departure.longitude,
-                        label: `Départ: ${departureAddress}`,
+                        label: `Departure: ${departureAddress}`,
                     }
                     : null;
                 this.arrivalAddressPoint = arrival
                     ? {
                         latitude: arrival.latitude,
                         longitude: arrival.longitude,
-                        label: `Arrivée: ${arrivalAddress}`,
+                        label: `Arrival: ${arrivalAddress}`,
                     }
                     : null;
 

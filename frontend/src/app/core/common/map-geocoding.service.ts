@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, map, of } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface GeocodingResult {
     latitude: number;
@@ -32,7 +33,7 @@ export class MapGeocodingService {
             .set('limit', '1');
 
         return this._httpClient
-            .get<NominatimResponseItem[]>('https://nominatim.openstreetmap.org/search', {
+            .get<NominatimResponseItem[]>(environment.mapGeocodingApi, {
                 params,
             })
             .pipe(
