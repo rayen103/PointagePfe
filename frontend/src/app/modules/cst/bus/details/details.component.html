@@ -112,10 +112,49 @@
                                     class="icon-size-5"
                                     matPrefix
                                     [svgIcon]="'heroicons_solid:map'"></mat-icon>
+                                <mat-select formControlName="codeCircuit">
+                                    <mat-option [value]="''">{{ t('No-Circuit') }}</mat-option>
+                                    @for (circuit of circuits; track circuit.circuitId) {
+                                        <mat-option [value]="circuit.codeCircuit">
+                                            {{ circuit.codeCircuit }}
+                                            @if (circuit.libelleCircuit) {
+                                                - {{ circuit.libelleCircuit }}
+                                            }
+                                        </mat-option>
+                                    }
+                                    @if (busForm.get('codeCircuit')?.value && !hasExistingCircuit(busForm.get('codeCircuit')?.value)) {
+                                        <mat-option disabled>— Current Value —</mat-option>
+                                        <mat-option [value]="busForm.get('codeCircuit')?.value">
+                                            {{ busForm.get('codeCircuit')?.value }}
+                                        </mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+
+                            <!-- Departure Point -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Departure-Point') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:arrow-up-circle'"></mat-icon>
                                 <input
                                     matInput
-                                    formControlName="codeCircuit"
-                                    [placeholder]="t('Enter-circuit-code')">
+                                    [value]="departurePoint || '-'"
+                                    readonly>
+                            </mat-form-field>
+
+                            <!-- Arrival Point -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Arrival-Point') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:arrow-down-circle'"></mat-icon>
+                                <input
+                                    matInput
+                                    [value]="arrivalPoint || '-'"
+                                    readonly>
                             </mat-form-field>
 
                             <!-- Societe ID (hidden, populated from user context) -->
@@ -175,6 +214,7 @@
                             <app-map-picker
                                 [latitude]="mapLatitude"
                                 [longitude]="mapLongitude"
+                                [routePoints]="circuitRoutePoints"
                                 height="350px"
                                 (locationChange)="onLocationChange($event)">
                             </app-map-picker>

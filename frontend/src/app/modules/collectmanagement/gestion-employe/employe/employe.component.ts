@@ -133,20 +133,20 @@ export class EmployeComponent implements OnInit, OnDestroy {
 
         this.selectedEmployeForm = this._formBuilder.group({
             employeId: [''],
-            matricule: ['', [Validators.required]],
-            rfid: [''],
-            nom: ['', [Validators.required]],
-            prenom: ['', [Validators.required]],
+            matricule: ['', [Validators.required, Validators.maxLength(50)]],
+            rfid: ['', [Validators.maxLength(50)]],
+            nom: ['', [Validators.required, Validators.maxLength(100)]],
+            prenom: ['', [Validators.required, Validators.maxLength(100)]],
             typeEmploye: ['EmployeSimple', [Validators.required]],
-            codeCircuit: [''],
-            codePointCollecte: [''],
-            codeBus: [''],
-            codeShift: [''],
-            adresse: [''],
-            codeGouvernorat: [''],
-            codeRegion: [''],
-            latitude: [null],
-            longitude: [null],
+            codeCircuit: ['', [Validators.maxLength(50)]],
+            codePointCollecte: ['', [Validators.maxLength(50)]],
+            codeBus: ['', [Validators.maxLength(50)]],
+            codeShift: ['', [Validators.maxLength(50)]],
+            adresse: ['', [Validators.maxLength(255)]],
+            codeGouvernorat: ['', [Validators.maxLength(50)]],
+            codeRegion: ['', [Validators.maxLength(50)]],
+            latitude: [null, [Validators.min(-90), Validators.max(90)]],
+            longitude: [null, [Validators.min(-180), Validators.max(180)]],
             societeId: ['', [Validators.required]]
         });
 
@@ -323,6 +323,7 @@ export class EmployeComponent implements OnInit, OnDestroy {
         this.saveClicked = true;
 
         if (this.selectedEmployeForm.invalid) {
+            this.selectedEmployeForm.markAllAsTouched();
             this._changeDetectorRef.markForCheck();
             setTimeout(() => {
                 this.saveClicked = false;

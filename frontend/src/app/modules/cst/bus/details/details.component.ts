@@ -23,11 +23,15 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { fuseAnimations } from '../../../../../@fuse/animations';
 import { Bus } from '../../../../core/bus/bus.model';
-import { catchError, EMPTY, Subject, takeUntil } from 'rxjs';
+import { catchError, EMPTY, Observable, of, Subject, switchMap, takeUntil, distinctUntilChanged, startWith, map, take, forkJoin } from 'rxjs';
 import { BusService } from '../../../../core/bus/bus.service';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UserService } from '../../../../core/user/user.service';
-import { MapPickerComponent } from '../../../../shared/components/map-picker/map-picker.component';
+import { MapPickerComponent, MapRoutePoint } from '../../../../shared/components/map-picker/map-picker.component';
+import { Circuit } from '../../../../core/circuit/circuit.model';
+import { CircuitService } from '../../../../core/circuit/circuit.service';
+import { CircuitPointCollecteService } from '../../../../core/circuit/circuit-point-collecte.service';
+import { MapGeocodingService } from '../../../../core/common/map-geocoding.service';
 
 @Component({
   selector: 'app-details',
@@ -66,6 +70,10 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
     isLoading: boolean = false;
     mapLatitude: number | null = null;
     mapLongitude: number | null = null;
+    circuits: Circuit[] = [];
+    departurePoint: string = '';
+    arrivalPoint: string = '';
+    circuitRoutePoints: MapRoutePoint[] = [];
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     constructor(
@@ -73,6 +81,9 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         private _router: Router,
         private formBuilder: FormBuilder,
         private _busService: BusService,
+        private _circuitService: CircuitService,
+        private _circuitPointCollecteService: CircuitPointCollecteService,
+        private _mapGeocodingService: MapGeocodingService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _userService: UserService
     ) { }
@@ -103,6 +114,31 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                 if (user?.societeId) {
                     this.busForm.patchValue({ societeId: user.societeId });
                 }
+
+                this._circuitService
+                    .GetCircuit()
+                    .pipe(takeUntil(this._unsubscribeAll))
+                    .subscribe((pagedCircuits) => {
+                        const allCircuits = pagedCircuits?.circuits ?? [];
+                        this.circuits = user?.societeId
+                            ? allCircuits.filter((c) => c.societeId === user.societeId)
+                            : allCircuits;
+                        this.refreshSelectedCircuitRoute();
+                        this._changeDetectorRef.markForCheck();
+                    });
+            });
+
+        this.busForm.get('codeCircuit')?.valueChanges
+            .pipe(
+                startWith(this.busForm.get('codeCircuit')?.value),
+                distinctUntilChanged(),
+                switchMap((codeCircuit: string | null) => this.onCircuitChanged(codeCircuit)),
+                catchError(() => of([])),
+                takeUntil(this._unsubscribeAll)
+            )
+            .subscribe((routePoints) => {
+                this.circuitRoutePoints = routePoints;
+                this._changeDetectorRef.markForCheck();
             });
 
         this._busService.bus$
@@ -189,6 +225,113 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         this.busForm.patchValue({ latitude: event.latitude, longitude: event.longitude });
         this.mapLatitude = event.latitude;
         this.mapLongitude = event.longitude;
+    }
+
+    hasExistingCircuit(codeCircuit: string | null | undefined): boolean {
+        if (!codeCircuit) {
+            return false;
+        }
+
+        return this.circuits.some((circuit) => circuit.codeCircuit === codeCircuit);
+    }
+
+    private onCircuitChanged(codeCircuit: string | null | undefined): Observable<MapRoutePoint[]> {
+        if (!codeCircuit) {
+            this.departurePoint = '';
+            this.arrivalPoint = '';
+            return of<MapRoutePoint[]>([]);
+        }
+
+        const selectedCircuit = this.circuits.find((circuit) => circuit.codeCircuit === codeCircuit);
+        this.departurePoint = selectedCircuit?.codePCDepart ?? '';
+        this.arrivalPoint = selectedCircuit?.codePCArrivee ?? '';
+
+        if (!selectedCircuit?.circuitId) {
+            return of<MapRoutePoint[]>([]);
+        }
+
+        return this._circuitPointCollecteService.getByCircuit(selectedCircuit.circuitId)
+            .pipe(
+                catchError(() => of([])),
+                switchMap((points) => {
+                    const orderedPoints = [...points]
+                        .sort((a, b) => (a.ordre ?? 0) - (b.ordre ?? 0))
+                        .filter((p) => p.latitude != null && p.longitude != null)
+                        .map((point) => ({
+                            latitude: point.latitude!,
+                            longitude: point.longitude!,
+                            label: point.libellePointCollecte || point.codePointCollecte,
+                        }));
+
+                    const departureAddress = (selectedCircuit.codePCDepart ?? '').trim();
+                    const arrivalAddress = (selectedCircuit.codePCArrivee ?? '').trim();
+                    const departure$ = departureAddress
+                        ? this._mapGeocodingService.searchAddress(departureAddress)
+                        : of(null);
+                    const arrival$ = arrivalAddress
+                        ? this._mapGeocodingService.searchAddress(arrivalAddress)
+                        : of(null);
+
+                    return forkJoin({
+                        departure: departure$,
+                        arrival: arrival$,
+                    }).pipe(
+                        map(({ departure, arrival }) => {
+                            const routePoints: MapRoutePoint[] = [];
+                            if (departure) {
+                                routePoints.push({
+                                    latitude: departure.latitude,
+                                    longitude: departure.longitude,
+                                    label: `Departure: ${departureAddress}`,
+                                });
+                            }
+
+                            routePoints.push(...orderedPoints);
+
+                            if (arrival) {
+                                routePoints.push({
+                                    latitude: arrival.latitude,
+                                    longitude: arrival.longitude,
+                                    label: `Arrival: ${arrivalAddress}`,
+                                });
+                            }
+
+                            if (routePoints.length > 0) {
+                                return routePoints;
+                            }
+
+                            if (selectedCircuit.latitude != null && selectedCircuit.longitude != null) {
+                                return [
+                                    {
+                                        latitude: selectedCircuit.latitude,
+                                        longitude: selectedCircuit.longitude,
+                                        label: selectedCircuit.codeCircuit,
+                                    },
+                                ];
+                            }
+
+                            return [];
+                        })
+                    );
+                })
+            );
+    }
+
+    private refreshSelectedCircuitRoute(): void {
+        const codeCircuitControl = this.busForm.get('codeCircuit');
+        if (!codeCircuitControl) {
+            return;
+        }
+
+        this.onCircuitChanged(codeCircuitControl.value)
+            .pipe(
+                take(1),
+                catchError(() => of([]))
+            )
+            .subscribe((routePoints) => {
+                this.circuitRoutePoints = routePoints;
+                this._changeDetectorRef.markForCheck();
+            });
     }
 
     ngOnDestroy(): void {
