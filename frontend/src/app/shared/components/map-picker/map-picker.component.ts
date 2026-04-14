@@ -19,6 +19,11 @@ export interface MapRoutePoint {
     label?: string;
 }
 
+const TUNISIA_BOUNDS = L.latLngBounds(
+    [30.1, 7.5],
+    [37.6, 11.8]
+);
+
 @Component({
     selector: 'app-map-picker',
     standalone: true,
@@ -70,6 +75,8 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
         this.map = L.map(this.mapElementId, {
             center: center,
             zoom: this.zoom,
+            maxBounds: TUNISIA_BOUNDS,
+            maxBoundsViscosity: 1.0,
         });
 
         // Add OpenStreetMap tile layer

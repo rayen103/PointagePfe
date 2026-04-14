@@ -12,6 +12,10 @@ import * as L from 'leaflet';
 import { Map as LeafletMap, Marker, Polyline } from 'leaflet';
 
 export type MapPointType = 'base' | 'departure' | 'arrival';
+const TUNISIA_BOUNDS = L.latLngBounds(
+    [30.1, 7.5],
+    [37.6, 11.8]
+);
 
 export interface MapLocation {
     id: string;
@@ -58,6 +62,8 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
         this.map = L.map('map-viewer', {
             center: center,
             zoom: this.zoom,
+            maxBounds: TUNISIA_BOUNDS,
+            maxBoundsViscosity: 1.0,
         });
 
         // Add OpenStreetMap tile layer
