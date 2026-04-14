@@ -93,17 +93,44 @@
             @if(circuit$ | async; as circuits){
                 @if(circuits.length > 0){
                     <div class="grid gap-4 pb-20">
-                        <!-- Hidden sort host (keeps existing sorting behavior) -->
-                        <div
-                            class="hidden"
-                            matSort
-                            matSortActive="codeCircuit"
-                            matSortDirection="asc"
-                            (matSortChange)="SortChange()"
-                            matSortDisableClear="true">
-                            <div [mat-sort-header]="'circuitId'">Id</div>
-                            <div [mat-sort-header]="'codeCircuit'">{{ t('Code') }}</div>
-                            <div [mat-sort-header]="'libelleCircuit'">{{ t('Label') }}</div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="text-sm text-hint">{{ t('Sort') }}:</span>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-code-ascending')"
+                                [disabled]="sortActive === 'codeCircuit' && sortDirection === 'asc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'codeCircuit' && sortDirection === 'asc'}"
+                                (click)="setSort('codeCircuit','asc')">
+                                {{ t('Code') }} ↑
+                            </button>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-code-descending')"
+                                [disabled]="sortActive === 'codeCircuit' && sortDirection === 'desc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'codeCircuit' && sortDirection === 'desc'}"
+                                (click)="setSort('codeCircuit','desc')">
+                                {{ t('Code') }} ↓
+                            </button>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-label-ascending')"
+                                [disabled]="sortActive === 'libelleCircuit' && sortDirection === 'asc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'libelleCircuit' && sortDirection === 'asc'}"
+                                (click)="setSort('libelleCircuit','asc')">
+                                {{ t('Label') }} ↑
+                            </button>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-label-descending')"
+                                [disabled]="sortActive === 'libelleCircuit' && sortDirection === 'desc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'libelleCircuit' && sortDirection === 'desc'}"
+                                (click)="setSort('libelleCircuit','desc')">
+                                {{ t('Label') }} ↓
+                            </button>
                         </div>
 
                         <!-- Cards -->

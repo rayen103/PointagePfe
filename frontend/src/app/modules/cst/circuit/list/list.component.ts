@@ -11,7 +11,6 @@ import { TranslocoModule } from '@ngneat/transloco';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
-import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
@@ -37,7 +36,6 @@ import { MapGeocodingService } from '../../../../core/common/map-geocoding.servi
         MatIconModule,
         MatInputModule,
         MatProgressBarModule,
-        MatSortModule,
         ReactiveFormsModule,
         CommonModule,
         MatPaginatorModule,
@@ -53,7 +51,6 @@ import { MapGeocodingService } from '../../../../core/common/map-geocoding.servi
 })
 export class ListComponent implements OnInit, OnDestroy {
     @ViewChild(MatPaginator) private _paginator: MatPaginator;
-    @ViewChild(MatSort) private _sort: MatSort;
 
     circuit$: Observable<Circuit[]>;
 
@@ -68,6 +65,8 @@ export class ListComponent implements OnInit, OnDestroy {
     showMapView: boolean = false; // Toggle between list and map view
     mapLocations: MapLocation[] = []; // Locations for map display
     mapCircuitsWithLocations: number = 0;
+    sortActive: string = 'codeCircuit';
+    sortDirection: 'asc' | 'desc' = 'asc';
 
     constructor(
         private _circuitService: CircuitService,
@@ -94,10 +93,16 @@ export class ListComponent implements OnInit, OnDestroy {
         return this._circuitService.GetCircuit(
             (this._paginator?.pageIndex | 0) + 1,
             this._paginator?.pageSize,
-            this._sort?.active,
-            this._sort?.direction,
+            this.sortActive,
+            this.sortDirection,
             this.searchInputControl.value
         );
+    }
+
+    setSort(active: string, direction: 'asc' | 'desc'): void {
+        this.sortActive = active;
+        this.sortDirection = direction;
+        this.SortChange();
     }
 
     hasActionPermission(action: FuseNavigationAction): boolean {

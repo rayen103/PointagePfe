@@ -271,6 +271,11 @@
     "No-details-added": "لم تتم إضافة أي تفاصيل",
     "Click-on": "انقر فوق \"إضافة التفاصيل\" للبدء",
     "Formula-successfully-registered": "تم تسجيل الصيغة بنجاح",
-    "Error-while-saving": "حدث خطأ أثناء الحفظ"
+    "Error-while-saving": "حدث خطأ أثناء الحفظ",
+    "Sort-by-code-ascending": "الفرز حسب الرمز تصاعدياً",
+    "Sort-by-code-descending": "الفرز حسب الرمز تنازلياً",
+    "Sort-by-label-ascending": "الفرز حسب التسمية تصاعدياً",
+    "Sort-by-label-descending": "الفرز حسب التسمية تنازلياً",
+    "Sort": "فرز"
 
 }

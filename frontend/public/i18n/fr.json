@@ -272,5 +272,10 @@
     "No-details-added": "Aucun détail ajouté",
     "Click-on": "Cliquez sur \"Ajouter Détail\" pour commencer",
     "Formula-successfully-registered": "Formule enregistrée avec succès",
-    "Error-while-saving": "Erreur lors de l'enregistrement"
+    "Error-while-saving": "Erreur lors de l'enregistrement",
+    "Sort-by-code-ascending": "Trier par code croissant",
+    "Sort-by-code-descending": "Trier par code décroissant",
+    "Sort-by-label-ascending": "Trier par libellé croissant",
+    "Sort-by-label-descending": "Trier par libellé décroissant",
+    "Sort": "Trier"
 }

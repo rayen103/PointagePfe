@@ -268,6 +268,11 @@
     "No-details-added": "No se han añadido detalles",
     "Click-on": "Haga clic en \"Agregar detalles\" para comenzar",
     "Formula-successfully-registered": "Fórmula registrada con éxito",
-    "Error-while-saving": "Error al guardar"
+    "Error-while-saving": "Error al guardar",
+    "Sort-by-code-ascending": "Ordenar por código ascendente",
+    "Sort-by-code-descending": "Ordenar por código descendente",
+    "Sort-by-label-ascending": "Ordenar por etiqueta ascendente",
+    "Sort-by-label-descending": "Ordenar por etiqueta descendente",
+    "Sort": "Ordenar"
 
 }
