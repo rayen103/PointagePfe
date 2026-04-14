@@ -183,14 +183,15 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
                 waypoints: latLngs,
                 show: false,
                 addWaypoints: false,
-                draggableWaypoints: false,
                 fitSelectedRoutes: false,
                 routeWhileDragging: false,
                 createMarker: () => null,
                 lineOptions: {
                     styles: [{ color: '#2563eb', weight: 4, opacity: 0.8 }],
+                    extendToWaypoints: true,
+                    missingRouteTolerance: 0,
                 },
-            })
+            } as any)
                 .on('routingerror', () => {
                     this.routePolyline = L.polyline(latLngs, {
                         color: '#2563eb',

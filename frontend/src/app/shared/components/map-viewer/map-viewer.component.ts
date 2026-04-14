@@ -155,14 +155,15 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
                 waypoints,
                 show: false,
                 addWaypoints: false,
-                draggableWaypoints: false,
                 fitSelectedRoutes: false,
                 routeWhileDragging: false,
                 createMarker: () => null,
                 lineOptions: {
                     styles: [{ color: '#2563eb', weight: 3, opacity: 0.8 }],
+                    extendToWaypoints: true,
+                    missingRouteTolerance: 0,
                 },
-            })
+            } as any)
                 .on('routingerror', () => {
                     const fallbackLine = L.polyline(
                         [
