@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import * as L from 'leaflet';
 import { Map as LeafletMap, Marker, Polyline } from 'leaflet';
+import 'leaflet-routing-machine';
 
 export type MapPointType = 'base' | 'departure' | 'arrival';
 const TUNISIA_BOUNDS = L.latLngBounds(
@@ -43,6 +44,7 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
 
     private map: LeafletMap | null = null;
     private markers: Marker[] = [];
+    private routeControls: L.Routing.Control[] = [];
     private routeLines: Polyline[] = [];
 
     ngAfterViewInit(): void {
@@ -84,6 +86,8 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
         // Clear existing markers
         this.markers.forEach(marker => marker.remove());
         this.markers = [];
+        this.routeControls.forEach((control) => control.remove());
+        this.routeControls = [];
         this.routeLines.forEach((line) => line.remove());
         this.routeLines = [];
 
@@ -142,19 +146,41 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
                 return;
             }
 
-            const routeLine = L.polyline(
-                [
-                    [departure.latitude, departure.longitude],
-                    [arrival.latitude, arrival.longitude],
-                ],
-                {
-                    color: '#2563eb',
-                    weight: 3,
-                    opacity: 0.8,
-                }
-            ).addTo(this.map!);
+            const waypoints = [
+                L.latLng(departure.latitude, departure.longitude),
+                L.latLng(arrival.latitude, arrival.longitude),
+            ];
 
-            this.routeLines.push(routeLine);
+            const routingControl = L.Routing.control({
+                waypoints,
+                show: false,
+                addWaypoints: false,
+                draggableWaypoints: false,
+                fitSelectedRoutes: false,
+                routeWhileDragging: false,
+                createMarker: () => null,
+                lineOptions: {
+                    styles: [{ color: '#2563eb', weight: 3, opacity: 0.8 }],
+                },
+            })
+                .on('routingerror', () => {
+                    const fallbackLine = L.polyline(
+                        [
+                            [departure.latitude, departure.longitude],
+                            [arrival.latitude, arrival.longitude],
+                        ],
+                        {
+                            color: '#2563eb',
+                            weight: 3,
+                            opacity: 0.8,
+                        }
+                    ).addTo(this.map!);
+
+                    this.routeLines.push(fallbackLine);
+                })
+                .addTo(this.map);
+
+            this.routeControls.push(routingControl);
         });
     }
 
@@ -200,6 +226,9 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        this.routeControls.forEach((control) => control.remove());
+        this.routeControls = [];
+
         this.routeLines.forEach((line) => line.remove());
         this.routeLines = [];
 

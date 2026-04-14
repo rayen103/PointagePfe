@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import * as L from 'leaflet';
 import { LatLng, Map, Marker, Polyline } from 'leaflet';
+import 'leaflet-routing-machine';
 
 export interface MapRoutePoint {
     latitude: number;
@@ -45,6 +46,7 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
     private map: Map | null = null;
     private marker: Marker | null = null;
     private routeMarkers: Marker[] = [];
+    private routeControl: L.Routing.Control | null = null;
     private routePolyline: Polyline | null = null;
 
     ngAfterViewInit(): void {
@@ -162,6 +164,10 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
             this.routePolyline.remove();
             this.routePolyline = null;
         }
+        if (this.routeControl) {
+            this.routeControl.remove();
+            this.routeControl = null;
+        }
 
         const validRoutePoints = (this.routePoints ?? [])
             .filter((point) => point.latitude != null && point.longitude != null);
@@ -173,11 +179,26 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
         const latLngs = validRoutePoints.map((point) => L.latLng(point.latitude, point.longitude));
 
         if (latLngs.length > 1) {
-            this.routePolyline = L.polyline(latLngs, {
-                color: '#2563eb',
-                weight: 4,
-                opacity: 0.8,
-            }).addTo(this.map);
+            this.routeControl = L.Routing.control({
+                waypoints: latLngs,
+                show: false,
+                addWaypoints: false,
+                draggableWaypoints: false,
+                fitSelectedRoutes: false,
+                routeWhileDragging: false,
+                createMarker: () => null,
+                lineOptions: {
+                    styles: [{ color: '#2563eb', weight: 4, opacity: 0.8 }],
+                },
+            })
+                .on('routingerror', () => {
+                    this.routePolyline = L.polyline(latLngs, {
+                        color: '#2563eb',
+                        weight: 4,
+                        opacity: 0.8,
+                    }).addTo(this.map!);
+                })
+                .addTo(this.map);
         }
 
         validRoutePoints.forEach((point, index) => {
@@ -240,6 +261,10 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
         if (this.routePolyline) {
             this.routePolyline.remove();
             this.routePolyline = null;
+        }
+        if (this.routeControl) {
+            this.routeControl.remove();
+            this.routeControl = null;
         }
 
         if (this.map) {
