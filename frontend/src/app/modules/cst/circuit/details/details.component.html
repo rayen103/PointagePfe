@@ -276,41 +276,44 @@
                     </mat-card-header>
                     <mat-card-content>
 
-                        <!-- Waypoints table -->
+                        <!-- Waypoints cards -->
                         @if(circuitPoints.length > 0){
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-sm">
-                                    <thead>
-                                        <tr class="border-b text-hint font-semibold">
-                                            <th class="text-left py-2 pr-4">{{ t('Ordre') }}</th>
-                                            <th class="text-left py-2 pr-4">{{ t('Code') }}</th>
-                                            <th class="text-left py-2 pr-4">{{ t('Label') }}</th>
-                                            <th class="text-left py-2 pr-4">{{ t('Latitude') }}</th>
-                                            <th class="text-left py-2 pr-4">{{ t('Longitude') }}</th>
-                                            <th class="text-center py-2"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @for(point of circuitPoints; track point.circuitPointCollecteId){
-                                            <tr class="border-b dark:border-slate-700">
-                                                <td class="py-2 pr-4">{{ point.ordre ?? '-' }}</td>
-                                                <td class="py-2 pr-4 font-medium">{{ point.codePointCollecte }}</td>
-                                                <td class="py-2 pr-4">{{ point.libellePointCollecte || '-' }}</td>
-                                                <td class="py-2 pr-4">{{ point.latitude ?? '-' }}</td>
-                                                <td class="py-2 pr-4">{{ point.longitude ?? '-' }}</td>
-                                                <td class="py-2 text-center">
-                                                    <button
-                                                        mat-icon-button
-                                                        [color]="'warn'"
-                                                        type="button"
-                                                        (click)="removeWaypoint(point.circuitPointCollecteId)">
-                                                        <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
+                            <div class="grid grid-cols-1 gap-4">
+                                @for(point of circuitPoints; track point.circuitPointCollecteId){
+                                    <div class="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+                                        <div class="flex items-start justify-between gap-4">
+                                            <div class="grid flex-1 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3 text-sm">
+                                                <div>
+                                                    <p class="text-hint text-xs">{{ t('Ordre') }}</p>
+                                                    <p>{{ point.ordre ?? '-' }}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-hint text-xs">{{ t('Code') }}</p>
+                                                    <p class="font-medium">{{ point.codePointCollecte || '-' }}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-hint text-xs">{{ t('Label') }}</p>
+                                                    <p>{{ point.libellePointCollecte || '-' }}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-hint text-xs">{{ t('Latitude') }}</p>
+                                                    <p>{{ point.latitude ?? '-' }}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-hint text-xs">{{ t('Longitude') }}</p>
+                                                    <p>{{ point.longitude ?? '-' }}</p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                mat-icon-button
+                                                [color]="'warn'"
+                                                type="button"
+                                                (click)="removeWaypoint(point.circuitPointCollecteId)">
+                                                <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
                             </div>
                         } @else {
                             <p class="text-hint text-sm mb-4">{{ t('No-waypoints') }}</p>

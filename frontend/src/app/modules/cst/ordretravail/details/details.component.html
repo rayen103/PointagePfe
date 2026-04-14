@@ -245,47 +245,56 @@
                     </mat-card-header>
                     <mat-card-content>
 
-                        <!-- Details table -->
+                        <!-- Details cards -->
                         @if(ordreTravailDetails.length > 0){
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-sm">
-                                    <thead>
-                                        <tr class="border-b text-hint font-semibold">
-                                            <th class="text-left py-2 pr-4">{{ t('Code-Article') }}</th>
-                                            <th class="text-left py-2 pr-4">{{ t('Libelle-Article') }}</th>
-                                            <th class="text-left py-2 pr-4">{{ t('Code-Entrepot') }}</th>
-                                            <th class="text-left py-2 pr-4">{{ t('Code-Unite') }}</th>
-                                            <th class="text-right py-2 pr-4">{{ t('Quantite') }}</th>
-                                            <th class="text-right py-2 pr-4">{{ t('Prix-Unitaire-HT') }}</th>
-                                            <th class="text-right py-2 pr-4">{{ t('Taux-TVA') }}</th>
-                                            <th class="text-right py-2 pr-4">{{ t('Montant') }}</th>
-                                            <th class="text-center py-2"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @for(detail of ordreTravailDetails; track detail.ordreTravailDetailId){
-                                            <tr class="border-b dark:border-slate-700">
-                                                <td class="py-2 pr-4 font-medium">{{ detail.codeArticle }}</td>
-                                                <td class="py-2 pr-4">{{ detail.libelleArticle || '-' }}</td>
-                                                <td class="py-2 pr-4">{{ detail.codeEntrepot || '-' }}</td>
-                                                <td class="py-2 pr-4">{{ detail.codeUnite || '-' }}</td>
-                                                <td class="py-2 pr-4 text-right">{{ detail.quantite ?? '-' }}</td>
-                                                <td class="py-2 pr-4 text-right">{{ detail.prixUnitaireHT ?? '-' }}</td>
-                                                <td class="py-2 pr-4 text-right">{{ detail.tauxTVA ?? '-' }}</td>
-                                                <td class="py-2 pr-4 text-right">{{ detail.montant ?? '-' }}</td>
-                                                <td class="py-2 text-center">
-                                                    <button
-                                                        mat-icon-button
-                                                        [color]="'warn'"
-                                                        type="button"
-                                                        (click)="removeDetail(detail.ordreTravailDetailId)">
-                                                        <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
+                            <div class="grid grid-cols-1 gap-4">
+                                @for(detail of ordreTravailDetails; track detail.ordreTravailDetailId){
+                                    <div class="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+                                        <div class="flex items-start justify-between gap-4">
+                                            <div class="grid flex-1 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-3 text-sm">
+                                                <div>
+                                                    <p class="text-hint text-xs">{{ t('Code-Article') }}</p>
+                                                    <p class="font-medium">{{ detail.codeArticle || '-' }}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-hint text-xs">{{ t('Libelle-Article') }}</p>
+                                                    <p>{{ detail.libelleArticle || '-' }}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-hint text-xs">{{ t('Code-Entrepot') }}</p>
+                                                    <p>{{ detail.codeEntrepot || '-' }}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-hint text-xs">{{ t('Code-Unite') }}</p>
+                                                    <p>{{ detail.codeUnite || '-' }}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-hint text-xs">{{ t('Quantite') }}</p>
+                                                    <p>{{ detail.quantite ?? '-' }}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-hint text-xs">{{ t('Prix-Unitaire-HT') }}</p>
+                                                    <p>{{ detail.prixUnitaireHT ?? '-' }}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-hint text-xs">{{ t('Taux-TVA') }}</p>
+                                                    <p>{{ detail.tauxTVA ?? '-' }}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-hint text-xs">{{ t('Montant') }}</p>
+                                                    <p>{{ detail.montant ?? '-' }}</p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                mat-icon-button
+                                                [color]="'warn'"
+                                                type="button"
+                                                (click)="removeDetail(detail.ordreTravailDetailId)">
+                                                <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
                             </div>
                         } @else {
                             <p class="text-hint text-sm mb-4">{{ t('No-details') }}</p>
