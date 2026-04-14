@@ -41,82 +41,136 @@
         <div class="relative flex flex-col flex-auto mb-8 overflow-hidden rounded-lg bg-card justify-between">
             @if (employe$ | async; as employes){
                 @if (employes.length > 0){
-                    <div class="grid">
-                        <!-- Header -->
-                        <div
-                            class="employe-grid grid gap-4 px-6 py-4 text-md font-semibold text-hint bg-card border-b border-b-slate-300 dark:border-b-slate-700"
-                            matSort
-                            matSortDisableClear="true">
-
-                            <div [mat-sort-header]="'matricule'">{{ t('ID-Number') }}</div>
-                            <div [mat-sort-header]="'nom'">{{ t('Name') }}</div>
-                            <div [mat-sort-header]="'prenom'">{{ t('First-Name') }}</div>
-                            <div>{{ t('RFID') }}</div>
-                            <div>{{ t('Circuit') }}</div>
-                            <div class="text-center">{{ t('Actions') }}</div>
+                    <div class="grid gap-4 pb-20">
+                        <!-- Sort controls -->
+                        <div class="flex flex-wrap items-center gap-2 px-4">
+                            <span class="text-sm text-hint">{{ t('Sort') }}:</span>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-id-ascending')"
+                                [disabled]="sortActive === 'matricule' && sortDirection === 'asc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'matricule' && sortDirection === 'asc'}"
+                                (click)="setSort('matricule','asc')">
+                                {{ t('ID-Number') }} ↑
+                            </button>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-id-descending')"
+                                [disabled]="sortActive === 'matricule' && sortDirection === 'desc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'matricule' && sortDirection === 'desc'}"
+                                (click)="setSort('matricule','desc')">
+                                {{ t('ID-Number') }} ↓
+                            </button>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-name-ascending')"
+                                [disabled]="sortActive === 'nom' && sortDirection === 'asc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'nom' && sortDirection === 'asc'}"
+                                (click)="setSort('nom','asc')">
+                                {{ t('Name') }} ↑
+                            </button>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-name-descending')"
+                                [disabled]="sortActive === 'nom' && sortDirection === 'desc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'nom' && sortDirection === 'desc'}"
+                                (click)="setSort('nom','desc')">
+                                {{ t('Name') }} ↓
+                            </button>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-first-name-ascending')"
+                                [disabled]="sortActive === 'prenom' && sortDirection === 'asc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'prenom' && sortDirection === 'asc'}"
+                                (click)="setSort('prenom','asc')">
+                                {{ t('First-Name') }} ↑
+                            </button>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-first-name-descending')"
+                                [disabled]="sortActive === 'prenom' && sortDirection === 'desc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'prenom' && sortDirection === 'desc'}"
+                                (click)="setSort('prenom','desc')">
+                                {{ t('First-Name') }} ↓
+                            </button>
                         </div>
-                        <!-- Rows -->
+
+                        <!-- Cards -->
                         @for ( employe of employes;track trackByFn($index,employe)){
-                            <div class="employe-grid grid items-center gap-4 px-6 py-2 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 border-b  dark:border-b-slate-700 last:border-none"
+                            <div class="rounded-lg border border-slate-200 dark:border-slate-700 p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800"
                                  [ngClass]="{'bg-dialog': selectedEmploye?.employeId === employe.employeId}"
                                  (click)="toggleDetails(employe.employeId)"
                             >
-                                <!-- Matricule -->
-                                <div class="truncate">
-                                    {{employe.matricule}}
-                                </div>
-                                <div class="truncate">
-                                    {{employe.nom}}
-                                </div>
-                                <div class="truncate">
-                                    {{employe.prenom}}
-                                </div>
-                                <div class="truncate">
-                                    {{employe.rfid || '-'  }}
-                                </div>
-                                <div class="truncate">
-                                    {{employe.codeCircuit || '-' }}
-                                </div>
+                                <div class="flex items-start justify-between gap-4">
+                                    <div class="grid flex-1 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
+                                        <div>
+                                            <p class="text-hint text-xs">{{ t('ID-Number') }}</p>
+                                            <p class="font-medium truncate">{{employe.matricule || '-'}}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-hint text-xs">{{ t('Name') }}</p>
+                                            <p class="truncate">{{employe.nom || '-'}}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-hint text-xs">{{ t('First-Name') }}</p>
+                                            <p class="truncate">{{employe.prenom || '-'}}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-hint text-xs">{{ t('RFID') }}</p>
+                                            <p class="truncate">{{employe.rfid || '-'}}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-hint text-xs">{{ t('Circuit') }}</p>
+                                            <p class="truncate">{{employe.codeCircuit || '-'}}</p>
+                                        </div>
+                                    </div>
 
-                                <!-- Details & delete button -->
-                                <div class="flex items-center justify-end gap-2">
-                                    <!-- View button -->
-                                    <button
-                                        mat-icon-button
-                                        (click)="onViewClick($event, employe.employeId)"
-                                        class="!w-6 !h-6 sm:!w-8 sm:!h-8">
-                                        <mat-icon
-                                            class="text-hint text-xs sm:text-sm lg:text-base"
-                                            [svgIcon]="selectedEmploye?.employeId === employe.employeId ? 'heroicons_solid:chevron-up' : 'remove_red_eye'">
-                                        </mat-icon>
-                                    </button>
-
-                                    <!-- Edit button -->
-                                    @if(hasActionPermission(FuseNavigationAction.Edit)){
+                                    <!-- Details & delete button -->
+                                    <div class="flex items-center justify-end gap-2 shrink-0">
+                                        <!-- View button -->
                                         <button
                                             mat-icon-button
-                                            (click)="onEditClick($event, employe.employeId)"
+                                            (click)="onViewClick($event, employe.employeId)"
                                             class="!w-6 !h-6 sm:!w-8 sm:!h-8">
                                             <mat-icon
                                                 class="text-hint text-xs sm:text-sm lg:text-base"
-                                                [svgIcon]="'edit_road'">
+                                                [svgIcon]="selectedEmploye?.employeId === employe.employeId ? 'heroicons_solid:chevron-up' : 'remove_red_eye'">
                                             </mat-icon>
                                         </button>
-                                    }
 
-                                    <!-- Delete button -->
-                                    @if(hasActionPermission(FuseNavigationAction.Delete)){
-                                        <button
-                                            mat-icon-button
-                                            [color]="'warn'"
-                                            (click)="onDeleteClick($event, employe)"
-                                            class="!w-6 !h-6 sm:!w-8 sm:!h-8">
-                                            <mat-icon
-                                                class="text-hint text-xs sm:text-sm lg:text-base"
-                                                [svgIcon]="'heroicons_outline:trash'">
-                                            </mat-icon>
-                                        </button>
-                                    }
+                                        <!-- Edit button -->
+                                        @if(hasActionPermission(FuseNavigationAction.Edit)){
+                                            <button
+                                                mat-icon-button
+                                                (click)="onEditClick($event, employe.employeId)"
+                                                class="!w-6 !h-6 sm:!w-8 sm:!h-8">
+                                                <mat-icon
+                                                    class="text-hint text-xs sm:text-sm lg:text-base"
+                                                    [svgIcon]="'edit_road'">
+                                                </mat-icon>
+                                            </button>
+                                        }
+
+                                        <!-- Delete button -->
+                                        @if(hasActionPermission(FuseNavigationAction.Delete)){
+                                            <button
+                                                mat-icon-button
+                                                [color]="'warn'"
+                                                (click)="onDeleteClick($event, employe)"
+                                                class="!w-6 !h-6 sm:!w-8 sm:!h-8">
+                                                <mat-icon
+                                                    class="text-hint text-xs sm:text-sm lg:text-base"
+                                                    [svgIcon]="'heroicons_outline:trash'">
+                                                </mat-icon>
+                                            </button>
+                                        }
+                                    </div>
                                 </div>
                             </div>
                             <div class="grid">

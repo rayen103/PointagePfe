@@ -7,7 +7,6 @@ import {
     ViewEncapsulation,
 } from '@angular/core';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import { MatSort, MatSortModule } from '@angular/material/sort';
 import { debounceTime, distinctUntilChanged, finalize, map, Observable, Subject, switchMap, takeUntil } from 'rxjs';
 import {
     ReactiveFormsModule,
@@ -48,7 +47,6 @@ import { TranslocoDirective } from '@ngneat/transloco';
         MatOptionModule,
         MatProgressBarModule,
         MatSelectModule,
-        MatSortModule,
         NgTemplateOutlet,
         ReactiveFormsModule,
         NgClass,
@@ -67,7 +65,6 @@ import { TranslocoDirective } from '@ngneat/transloco';
 export class EmployeComponent implements OnInit, OnDestroy {
 
     @ViewChild(MatPaginator) private _paginator: MatPaginator;
-    @ViewChild(MatSort) private _sort: MatSort;
 
     employe$: Observable<Employe[]>;
     flashMessage: 'success' | 'error' | null = null;
@@ -82,6 +79,8 @@ export class EmployeComponent implements OnInit, OnDestroy {
     societe: Societe[] = [];
     filteredSocietes$: Observable<Societe[]>;
     isViewMode: boolean = false; // To distinguish between view and edit mode
+    sortActive: string = 'matricule';
+    sortDirection: 'asc' | 'desc' = 'asc';
 
 
     constructor(
@@ -115,9 +114,15 @@ export class EmployeComponent implements OnInit, OnDestroy {
         return this._employeService.GetEmploye(
             (this._paginator?.pageIndex | 0) + 1,
             this._paginator?.pageSize,
-            this._sort?.active,
-            this._sort?.direction,
+            this.sortActive,
+            this.sortDirection,
             this.searchInputControl.value);
+    }
+
+    setSort(active: string, direction: 'asc' | 'desc'): void {
+        this.sortActive = active;
+        this.sortDirection = direction;
+        this.SortChange();
     }
 
     hasActionPermission(action: FuseNavigationAction): boolean {
