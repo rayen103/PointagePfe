@@ -41,84 +41,82 @@
         <div class="relative flex flex-col flex-auto sm:mb-18 overflow-hidden px-4 sm:px-8 pt-4 sm:pt-8 rounded-lg bg-card">
             @if(equipe$ | async; as equipes){
                 @if(equipes.length > 0){
-                    <div class="grid">
-                        <!-- Header -->
-                        <div
-                            class="equipe-grid-header hidden sm:grid z-10 sticky top-0 mb-4 gap-4 text-md font-semibold text-hint bg-card"
-                            *transloco="let t"
-                            matSort
-                            matSortActive="codeEquipe"
-                            matSortDirection="asc"
-                            (matSortChange)="SortChange()"
-                            matSortDisableClear="true">
-
-                            <div class="hidden" [mat-sort-header]="'equipeId'">Id</div>
-                            <div [mat-sort-header]="'codeEquipe'">{{ t('Code') }}</div>
-                            <div [mat-sort-header]="'libelleEquipe'">{{ t('Label') }}</div>
-                            <div [mat-sort-header]="'responsable'">{{ t('Responsable') }}</div>
-                            <div [mat-sort-header]="'codeVehicule'">{{ t('Vehicle') }}</div>
-                            <div class="text-center">{{ t('Status') }}</div>
-                            <div class="hidden sm:block text-center">{{ t('Details') }}</div>
+                    <div class="grid gap-4 pb-20">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="text-sm text-hint">{{ t('Sort') }}:</span>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-code-ascending')"
+                                [disabled]="sortActive === 'codeEquipe' && sortDirection === 'asc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'codeEquipe' && sortDirection === 'asc'}"
+                                (click)="setSort('codeEquipe','asc')">
+                                {{ t('Code') }} ↑
+                            </button>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-code-descending')"
+                                [disabled]="sortActive === 'codeEquipe' && sortDirection === 'desc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'codeEquipe' && sortDirection === 'desc'}"
+                                (click)="setSort('codeEquipe','desc')">
+                                {{ t('Code') }} ↓
+                            </button>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-label-ascending')"
+                                [disabled]="sortActive === 'libelleEquipe' && sortDirection === 'asc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'libelleEquipe' && sortDirection === 'asc'}"
+                                (click)="setSort('libelleEquipe','asc')">
+                                {{ t('Label') }} ↑
+                            </button>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-label-descending')"
+                                [disabled]="sortActive === 'libelleEquipe' && sortDirection === 'desc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'libelleEquipe' && sortDirection === 'desc'}"
+                                (click)="setSort('libelleEquipe','desc')">
+                                {{ t('Label') }} ↓
+                            </button>
                         </div>
-                        <!-- Rows -->
-                        @if(equipe$ | async; as equipes){
-                            @for(equipe of equipes; track equipe.equipeId || $index){
-                                <div class="equipe-grid-item sm:equipe-grid grid sm:grid-cols-6 grid-cols-1 gap-2 sm:gap-4 p-3 sm:py-0.5"
-                                     [ngClass]="{'border-b dark:border-b-slate-700': $index+1 !== equipes.length}">
 
-                                    <!-- Mobile label + value -->
-                                    <div class="sm:hidden flex justify-between">
-                                        <span class="font-semibold">{{ t('Code') }}:</span>
-                                        <span>{{equipe.codeEquipe}}</span>
+                        @for(equipe of equipes; track equipe.equipeId || $index){
+                            <div class="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div class="grid flex-1 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
+                                        <div>
+                                            <p class="text-hint text-xs">{{ t('Code') }}</p>
+                                            <p class="font-medium truncate">{{equipe.codeEquipe || '-'}}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-hint text-xs">{{ t('Label') }}</p>
+                                            <p class="truncate">{{equipe.libelleEquipe || '-'}}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-hint text-xs">{{ t('Status') }}</p>
+                                            <p [ngClass]="equipe.isActive ? 'text-green-600' : 'text-red-600'">
+                                                {{equipe.isActive ? t('Active') : t('Inactive')}}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p class="text-hint text-xs">{{ t('Responsable') }}</p>
+                                            <p class="truncate">{{equipe.responsable || '-'}}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-hint text-xs">{{ t('Vehicle') }}</p>
+                                            <p class="truncate">{{equipe.codeVehicule || '-'}}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-hint text-xs">{{ t('Internal') }}</p>
+                                            <p [ngClass]="equipe.isInternal ? 'text-green-600' : 'text-orange-600'">
+                                                {{equipe.isInternal ? t('Yes') : t('No')}}
+                                            </p>
+                                        </div>
                                     </div>
 
-                                    <!-- Desktop view -->
-                                    <div class="hidden sm:block truncate font-medium">{{equipe.codeEquipe}}</div>
-
-                                    <!-- Mobile label + value -->
-                                    <div class="sm:hidden flex justify-between">
-                                        <span class="font-semibold">{{ t('Label') }}:</span>
-                                        <span class="truncate">{{equipe.libelleEquipe}}</span>
-                                    </div>
-
-                                    <!-- Desktop view -->
-                                    <div class="hidden sm:block truncate">{{equipe.libelleEquipe}}</div>
-
-                                    <!-- Mobile label + value -->
-                                    <div class="sm:hidden flex justify-between">
-                                        <span class="font-semibold">{{ t('Responsable') }}:</span>
-                                        <span class="truncate">{{equipe.responsable || '-'}}</span>
-                                    </div>
-
-                                    <!-- Desktop view -->
-                                    <div class="hidden sm:block truncate">{{equipe.responsable || '-'}}</div>
-
-                                    <!-- Mobile label + value -->
-                                    <div class="sm:hidden flex justify-between">
-                                        <span class="font-semibold">{{ t('Vehicle') }}:</span>
-                                        <span class="truncate">{{equipe.codeVehicule || '-'}}</span>
-                                    </div>
-
-                                    <!-- Desktop view -->
-                                    <div class="hidden sm:block truncate">{{equipe.codeVehicule || '-'}}</div>
-
-                                    <!-- Mobile label + value -->
-                                    <div class="sm:hidden flex justify-between">
-                                        <span class="font-semibold">{{ t('Status') }}:</span>
-                                        <span [ngClass]="equipe.isActive ? 'text-green-600' : 'text-red-600'">
-                                            {{equipe.isActive ? t('Active') : t('Inactive')}}
-                                        </span>
-                                    </div>
-                                    <!-- Desktop view -->
-                                    <div class="hidden sm:flex justify-center">
-                                        <span [ngClass]="equipe.isActive ? 'text-green-600' : 'text-red-600'">
-                                            {{equipe.isActive ? t('Active') : t('Inactive')}}
-                                        </span>
-                                    </div>
-
-                                    <!-- Details & delete button -->
-                                    <div class="flex sm:justify-center justify-end gap-2 sm:gap-4 mt-2 sm:mt-0">
-                                        <!-- View button -->
+                                    <div class="flex justify-end gap-2 sm:gap-4 shrink-0">
                                         <button
                                             mat-icon-button
                                             (click)="toggleDetails(equipe.equipeId)"
@@ -129,7 +127,6 @@
                                             </mat-icon>
                                         </button>
 
-                                        <!-- Edit button -->
                                         <button
                                             mat-icon-button
                                             [routerLink]="equipe.equipeId"
@@ -140,7 +137,6 @@
                                             </mat-icon>
                                         </button>
 
-                                        <!-- Delete button -->
                                         @if(hasActionPermission(FuseNavigationAction.Delete)){
                                         <button
                                             mat-icon-button
@@ -154,60 +150,59 @@
                                         </button>
                                         }
                                     </div>
+                                </div>
 
-                                    <!-- Details panel (expanded) -->
-                                    @if(selectedEquipe?.equipeId === equipe.equipeId){
-                                        <div class="col-span-full border-t border-b dark:border-slate-700 p-4 mt-2">
-                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Code') }}:</span>
-                                                    <span class="ml-2">{{equipe.codeEquipe}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Label') }}:</span>
-                                                    <span class="ml-2">{{equipe.libelleEquipe}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Responsable') }}:</span>
-                                                    <span class="ml-2">{{equipe.responsable || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Vehicle') }}:</span>
-                                                    <span class="ml-2">{{equipe.codeVehicule || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Code-Client') }}:</span>
-                                                    <span class="ml-2">{{equipe.codeClient || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Code-Entrepot') }}:</span>
-                                                    <span class="ml-2">{{equipe.codeEntrepot || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Code-Tarif') }}:</span>
-                                                    <span class="ml-2">{{equipe.codeTarif || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Code-Fournisseur') }}:</span>
-                                                    <span class="ml-2">{{equipe.codeFournisseur || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Internal') }}:</span>
-                                                    <span class="ml-2" [ngClass]="equipe.isInternal ? 'text-green-600' : 'text-orange-600'">
-                                                        {{equipe.isInternal ? t('Yes') : t('No')}}
-                                                    </span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Status') }}:</span>
-                                                    <span class="ml-2" [ngClass]="equipe.isActive ? 'text-green-600' : 'text-red-600'">
-                                                        {{equipe.isActive ? t('Active') : t('Inactive')}}
-                                                    </span>
-                                                </div>
+                                @if(selectedEquipe?.equipeId === equipe.equipeId){
+                                    <div class="border-t dark:border-slate-700 pt-4 mt-4">
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div>
+                                                <span class="font-semibold">{{ t('Code') }}:</span>
+                                                <span class="ml-2">{{equipe.codeEquipe}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Label') }}:</span>
+                                                <span class="ml-2">{{equipe.libelleEquipe}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Responsable') }}:</span>
+                                                <span class="ml-2">{{equipe.responsable || '-'}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Vehicle') }}:</span>
+                                                <span class="ml-2">{{equipe.codeVehicule || '-'}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Code-Client') }}:</span>
+                                                <span class="ml-2">{{equipe.codeClient || '-'}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Code-Entrepot') }}:</span>
+                                                <span class="ml-2">{{equipe.codeEntrepot || '-'}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Code-Tarif') }}:</span>
+                                                <span class="ml-2">{{equipe.codeTarif || '-'}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Code-Fournisseur') }}:</span>
+                                                <span class="ml-2">{{equipe.codeFournisseur || '-'}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Internal') }}:</span>
+                                                <span class="ml-2" [ngClass]="equipe.isInternal ? 'text-green-600' : 'text-orange-600'">
+                                                    {{equipe.isInternal ? t('Yes') : t('No')}}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Status') }}:</span>
+                                                <span class="ml-2" [ngClass]="equipe.isActive ? 'text-green-600' : 'text-red-600'">
+                                                    {{equipe.isActive ? t('Active') : t('Inactive')}}
+                                                </span>
                                             </div>
                                         </div>
-                                    }
-                                </div>
-                            }
+                                    </div>
+                                }
+                            </div>
                         }
                         <!-- Paginator -->
                         <mat-paginator

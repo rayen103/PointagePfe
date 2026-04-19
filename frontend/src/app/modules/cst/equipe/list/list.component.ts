@@ -11,7 +11,6 @@ import { TranslocoModule } from '@ngneat/transloco';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
-import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
@@ -35,7 +34,6 @@ import { FuseNavigationAction } from '../../../../../@fuse/components/navigation
         MatIconModule,
         MatInputModule,
         MatProgressBarModule,
-        MatSortModule,
         ReactiveFormsModule,
         CommonModule,
         MatPaginatorModule,
@@ -50,7 +48,6 @@ import { FuseNavigationAction } from '../../../../../@fuse/components/navigation
 })
 export class ListComponent implements OnInit, OnDestroy {
     @ViewChild(MatPaginator) private _paginator: MatPaginator;
-    @ViewChild(MatSort) private _sort: MatSort;
 
     equipe$: Observable<Equipe[]>;
 
@@ -62,6 +59,8 @@ export class ListComponent implements OnInit, OnDestroy {
     roleNavigation: RoleNavigation;
     selectedEquipe: Equipe | null = null;
     isViewMode: boolean = false;
+    sortActive: string = 'codeEquipe';
+    sortDirection: 'asc' | 'desc' = 'asc';
 
     constructor(
         private _equipeService: EquipeService,
@@ -87,10 +86,16 @@ export class ListComponent implements OnInit, OnDestroy {
         return this._equipeService.GetEquipes(
             (this._paginator?.pageIndex ?? 0) + 1,
             this._paginator?.pageSize,
-            this._sort?.active,
-            this._sort?.direction,
+            this.sortActive,
+            this.sortDirection,
             this.searchInputControl.value
         );
+    }
+
+    setSort(active: string, direction: 'asc' | 'desc'): void {
+        this.sortActive = active;
+        this.sortDirection = direction;
+        this.SortChange();
     }
 
     hasActionPermission(action: FuseNavigationAction): boolean {
