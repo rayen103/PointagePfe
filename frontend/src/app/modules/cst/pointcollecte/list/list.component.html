@@ -42,8 +42,8 @@
             @if(pointCollecte$ | async; as pointsCollecte){
                 @if(pointsCollecte.length > 0){
                     <div class="grid gap-4 pb-20">
-                        <div class="flex flex-wrap items-center gap-2">
-                            <span class="text-sm text-hint">{{ t('Sort') }}:</span>
+                        <fieldset class="flex flex-wrap items-center gap-2">
+                            <legend class="text-sm text-hint">{{ t('Sort') }}</legend>
                             <button
                                 mat-stroked-button
                                 type="button"
@@ -80,7 +80,7 @@
                                 (click)="setSort('libellePointCollecte','desc')">
                                 {{ t('Label') }} ↓
                             </button>
-                        </div>
+                        </fieldset>
 
                         @for(pointCollecte of pointsCollecte; track pointCollecte.pointCollecteId || $index){
                             <div class="rounded-lg border border-slate-200 dark:border-slate-700 p-4">

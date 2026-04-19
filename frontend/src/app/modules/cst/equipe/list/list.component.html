@@ -42,8 +42,8 @@
             @if(equipe$ | async; as equipes){
                 @if(equipes.length > 0){
                     <div class="grid gap-4 pb-20">
-                        <div class="flex flex-wrap items-center gap-2">
-                            <span class="text-sm text-hint">{{ t('Sort') }}:</span>
+                        <fieldset class="flex flex-wrap items-center gap-2">
+                            <legend class="text-sm text-hint">{{ t('Sort') }}</legend>
                             <button
                                 mat-stroked-button
                                 type="button"
@@ -80,7 +80,7 @@
                                 (click)="setSort('libelleEquipe','desc')">
                                 {{ t('Label') }} ↓
                             </button>
-                        </div>
+                        </fieldset>
 
                         @for(equipe of equipes; track equipe.equipeId || $index){
                             <div class="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
