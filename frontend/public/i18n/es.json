@@ -268,6 +268,17 @@
     "No-details-added": "No se han añadido detalles",
     "Click-on": "Haga clic en \"Agregar detalles\" para comenzar",
     "Formula-successfully-registered": "Fórmula registrada con éxito",
-    "Error-while-saving": "Error al guardar"
+    "Error-while-saving": "Error al guardar",
+    "Sort-by-code-ascending": "Ordenar por código ascendente",
+    "Sort-by-code-descending": "Ordenar por código descendente",
+    "Sort-by-label-ascending": "Ordenar por etiqueta ascendente",
+    "Sort-by-label-descending": "Ordenar por etiqueta descendente",
+    "Sort": "Ordenar",
+    "Sort-by-id-ascending": "Ordenar por ID ascendente",
+    "Sort-by-id-descending": "Ordenar por ID descendente",
+    "Sort-by-name-ascending": "Ordenar por nombre ascendente",
+    "Sort-by-name-descending": "Ordenar por nombre descendente",
+    "Sort-by-first-name-ascending": "Ordenar por nombre de pila ascendente",
+    "Sort-by-first-name-descending": "Ordenar por nombre de pila descendente"
 
 }

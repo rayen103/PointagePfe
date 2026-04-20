@@ -272,5 +272,16 @@
     "No-details-added": "Aucun détail ajouté",
     "Click-on": "Cliquez sur \"Ajouter Détail\" pour commencer",
     "Formula-successfully-registered": "Formule enregistrée avec succès",
-    "Error-while-saving": "Erreur lors de l'enregistrement"
+    "Error-while-saving": "Erreur lors de l'enregistrement",
+    "Sort-by-code-ascending": "Trier par code croissant",
+    "Sort-by-code-descending": "Trier par code décroissant",
+    "Sort-by-label-ascending": "Trier par libellé croissant",
+    "Sort-by-label-descending": "Trier par libellé décroissant",
+    "Sort": "Trier",
+    "Sort-by-id-ascending": "Trier par identifiant croissant",
+    "Sort-by-id-descending": "Trier par identifiant décroissant",
+    "Sort-by-name-ascending": "Trier par nom croissant",
+    "Sort-by-name-descending": "Trier par nom décroissant",
+    "Sort-by-first-name-ascending": "Trier par prénom croissant",
+    "Sort-by-first-name-descending": "Trier par prénom décroissant"
 }

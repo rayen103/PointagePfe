@@ -271,6 +271,17 @@
     "No-details-added": "لم تتم إضافة أي تفاصيل",
     "Click-on": "انقر فوق \"إضافة التفاصيل\" للبدء",
     "Formula-successfully-registered": "تم تسجيل الصيغة بنجاح",
-    "Error-while-saving": "حدث خطأ أثناء الحفظ"
+    "Error-while-saving": "حدث خطأ أثناء الحفظ",
+    "Sort-by-code-ascending": "الفرز حسب الرمز تصاعدياً",
+    "Sort-by-code-descending": "الفرز حسب الرمز تنازلياً",
+    "Sort-by-label-ascending": "الفرز حسب التسمية تصاعدياً",
+    "Sort-by-label-descending": "الفرز حسب التسمية تنازلياً",
+    "Sort": "فرز",
+    "Sort-by-id-ascending": "الفرز حسب المعرف تصاعدياً",
+    "Sort-by-id-descending": "الفرز حسب المعرف تنازلياً",
+    "Sort-by-name-ascending": "الفرز حسب الاسم تصاعدياً",
+    "Sort-by-name-descending": "الفرز حسب الاسم تنازلياً",
+    "Sort-by-first-name-ascending": "الفرز حسب الاسم الأول تصاعدياً",
+    "Sort-by-first-name-descending": "الفرز حسب الاسم الأول تنازلياً"
 
 }

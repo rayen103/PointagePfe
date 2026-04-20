@@ -272,5 +272,16 @@
     "No-details-added": "No details added",
     "Click-on": "Click on \"Add Detail\" to begin",
     "Formula-successfully-registered": "Formula successfully registered",
-    "Error-while-saving": "Error while saving"
+    "Error-while-saving": "Error while saving",
+    "Sort-by-code-ascending": "Sort by code ascending",
+    "Sort-by-code-descending": "Sort by code descending",
+    "Sort-by-label-ascending": "Sort by label ascending",
+    "Sort-by-label-descending": "Sort by label descending",
+    "Sort": "Sort",
+    "Sort-by-id-ascending": "Sort by ID ascending",
+    "Sort-by-id-descending": "Sort by ID descending",
+    "Sort-by-name-ascending": "Sort by name ascending",
+    "Sort-by-name-descending": "Sort by name descending",
+    "Sort-by-first-name-ascending": "Sort by first name ascending",
+    "Sort-by-first-name-descending": "Sort by first name descending"
 }

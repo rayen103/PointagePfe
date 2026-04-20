@@ -41,80 +41,82 @@
         <div class="relative flex flex-col flex-auto sm:mb-18 overflow-hidden px-4 sm:px-8 pt-4 sm:pt-8 rounded-lg bg-card">
             @if(bus$ | async; as buses){
                 @if(buses.length > 0){
-                    <div class="grid">
-                        <!-- Header -->
-                        <div
-                            class="bus-grid-header hidden sm:grid z-10 sticky top-0 mb-4 gap-4 text-md font-semibold text-hint bg-card"
-                            *transloco="let t"
-                            matSort
-                            matSortActive="numeroIMM"
-                            matSortDirection="asc"
-                            (matSortChange)="SortChange()"
-                            matSortDisableClear="true">
+                    <div class="grid gap-4 pb-20">
+                        <fieldset class="flex flex-wrap items-center gap-2">
+                            <legend class="text-sm text-hint">{{ t('Sort') }}</legend>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-numero-imm-ascending')"
+                                [disabled]="sortActive === 'numeroIMM' && sortDirection === 'asc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'numeroIMM' && sortDirection === 'asc'}"
+                                (click)="setSort('numeroIMM','asc')">
+                                {{ t('NumeroIMM') }} ↑
+                            </button>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-numero-imm-descending')"
+                                [disabled]="sortActive === 'numeroIMM' && sortDirection === 'desc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'numeroIMM' && sortDirection === 'desc'}"
+                                (click)="setSort('numeroIMM','desc')">
+                                {{ t('NumeroIMM') }} ↓
+                            </button>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-model-ascending')"
+                                [disabled]="sortActive === 'modelBus' && sortDirection === 'asc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'modelBus' && sortDirection === 'asc'}"
+                                (click)="setSort('modelBus','asc')">
+                                {{ t('Model') }} ↑
+                            </button>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-model-descending')"
+                                [disabled]="sortActive === 'modelBus' && sortDirection === 'desc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'modelBus' && sortDirection === 'desc'}"
+                                (click)="setSort('modelBus','desc')">
+                                {{ t('Model') }} ↓
+                            </button>
+                        </fieldset>
 
-                            <div class="hidden" [mat-sort-header]="'busId'">Id</div>
-                            <div [mat-sort-header]="'numeroIMM'">{{ t('NumeroIMM') }}</div>
-                            <div [mat-sort-header]="'modelBus'">{{ t('Model') }}</div>
-                            <div [mat-sort-header]="'codeCircuit'">{{ t('Circuit') }}</div>
-                            <div [mat-sort-header]="'capacite'">{{ t('Capacity') }}</div>
-                            <div class="text-center">{{ t('Status') }}</div>
-                            <div class="hidden sm:block text-center">{{ t('Details') }}</div>
-                        </div>
-                        <!-- Rows -->
-                        @if(bus$ | async; as buses){
-                            @for(bus of buses; track bus.busId || $index){
-                                <div class="bus-grid-item sm:bus-grid grid sm:grid-cols-6 grid-cols-1 gap-2 sm:gap-4 p-3 sm:py-0.5"
-                                     [ngClass]="{'border-b dark:border-b-slate-700': $index+1 !== buses.length}">
-
-                                    <!-- Mobile label + value -->
-                                    <div class="sm:hidden flex justify-between">
-                                        <span class="font-semibold">{{ t('NumeroIMM') }}:</span>
-                                        <span>{{bus.numeroIMM}}</span>
+                        @for(bus of buses; track bus.busId || $index){
+                            <div class="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div class="grid flex-1 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
+                                        <div>
+                                            <p class="text-hint text-xs">{{ t('NumeroIMM') }}</p>
+                                            <p class="font-medium truncate">{{bus.numeroIMM || '-'}}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-hint text-xs">{{ t('Model') }}</p>
+                                            <p class="truncate">{{bus.modelBus || '-'}}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-hint text-xs">{{ t('Status') }}</p>
+                                            <p [ngClass]="bus.isActive ? 'text-green-600' : 'text-red-600'">
+                                                {{bus.isActive ? t('Active') : t('Inactive')}}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p class="text-hint text-xs">{{ t('Circuit') }}</p>
+                                            <p class="truncate">{{bus.codeCircuit || '-'}}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-hint text-xs">{{ t('Capacity') }}</p>
+                                            <p class="truncate">{{bus.capacite ?? '-'}}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-hint text-xs">{{ t('App-Sagem') }}</p>
+                                            <p [ngClass]="bus.appSagem ? 'text-green-600' : 'text-orange-600'">
+                                                {{bus.appSagem ? t('Yes') : t('No')}}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <!-- Desktop view -->
-                                    <div class="hidden sm:block truncate font-medium">{{bus.numeroIMM}}</div>
 
-                                    <!-- Mobile label + value -->
-                                    <div class="sm:hidden flex justify-between">
-                                        <span class="font-semibold">{{ t('Model') }}:</span>
-                                        <span class="truncate">{{bus.modelBus || '-'}}</span>
-                                    </div>
-                                    <!-- Desktop view -->
-                                    <div class="hidden sm:block truncate">{{bus.modelBus || '-'}}</div>
-
-                                    <!-- Mobile label + value -->
-                                    <div class="sm:hidden flex justify-between">
-                                        <span class="font-semibold">{{ t('Circuit') }}:</span>
-                                        <span class="truncate">{{bus.codeCircuit || '-'}}</span>
-                                    </div>
-                                    <!-- Desktop view -->
-                                    <div class="hidden sm:block truncate">{{bus.codeCircuit || '-'}}</div>
-
-                                    <!-- Mobile label + value -->
-                                    <div class="sm:hidden flex justify-between">
-                                        <span class="font-semibold">{{ t('Capacity') }}:</span>
-                                        <span class="truncate">{{bus.capacite ?? '-'}}</span>
-                                    </div>
-                                    <!-- Desktop view -->
-                                    <div class="hidden sm:block truncate">{{bus.capacite ?? '-'}}</div>
-
-                                    <!-- Mobile label + value -->
-                                    <div class="sm:hidden flex justify-between">
-                                        <span class="font-semibold">{{ t('Status') }}:</span>
-                                        <span [ngClass]="bus.isActive ? 'text-green-600' : 'text-red-600'">
-                                            {{bus.isActive ? t('Active') : t('Inactive')}}
-                                        </span>
-                                    </div>
-                                    <!-- Desktop view -->
-                                    <div class="hidden sm:flex justify-center">
-                                        <span [ngClass]="bus.isActive ? 'text-green-600' : 'text-red-600'">
-                                            {{bus.isActive ? t('Active') : t('Inactive')}}
-                                        </span>
-                                    </div>
-
-                                    <!-- Details & delete button -->
-                                    <div class="flex sm:justify-center justify-end gap-2 sm:gap-4 mt-2 sm:mt-0">
-                                        <!-- View button -->
+                                    <div class="flex justify-end gap-2 sm:gap-4 shrink-0">
                                         <button
                                             mat-icon-button
                                             (click)="toggleDetails(bus.busId)"
@@ -125,7 +127,6 @@
                                             </mat-icon>
                                         </button>
 
-                                        <!-- Edit button -->
                                         <button
                                             mat-icon-button
                                             [routerLink]="bus.busId"
@@ -136,7 +137,6 @@
                                             </mat-icon>
                                         </button>
 
-                                        <!-- Delete button -->
                                         @if(hasActionPermission(FuseNavigationAction.Delete)){
                                         <button
                                             mat-icon-button
@@ -150,48 +150,47 @@
                                         </button>
                                         }
                                     </div>
+                                </div>
 
-                                    <!-- Details panel (expanded) -->
-                                    @if(selectedBus?.busId === bus.busId){
-                                        <div class="col-span-full border-t border-b dark:border-slate-700 p-4 mt-2">
-                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                <div>
-                                                    <span class="font-semibold">{{ t('NumeroIMM') }}:</span>
-                                                    <span class="ml-2">{{bus.numeroIMM}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Model') }}:</span>
-                                                    <span class="ml-2">{{bus.modelBus || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Circuit') }}:</span>
-                                                    <span class="ml-2">{{bus.codeCircuit || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Capacity') }}:</span>
-                                                    <span class="ml-2">{{bus.capacite ?? '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('IMEI') }}:</span>
-                                                    <span class="ml-2">{{bus.imei || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('App-Sagem') }}:</span>
-                                                    <span class="ml-2" [ngClass]="bus.appSagem ? 'text-green-600' : 'text-orange-600'">
-                                                        {{bus.appSagem ? t('Yes') : t('No')}}
-                                                    </span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Status') }}:</span>
-                                                    <span class="ml-2" [ngClass]="bus.isActive ? 'text-green-600' : 'text-red-600'">
-                                                        {{bus.isActive ? t('Active') : t('Inactive')}}
-                                                    </span>
-                                                </div>
+                                @if(selectedBus?.busId === bus.busId){
+                                    <div class="border-t dark:border-slate-700 pt-4 mt-4">
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div>
+                                                <span class="font-semibold">{{ t('NumeroIMM') }}:</span>
+                                                <span class="ml-2">{{bus.numeroIMM}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Model') }}:</span>
+                                                <span class="ml-2">{{bus.modelBus || '-'}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Circuit') }}:</span>
+                                                <span class="ml-2">{{bus.codeCircuit || '-'}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Capacity') }}:</span>
+                                                <span class="ml-2">{{bus.capacite ?? '-'}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('IMEI') }}:</span>
+                                                <span class="ml-2">{{bus.imei || '-'}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('App-Sagem') }}:</span>
+                                                <span class="ml-2" [ngClass]="bus.appSagem ? 'text-green-600' : 'text-orange-600'">
+                                                    {{bus.appSagem ? t('Yes') : t('No')}}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Status') }}:</span>
+                                                <span class="ml-2" [ngClass]="bus.isActive ? 'text-green-600' : 'text-red-600'">
+                                                    {{bus.isActive ? t('Active') : t('Inactive')}}
+                                                </span>
                                             </div>
                                         </div>
-                                    }
-                                </div>
-                            }
+                                    </div>
+                                }
+                            </div>
                         }
                         <!-- Paginator -->
                         <mat-paginator
