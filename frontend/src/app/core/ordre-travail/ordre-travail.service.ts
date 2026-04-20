@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, map, Observable, of, switchMap } from 'rxjs';
+import { BehaviorSubject, map, Observable, of, switchMap, tap } from 'rxjs';
 import { PagedOrdreTravail, OrdreTravail } from './ordre-travail.model';
 import { ApiService } from '../common/api.service';
 

@@ -131,10 +131,10 @@
                                         </div>
                                         <div>
                                             <p class="text-hint text-xs">{{ t('Absence-Risk') }}</p>
-                                            <span
+                                                <span
                                                 class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
                                                 [ngClass]="getRiskBadgeClass(employe.absenceRiskLevel)">
-                                                {{ getRiskLabel(employe.absenceRiskLevel) }}
+                                                {{ t(getRiskLabel(employe.absenceRiskLevel)) }}
                                                 @if (employe.absenceRiskScore !== null && employe.absenceRiskScore !== undefined) {
                                                     <span class="ml-1">({{ employe.absenceRiskScore * 100 | number:'1.0-0' }}%)</span>
                                                 }
