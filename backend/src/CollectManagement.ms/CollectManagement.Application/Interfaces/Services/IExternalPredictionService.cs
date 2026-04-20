@@ -8,8 +8,16 @@ public interface IExternalPredictionService
         DurationPredictionRequest request,
         CancellationToken cancellationToken = default);
 
+    Task<DurationBatchPredictionResponse> PredictDurationBatchAsync(
+        DurationBatchPredictionRequest request,
+        CancellationToken cancellationToken = default);
+
     Task<AbsenceRiskPredictionResponse> PredictAbsenceRiskAsync(
         AbsenceRiskPredictionRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<AbsenceRiskBatchPredictionResponse> PredictAbsenceRiskBatchAsync(
+        AbsenceRiskBatchPredictionRequest request,
         CancellationToken cancellationToken = default);
 
     Task<PredictionModelMetadataResponse> GetModelMetadataAsync(

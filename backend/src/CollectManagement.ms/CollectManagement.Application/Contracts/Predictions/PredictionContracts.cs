@@ -13,6 +13,12 @@ public sealed record DurationPredictionResponse(
     string Source,
     string ModelVersion);
 
+public sealed record DurationBatchPredictionRequest(
+    IReadOnlyList<DurationPredictionRequest> Items);
+
+public sealed record DurationBatchPredictionResponse(
+    IReadOnlyList<DurationPredictionResponse> Predictions);
+
 public sealed record AbsenceRiskPredictionRequest(
     string? EmployeId,
     string? TypeEmploye,
@@ -26,6 +32,12 @@ public sealed record AbsenceRiskPredictionResponse(
     double Confidence,
     string Source,
     string ModelVersion);
+
+public sealed record AbsenceRiskBatchPredictionRequest(
+    IReadOnlyList<AbsenceRiskPredictionRequest> Items);
+
+public sealed record AbsenceRiskBatchPredictionResponse(
+    IReadOnlyList<AbsenceRiskPredictionResponse> Predictions);
 
 public sealed record PredictionModelMetadataResponse(
     string ModelVersion,

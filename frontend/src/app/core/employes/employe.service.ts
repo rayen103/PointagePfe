@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of, tap, map, catchError, forkJoin, switchMap } from 'rxjs';
+import { BehaviorSubject, Observable, of, tap, map, catchError, switchMap } from 'rxjs';
 import { PagedEmploye, Employe } from './employe.model';
 import { ApiService } from '../common/api.service';
 import { Societe } from '../Societe/societe.model';
@@ -10,6 +10,10 @@ interface AbsenceRiskPredictionResponse {
     confidence: number;
     source: string;
     modelVersion: string;
+}
+
+interface AbsenceRiskBatchPredictionResponse {
+    predictions: AbsenceRiskPredictionResponse[];
 }
 
 @Injectable({
@@ -57,17 +61,16 @@ export class EmployeService {
                         return of(pagedEmploye);
                     }
 
-                    const predictions$ = employes.map((employe) =>
-                        this._apiservice.Post2<AbsenceRiskPredictionResponse>("prediction/absence-risk", {
+                    return this._apiservice.Post2<AbsenceRiskBatchPredictionResponse>("prediction/absence-risk/batch", {
+                        items: employes.map((employe) => ({
                             employeId: employe.employeId,
                             typeEmploye: employe.typeEmploye,
                             codeShift: employe.codeShift ?? null,
                             codeRattachement: employe.codeCircuit ?? null,
                             numeroChantier: null
-                        }).pipe(map((response) => response?.data))
-                    );
-
-                    return forkJoin(predictions$).pipe(
+                        }))
+                    }).pipe(
+                        map((response) => response?.data?.predictions ?? []),
                         map((predictions) => {
                             const enrichedEmployes = employes.map((employe, index) => ({
                                 ...employe,

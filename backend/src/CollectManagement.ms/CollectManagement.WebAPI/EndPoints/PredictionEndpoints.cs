@@ -14,8 +14,22 @@ public sealed class PredictionEndpoints : ICarterModule
         var routeGroupBuilder = app.MapGroup("cm/prediction").RequireAuthorization();
 
         routeGroupBuilder.MapPost("duration", PredictDuration);
+        routeGroupBuilder.MapPost("duration/batch", PredictDurationBatch);
         routeGroupBuilder.MapPost("absence-risk", PredictAbsenceRisk);
+        routeGroupBuilder.MapPost("absence-risk/batch", PredictAbsenceRiskBatch);
         routeGroupBuilder.MapGet("metadata", GetMetadata);
+    }
+
+    private static async Task<IResult> PredictDurationBatch(
+        [FromBody] [Required] DurationBatchPredictionRequest request,
+        IExternalPredictionService externalPredictionService,
+        CancellationToken cancellationToken)
+    {
+        var prediction = await externalPredictionService
+            .PredictDurationBatchAsync(request, cancellationToken)
+            .ConfigureAwait(false);
+
+        return Results.Ok(new ApiResponse<DurationBatchPredictionResponse>(prediction));
     }
 
     private static async Task<IResult> PredictDuration(
@@ -40,6 +54,18 @@ public sealed class PredictionEndpoints : ICarterModule
             .ConfigureAwait(false);
 
         return Results.Ok(new ApiResponse<AbsenceRiskPredictionResponse>(prediction));
+    }
+
+    private static async Task<IResult> PredictAbsenceRiskBatch(
+        [FromBody] [Required] AbsenceRiskBatchPredictionRequest request,
+        IExternalPredictionService externalPredictionService,
+        CancellationToken cancellationToken)
+    {
+        var prediction = await externalPredictionService
+            .PredictAbsenceRiskBatchAsync(request, cancellationToken)
+            .ConfigureAwait(false);
+
+        return Results.Ok(new ApiResponse<AbsenceRiskBatchPredictionResponse>(prediction));
     }
 
     private static async Task<IResult> GetMetadata(

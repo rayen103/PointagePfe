@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, map, Observable, of, switchMap } from 'rxjs';
 import { PagedOrdreTravail, OrdreTravail } from './ordre-travail.model';
 import { ApiService } from '../common/api.service';
 
@@ -8,6 +8,10 @@ interface DurationPredictionResponse {
     confidence: number;
     source: string;
     modelVersion: string;
+}
+
+interface DurationBatchPredictionResponse {
+    predictions: DurationPredictionResponse[];
 }
 
 @Injectable({
@@ -52,17 +56,16 @@ export class OrdreTravailService {
                         return of(pagedOrdresTravail);
                     }
 
-                    const predictions$ = ordresTravail.map((ordreTravail) =>
-                        this._apiservice.Post2<DurationPredictionResponse>("prediction/duration", {
+                    return this._apiservice.Post2<DurationBatchPredictionResponse>("prediction/duration/batch", {
+                        items: ordresTravail.map((ordreTravail) => ({
                             numeroChantier: ordreTravail.numeroChantier ?? null,
                             codeShift: null,
                             codeRattachement: null,
                             typeEmploye: null,
                             workOrderType: ordreTravail.etatOT ?? ordreTravail.libelle ?? null
-                        }).pipe(map((response) => response?.data))
-                    );
-
-                    return forkJoin(predictions$).pipe(
+                        }))
+                    }).pipe(
+                        map((response) => response?.data?.predictions ?? []),
                         map((predictions) => {
                             const enrichedOrdresTravail = ordresTravail.map((ordreTravail, index) => ({
                                 ...ordreTravail,

@@ -64,6 +64,20 @@ public sealed class ExternalPredictionService : IExternalPredictionService
             ModelVersion));
     }
 
+    public async Task<DurationBatchPredictionResponse> PredictDurationBatchAsync(
+        DurationBatchPredictionRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var items = request.Items ?? Array.Empty<DurationPredictionRequest>();
+        var predictions = new List<DurationPredictionResponse>(items.Count);
+        foreach (var item in items)
+        {
+            predictions.Add(await PredictDurationAsync(item, cancellationToken).ConfigureAwait(false));
+        }
+
+        return new DurationBatchPredictionResponse(predictions);
+    }
+
     public Task<AbsenceRiskPredictionResponse> PredictAbsenceRiskAsync(
         AbsenceRiskPredictionRequest request,
         CancellationToken cancellationToken = default)
@@ -100,6 +114,20 @@ public sealed class ExternalPredictionService : IExternalPredictionService
             confidence,
             source,
             ModelVersion));
+    }
+
+    public async Task<AbsenceRiskBatchPredictionResponse> PredictAbsenceRiskBatchAsync(
+        AbsenceRiskBatchPredictionRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var items = request.Items ?? Array.Empty<AbsenceRiskPredictionRequest>();
+        var predictions = new List<AbsenceRiskPredictionResponse>(items.Count);
+        foreach (var item in items)
+        {
+            predictions.Add(await PredictAbsenceRiskAsync(item, cancellationToken).ConfigureAwait(false));
+        }
+
+        return new AbsenceRiskBatchPredictionResponse(predictions);
     }
 
     public Task<PredictionModelMetadataResponse> GetModelMetadataAsync(
@@ -146,7 +174,7 @@ public sealed class ExternalPredictionService : IExternalPredictionService
                 ? 0.18
                 : mappedAbsenceRows.Average(x => x.WasAbsent ? 1.0 : 0.0);
 
-            _metadata = BuildMetadata(mappedDurationRows, mappedAbsenceRows);
+            _metadata = BuildMetadata(mappedDurationRows, mappedAbsenceRows, durationDatasetPath, absenceDatasetPath);
             PersistArtifacts(_metadata, mappedDurationRows.Count, mappedAbsenceRows.Count);
 
             _isInitialized = true;
@@ -187,7 +215,9 @@ public sealed class ExternalPredictionService : IExternalPredictionService
 
     private PredictionModelMetadataResponse BuildMetadata(
         List<MappedDurationRow> durations,
-        List<MappedAbsenceRow> absences)
+        List<MappedAbsenceRow> absences,
+        string durationDatasetPath,
+        string absenceDatasetPath)
     {
         var durationMaeEstimate = durations.Count == 0
             ? 0
@@ -197,11 +227,13 @@ public sealed class ExternalPredictionService : IExternalPredictionService
             ? 0.5
             : Math.Min(0.88, 0.64 + (absences.Count / 2000d));
 
+        var datasetTrainingTimestamp = GetDatasetTrainingTimestamp(durationDatasetPath, absenceDatasetPath);
+
         return new PredictionModelMetadataResponse(
             ModelVersion,
             DurationDatasetFileName,
             AbsenceDatasetFileName,
-            DateTime.UtcNow,
+            datasetTrainingTimestamp,
             durations.Count,
             absences.Count,
             Math.Round(durationMaeEstimate, 4),
@@ -215,6 +247,20 @@ public sealed class ExternalPredictionService : IExternalPredictionService
                 "Bias and fairness spot-check completed",
                 "Feature mapping validated for Tunisian operational context"
             });
+    }
+
+    private static DateTime GetDatasetTrainingTimestamp(
+        string durationDatasetPath,
+        string absenceDatasetPath)
+    {
+        var durationWriteTime = File.Exists(durationDatasetPath)
+            ? File.GetLastWriteTimeUtc(durationDatasetPath)
+            : DateTime.UtcNow;
+        var absenceWriteTime = File.Exists(absenceDatasetPath)
+            ? File.GetLastWriteTimeUtc(absenceDatasetPath)
+            : DateTime.UtcNow;
+
+        return durationWriteTime > absenceWriteTime ? durationWriteTime : absenceWriteTime;
     }
 
     private Dictionary<string, DurationAggregate> BuildDurationAggregates(
