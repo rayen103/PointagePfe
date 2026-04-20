@@ -80,6 +80,7 @@ public static class DependencyInjection
         services.AddScoped<IPdfGeneratorService, PdfGeneratorService>();
         services.AddScoped<IBrowserProvider, BrowserProvider>();
         services.AddScoped<IDocumentService, DocumentService>();
+        services.AddScoped<IExternalPredictionService, ExternalPredictionService>();
         services.AddHttpContextAccessor();
         
         

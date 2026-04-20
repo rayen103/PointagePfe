@@ -1,8 +1,16 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of, tap, map, catchError } from 'rxjs';
+import { BehaviorSubject, Observable, of, tap, map, catchError, forkJoin, switchMap } from 'rxjs';
 import { PagedEmploye, Employe } from './employe.model';
 import { ApiService } from '../common/api.service';
 import { Societe } from '../Societe/societe.model';
+
+interface AbsenceRiskPredictionResponse {
+    riskScore: number;
+    riskLevel: 'low' | 'medium' | 'high';
+    confidence: number;
+    source: string;
+    modelVersion: string;
+}
 
 @Injectable({
     providedIn: 'root'
@@ -40,11 +48,44 @@ export class EmployeService {
                 params: { search: search || '', sort, order, page, size}
             })
             .pipe(
-                tap((employes) => {
-                    this._employes.next(employes.data?.employes ?? []);
-                    this._employesLength.next(employes.data?.total);
+                map((response) => response.data),
+                switchMap((pagedEmploye) => {
+                    const employes = pagedEmploye?.employes ?? [];
+                    if (!employes.length) {
+                        this._employes.next([]);
+                        this._employesLength.next(pagedEmploye?.total ?? 0);
+                        return of(pagedEmploye);
+                    }
+
+                    const predictions$ = employes.map((employe) =>
+                        this._apiservice.Post2<AbsenceRiskPredictionResponse>("prediction/absence-risk", {
+                            employeId: employe.employeId,
+                            typeEmploye: employe.typeEmploye,
+                            codeShift: employe.codeShift ?? null,
+                            codeRattachement: employe.codeCircuit ?? null,
+                            numeroChantier: null
+                        }).pipe(map((response) => response?.data))
+                    );
+
+                    return forkJoin(predictions$).pipe(
+                        map((predictions) => {
+                            const enrichedEmployes = employes.map((employe, index) => ({
+                                ...employe,
+                                absenceRiskScore: predictions[index]?.riskScore ?? null,
+                                absenceRiskLevel: predictions[index]?.riskLevel ?? 'low',
+                                absencePredictionConfidence: predictions[index]?.confidence ?? null
+                            }));
+
+                            this._employes.next(enrichedEmployes);
+                            this._employesLength.next(pagedEmploye?.total ?? enrichedEmployes.length);
+
+                            return {
+                                ...pagedEmploye,
+                                employes: enrichedEmployes
+                            } as PagedEmploye;
+                        })
+                    );
                 }),
-                map(r => r.data)
             );
     }
 

@@ -1,7 +1,14 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, map, Observable, of, tap } from 'rxjs';
+import { BehaviorSubject, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 import { PagedOrdreTravail, OrdreTravail } from './ordre-travail.model';
 import { ApiService } from '../common/api.service';
+
+interface DurationPredictionResponse {
+    predictedDurationHours: number;
+    confidence: number;
+    source: string;
+    modelVersion: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -36,11 +43,44 @@ export class OrdreTravailService {
             params: { search: search || '', sort, order, page, size }
         })
             .pipe(
-                tap((ordresTravail) => {
-                    this._ordresTravail.next(ordresTravail.data?.ordresTravail);
-                    this._ordresTravailLength.next(ordresTravail.data?.totalCount);
+                map((response) => response.data),
+                switchMap((pagedOrdresTravail) => {
+                    const ordresTravail = pagedOrdresTravail?.ordresTravail ?? [];
+                    if (!ordresTravail.length) {
+                        this._ordresTravail.next([]);
+                        this._ordresTravailLength.next(pagedOrdresTravail?.totalCount ?? 0);
+                        return of(pagedOrdresTravail);
+                    }
+
+                    const predictions$ = ordresTravail.map((ordreTravail) =>
+                        this._apiservice.Post2<DurationPredictionResponse>("prediction/duration", {
+                            numeroChantier: ordreTravail.numeroChantier ?? null,
+                            codeShift: null,
+                            codeRattachement: null,
+                            typeEmploye: null,
+                            workOrderType: ordreTravail.etatOT ?? ordreTravail.libelle ?? null
+                        }).pipe(map((response) => response?.data))
+                    );
+
+                    return forkJoin(predictions$).pipe(
+                        map((predictions) => {
+                            const enrichedOrdresTravail = ordresTravail.map((ordreTravail, index) => ({
+                                ...ordreTravail,
+                                predictedDurationHours: predictions[index]?.predictedDurationHours ?? null,
+                                predictionConfidence: predictions[index]?.confidence ?? null,
+                                predictionSource: predictions[index]?.source ?? 'fallback'
+                            }));
+
+                            this._ordresTravail.next(enrichedOrdresTravail);
+                            this._ordresTravailLength.next(pagedOrdresTravail?.totalCount ?? enrichedOrdresTravail.length);
+
+                            return {
+                                ...pagedOrdresTravail,
+                                ordresTravail: enrichedOrdresTravail
+                            } as PagedOrdreTravail;
+                        })
+                    );
                 }),
-                map(r => r.data)
             );
     }
 

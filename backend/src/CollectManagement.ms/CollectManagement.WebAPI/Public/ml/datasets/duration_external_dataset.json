@@ -1,0 +1,98 @@
+[
+  {
+    "external_employee_type": "EmployeSimple",
+    "external_shift_code": "S1",
+    "external_rattachement_code": "RATT-EST",
+    "external_chantier_code": "CH-100",
+    "external_work_order_type": "INSTALLATION",
+    "duration_hours": 3.2
+  },
+  {
+    "external_employee_type": "EmployeSimple",
+    "external_shift_code": "S1",
+    "external_rattachement_code": "RATT-EST",
+    "external_chantier_code": "CH-101",
+    "external_work_order_type": "MAINTENANCE",
+    "duration_hours": 4.1
+  },
+  {
+    "external_employee_type": "EmployeSimple",
+    "external_shift_code": "S2",
+    "external_rattachement_code": "RATT-NORD",
+    "external_chantier_code": "CH-200",
+    "external_work_order_type": "MAINTENANCE",
+    "duration_hours": 4.8
+  },
+  {
+    "external_employee_type": "EmployeSimple",
+    "external_shift_code": "S2",
+    "external_rattachement_code": "RATT-NORD",
+    "external_chantier_code": "CH-201",
+    "external_work_order_type": "INSPECTION",
+    "duration_hours": 2.7
+  },
+  {
+    "external_employee_type": "Chauffeur",
+    "external_shift_code": "S3",
+    "external_rattachement_code": "RATT-SUD",
+    "external_chantier_code": "CH-300",
+    "external_work_order_type": "LIVRAISON",
+    "duration_hours": 6.3
+  },
+  {
+    "external_employee_type": "Chauffeur",
+    "external_shift_code": "S3",
+    "external_rattachement_code": "RATT-SUD",
+    "external_chantier_code": "CH-301",
+    "external_work_order_type": "LIVRAISON",
+    "duration_hours": 5.9
+  },
+  {
+    "external_employee_type": "Chauffeur",
+    "external_shift_code": "N1",
+    "external_rattachement_code": "RATT-CENTRE",
+    "external_chantier_code": "CH-400",
+    "external_work_order_type": "URGENT",
+    "duration_hours": 7.4
+  },
+  {
+    "external_employee_type": "EmployeSimple",
+    "external_shift_code": "N1",
+    "external_rattachement_code": "RATT-CENTRE",
+    "external_chantier_code": "CH-401",
+    "external_work_order_type": "URGENT",
+    "duration_hours": 5.6
+  },
+  {
+    "external_employee_type": "EmployeSimple",
+    "external_shift_code": "S1",
+    "external_rattachement_code": "RATT-OUEST",
+    "external_chantier_code": "CH-500",
+    "external_work_order_type": "INSTALLATION",
+    "duration_hours": 3.6
+  },
+  {
+    "external_employee_type": "Chauffeur",
+    "external_shift_code": "S2",
+    "external_rattachement_code": "RATT-OUEST",
+    "external_chantier_code": "CH-501",
+    "external_work_order_type": "TRANSFERT",
+    "duration_hours": 5.2
+  },
+  {
+    "external_employee_type": "EmployeSimple",
+    "external_shift_code": "S3",
+    "external_rattachement_code": "RATT-EST",
+    "external_chantier_code": "CH-102",
+    "external_work_order_type": "INSPECTION",
+    "duration_hours": 2.9
+  },
+  {
+    "external_employee_type": "Chauffeur",
+    "external_shift_code": "N1",
+    "external_rattachement_code": "RATT-CENTRE",
+    "external_chantier_code": "CH-402",
+    "external_work_order_type": "URGENT",
+    "duration_hours": 7.1
+  }
+]
