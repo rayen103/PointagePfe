@@ -34,6 +34,10 @@ import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autoc
 import { PagedSociete, Societe } from '../../../../core/Societe/societe.model';
 import { SocieteService } from '../../../../core/Societe/societe.service';
 import { TranslocoDirective } from '@ngneat/transloco';
+import { Circuit } from '../../../../core/circuit/circuit.model';
+import { CircuitService } from '../../../../core/circuit/circuit.service';
+import { Bus } from '../../../../core/bus/bus.model';
+import { BusService } from '../../../../core/bus/bus.service';
 
 @Component({
     selector: 'app-employe',
@@ -77,6 +81,8 @@ export class EmployeComponent implements OnInit, OnDestroy {
     saveClicked = false
     roleNavigation: RoleNavigation;
     societe: Societe[] = [];
+    circuits: Circuit[] = [];
+    buses: Bus[] = [];
     filteredSocietes$: Observable<Societe[]>;
     isViewMode: boolean = false; // To distinguish between view and edit mode
     sortActive: string = 'matricule';
@@ -90,6 +96,8 @@ export class EmployeComponent implements OnInit, OnDestroy {
         private _fuseConfirmationService: FuseConfirmationService,
         private _formBuilder: UntypedFormBuilder,
         private _societeService: SocieteService,
+        private _circuitService: CircuitService,
+        private _busService: BusService,
 
     ) {
     }
@@ -203,6 +211,20 @@ export class EmployeComponent implements OnInit, OnDestroy {
             this.societe = pagedSociete.societes || [];
             this._changeDetectorRef.markForCheck();
         });
+
+        this._circuitService.GetCircuit()
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((pagedCircuit) => {
+                this.circuits = pagedCircuit?.circuits ?? [];
+                this._changeDetectorRef.markForCheck();
+            });
+
+        this._busService.GetBuses()
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((pagedBus) => {
+                this.buses = pagedBus?.buses ?? [];
+                this._changeDetectorRef.markForCheck();
+            });
 
 
     }
@@ -337,6 +359,12 @@ export class EmployeComponent implements OnInit, OnDestroy {
             return;
         }
 
+        if (!this.validateBusCircuitAssignment()) {
+            this.saveClicked = false;
+            this._changeDetectorRef.markForCheck();
+            return;
+        }
+
         // Get the employe object
         const employe = this.selectedEmployeForm.getRawValue();
 
@@ -423,6 +451,77 @@ export class EmployeComponent implements OnInit, OnDestroy {
      */
     trackByFn(index: number, item: any): any {
         return item.employeId || index;
+    }
+
+    getFilteredCircuits(): Circuit[] {
+        const societeId = this.selectedEmployeForm?.get('societeId')?.value;
+        if (!societeId) {
+            return this.circuits;
+        }
+
+        return this.circuits.filter((circuit) => circuit.societeId === societeId);
+    }
+
+    getFilteredBuses(): Bus[] {
+        const societeId = this.selectedEmployeForm?.get('societeId')?.value;
+        if (!societeId) {
+            return this.buses;
+        }
+
+        return this.buses.filter((bus) => bus.societeId === societeId);
+    }
+
+    hasExistingCircuitOption(codeCircuit: string | null | undefined): boolean {
+        if (!codeCircuit) {
+            return false;
+        }
+
+        return this.getFilteredCircuits().some((circuit) => circuit.codeCircuit === codeCircuit);
+    }
+
+    hasExistingBusOption(codeBus: string | null | undefined): boolean {
+        if (!codeBus) {
+            return false;
+        }
+
+        return this.getFilteredBuses().some((bus) => bus.numeroIMM === codeBus);
+    }
+
+    private validateBusCircuitAssignment(): boolean {
+        const selectedCodeBus = (this.selectedEmployeForm.get('codeBus')?.value ?? '').trim();
+        const selectedCodeCircuit = (this.selectedEmployeForm.get('codeCircuit')?.value ?? '').trim();
+
+        if (!selectedCodeBus || !selectedCodeCircuit) {
+            return true;
+        }
+
+        const selectedBus = this.buses.find((bus) => bus.numeroIMM === selectedCodeBus);
+        if (!selectedBus) {
+            return true;
+        }
+
+        const busCircuit = (selectedBus.codeCircuit ?? '').trim();
+        if (busCircuit !== selectedCodeCircuit) {
+            this._fuseConfirmationService.open({
+                title: 'Bus/Circuit mismatch',
+                message: busCircuit
+                    ? `The selected bus (${selectedCodeBus}) is assigned to circuit "${busCircuit}", not "${selectedCodeCircuit}".`
+                    : `The selected bus (${selectedCodeBus}) is not assigned to any circuit.`,
+                icon: {
+                    show: false,
+                },
+                actions: {
+                    confirm: {
+                        label: 'OK',
+                        color: 'primary'
+                    }
+                },
+                dismissible: true
+            });
+            return false;
+        }
+
+        return true;
     }
 
     /**
