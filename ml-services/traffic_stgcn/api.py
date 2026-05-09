@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 
 import torch
@@ -58,12 +59,44 @@ def predict(req: TrafficPredictRequest):
     try:
         if model is None:
             raise HTTPException(status_code=500, detail="Model not loaded")
+        if len(req.segment_ids) == 0:
+            raise HTTPException(status_code=422, detail="segment_ids cannot be empty")
+        if len(req.segment_ids) != len(req.current_speeds):
+            raise HTTPException(status_code=422, detail="segment_ids and current_speeds length mismatch")
+
+        hour = 12.0
+        day_of_week_enc = 3.0
+        weather = 0.0
+        time_sin = math.sin(2 * math.pi * hour / 24.0)
+        time_cos = math.cos(2 * math.pi * hour / 24.0)
+
+        x = torch.tensor(
+            [[float(speed), float(time_sin), float(time_cos), float(day_of_week_enc), float(weather)] for speed in req.current_speeds],
+            dtype=torch.float32,
+        )
+
+        n = len(req.segment_ids)
+        if n == 1:
+            edge_index = torch.tensor([[0], [0]], dtype=torch.long)
+        else:
+            edges = []
+            for i in range(n - 1):
+                edges.append([i, i + 1])
+                edges.append([i + 1, i])
+            edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()
+
+        with torch.no_grad():
+            raw_pred = model(x, edge_index).cpu().numpy()
+
+        horizon_options = [15, 30, 60]
+        horizon_idx = int(min(range(len(horizon_options)), key=lambda i: abs(horizon_options[i] - req.horizon_minutes)))
         preds = []
-        for seg, speed in zip(req.segment_ids, req.current_speeds):
-            base = max(1.0, 30.0 / max(speed, 1.0))
-            horizon_factor = req.horizon_minutes / 15.0
-            p = base * horizon_factor
-            preds.append(SegmentPrediction(segment_id=seg, predicted_travel_time=float(p), confidence=0.75))
+        for idx, seg in enumerate(req.segment_ids):
+            all_horizons = raw_pred[idx]
+            selected = float(max(0.0, all_horizons[horizon_idx]))
+            spread = float(abs(all_horizons.max() - all_horizons.min()))
+            confidence = float(max(0.1, min(0.99, 1.0 / (1.0 + spread))))
+            preds.append(SegmentPrediction(segment_id=seg, predicted_travel_time=selected, confidence=confidence))
         return TrafficPredictResponse(predictions=preds)
     except HTTPException:
         raise
