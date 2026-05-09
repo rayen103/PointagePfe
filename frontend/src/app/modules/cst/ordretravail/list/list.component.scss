@@ -2,12 +2,12 @@
     grid-template-columns: 48px auto;
 
     @screen sm {
-        grid-template-columns: 1fr 2fr 1fr 1fr 1fr 120px 100px;
+        grid-template-columns: 1fr 2fr 1fr 1fr 1fr 130px 120px 100px;
     }
 }
 
 .ordretravail-grid-header {
-    grid-template-columns: 1fr 2fr 1fr 1fr 1fr 120px 100px;
+    grid-template-columns: 1fr 2fr 1fr 1fr 1fr 130px 120px 100px;
 }
 
 .ordretravail-grid-item {

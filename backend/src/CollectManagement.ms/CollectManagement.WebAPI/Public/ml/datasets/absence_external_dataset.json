@@ -1,0 +1,86 @@
+[
+  {
+    "external_employee_type": "EmployeSimple",
+    "external_shift_code": "S1",
+    "external_rattachement_code": "RATT-EST",
+    "external_chantier_code": "CH-100",
+    "was_absent": false
+  },
+  {
+    "external_employee_type": "EmployeSimple",
+    "external_shift_code": "S1",
+    "external_rattachement_code": "RATT-EST",
+    "external_chantier_code": "CH-101",
+    "was_absent": false
+  },
+  {
+    "external_employee_type": "EmployeSimple",
+    "external_shift_code": "S2",
+    "external_rattachement_code": "RATT-NORD",
+    "external_chantier_code": "CH-200",
+    "was_absent": true
+  },
+  {
+    "external_employee_type": "EmployeSimple",
+    "external_shift_code": "S2",
+    "external_rattachement_code": "RATT-NORD",
+    "external_chantier_code": "CH-201",
+    "was_absent": false
+  },
+  {
+    "external_employee_type": "Chauffeur",
+    "external_shift_code": "S3",
+    "external_rattachement_code": "RATT-SUD",
+    "external_chantier_code": "CH-300",
+    "was_absent": false
+  },
+  {
+    "external_employee_type": "Chauffeur",
+    "external_shift_code": "S3",
+    "external_rattachement_code": "RATT-SUD",
+    "external_chantier_code": "CH-301",
+    "was_absent": true
+  },
+  {
+    "external_employee_type": "Chauffeur",
+    "external_shift_code": "N1",
+    "external_rattachement_code": "RATT-CENTRE",
+    "external_chantier_code": "CH-400",
+    "was_absent": true
+  },
+  {
+    "external_employee_type": "EmployeSimple",
+    "external_shift_code": "N1",
+    "external_rattachement_code": "RATT-CENTRE",
+    "external_chantier_code": "CH-401",
+    "was_absent": true
+  },
+  {
+    "external_employee_type": "EmployeSimple",
+    "external_shift_code": "S1",
+    "external_rattachement_code": "RATT-OUEST",
+    "external_chantier_code": "CH-500",
+    "was_absent": false
+  },
+  {
+    "external_employee_type": "Chauffeur",
+    "external_shift_code": "S2",
+    "external_rattachement_code": "RATT-OUEST",
+    "external_chantier_code": "CH-501",
+    "was_absent": false
+  },
+  {
+    "external_employee_type": "EmployeSimple",
+    "external_shift_code": "S3",
+    "external_rattachement_code": "RATT-EST",
+    "external_chantier_code": "CH-102",
+    "was_absent": false
+  },
+  {
+    "external_employee_type": "Chauffeur",
+    "external_shift_code": "N1",
+    "external_rattachement_code": "RATT-CENTRE",
+    "external_chantier_code": "CH-402",
+    "was_absent": true
+  }
+]

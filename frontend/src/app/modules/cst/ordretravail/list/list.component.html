@@ -58,13 +58,14 @@
                             <div [mat-sort-header]="'codeClient'">{{ t('Client') }}</div>
                             <div [mat-sort-header]="'montant'">{{ t('Montant') }}</div>
                             <div [mat-sort-header]="'etatOT'">{{ t('Etat') }}</div>
+                            <div class="text-center">{{ t('Predicted-Duration-(h)') }}</div>
                             <div class="text-center">{{ t('Status') }}</div>
                             <div class="hidden sm:block text-center">{{ t('Details') }}</div>
                         </div>
                         <!-- Rows -->
                         @if(ordreTravail$ | async; as ordresTravail){
                             @for(ordreTravail of ordresTravail; track ordreTravail.ordreTravailId || $index){
-                                <div class="ordretravail-grid-item sm:ordretravail-grid grid sm:grid-cols-7 grid-cols-1 gap-2 sm:gap-4 p-3 sm:py-0.5"
+                                <div class="ordretravail-grid-item sm:ordretravail-grid grid sm:grid-cols-8 grid-cols-1 gap-2 sm:gap-4 p-3 sm:py-0.5"
                                      [ngClass]="{'border-b dark:border-b-slate-700': $index+1 !== ordresTravail.length}">
 
                                     <!-- Mobile label + value -->
@@ -111,6 +112,21 @@
 
                                     <!-- Desktop view -->
                                     <div class="hidden sm:block truncate">{{ordreTravail.etatOT || '-'}}</div>
+
+                                    <!-- Mobile label + value -->
+                                    <div class="sm:hidden flex justify-between">
+                                        <span class="font-semibold">{{ t('Predicted-Duration') }}:</span>
+                                        <span class="truncate">
+                                            {{ordreTravail.predictedDurationHours ? (ordreTravail.predictedDurationHours | number:'1.1-2') + ' h' : '-'}}
+                                        </span>
+                                    </div>
+
+                                    <!-- Desktop view -->
+                                    <div class="hidden sm:flex justify-center">
+                                        <span class="truncate">
+                                            {{ordreTravail.predictedDurationHours ? (ordreTravail.predictedDurationHours | number:'1.1-2') + ' h' : '-'}}
+                                        </span>
+                                    </div>
 
                                     <!-- Mobile label + value -->
                                     <div class="sm:hidden flex justify-between">
@@ -217,6 +233,12 @@
                                                     <span class="font-semibold">{{ t('Status') }}:</span>
                                                     <span class="ml-2" [ngClass]="ordreTravail.isActive ? 'text-green-600' : 'text-red-600'">
                                                         {{ordreTravail.isActive ? t('Active') : t('Inactive')}}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span class="font-semibold">{{ t('Predicted-Duration') }}:</span>
+                                                    <span class="ml-2">
+                                                        {{ordreTravail.predictedDurationHours ? (ordreTravail.predictedDurationHours | number:'1.1-2') + ' h' : '-'}}
                                                     </span>
                                                 </div>
                                             </div>
