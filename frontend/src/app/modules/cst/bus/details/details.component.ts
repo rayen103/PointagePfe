@@ -114,18 +114,15 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                 if (user?.societeId) {
                     this.busForm.patchValue({ societeId: user.societeId });
                 }
+            });
 
-                this._circuitService
-                    .GetCircuit()
-                    .pipe(takeUntil(this._unsubscribeAll))
-                    .subscribe((pagedCircuits) => {
-                        const allCircuits = pagedCircuits?.circuits ?? [];
-                        this.circuits = user?.societeId
-                            ? allCircuits.filter((c) => c.societeId === user.societeId)
-                            : allCircuits;
-                        this.refreshSelectedCircuitRoute();
-                        this._changeDetectorRef.markForCheck();
-                    });
+        this._circuitService
+            .GetCircuit()
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((pagedCircuits) => {
+                this.circuits = pagedCircuits?.circuits ?? [];
+                this.refreshSelectedCircuitRoute();
+                this._changeDetectorRef.markForCheck();
             });
 
         this.busForm.get('codeCircuit')?.valueChanges
