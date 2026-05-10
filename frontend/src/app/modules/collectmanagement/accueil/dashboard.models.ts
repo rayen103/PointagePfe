@@ -54,8 +54,20 @@ export interface DashboardQuickAction {
     link: string;
 }
 
+export interface DashboardAiFeature {
+    id: string;
+    title: string;
+    description: string;
+    icon: string;
+    link: string;
+    status: string;
+    detail: string;
+    enabled: boolean;
+}
+
 export interface DashboardData {
     kpis: DashboardKpi[];
+    aiFeatures: DashboardAiFeature[];
     charts: DashboardCharts;
     recentCreated: DashboardActivityItem[];
     recentUpdated: DashboardActivityItem[];

@@ -9,11 +9,12 @@ import { UtilisateurService } from 'app/core/utilisateurs/utilisateur.service';
 import { PagedBus } from 'app/core/bus/bus.model';
 import { PagedCircuit } from 'app/core/circuit/circuit.model';
 import { Employe, PagedEmploye } from 'app/core/employes/employe.model';
-import { PagedOrdreTravail } from 'app/core/ordre-travail/ordre-travail.model';
+import { OrdreTravail, PagedOrdreTravail } from 'app/core/ordre-travail/ordre-travail.model';
 import { PagedRattachement } from 'app/core/rattachement/rattachement.model';
 import { PagedUtilisateur } from 'app/core/utilisateurs/utilisateur.model';
 import {
     DashboardActivityItem,
+    DashboardAiFeature,
     DashboardAxisChart,
     DashboardAxisSeries,
     DashboardCharts,
@@ -29,6 +30,7 @@ export class DashboardService {
     private readonly DASHBOARD_FETCH_LIMIT = 200;
     private readonly DEFAULT_ACTIVITY_LIMIT = 5;
     private readonly ACTIVE_RATE_THRESHOLD = 80;
+    private readonly AI_CONFIDENCE_THRESHOLD = 0.45;
     private readonly FALLBACK_NEW_ORDER_LABEL = 'Nouvelle intervention';
     private readonly FALLBACK_RECENT_UPDATE_LABEL = 'Mise à jour récente';
 
@@ -82,6 +84,7 @@ export class DashboardService {
         const totalCircuits = this._resolveTotal(payload.circuits?.totalCount, circuits);
         const totalOrdresTravail = this._resolveTotal(payload.ordresTravail?.totalCount, ordresTravail);
         const totalRattachements = this._resolveTotal(payload.rattachements?.totalCount, rattachements);
+        const aiFeatures = this._buildAiFeatures(employes, totalEmployees, ordresTravail, totalOrdresTravail);
 
         const activeBuses = buses.filter((bus) => bus.isActive).length;
         const inactiveBuses = buses.length - activeBuses;
@@ -263,6 +266,7 @@ export class DashboardService {
 
         return {
             kpis,
+            aiFeatures,
             charts,
             recentCreated,
             recentUpdated,
@@ -289,6 +293,57 @@ export class DashboardService {
             labels,
             series,
         };
+    }
+
+    private _buildAiFeatures(
+        employes: Employe[],
+        totalEmployees: number,
+        ordresTravail: OrdreTravail[],
+        totalOrdresTravail: number
+    ): DashboardAiFeature[] {
+        const employeesWithRiskScore = employes.filter((employe) => typeof employe.absenceRiskScore === 'number');
+        const highRiskEmployees = employeesWithRiskScore.filter((employe) => (employe.absenceRiskScore ?? 0) >= 0.6).length;
+        const averageRiskConfidence = this._average(
+            employeesWithRiskScore.map((employe) => employe.absencePredictionConfidence)
+        );
+        const ordersWithPrediction = ordresTravail.filter((ordre) => typeof ordre.predictedDurationHours === 'number');
+        const averagePredictedDuration = this._average(
+            ordersWithPrediction.map((ordre) => ordre.predictedDurationHours)
+        );
+        const confidentOrders = ordersWithPrediction.filter(
+            (ordre) => (ordre.predictionConfidence ?? 0) >= this.AI_CONFIDENCE_THRESHOLD
+        ).length;
+
+        return [
+            {
+                id: 'absence-risk',
+                title: "IA - Risque d'absence",
+                description: "Scoring automatique du risque d'absence des employés",
+                icon: 'mat_outline:psychology',
+                link: '/fichier/employe',
+                status: employeesWithRiskScore.length
+                    ? `${highRiskEmployees} risque élevé`
+                    : 'Aucune donnée',
+                detail: employeesWithRiskScore.length
+                    ? `${employeesWithRiskScore.length}/${totalEmployees} employés évalués · confiance moyenne ${this._formatPercent(averageRiskConfidence)}`
+                    : "Aucun scoring d'absence disponible.",
+                enabled: employeesWithRiskScore.length > 0,
+            },
+            {
+                id: 'duration-prediction',
+                title: 'IA - Durée prévisionnelle des OT',
+                description: 'Estimation automatique de la durée des ordres de travail',
+                icon: 'mat_outline:auto_graph',
+                link: '/fichier/ordretravail',
+                status: ordersWithPrediction.length
+                    ? `${averagePredictedDuration.toFixed(1)} h en moyenne`
+                    : 'Aucune donnée',
+                detail: ordersWithPrediction.length
+                    ? `${ordersWithPrediction.length}/${totalOrdresTravail} OT estimés · ${confidentOrders} à forte confiance`
+                    : 'Aucune prédiction de durée disponible.',
+                enabled: ordersWithPrediction.length > 0,
+            },
+        ];
     }
 
     private _buildMonthlySeries(
@@ -370,6 +425,19 @@ export class DashboardService {
         return Math.round((part / total) * 100);
     }
 
+    private _average(values: Array<number | null | undefined>): number {
+        const normalized = values.filter((value): value is number => typeof value === 'number' && !isNaN(value));
+        if (!normalized.length) {
+            return 0;
+        }
+
+        return normalized.reduce((sum, value) => sum + value, 0) / normalized.length;
+    }
+
+    private _formatPercent(value: number): string {
+        return `${Math.round(value * 100)}%`;
+    }
+
     private _resolveTotal<T>(total: number | null | undefined, items: T[]): number {
         if (typeof total === 'number') {
             return total;
@@ -385,6 +453,7 @@ export class DashboardService {
     private _buildEmptyDashboardData(errorMessage?: string): DashboardData {
         return {
             kpis: [],
+            aiFeatures: this._buildFallbackAiFeatures(),
             charts: {
                 bar: { labels: [], series: [] },
                 line: { labels: [], series: [] },
@@ -397,5 +466,30 @@ export class DashboardService {
             lastUpdated: new Date(),
             errorMessage,
         };
+    }
+
+    private _buildFallbackAiFeatures(): DashboardAiFeature[] {
+        return [
+            {
+                id: 'absence-risk',
+                title: "IA - Risque d'absence",
+                description: "Scoring automatique du risque d'absence des employés",
+                icon: 'mat_outline:psychology',
+                link: '/fichier/employe',
+                status: 'Indisponible',
+                detail: "Le scoring d'absence est temporairement indisponible.",
+                enabled: false,
+            },
+            {
+                id: 'duration-prediction',
+                title: 'IA - Durée prévisionnelle des OT',
+                description: 'Estimation automatique de la durée des ordres de travail',
+                icon: 'mat_outline:auto_graph',
+                link: '/fichier/ordretravail',
+                status: 'Indisponible',
+                detail: 'Les prédictions de durée sont temporairement indisponibles.',
+                enabled: false,
+            },
+        ];
     }
 }

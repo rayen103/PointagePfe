@@ -66,6 +66,36 @@
                 }
             </div>
 
+            <div class="bg-card p-4 mt-6">
+                <div class="text-lg font-semibold">Fonctionnalités IA</div>
+                <div class="text-sm text-secondary">Toutes les capacités IA disponibles, visibles et accessibles ici.</div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+                    @for (feature of vm.data.aiFeatures; track feature.id) {
+                        <div class="ai-feature-card">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="flex items-start gap-3">
+                                    <div class="ai-feature-icon">
+                                        <mat-icon [svgIcon]="feature.icon"></mat-icon>
+                                    </div>
+                                    <div>
+                                        <div class="text-base font-semibold">{{ feature.title }}</div>
+                                        <div class="text-sm text-secondary">{{ feature.description }}</div>
+                                    </div>
+                                </div>
+                                <span class="ai-feature-status" [class.ai-feature-status--enabled]="feature.enabled">
+                                    {{ feature.status }}
+                                </span>
+                            </div>
+                            <div class="text-xs text-secondary mt-3">{{ feature.detail }}</div>
+                            <div class="mt-3">
+                                <button mat-stroked-button [routerLink]="feature.link">Ouvrir</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-6">
                 <div class="chart-card bg-card p-4">
                     <div class="flex items-start justify-between mb-3">
