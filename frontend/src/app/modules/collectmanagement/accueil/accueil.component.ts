@@ -19,7 +19,7 @@ import {
     ApexXAxis,
     NgApexchartsModule,
 } from 'ng-apexcharts';
-import { BehaviorSubject, map, Observable, shareReplay, startWith, Subject, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, catchError, finalize, map, Observable, of, shareReplay, startWith, Subject, switchMap, tap } from 'rxjs';
 import { DashboardAxisChart, DashboardData, DashboardPieChart, DashboardQuickAction } from './dashboard.models';
 import { DashboardService } from './dashboard.service';
 
@@ -139,9 +139,13 @@ export class AccueilComponent {
         this.viewModel$ = this._refresh$.pipe(
             startWith(void 0),
             tap(() => this.isLoading$.next(true)),
-            switchMap(() => this._dashboardService.getDashboardData()),
-            map((data) => this._buildViewModel(data)),
-            tap(() => this.isLoading$.next(false)),
+            switchMap(() =>
+                this._dashboardService.getDashboardData().pipe(
+                    map((data) => this._buildViewModel(data)),
+                    catchError(() => of(this._buildViewModel(this._buildFallbackData()))),
+                    finalize(() => this.isLoading$.next(false))
+                )
+            ),
             shareReplay({ bufferSize: 1, refCount: true })
         );
     }
@@ -265,6 +269,45 @@ export class AccueilComponent {
             stroke: {
                 width: 2,
             },
+        };
+    }
+
+    private _buildFallbackData(): DashboardData {
+        return {
+            kpis: [],
+            aiFeatures: [
+                {
+                    id: 'absence-risk',
+                    title: "IA - Risque d'absence",
+                    description: "Scoring automatique du risque d'absence des employés",
+                    icon: 'mat_outline:psychology',
+                    link: '/fichier/employe',
+                    status: 'Indisponible',
+                    detail: "Le scoring d'absence est temporairement indisponible.",
+                    enabled: false,
+                },
+                {
+                    id: 'duration-prediction',
+                    title: 'IA - Durée prévisionnelle des OT',
+                    description: 'Estimation automatique de la durée des ordres de travail',
+                    icon: 'mat_outline:auto_graph',
+                    link: '/fichier/ordretravail',
+                    status: 'Indisponible',
+                    detail: 'Les prédictions de durée sont temporairement indisponibles.',
+                    enabled: false,
+                },
+            ],
+            charts: {
+                bar: { labels: [], series: [] },
+                line: { labels: [], series: [] },
+                pie: { labels: [], series: [] },
+                doughnut: { labels: [], series: [] },
+            },
+            recentCreated: [],
+            recentUpdated: [],
+            systemActivity: [],
+            lastUpdated: new Date(),
+            errorMessage: 'Impossible de charger les données du tableau de bord. Veuillez réessayer.',
         };
     }
 }

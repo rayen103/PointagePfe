@@ -92,6 +92,8 @@
                                 <button mat-stroked-button [routerLink]="feature.link">Ouvrir</button>
                             </div>
                         </div>
+                    } @empty {
+                        <div class="empty-state lg:col-span-2">Aucune fonctionnalité IA disponible.</div>
                     }
                 </div>
             </div>
