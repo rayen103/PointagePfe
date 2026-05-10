@@ -301,12 +301,16 @@ export class DashboardService {
         ordresTravail: OrdreTravail[],
         totalOrdresTravail: number
     ): DashboardAiFeature[] {
-        const employeesWithRiskScore = employes.filter((employe) => typeof employe.absenceRiskScore === 'number');
+        const employeesWithRiskScore = employes.filter(
+            (employe) => typeof employe.absenceRiskScore === 'number' && !isNaN(employe.absenceRiskScore)
+        );
         const highRiskEmployees = employeesWithRiskScore.filter((employe) => (employe.absenceRiskScore ?? 0) >= 0.6).length;
         const averageRiskConfidence = this._average(
             employeesWithRiskScore.map((employe) => employe.absencePredictionConfidence)
         );
-        const ordersWithPrediction = ordresTravail.filter((ordre) => typeof ordre.predictedDurationHours === 'number');
+        const ordersWithPrediction = ordresTravail.filter(
+            (ordre) => typeof ordre.predictedDurationHours === 'number' && !isNaN(ordre.predictedDurationHours)
+        );
         const averagePredictedDuration = this._average(
             ordersWithPrediction.map((ordre) => ordre.predictedDurationHours)
         );
