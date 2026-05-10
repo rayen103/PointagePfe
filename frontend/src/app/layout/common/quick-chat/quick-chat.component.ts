@@ -108,6 +108,22 @@ export class QuickChatComponent implements OnInit, AfterViewInit, OnDestroy {
      * On init
      */
     ngOnInit(): void {
+        // Opened
+        this._quickChatService.opened$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((opened: boolean) => {
+                this.opened = opened;
+
+                // If the panel opens, show the overlay
+                if (opened) {
+                    this._showOverlay();
+                }
+                // Otherwise, hide the overlay
+                else {
+                    this._hideOverlay();
+                }
+            });
+
         // Chat
         this._quickChatService.chat$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -191,37 +207,21 @@ export class QuickChatComponent implements OnInit, AfterViewInit, OnDestroy {
      * Open the panel
      */
     open(): void {
-        // Return if the panel has already opened
-        if (this.opened) {
-            return;
-        }
-
-        // Open the panel
-        this._toggleOpened(true);
+        this._quickChatService.setOpened(true);
     }
 
     /**
      * Close the panel
      */
     close(): void {
-        // Return if the panel has already closed
-        if (!this.opened) {
-            return;
-        }
-
-        // Close the panel
-        this._toggleOpened(false);
+        this._quickChatService.setOpened(false);
     }
 
     /**
-     * Toggle the panel
+     * Toggle the opened state
      */
     toggle(): void {
-        if (this.opened) {
-            this.close();
-        } else {
-            this.open();
-        }
+        this._quickChatService.setOpened(!this.opened);
     }
 
     /**
@@ -231,7 +231,7 @@ export class QuickChatComponent implements OnInit, AfterViewInit, OnDestroy {
      */
     selectChat(id: string): void {
         // Open the panel
-        this._toggleOpened(true);
+        this._quickChatService.setOpened(true);
 
         // Get the chat data
         this._quickChatService.getChatById(id).subscribe();

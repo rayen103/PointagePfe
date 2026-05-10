@@ -170,14 +170,12 @@ export class AccueilComponent {
         // Special case for Gemini Assistant
         if (feature.id === 'gemini-assistant') {
             // Select the Gemini chat first
-            this._dashboardService.getGeminiChatId().pipe(take(1)).subscribe((chatId) => {
-                const quickChatButton = document.querySelector('[data-fuse-quick-chat-button]') as HTMLElement;
-                if (quickChatButton) {
-                    this._dashboardService.selectGeminiChat(chatId).pipe(take(1)).subscribe(() => {
-                        quickChatButton.click();
-                    });
-                }
-            });
+            this._dashboardService
+                .getGeminiChatId()
+                .pipe(take(1))
+                .subscribe((chatId) => {
+                    this._dashboardService.selectGeminiChat(chatId).pipe(take(1)).subscribe();
+                });
             return;
         }
 

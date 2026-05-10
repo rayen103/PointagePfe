@@ -15,6 +15,7 @@ import {
 export class QuickChatService {
     private _chat: BehaviorSubject<Chat> = new BehaviorSubject(null);
     private _chats: BehaviorSubject<Chat[]> = new BehaviorSubject<Chat[]>(null);
+    private _opened: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
     /**
      * Constructor
@@ -33,10 +34,25 @@ export class QuickChatService {
     }
 
     /**
-     * Getter for chat
+     * Getter for chats
      */
     get chats$(): Observable<Chat[]> {
         return this._chats.asObservable();
+    }
+
+    /**
+     * Getter for opened
+     */
+    get opened$(): Observable<boolean> {
+        return this._opened.asObservable();
+    }
+
+    /**
+     * Setter for opened
+     * @param value
+     */
+    setOpened(value: boolean): void {
+        this._opened.next(value);
     }
 
     // -----------------------------------------------------------------------------------------------------

@@ -82,6 +82,7 @@ export class DashboardService {
      * @param chatId
      */
     selectGeminiChat(chatId: string): Observable<any> {
+        this._quickChatService.setOpened(true);
         return this._quickChatService.getChatById(chatId);
     }
 
