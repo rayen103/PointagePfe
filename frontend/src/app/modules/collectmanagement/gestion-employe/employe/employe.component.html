@@ -349,7 +349,23 @@
 
                                         <mat-form-field class="w-1/3 fuse-mat-dense">
                                             <mat-label>{{ t('Circuit') }}</mat-label>
-                                            <input matInput [formControlName]="'codeCircuit'">
+                                            <mat-select [formControlName]="'codeCircuit'">
+                                                <mat-option [value]="''">--</mat-option>
+                                                @for (circuit of getFilteredCircuits(); track circuit.circuitId) {
+                                                    <mat-option [value]="circuit.codeCircuit">
+                                                        {{ circuit.codeCircuit }}
+                                                        @if (circuit.libelleCircuit) {
+                                                            - {{ circuit.libelleCircuit }}
+                                                        }
+                                                    </mat-option>
+                                                }
+                                                @if (selectedEmployeForm.get('codeCircuit')?.value && !hasExistingCircuitOption(selectedEmployeForm.get('codeCircuit')?.value)) {
+                                                    <mat-option disabled>— Current Value —</mat-option>
+                                                    <mat-option [value]="selectedEmployeForm.get('codeCircuit')?.value">
+                                                        {{ selectedEmployeForm.get('codeCircuit')?.value }}
+                                                    </mat-option>
+                                                }
+                                            </mat-select>
                                             @if (selectedEmployeForm.get('codeCircuit')?.hasError('maxlength')) {
                                                 <mat-error>{{ t('Circuit') }} must be at most 50 characters.</mat-error>
                                             }
@@ -369,7 +385,23 @@
 
                                         <mat-form-field class="w-1/3 fuse-mat-dense">
                                             <mat-label>{{ t('Bus') }}</mat-label>
-                                            <input matInput [formControlName]="'codeBus'">
+                                            <mat-select [formControlName]="'codeBus'">
+                                                <mat-option [value]="''">--</mat-option>
+                                                @for (bus of getFilteredBuses(); track bus.busId) {
+                                                    <mat-option [value]="bus.numeroIMM">
+                                                        {{ bus.numeroIMM }}
+                                                        @if (bus.modelBus) {
+                                                            - {{ bus.modelBus }}
+                                                        }
+                                                    </mat-option>
+                                                }
+                                                @if (selectedEmployeForm.get('codeBus')?.value && !hasExistingBusOption(selectedEmployeForm.get('codeBus')?.value)) {
+                                                    <mat-option disabled>— Current Value —</mat-option>
+                                                    <mat-option [value]="selectedEmployeForm.get('codeBus')?.value">
+                                                        {{ selectedEmployeForm.get('codeBus')?.value }}
+                                                    </mat-option>
+                                                }
+                                            </mat-select>
                                             @if (selectedEmployeForm.get('codeBus')?.hasError('maxlength')) {
                                                 <mat-error>{{ t('Bus') }} must be at most 50 characters.</mat-error>
                                             }

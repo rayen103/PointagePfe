@@ -36,6 +36,47 @@ dotnet restore
 
 ---
 
+## Full Platform Startup (Backend + Frontend + 8 AI Services)
+
+### Option 1: Docker Compose (recommended)
+
+From repository root:
+
+```bash
+docker compose up --build
+```
+
+This starts:
+- SQL Server
+- Backend API on `http://localhost:6064`
+- Frontend on `http://localhost:4200`
+- 8 AI services on ports `8001` to `8008`
+
+Stop everything:
+
+```bash
+docker compose down
+```
+
+### Option 2: Local scripts (without Docker)
+
+From repository root:
+
+```bash
+# Linux / macOS
+chmod +x start-all.sh
+./start-all.sh
+```
+
+```bat
+:: Windows
+start-all.bat
+```
+
+The script starts backend, frontend, and all AI microservices in one run.
+
+---
+
 ## Frontend (Angular)
 
 ### Prerequisites

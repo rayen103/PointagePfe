@@ -1,0 +1,119 @@
+# ─────────────────────────────────────────────────────────────
+# PointagePfe – Full-stack docker-compose
+# Run:  docker-compose up --build
+# Stop: docker-compose down
+# ─────────────────────────────────────────────────────────────
+
+services:
+
+  # ── SQL Server ───────────────────────────────────────────────
+  db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      SA_PASSWORD: "@dmin123"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqldata:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P @dmin123 -Q \"SELECT 1\" -No || /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P @dmin123 -Q \"SELECT 1\" -No"]
+      interval: 10s
+      retries: 10
+      start_period: 30s
+
+  # ── .NET Backend ─────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "6064:6064"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://+:6064"
+      ConnectionStrings__SqlServerConnection: >-
+        Server=db,1433;Database=PointageBus;User Id=sa;
+        Password=@dmin123;TrustServerCertificate=True
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ── Angular Frontend ─────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+
+  # ─────────────── AI / ML micro-services ──────────────────────
+  eta-prediction:
+    build: ./ml-services/eta_prediction
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./ml-services/eta_prediction/artifacts:/app/artifacts
+    restart: unless-stopped
+
+  anomaly-detection:
+    build: ./ml-services/anomaly_detection
+    ports:
+      - "8002:8000"
+    volumes:
+      - ./ml-services/anomaly_detection/artifacts:/app/artifacts
+    restart: unless-stopped
+
+  demand-forecasting:
+    build: ./ml-services/demand_forecasting
+    ports:
+      - "8003:8000"
+    volumes:
+      - ./ml-services/demand_forecasting/artifacts:/app/artifacts
+    restart: unless-stopped
+
+  passenger-counting-cv:
+    build: ./ml-services/passenger_counting_cv
+    ports:
+      - "8004:8000"
+    volumes:
+      - ./ml-services/passenger_counting_cv/artifacts:/app/artifacts
+    restart: unless-stopped
+
+  driver-behavior-scoring:
+    build: ./ml-services/driver_behavior_scoring
+    ports:
+      - "8005:8000"
+    volumes:
+      - ./ml-services/driver_behavior_scoring/artifacts:/app/artifacts
+    restart: unless-stopped
+
+  predictive-maintenance:
+    build: ./ml-services/predictive_maintenance
+    ports:
+      - "8006:8000"
+    volumes:
+      - ./ml-services/predictive_maintenance/artifacts:/app/artifacts
+    restart: unless-stopped
+
+  rl-dispatcher:
+    build: ./ml-services/rl_dispatcher
+    ports:
+      - "8007:8000"
+    volumes:
+      - ./ml-services/rl_dispatcher/artifacts:/app/artifacts
+    restart: unless-stopped
+
+  traffic-stgcn:
+    build: ./ml-services/traffic_stgcn
+    ports:
+      - "8008:8000"
+    volumes:
+      - ./ml-services/traffic_stgcn/artifacts:/app/artifacts
+    restart: unless-stopped
+
+volumes:
+  sqldata:
