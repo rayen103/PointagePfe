@@ -63,6 +63,7 @@ export interface DashboardAiFeature {
     status: string;
     detail: string;
     enabled: boolean;
+    isWorking?: boolean;
 }
 
 export interface DashboardData {

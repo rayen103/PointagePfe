@@ -30,7 +30,32 @@ export class ChatMockApi {
                 (contact) => contact.id === chat.contactId
             ),
             // Since we use same set of messages on all chats, we assign them here.
-            messages: this._messages.map((message) => ({
+            messages: chat.id === 'gemini-chat-id' ? [
+                {
+                    id: 'gemini-msg-1',
+                    chatId: 'gemini-chat-id',
+                    contactId: 'gemini-contact-id',
+                    isMine: false,
+                    value: 'Bonjour Brian ! Je suis votre assistant Gemini spécialisé dans ce projet de gestion de collecte et de pointage. Je connais parfaitement la structure de votre backend .NET, de votre frontend Angular et de vos services de Machine Learning.',
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: 'gemini-msg-2',
+                    chatId: 'gemini-chat-id',
+                    contactId: 'gemini-contact-id',
+                    isMine: false,
+                    value: 'Je peux vous aider sur les points suivants :\n- Explication de l\'architecture (CQRS, MediatR, Carter)\n- Détails des modules frontend (CollectManagement, CST)\n- Fonctionnement des modèles ML (STGCN, RL Dispatcher, Predictive Maintenance)\n- Gestion des utilisateurs et des rôles\n- Et bien plus encore !',
+                    createdAt: new Date().toISOString()
+                },
+                {
+                    id: 'gemini-msg-3',
+                    chatId: 'gemini-chat-id',
+                    contactId: 'gemini-contact-id',
+                    isMine: false,
+                    value: 'Quelle est votre question sur le projet ?',
+                    createdAt: new Date().toISOString()
+                }
+            ] : this._messages.map((message) => ({
                 ...message,
                 chatId: chat.id,
                 contactId:

@@ -72,11 +72,18 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-4">
                     @for (feature of vm.data.aiFeatures; track feature.id) {
-                        <div class="ai-feature-card">
+                        <div class="ai-feature-card" [class.ai-feature-card--working]="feature.isWorking">
                             <div class="flex items-start justify-between gap-3">
                                 <div class="flex items-start gap-3">
                                     <div class="ai-feature-icon">
-                                        <mat-icon [svgIcon]="feature.icon"></mat-icon>
+                                        @if (feature.isWorking) {
+                                            <mat-progress-spinner
+                                                class="icon-size-5"
+                                                [diameter]="20"
+                                                [mode]="'indeterminate'"></mat-progress-spinner>
+                                        } @else {
+                                            <mat-icon [svgIcon]="feature.icon"></mat-icon>
+                                        }
                                     </div>
                                     <div>
                                         <div class="text-base font-semibold">{{ feature.title }}</div>
@@ -84,12 +91,17 @@
                                     </div>
                                 </div>
                                 <span class="ai-feature-status" [class.ai-feature-status--enabled]="feature.enabled">
-                                    {{ feature.status }}
+                                    {{ feature.isWorking ? 'Analyse...' : feature.status }}
                                 </span>
                             </div>
                             <div class="text-xs text-secondary mt-3">{{ feature.detail }}</div>
                             <div class="mt-3">
-                                <button mat-stroked-button [routerLink]="feature.link">Ouvrir</button>
+                                <button 
+                                    mat-stroked-button 
+                                    [disabled]="!feature.enabled || feature.isWorking"
+                                    (click)="executeAiFeature(feature)">
+                                    {{ feature.isWorking ? 'Traitement' : 'Ouvrir' }}
+                                </button>
                             </div>
                         </div>
                     } @empty {

@@ -85,6 +85,12 @@
     border-radius: 12px;
     padding: 1rem;
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    background: var(--fuse-card-background);
+}
+
+.ai-feature-card--working {
+    border-color: #6366f1;
+    background: rgba(99, 102, 241, 0.02);
 }
 
 .ai-feature-card:hover {

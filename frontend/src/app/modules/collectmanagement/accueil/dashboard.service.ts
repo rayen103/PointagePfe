@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { catchError, forkJoin, map, Observable, of } from 'rxjs';
 import { BusService } from 'app/core/bus/bus.service';
+import { QuickChatService } from 'app/layout/common/quick-chat/quick-chat.service';
 import { CircuitService } from 'app/core/circuit/circuit.service';
 import { EmployeService } from 'app/core/employes/employe.service';
 import { OrdreTravailService } from 'app/core/ordre-travail/ordre-travail.service';
 import { RattachementService } from 'app/core/rattachement/rattachement.service';
 import { UtilisateurService } from 'app/core/utilisateurs/utilisateur.service';
-import { PagedBus } from 'app/core/bus/bus.model';
-import { PagedCircuit } from 'app/core/circuit/circuit.model';
+import { Bus, PagedBus } from 'app/core/bus/bus.model';
+import { Circuit, PagedCircuit } from 'app/core/circuit/circuit.model';
 import { Employe, PagedEmploye } from 'app/core/employes/employe.model';
 import { OrdreTravail, PagedOrdreTravail } from 'app/core/ordre-travail/ordre-travail.model';
 import { PagedRattachement } from 'app/core/rattachement/rattachement.model';
@@ -40,7 +41,8 @@ export class DashboardService {
         private _busService: BusService,
         private _circuitService: CircuitService,
         private _ordreTravailService: OrdreTravailService,
-        private _rattachementService: RattachementService
+        private _rattachementService: RattachementService,
+        private _quickChatService: QuickChatService
     ) {}
 
     getDashboardData(): Observable<DashboardData> {
@@ -61,6 +63,26 @@ export class DashboardService {
                 )
             )
         );
+    }
+
+    /**
+     * Get Gemini Chat ID
+     */
+    getGeminiChatId(): Observable<string> {
+        return this._quickChatService.getChats().pipe(
+            map((chats) => {
+                const geminiChat = chats.find((c) => c.id === 'gemini-chat-id');
+                return geminiChat ? geminiChat.id : 'gemini-chat-id';
+            })
+        );
+    }
+
+    /**
+     * Select Gemini Chat
+     * @param chatId
+     */
+    selectGeminiChat(chatId: string): Observable<any> {
+        return this._quickChatService.getChatById(chatId);
     }
 
     private _buildDashboardData(payload: {
@@ -357,7 +379,7 @@ export class DashboardService {
                 icon: 'mat_outline:build',
                 link: '/fichier/bus',
                 status: buses.length > 0 ? 'Optimisé' : 'Indisponible',
-                detail: buses.length > 0 
+                detail: buses.length > 0
                     ? `Analyse de ${buses.length} bus · Alertes critiques: 0`
                     : 'Aucune donnée de bus disponible pour l\'analyse.',
                 enabled: buses.length > 0,
