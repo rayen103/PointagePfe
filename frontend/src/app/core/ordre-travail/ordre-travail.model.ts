@@ -13,6 +13,9 @@ export interface OrdreTravail {
     libelle?: string;
     isActive: boolean;
     societeId: string;
+    predictedDurationHours?: number;
+    predictionConfidence?: number;
+    predictionSource?: string;
 }
 
 export interface PagedOrdreTravail {
