@@ -317,6 +317,7 @@ export class DashboardService {
         const confidentOrders = ordersWithPrediction.filter(
             (ordre) => (ordre.predictionConfidence ?? 0) >= this.AI_CONFIDENCE_THRESHOLD
         ).length;
+        const hasPredictedDurationMetrics = ordersWithPrediction.length > 0 && averagePredictedDuration > 0;
 
         return [
             {
@@ -326,7 +327,7 @@ export class DashboardService {
                 icon: 'mat_outline:psychology',
                 link: '/fichier/employe',
                 status: employeesWithRiskScore.length
-                    ? `${highRiskEmployees} risque élevé`
+                    ? `${highRiskEmployees} risque${highRiskEmployees > 1 ? 's' : ''} élevé${highRiskEmployees > 1 ? 's' : ''}`
                     : 'Aucune donnée',
                 detail: employeesWithRiskScore.length
                     ? `${employeesWithRiskScore.length}/${totalEmployees} employés évalués · confiance moyenne ${this._formatPercent(averageRiskConfidence)}`
@@ -339,7 +340,7 @@ export class DashboardService {
                 description: 'Estimation automatique de la durée des ordres de travail',
                 icon: 'mat_outline:auto_graph',
                 link: '/fichier/ordretravail',
-                status: ordersWithPrediction.length
+                status: hasPredictedDurationMetrics
                     ? `${averagePredictedDuration.toFixed(1)} h en moyenne`
                     : 'Aucune donnée',
                 detail: ordersWithPrediction.length
