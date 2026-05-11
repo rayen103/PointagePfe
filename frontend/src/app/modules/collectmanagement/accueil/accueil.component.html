@@ -110,6 +110,33 @@
                 </div>
             </div>
 
+            <!-- Gemini Chat Dialog Template -->
+            <ng-template #geminiChatDialog>
+                <div class="flex flex-col h-full overflow-hidden bg-card">
+                    <!-- Dialog Header -->
+                    <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50 dark:bg-transparent">
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-primary-100 text-primary">
+                                <mat-icon class="icon-size-6" svgIcon="mat_outline:psychology"></mat-icon>
+                            </div>
+                            <div>
+                                <div class="text-lg font-semibold leading-none">Assistant Gemini</div>
+                                <div class="text-sm text-secondary mt-1">Expert IA - Pointage & Collecte</div>
+                            </div>
+                        </div>
+                        <button mat-icon-button mat-dialog-close>
+                            <mat-icon svgIcon="heroicons_outline:x-mark"></mat-icon>
+                        </button>
+                    </div>
+
+                    <!-- Dialog Content (QuickChat) -->
+                    <div class="flex-auto overflow-hidden">
+                        <!-- We use the QuickChatComponent inside the dialog -->
+                        <quick-chat class="relative h-full w-full shadow-none" [opened]="true"></quick-chat>
+                    </div>
+                </div>
+            </ng-template>
+
             <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-6">
                 <div class="chart-card bg-card p-4">
                     <div class="flex items-start justify-between mb-3">

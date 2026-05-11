@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, TemplateRef, ViewChild, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Router, RouterLink } from '@angular/router';
 import {
     ApexAxisChartSeries,
@@ -22,6 +23,7 @@ import {
 import { BehaviorSubject, catchError, delay, finalize, map, Observable, of, shareReplay, startWith, Subject, switchMap, tap, take } from 'rxjs';
 import { DashboardAxisChart, DashboardData, DashboardPieChart, DashboardQuickAction, DashboardAiFeature } from './dashboard.models';
 import { DashboardService } from './dashboard.service';
+import { QuickChatComponent } from 'app/layout/common/quick-chat/quick-chat.component';
 
 type AxisChartOptions = {
     series: ApexAxisChartSeries;
@@ -70,7 +72,9 @@ interface DashboardViewModel {
         MatIconModule,
         MatProgressBarModule,
         MatProgressSpinnerModule,
+        MatDialogModule,
         NgApexchartsModule,
+        QuickChatComponent,
     ],
     templateUrl: './accueil.component.html',
     styleUrl: './accueil.component.scss',
@@ -78,6 +82,8 @@ interface DashboardViewModel {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccueilComponent {
+    @ViewChild('geminiChatDialog') geminiChatDialog: TemplateRef<any>;
+
     private readonly CHART_COLORS = {
         bar: ['#6366f1'],
         line: ['#0ea5e9', '#f97316'],
@@ -138,7 +144,8 @@ export class AccueilComponent {
     constructor(
         private _dashboardService: DashboardService,
         private _router: Router,
-        private _changeDetectorRef: ChangeDetectorRef
+        private _changeDetectorRef: ChangeDetectorRef,
+        private _matDialog: MatDialog
     ) {
         this.viewModel$ = this._refresh$.pipe(
             startWith(void 0),
@@ -175,7 +182,15 @@ export class AccueilComponent {
                 .pipe(take(1))
                 .subscribe((chatId) => {
                     this._dashboardService.selectGeminiChat(chatId).pipe(take(1)).subscribe();
-                    // Force change detection since we're in OnPush and using an external service
+                    
+                    // Open as a popup
+                    this._matDialog.open(this.geminiChatDialog, {
+                        width: '500px',
+                        height: '700px',
+                        panelClass: 'gemini-chat-dialog',
+                        autoFocus: false
+                    });
+
                     this._changeDetectorRef.markForCheck();
                 });
             return;
