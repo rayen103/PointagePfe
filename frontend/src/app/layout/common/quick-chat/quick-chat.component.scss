@@ -1,28 +1,30 @@
 quick-chat {
-    z-index: 399;
+    z-index: 1000;
     position: fixed;
     top: 0;
     bottom: 0;
     right: 0;
-    pointer-events: none;
-
-    > div {
-        overflow: hidden;
-        pointer-events: auto;
-    }
+    width: 0;
+    height: 100%;
 
     &.quick-chat-opened {
-        > div {
-            overflow: visible;
-        }
+        width: 384px; /* sm:w-96 equivalent */
     }
 
-    &:not(.quick-chat-opened) {
-        > div {
-            overflow: visible;
-            animation: addOverflowHidden 1ms linear 400ms;
-            animation-fill-mode: forwards;
-        }
+    > div {
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 384px;
+        overflow: hidden;
+        transition: transform 400ms cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateX(100%);
+        box-shadow: -5px 0 30px rgba(0, 0, 0, 0.1);
+    }
+
+    &.quick-chat-opened > div {
+        transform: translateX(0);
     }
 }
 

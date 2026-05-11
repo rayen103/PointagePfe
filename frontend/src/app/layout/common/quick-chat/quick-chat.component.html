@@ -1,15 +1,7 @@
 <div
-    class="fixed bottom-0 top-0 w-full sm:w-96 lg:left-full lg:h-screen lg:w-16 lg:shadow"
+    class="bg-card flex h-full w-full flex-col sm:w-96"
 >
-    <div
-        class="bg-card flex h-full w-full flex-col transition-transform duration-400 ease-drawer sm:w-96"
-        [ngClass]="{
-            '-translate-x-full shadow sm:-translate-x-96 lg:-translate-x-80':
-                opened,
-            'translate-x-0': !opened,
-        }"
-    >
-        <!-- Header -->
+    <!-- Header -->
         <div
             class="quick-chat-header flex flex-0 cursor-pointer items-center justify-start"
             (click)="toggle()"
@@ -285,7 +277,6 @@
             </div>
         </div>
     </div>
-</div>
 
 <!-- Select chat or start new template -->
 
