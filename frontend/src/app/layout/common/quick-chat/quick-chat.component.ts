@@ -3,6 +3,7 @@ import { TextFieldModule } from '@angular/cdk/text-field';
 import { DOCUMENT, DatePipe, NgClass, NgTemplateOutlet } from '@angular/common';
 import {
     AfterViewInit,
+    ChangeDetectorRef,
     Component,
     ElementRef,
     HostBinding,
@@ -64,7 +65,8 @@ export class QuickChatComponent implements OnInit, AfterViewInit, OnDestroy {
         private _renderer2: Renderer2,
         private _ngZone: NgZone,
         private _quickChatService: QuickChatService,
-        private _scrollStrategyOptions: ScrollStrategyOptions
+        private _scrollStrategyOptions: ScrollStrategyOptions,
+        private _changeDetectorRef: ChangeDetectorRef
     ) {}
 
     // -----------------------------------------------------------------------------------------------------
@@ -124,6 +126,9 @@ export class QuickChatComponent implements OnInit, AfterViewInit, OnDestroy {
                 else {
                     this._hideOverlay();
                 }
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
             });
 
         // Chat
@@ -131,6 +136,7 @@ export class QuickChatComponent implements OnInit, AfterViewInit, OnDestroy {
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((chat: Chat) => {
                 this.chat = chat;
+                this._changeDetectorRef.markForCheck();
             });
 
         // Chats
@@ -138,6 +144,7 @@ export class QuickChatComponent implements OnInit, AfterViewInit, OnDestroy {
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((chats: Chat[]) => {
                 this.chats = chats;
+                this._changeDetectorRef.markForCheck();
             });
 
         // Selected chat
@@ -145,6 +152,7 @@ export class QuickChatComponent implements OnInit, AfterViewInit, OnDestroy {
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((chat: Chat) => {
                 this.selectedChat = chat;
+                this._changeDetectorRef.markForCheck();
             });
     }
 

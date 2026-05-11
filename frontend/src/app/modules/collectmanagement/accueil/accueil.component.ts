@@ -175,6 +175,8 @@ export class AccueilComponent {
                 .pipe(take(1))
                 .subscribe((chatId) => {
                     this._dashboardService.selectGeminiChat(chatId).pipe(take(1)).subscribe();
+                    // Force change detection since we're in OnPush and using an external service
+                    this._changeDetectorRef.markForCheck();
                 });
             return;
         }
