@@ -92,10 +92,12 @@ export class QuickChatComponent implements OnInit, AfterViewInit, OnDestroy {
         this._ngZone.runOutsideAngular(() => {
             setTimeout(() => {
                 // Set the height to 'auto' so we can correctly read the scrollHeight
-                this.messageInput.nativeElement.style.height = 'auto';
+                if (this.messageInput) {
+                    this.messageInput.nativeElement.style.height = 'auto';
 
-                // Get the scrollHeight and subtract the vertical padding
-                this.messageInput.nativeElement.style.height = `${this.messageInput.nativeElement.scrollHeight}px`;
+                    // Get the scrollHeight and subtract the vertical padding
+                    this.messageInput.nativeElement.style.height = `${this.messageInput.nativeElement.scrollHeight}px`;
+                }
             });
         });
     }
@@ -238,6 +240,33 @@ export class QuickChatComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     /**
+     * Send message
+     */
+    sendMessage(): void {
+        const message = this.messageInput.nativeElement.value;
+
+        // Return if the message is empty
+        if (!message || !this.selectedChat) {
+            return;
+        }
+
+        // Prepare the message object
+        const messageObj = {
+            value: message,
+            createdAt: new Date().toISOString(),
+        };
+
+        // Clear the input
+        this.messageInput.nativeElement.value = '';
+        this._resizeMessageInput();
+
+        // Send the message
+        this._quickChatService
+            .createMessage(this.selectedChat.id, messageObj)
+            .subscribe();
+    }
+
+    /**
      * Track by function for ngFor loops
      *
      * @param index
@@ -305,25 +334,5 @@ export class QuickChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
         // Disable block scroll strategy
         this._scrollStrategy.disable();
-    }
-
-    /**
-     * Open/close the panel
-     *
-     * @param open
-     * @private
-     */
-    private _toggleOpened(open: boolean): void {
-        // Set the opened
-        this.opened = open;
-
-        // If the panel opens, show the overlay
-        if (open) {
-            this._showOverlay();
-        }
-        // Otherwise, hide the overlay
-        else {
-            this._hideOverlay();
-        }
     }
 }

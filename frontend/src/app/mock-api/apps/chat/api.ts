@@ -181,5 +181,87 @@ export class ChatMockApi {
             // Return the response
             return [200, profile];
         });
+
+        // -----------------------------------------------------------------------------------------------------
+        // @ Message - POST
+        // -----------------------------------------------------------------------------------------------------
+        this._fuseMockApiService
+            .onPost('api/apps/chat/message')
+            .reply(({ request }) => {
+                // Get the chat id and message
+                const chatId = request.body.chatId;
+                const message = cloneDeep(request.body.message);
+
+                // Add the message to the chat
+                this._chats.forEach((item) => {
+                    if (item.id === chatId) {
+                        // Add the message
+                        item.messages.push({
+                            ...message,
+                            id: Math.random().toString(36).substring(2, 15),
+                            chatId,
+                            contactId: this._profile.id,
+                            isMine: true,
+                        });
+                    }
+                });
+
+                // Return the response
+                return [
+                    200,
+                    {
+                        message: {
+                            ...message,
+                            id: Math.random().toString(36).substring(2, 15),
+                            chatId,
+                            contactId: this._profile.id,
+                            isMine: true,
+                        },
+                    },
+                ];
+            });
+
+        // -----------------------------------------------------------------------------------------------------
+        // @ Gemini Response - POST
+        // -----------------------------------------------------------------------------------------------------
+        this._fuseMockApiService
+            .onPost('api/apps/chat/gemini-response')
+            .reply(({ request }) => {
+                const chatId = request.body.chatId;
+                const userMessage = request.body.userMessage.toLowerCase();
+
+                let aiValue = '';
+
+                // Intelligent responses based on project context
+                if (userMessage.includes('architecture') || userMessage.includes('structure')) {
+                    aiValue = 'L\'architecture du projet est basée sur le **Clean Architecture** côté backend (.NET 8) avec CQRS (MediatR) et Carter pour les endpoints. Côté frontend, nous utilisons **Angular 18** avec une structure modulaire par domaine (CollectManagement, CST).';
+                } else if (userMessage.includes('ml') || userMessage.includes('ia') || userMessage.includes('machine learning')) {
+                    aiValue = 'Le projet intègre plusieurs services ML :\n- **STGCN** pour la prédiction du trafic.\n- **RL Dispatcher** pour l\'optimisation des tournées.\n- **Scoring d\'absence** via des modèles de classification.\n- **Maintenance prédictive** pour les bus.';
+                } else if (userMessage.includes('collect') || userMessage.includes('circuit')) {
+                    aiValue = 'Le module **CollectManagement** gère les circuits de collecte, le pointage des employés et les ordres de travail (OT). Les circuits sont visualisables sur une carte interactive via Leaflet.';
+                } else if (userMessage.includes('hello') || userMessage.includes('bonjour') || userMessage.includes('salut')) {
+                    aiValue = 'Bonjour ! Je suis prêt à vous guider à travers l\'application. Que voulez-vous savoir sur le système de pointage, les circuits ou les modèles d\'IA ?';
+                } else {
+                    aiValue = 'C\'est une excellente question sur le projet PointagePfe. Pourriez-vous préciser si vous parlez du backend .NET, du frontend Angular ou d\'un service ML spécifique ? Je peux vous expliquer comment chaque partie communique via le Bus de données.';
+                }
+
+                const aiMessage = {
+                    id: Math.random().toString(36).substring(2, 15),
+                    chatId,
+                    contactId: 'gemini-contact-id',
+                    isMine: false,
+                    value: aiValue,
+                    createdAt: new Date().toISOString(),
+                };
+
+                // Add the message to the chat
+                this._chats.forEach((item) => {
+                    if (item.id === chatId) {
+                        item.messages.push(aiMessage);
+                    }
+                });
+
+                return [200, { message: aiMessage }];
+            });
     }
 }
