@@ -1,19 +1,21 @@
 import { Injectable } from '@angular/core';
 import { catchError, forkJoin, map, Observable, of } from 'rxjs';
 import { BusService } from 'app/core/bus/bus.service';
+import { QuickChatService } from 'app/layout/common/quick-chat/quick-chat.service';
 import { CircuitService } from 'app/core/circuit/circuit.service';
 import { EmployeService } from 'app/core/employes/employe.service';
 import { OrdreTravailService } from 'app/core/ordre-travail/ordre-travail.service';
 import { RattachementService } from 'app/core/rattachement/rattachement.service';
 import { UtilisateurService } from 'app/core/utilisateurs/utilisateur.service';
-import { PagedBus } from 'app/core/bus/bus.model';
-import { PagedCircuit } from 'app/core/circuit/circuit.model';
+import { Bus, PagedBus } from 'app/core/bus/bus.model';
+import { Circuit, PagedCircuit } from 'app/core/circuit/circuit.model';
 import { Employe, PagedEmploye } from 'app/core/employes/employe.model';
-import { PagedOrdreTravail } from 'app/core/ordre-travail/ordre-travail.model';
+import { OrdreTravail, PagedOrdreTravail } from 'app/core/ordre-travail/ordre-travail.model';
 import { PagedRattachement } from 'app/core/rattachement/rattachement.model';
 import { PagedUtilisateur } from 'app/core/utilisateurs/utilisateur.model';
 import {
     DashboardActivityItem,
+    DashboardAiFeature,
     DashboardAxisChart,
     DashboardAxisSeries,
     DashboardCharts,
@@ -29,6 +31,7 @@ export class DashboardService {
     private readonly DASHBOARD_FETCH_LIMIT = 200;
     private readonly DEFAULT_ACTIVITY_LIMIT = 5;
     private readonly ACTIVE_RATE_THRESHOLD = 80;
+    private readonly AI_CONFIDENCE_THRESHOLD = 0.45;
     private readonly FALLBACK_NEW_ORDER_LABEL = 'Nouvelle intervention';
     private readonly FALLBACK_RECENT_UPDATE_LABEL = 'Mise à jour récente';
 
@@ -38,7 +41,8 @@ export class DashboardService {
         private _busService: BusService,
         private _circuitService: CircuitService,
         private _ordreTravailService: OrdreTravailService,
-        private _rattachementService: RattachementService
+        private _rattachementService: RattachementService,
+        private _quickChatService: QuickChatService
     ) {}
 
     getDashboardData(): Observable<DashboardData> {
@@ -59,6 +63,27 @@ export class DashboardService {
                 )
             )
         );
+    }
+
+    /**
+     * Get Gemini Chat ID
+     */
+    getGeminiChatId(): Observable<string> {
+        return this._quickChatService.getChats().pipe(
+            map((chats) => {
+                const geminiChat = chats.find((c) => c.id === 'gemini-chat-id');
+                return geminiChat ? geminiChat.id : 'gemini-chat-id';
+            })
+        );
+    }
+
+    /**
+     * Select Gemini Chat
+     * @param chatId
+     */
+    selectGeminiChat(chatId: string): Observable<any> {
+        this._quickChatService.setOpened(true);
+        return this._quickChatService.getChatById(chatId);
     }
 
     private _buildDashboardData(payload: {
@@ -82,6 +107,7 @@ export class DashboardService {
         const totalCircuits = this._resolveTotal(payload.circuits?.totalCount, circuits);
         const totalOrdresTravail = this._resolveTotal(payload.ordresTravail?.totalCount, ordresTravail);
         const totalRattachements = this._resolveTotal(payload.rattachements?.totalCount, rattachements);
+        const aiFeatures = this._buildAiFeatures(employes, totalEmployees, ordresTravail, totalOrdresTravail, buses, circuits);
 
         const activeBuses = buses.filter((bus) => bus.isActive).length;
         const inactiveBuses = buses.length - activeBuses;
@@ -263,6 +289,7 @@ export class DashboardService {
 
         return {
             kpis,
+            aiFeatures,
             charts,
             recentCreated,
             recentUpdated,
@@ -289,6 +316,158 @@ export class DashboardService {
             labels,
             series,
         };
+    }
+
+    private _buildAiFeatures(
+        employes: Employe[],
+        totalEmployees: number,
+        ordresTravail: OrdreTravail[],
+        totalOrdresTravail: number,
+        buses: Bus[],
+        circuits: Circuit[]
+    ): DashboardAiFeature[] {
+        const employeesWithRiskScore = employes.filter(
+            (employe) => typeof employe.absenceRiskScore === 'number' && !isNaN(employe.absenceRiskScore)
+        );
+        const highRiskEmployees = employeesWithRiskScore.filter((employe) => (employe.absenceRiskScore ?? 0) >= 0.6).length;
+        const averageRiskConfidence = this._average(
+            employeesWithRiskScore.map((employe) => employe.absencePredictionConfidence)
+        );
+        const ordersWithPrediction = ordresTravail.filter(
+            (ordre) => typeof ordre.predictedDurationHours === 'number' && !isNaN(ordre.predictedDurationHours)
+        );
+        const averagePredictedDuration = this._average(
+            ordersWithPrediction.map((ordre) => ordre.predictedDurationHours)
+        );
+        const confidentOrders = ordersWithPrediction.filter(
+            (ordre) => (ordre.predictionConfidence ?? 0) >= this.AI_CONFIDENCE_THRESHOLD
+        ).length;
+        const hasPredictedDurationMetrics = ordersWithPrediction.length > 0 && averagePredictedDuration > 0;
+
+        return [
+            {
+                id: 'absence-risk',
+                title: "IA - Risque d'absence",
+                description: "Scoring automatique du risque d'absence des employés",
+                icon: 'mat_outline:psychology',
+                link: '/fichier/employe',
+                status: employeesWithRiskScore.length
+                    ? `${highRiskEmployees} risque${highRiskEmployees > 1 ? 's' : ''} élevé${highRiskEmployees > 1 ? 's' : ''}`
+                    : 'Aucune donnée',
+                detail: employeesWithRiskScore.length
+                    ? `${employeesWithRiskScore.length}/${totalEmployees} employés évalués · confiance moyenne ${this._formatPercent(averageRiskConfidence)}`
+                    : "Aucun scoring d'absence disponible.",
+                enabled: employeesWithRiskScore.length > 0,
+            },
+            {
+                id: 'duration-prediction',
+                title: 'IA - Durée prévisionnelle des OT',
+                description: 'Estimation automatique de la durée des ordres de travail',
+                icon: 'mat_outline:auto_graph',
+                link: '/fichier/ordretravail',
+                status: hasPredictedDurationMetrics
+                    ? `${averagePredictedDuration.toFixed(1)} h en moyenne`
+                    : 'Aucune donnée',
+                detail: ordersWithPrediction.length
+                    ? `${ordersWithPrediction.length}/${totalOrdresTravail} OT estimés · ${confidentOrders} à forte confiance`
+                    : 'Aucune prédiction de durée disponible.',
+                enabled: ordersWithPrediction.length > 0,
+            },
+            {
+                id: 'predictive-maintenance',
+                title: 'Maintenance Prédictive',
+                description: 'Prédiction des pannes et maintenance préventive des bus',
+                icon: 'mat_outline:build',
+                link: '/fichier/bus',
+                status: buses.length > 0 ? 'Optimisé' : 'Indisponible',
+                detail: buses.length > 0
+                    ? `Analyse de ${buses.length} bus · Alertes critiques: 0`
+                    : 'Aucune donnée de bus disponible pour l\'analyse.',
+                enabled: buses.length > 0,
+            },
+            {
+                id: 'eta-prediction',
+                title: 'Prédiction ETA',
+                description: 'Estimation du temps d\'arrivée en temps réel',
+                icon: 'mat_outline:schedule',
+                link: '/fichier/bus',
+                status: buses.length > 0 ? 'Actif' : 'Indisponible',
+                detail: buses.length > 0
+                    ? `Précision de +/- 2 min sur les trajets en cours`
+                    : 'Aucun bus en mouvement détecté.',
+                enabled: buses.length > 0,
+            },
+            {
+                id: 'passenger-counting',
+                title: 'Comptage Passagers',
+                description: 'Analyse des flux par Computer Vision',
+                icon: 'mat_outline:people',
+                link: '/fichier/bus',
+                status: buses.length > 0 ? 'En ligne' : 'Indisponible',
+                detail: 'Détection automatique du taux d\'occupation des bus.',
+                enabled: buses.length > 0,
+            },
+            {
+                id: 'driver-behavior',
+                title: 'Scoring Conducteur',
+                description: 'Évaluation du comportement de conduite',
+                icon: 'mat_outline:speed',
+                link: '/fichier/employe',
+                status: employes.filter(e => e.typeEmploye === 'Chauffeur').length > 0 ? 'Évalué' : 'Indisponible',
+                detail: 'Analyse des accélérations et freinages brusques.',
+                enabled: employes.filter(e => e.typeEmploye === 'Chauffeur').length > 0,
+            },
+            {
+                id: 'demand-forecasting',
+                title: 'Prévision Demande',
+                description: 'Forecasting des besoins en collecte',
+                icon: 'mat_outline:trending_up',
+                link: '/fichier/circuit',
+                status: circuits.length > 0 ? 'Calculé' : 'Indisponible',
+                detail: 'Optimisation des ressources pour les 7 prochains jours.',
+                enabled: circuits.length > 0,
+            },
+            {
+                id: 'anomaly-detection',
+                title: 'Détection Anomalies',
+                description: 'Identification des écarts de collecte',
+                icon: 'mat_outline:report_problem',
+                link: '/fichier/rattachement',
+                status: 'Vigilance',
+                detail: 'Surveillance automatique des flux de données.',
+                enabled: true,
+            },
+            {
+                id: 'rl-dispatcher',
+                title: 'Optimisation Dispatching',
+                description: 'Assignation par Reinforcement Learning',
+                icon: 'mat_outline:smart_toy',
+                link: '/fichier/ordretravail',
+                status: 'Auto',
+                detail: 'Optimisation intelligente des tournées.',
+                enabled: true,
+            },
+            {
+                id: 'traffic-stgcn',
+                title: 'Analyse Trafic',
+                description: 'Prédiction de congestion via STGCN',
+                icon: 'mat_outline:traffic',
+                link: '/fichier/circuit',
+                status: circuits.length > 0 ? 'Temps réel' : 'Indisponible',
+                detail: 'Modélisation spatio-temporelle des flux.',
+                enabled: circuits.length > 0,
+            },
+            {
+                id: 'gemini-assistant',
+                title: 'Assistant Gemini',
+                description: 'Support intelligent et analyse de données',
+                icon: 'mat_outline:psychology',
+                link: '/Accueil/page',
+                status: 'Connecté',
+                detail: 'Votre assistant IA est prêt à vous aider.',
+                enabled: true,
+            }
+        ];
     }
 
     private _buildMonthlySeries(
@@ -370,6 +549,19 @@ export class DashboardService {
         return Math.round((part / total) * 100);
     }
 
+    private _average(values: Array<number | null | undefined>): number {
+        const normalized = values.filter((value): value is number => typeof value === 'number' && !isNaN(value));
+        if (!normalized.length) {
+            return 0;
+        }
+
+        return normalized.reduce((sum, value) => sum + value, 0) / normalized.length;
+    }
+
+    private _formatPercent(value: number): string {
+        return `${Math.round(value * 100)}%`;
+    }
+
     private _resolveTotal<T>(total: number | null | undefined, items: T[]): number {
         if (typeof total === 'number') {
             return total;
@@ -385,6 +577,7 @@ export class DashboardService {
     private _buildEmptyDashboardData(errorMessage?: string): DashboardData {
         return {
             kpis: [],
+            aiFeatures: this._buildFallbackAiFeatures(),
             charts: {
                 bar: { labels: [], series: [] },
                 line: { labels: [], series: [] },
@@ -397,5 +590,120 @@ export class DashboardService {
             lastUpdated: new Date(),
             errorMessage,
         };
+    }
+
+    private _buildFallbackAiFeatures(): DashboardAiFeature[] {
+        return [
+            {
+                id: 'absence-risk',
+                title: "IA - Risque d'absence",
+                description: "Scoring automatique du risque d'absence des employés",
+                icon: 'mat_outline:psychology',
+                link: '/fichier/employe',
+                status: 'Indisponible',
+                detail: "Le scoring d'absence est temporairement indisponible.",
+                enabled: false,
+            },
+            {
+                id: 'duration-prediction',
+                title: 'IA - Durée prévisionnelle des OT',
+                description: 'Estimation automatique de la durée des ordres de travail',
+                icon: 'mat_outline:auto_graph',
+                link: '/fichier/ordretravail',
+                status: 'Indisponible',
+                detail: 'Les prédictions de durée sont temporairement indisponibles.',
+                enabled: false,
+            },
+            {
+                id: 'predictive-maintenance',
+                title: 'Maintenance Prédictive',
+                description: 'Prédiction des pannes et maintenance préventive des bus',
+                icon: 'mat_outline:build',
+                link: '/fichier/bus',
+                status: 'Indisponible',
+                detail: 'L\'analyse de maintenance est temporairement indisponible.',
+                enabled: false,
+            },
+            {
+                id: 'eta-prediction',
+                title: 'Prédiction ETA',
+                description: 'Estimation du temps d\'arrivée en temps réel',
+                icon: 'mat_outline:schedule',
+                link: '/fichier/bus',
+                status: 'Indisponible',
+                detail: 'Les prédictions ETA sont temporairement indisponibles.',
+                enabled: false,
+            },
+            {
+                id: 'passenger-counting',
+                title: 'Comptage Passagers',
+                description: 'Analyse des flux par Computer Vision',
+                icon: 'mat_outline:people',
+                link: '/fichier/bus',
+                status: 'Indisponible',
+                detail: 'Le comptage des passagers est temporairement indisponible.',
+                enabled: false,
+            },
+            {
+                id: 'driver-behavior',
+                title: 'Scoring Conducteur',
+                description: 'Évaluation du comportement de conduite',
+                icon: 'mat_outline:speed',
+                link: '/fichier/employe',
+                status: 'Indisponible',
+                detail: 'Le scoring conducteur est temporairement indisponible.',
+                enabled: false,
+            },
+            {
+                id: 'demand-forecasting',
+                title: 'Prévision Demande',
+                description: 'Forecasting des besoins en collecte',
+                icon: 'mat_outline:trending_up',
+                link: '/fichier/circuit',
+                status: 'Indisponible',
+                detail: 'La prévision de demande est temporairement indisponible.',
+                enabled: false,
+            },
+            {
+                id: 'anomaly-detection',
+                title: 'Détection Anomalies',
+                description: 'Identification des écarts de collecte',
+                icon: 'mat_outline:report_problem',
+                link: '/fichier/rattachement',
+                status: 'Indisponible',
+                detail: 'La détection d\'anomalies est temporairement indisponible.',
+                enabled: false,
+            },
+            {
+                id: 'rl-dispatcher',
+                title: 'Optimisation Dispatching',
+                description: 'Assignation par Reinforcement Learning',
+                icon: 'mat_outline:smart_toy',
+                link: '/fichier/ordretravail',
+                status: 'Indisponible',
+                detail: 'L\'optimisation du dispatching est temporairement indisponible.',
+                enabled: false,
+            },
+            {
+                id: 'traffic-stgcn',
+                title: 'Analyse Trafic',
+                description: 'Prédiction de congestion via STGCN',
+                icon: 'mat_outline:traffic',
+                link: '/fichier/circuit',
+                status: 'Indisponible',
+                detail: 'L\'analyse du trafic est temporairement indisponible.',
+                enabled: false,
+            },
+            {
+                id: 'gemini-assistant',
+                title: 'Assistant Gemini',
+                description: 'Support intelligent et analyse de données',
+                icon: 'mat_outline:psychology',
+                link: '/Accueil/page',
+                status: 'Connecté',
+                detail: 'Votre assistant IA est prêt à vous aider.',
+                enabled: true,
+            }
+        ];
     }
 }

@@ -353,6 +353,14 @@ export const messages = [
 ];
 export const chats = [
     {
+        id: 'gemini-chat-id',
+        contactId: 'gemini-contact-id',
+        unreadCount: 0,
+        muted: false,
+        lastMessage: 'Bonjour ! Je suis votre assistant Gemini spécialisé dans votre projet. Comment puis-je vous aider aujourd\'hui ?',
+        lastMessageAt: now.toISO(),
+    },
+    {
         id: 'ff6bc7f1-449a-4419-af62-b89ce6cae0aa',
         contactId: '9d3f0e7f-dcbd-4e56-a5e8-87b8154e9edf',
         unreadCount: 2,
@@ -473,6 +481,23 @@ export const chats = [
     },
 ];
 export const contacts = [
+    {
+        id: 'gemini-contact-id',
+        avatar: 'images/logo/logo.svg',
+        name: 'Assistant Gemini',
+        about: 'Expert IA sur votre projet de gestion de collecte et pointage.',
+        details: {
+            emails: [
+                {
+                    email: 'gemini@project.ai',
+                    label: 'AI Assistant',
+                },
+            ],
+            title: 'Project Intelligence',
+            company: 'Gemini AI',
+        },
+        attachments: _attachments,
+    },
     {
         id: 'cd5fa417-b667-482d-b208-798d9da3213c',
         avatar: 'images/avatars/male-01.jpg',

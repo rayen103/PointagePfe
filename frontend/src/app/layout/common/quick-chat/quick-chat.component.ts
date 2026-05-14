@@ -3,6 +3,7 @@ import { TextFieldModule } from '@angular/cdk/text-field';
 import { DOCUMENT, DatePipe, NgClass, NgTemplateOutlet } from '@angular/common';
 import {
     AfterViewInit,
+    ChangeDetectorRef,
     Component,
     ElementRef,
     HostBinding,
@@ -64,7 +65,8 @@ export class QuickChatComponent implements OnInit, AfterViewInit, OnDestroy {
         private _renderer2: Renderer2,
         private _ngZone: NgZone,
         private _quickChatService: QuickChatService,
-        private _scrollStrategyOptions: ScrollStrategyOptions
+        private _scrollStrategyOptions: ScrollStrategyOptions,
+        private _changeDetectorRef: ChangeDetectorRef
     ) {}
 
     // -----------------------------------------------------------------------------------------------------
@@ -92,10 +94,12 @@ export class QuickChatComponent implements OnInit, AfterViewInit, OnDestroy {
         this._ngZone.runOutsideAngular(() => {
             setTimeout(() => {
                 // Set the height to 'auto' so we can correctly read the scrollHeight
-                this.messageInput.nativeElement.style.height = 'auto';
+                if (this.messageInput) {
+                    this.messageInput.nativeElement.style.height = 'auto';
 
-                // Get the scrollHeight and subtract the vertical padding
-                this.messageInput.nativeElement.style.height = `${this.messageInput.nativeElement.scrollHeight}px`;
+                    // Get the scrollHeight and subtract the vertical padding
+                    this.messageInput.nativeElement.style.height = `${this.messageInput.nativeElement.scrollHeight}px`;
+                }
             });
         });
     }
@@ -108,11 +112,31 @@ export class QuickChatComponent implements OnInit, AfterViewInit, OnDestroy {
      * On init
      */
     ngOnInit(): void {
+        // Opened
+        this._quickChatService.opened$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((opened: boolean) => {
+                this.opened = opened;
+
+                // If the panel opens, show the overlay
+                if (opened) {
+                    this._showOverlay();
+                }
+                // Otherwise, hide the overlay
+                else {
+                    this._hideOverlay();
+                }
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
         // Chat
         this._quickChatService.chat$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((chat: Chat) => {
                 this.chat = chat;
+                this._changeDetectorRef.markForCheck();
             });
 
         // Chats
@@ -120,6 +144,7 @@ export class QuickChatComponent implements OnInit, AfterViewInit, OnDestroy {
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((chats: Chat[]) => {
                 this.chats = chats;
+                this._changeDetectorRef.markForCheck();
             });
 
         // Selected chat
@@ -127,6 +152,7 @@ export class QuickChatComponent implements OnInit, AfterViewInit, OnDestroy {
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((chat: Chat) => {
                 this.selectedChat = chat;
+                this._changeDetectorRef.markForCheck();
             });
     }
 
@@ -191,37 +217,21 @@ export class QuickChatComponent implements OnInit, AfterViewInit, OnDestroy {
      * Open the panel
      */
     open(): void {
-        // Return if the panel has already opened
-        if (this.opened) {
-            return;
-        }
-
-        // Open the panel
-        this._toggleOpened(true);
+        this._quickChatService.setOpened(true);
     }
 
     /**
      * Close the panel
      */
     close(): void {
-        // Return if the panel has already closed
-        if (!this.opened) {
-            return;
-        }
-
-        // Close the panel
-        this._toggleOpened(false);
+        this._quickChatService.setOpened(false);
     }
 
     /**
-     * Toggle the panel
+     * Toggle the opened state
      */
     toggle(): void {
-        if (this.opened) {
-            this.close();
-        } else {
-            this.open();
-        }
+        this._quickChatService.setOpened(!this.opened);
     }
 
     /**
@@ -231,10 +241,37 @@ export class QuickChatComponent implements OnInit, AfterViewInit, OnDestroy {
      */
     selectChat(id: string): void {
         // Open the panel
-        this._toggleOpened(true);
+        this._quickChatService.setOpened(true);
 
         // Get the chat data
         this._quickChatService.getChatById(id).subscribe();
+    }
+
+    /**
+     * Send message
+     */
+    sendMessage(): void {
+        const message = this.messageInput.nativeElement.value;
+
+        // Return if the message is empty
+        if (!message || !this.selectedChat) {
+            return;
+        }
+
+        // Prepare the message object
+        const messageObj = {
+            value: message,
+            createdAt: new Date().toISOString(),
+        };
+
+        // Clear the input
+        this.messageInput.nativeElement.value = '';
+        this._resizeMessageInput();
+
+        // Send the message
+        this._quickChatService
+            .createMessage(this.selectedChat.id, messageObj)
+            .subscribe();
     }
 
     /**
@@ -305,25 +342,5 @@ export class QuickChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
         // Disable block scroll strategy
         this._scrollStrategy.disable();
-    }
-
-    /**
-     * Open/close the panel
-     *
-     * @param open
-     * @private
-     */
-    private _toggleOpened(open: boolean): void {
-        // Set the opened
-        this.opened = open;
-
-        // If the panel opens, show the overlay
-        if (open) {
-            this._showOverlay();
-        }
-        // Otherwise, hide the overlay
-        else {
-            this._hideOverlay();
-        }
     }
 }

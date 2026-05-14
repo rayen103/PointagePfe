@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, TemplateRef, ViewChild, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { RouterLink } from '@angular/router';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { Router, RouterLink } from '@angular/router';
 import {
     ApexAxisChartSeries,
     ApexChart,
@@ -19,9 +20,10 @@ import {
     ApexXAxis,
     NgApexchartsModule,
 } from 'ng-apexcharts';
-import { BehaviorSubject, map, Observable, shareReplay, startWith, Subject, switchMap, tap } from 'rxjs';
-import { DashboardAxisChart, DashboardData, DashboardPieChart, DashboardQuickAction } from './dashboard.models';
+import { BehaviorSubject, catchError, delay, finalize, map, Observable, of, shareReplay, startWith, Subject, switchMap, tap, take } from 'rxjs';
+import { DashboardAxisChart, DashboardData, DashboardPieChart, DashboardQuickAction, DashboardAiFeature } from './dashboard.models';
 import { DashboardService } from './dashboard.service';
+import { QuickChatComponent } from 'app/layout/common/quick-chat/quick-chat.component';
 
 type AxisChartOptions = {
     series: ApexAxisChartSeries;
@@ -70,7 +72,9 @@ interface DashboardViewModel {
         MatIconModule,
         MatProgressBarModule,
         MatProgressSpinnerModule,
+        MatDialogModule,
         NgApexchartsModule,
+        QuickChatComponent,
     ],
     templateUrl: './accueil.component.html',
     styleUrl: './accueil.component.scss',
@@ -78,6 +82,8 @@ interface DashboardViewModel {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccueilComponent {
+    @ViewChild('geminiChatDialog') geminiChatDialog: TemplateRef<any>;
+
     private readonly CHART_COLORS = {
         bar: ['#6366f1'],
         line: ['#0ea5e9', '#f97316'],
@@ -135,19 +141,75 @@ export class AccueilComponent {
 
     private readonly _refresh$ = new Subject<void>();
 
-    constructor(private _dashboardService: DashboardService) {
+    constructor(
+        private _dashboardService: DashboardService,
+        private _router: Router,
+        private _changeDetectorRef: ChangeDetectorRef,
+        private _matDialog: MatDialog
+    ) {
         this.viewModel$ = this._refresh$.pipe(
             startWith(void 0),
             tap(() => this.isLoading$.next(true)),
-            switchMap(() => this._dashboardService.getDashboardData()),
-            map((data) => this._buildViewModel(data)),
-            tap(() => this.isLoading$.next(false)),
+            switchMap(() =>
+                this._dashboardService.getDashboardData().pipe(
+                    map((data) => this._buildViewModel(data)),
+                    catchError(() => of(this._buildViewModel(this._buildFallbackData()))),
+                    finalize(() => this.isLoading$.next(false))
+                )
+            ),
             shareReplay({ bufferSize: 1, refCount: true })
         );
     }
 
     refresh(): void {
         this._refresh$.next();
+    }
+
+    /**
+     * Execute AI Feature
+     * @param feature
+     */
+    executeAiFeature(feature: DashboardAiFeature): void {
+        if (!feature.enabled || feature.isWorking) {
+            return;
+        }
+
+        // Special case for Gemini Assistant
+        if (feature.id === 'gemini-assistant') {
+            // Select the Gemini chat first
+            this._dashboardService
+                .getGeminiChatId()
+                .pipe(take(1))
+                .subscribe((chatId) => {
+                    this._dashboardService.selectGeminiChat(chatId).pipe(take(1)).subscribe();
+                    
+                    // Open as a popup
+                    this._matDialog.open(this.geminiChatDialog, {
+                        width: '500px',
+                        height: '700px',
+                        panelClass: 'gemini-chat-dialog',
+                        autoFocus: false
+                    });
+
+                    this._changeDetectorRef.markForCheck();
+                });
+            return;
+        }
+
+        // Simulate working
+        feature.isWorking = true;
+        this._changeDetectorRef.markForCheck();
+
+        // Simulate AI processing delay
+        of(null)
+            .pipe(delay(2000))
+            .subscribe(() => {
+                feature.isWorking = false;
+                this._changeDetectorRef.markForCheck();
+
+                // Navigate to the feature link after "processing"
+                this._router.navigate([feature.link]);
+            });
     }
 
     private _buildViewModel(data: DashboardData): DashboardViewModel {
@@ -265,6 +327,45 @@ export class AccueilComponent {
             stroke: {
                 width: 2,
             },
+        };
+    }
+
+    private _buildFallbackData(): DashboardData {
+        return {
+            kpis: [],
+            aiFeatures: [
+                {
+                    id: 'absence-risk',
+                    title: "IA - Risque d'absence",
+                    description: "Scoring automatique du risque d'absence des employés",
+                    icon: 'mat_outline:psychology',
+                    link: '/fichier/employe',
+                    status: 'Indisponible',
+                    detail: "Le scoring d'absence est temporairement indisponible.",
+                    enabled: false,
+                },
+                {
+                    id: 'duration-prediction',
+                    title: 'IA - Durée prévisionnelle des OT',
+                    description: 'Estimation automatique de la durée des ordres de travail',
+                    icon: 'mat_outline:auto_graph',
+                    link: '/fichier/ordretravail',
+                    status: 'Indisponible',
+                    detail: 'Les prédictions de durée sont temporairement indisponibles.',
+                    enabled: false,
+                },
+            ],
+            charts: {
+                bar: { labels: [], series: [] },
+                line: { labels: [], series: [] },
+                pie: { labels: [], series: [] },
+                doughnut: { labels: [], series: [] },
+            },
+            recentCreated: [],
+            recentUpdated: [],
+            systemActivity: [],
+            lastUpdated: new Date(),
+            errorMessage: 'Impossible de charger les données du tableau de bord. Veuillez réessayer.',
         };
     }
 }
