@@ -10,14 +10,11 @@ using CollectManagement.Application.Interfaces.Repositories.Employes;
 using CollectManagement.Application.Interfaces.Repositories.Bus;
 using CollectManagement.Application.Interfaces.Repositories.Chantiers;
 using CollectManagement.Application.Interfaces.Repositories.Equipes;
-using CollectManagement.Application.Interfaces.Repositories.Gouvernorats;
-using CollectManagement.Application.Interfaces.Repositories.Modems;
 using CollectManagement.Application.Interfaces.Repositories.OrdresTravail;
 using CollectManagement.Application.Interfaces.Repositories.OrdresTravailDetails;
 using CollectManagement.Application.Interfaces.Repositories.Shifts;
 using CollectManagement.Application.Interfaces.Repositories.PointsCollecte;
 using CollectManagement.Application.Interfaces.Repositories.Rattachements;
-using CollectManagement.Application.Interfaces.Repositories.Regions;
 using CollectManagement.Application.Interfaces.Repositories.Societes;
 using CollectManagement.Application.Interfaces.Repositories.Utilisateurs;
 using CollectManagement.Application.Interfaces.Services;
@@ -34,14 +31,11 @@ using CollectManagement.Infrastructure.Persistence.Repositories.CircuitRepositor
 using CollectManagement.Infrastructure.Persistence.Repositories.CircuitPointCollecteRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.EmployeRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.EquipeRepositories;
-using CollectManagement.Infrastructure.Persistence.Repositories.GouvernoratRepositories;
-using CollectManagement.Infrastructure.Persistence.Repositories.ModemRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.OrdreTravailRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.OrdreTravailDetailRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.ShiftRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.PointCollecteRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.RattachementRepositories;
-using CollectManagement.Infrastructure.Persistence.Repositories.RegionRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.SocieteRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.UtilisateurRepositories;
 using CollectManagement.Infrastructure.PuppeteerConfig;
@@ -137,9 +131,6 @@ public static class DependencyInjection
         services.AddScoped<IShiftRepository, ShiftRepository>();
         services.AddScoped<IBusRepository, BusRepository>();
         services.AddScoped<IChantierRepository, ChantierRepository>();
-        services.AddScoped<IRegionRepository, RegionRepository>();
-        services.AddScoped<IModemRepository, ModemRepository>();
-        services.AddScoped<IGouvernoratRepository, GouvernoratRepository>();
 
 
         
