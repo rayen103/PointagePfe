@@ -6,6 +6,7 @@ using CollectManagement.Application.Interfaces.Authentification;
 using CollectManagement.Application.Interfaces.Repositories.Utilisateurs;
 using CollectManagement.Application.Interfaces.Services;
 using CollectManagement.Domain.Societes.ValueObjects;
+using CollectManagement.Domain.Utilisateurs.ValueObjects;
 
 namespace CollectManagement.Application.Features.Utilisateurs.Queries.Login;
 
@@ -43,11 +44,18 @@ public sealed class LoginQueryHandler
             new SocieteId(request.SocieteId),
             cancellationToken).ConfigureAwait(false);
         
-        if(utilisateur is null || _passwordService.VerifyHashedPassword(
-               utilisateur.UtilisateurId,
-               utilisateur.Password,
-               request.Password) == PasswordVerificationResult.Failure
-           || !hasActiveSite)
+        var utilisateurIdForVerification = utilisateur?.UtilisateurId
+                                        ?? new UtilisateurId(Ulid.Parse("00000000000000000000000000"));
+        var hashedPasswordForVerification = utilisateur?.Password
+                                            ?? new string('0', 128);
+        var passwordVerificationResult = _passwordService.VerifyHashedPassword(
+            utilisateurIdForVerification,
+            hashedPasswordForVerification,
+            request.Password);
+
+        if (utilisateur is null
+            || passwordVerificationResult == PasswordVerificationResult.Failure
+            || !hasActiveSite)
             throw new BadCredentialException("Invalid User");
 
         var token = _tokenGenerator.GenerateToken(utilisateur);

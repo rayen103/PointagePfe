@@ -44,7 +44,7 @@
                             </mat-option>
                         }
                     </mat-select>
-                    @if (signInForm.get('societeId').hasError('required')) {
+                    @if (signInForm.get('societeId')?.hasError('required')) {
                         <mat-error> Company is required </mat-error>
                     }
                 </mat-form-field>
@@ -61,7 +61,7 @@
                             </mat-option>
                         }
                     </mat-select>
-                    @if (signInForm.get('numeroChantier').hasError('required')) {
+                    @if (signInForm.get('numeroChantier')?.hasError('required')) {
                         <mat-error> Site is required </mat-error>
                     }
                 </mat-form-field>

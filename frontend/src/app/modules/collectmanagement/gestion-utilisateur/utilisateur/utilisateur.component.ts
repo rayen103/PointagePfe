@@ -301,16 +301,13 @@ export class UtilisateurComponent implements OnInit, OnDestroy{
 
         this.saveClicked = true;
 
-        // Get the product object
+        // Get the utilisateur object
         const utilisateur = this.selectedUtilisateurForm.getRawValue();
 
         const passwordControl = this.selectedUtilisateurForm.get('password');
         const passwordValue = (passwordControl?.value ?? '').toString();
         if (utilisateur.utilisateurId === 'new' && !passwordValue.trim()) {
             passwordControl?.setErrors({ ...(passwordControl.errors ?? {}), required: true });
-        }
-        if (passwordValue.trim() && !this.passwordComplexityRegex.test(passwordValue)) {
-            passwordControl?.setErrors({ ...(passwordControl.errors ?? {}), pattern: true });
         }
 
         if (this.selectedUtilisateurForm.invalid) {
