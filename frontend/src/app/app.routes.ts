@@ -76,6 +76,13 @@ export const appRoutes: Route[] = [
         },
         children: [
             {path: 'example', loadChildren: () => import('app/modules/admin/example/example.routes')},
+            {path: 'dashboard', pathMatch: 'full', redirectTo: 'Accueil/page'},
+            {path: 'dashboards', pathMatch: 'full', redirectTo: 'Accueil/page'},
+            {path: 'dashboards/dashboard', pathMatch: 'full', redirectTo: 'Accueil/page'},
+            {path: 'dashboards/project', pathMatch: 'full', redirectTo: 'Accueil/page'},
+            {path: 'dashboards/analytics', pathMatch: 'full', redirectTo: 'Accueil/page'},
+            {path: 'dashboards/finance', pathMatch: 'full', redirectTo: 'Accueil/page'},
+            {path: 'dashboards/crypto', pathMatch: 'full', redirectTo: 'Accueil/page'},
         ]
     },
 
@@ -98,6 +105,20 @@ export const appRoutes: Route[] = [
 
                 ]
             },
+            {path: 'utilisateur', pathMatch: 'full', redirectTo: 'fichier/utilisateur'},
+            {path: 'societe', pathMatch: 'full', redirectTo: 'fichier/societe'},
+            {path: 'role-utilisateur', pathMatch: 'full', redirectTo: 'fichier/role-utilisateur'},
+            {path: 'employe', pathMatch: 'full', redirectTo: 'fichier/employe'},
+            {path: 'circuit', pathMatch: 'full', redirectTo: 'fichier/circuit'},
+            {path: 'pointcollecte', pathMatch: 'full', redirectTo: 'fichier/pointcollecte'},
+            {path: 'equipe', pathMatch: 'full', redirectTo: 'fichier/equipe'},
+            {path: 'ordretravail', pathMatch: 'full', redirectTo: 'fichier/ordretravail'},
+            {path: 'rattachement', pathMatch: 'full', redirectTo: 'fichier/rattachement'},
+            {path: 'shift', pathMatch: 'full', redirectTo: 'fichier/shift'},
+            {path: 'bus', pathMatch: 'full', redirectTo: 'fichier/bus'},
+            {path: 'chantier', pathMatch: 'full', redirectTo: 'fichier/chantier'},
+            {path: 'rattachement-employe', pathMatch: 'full', redirectTo: 'fichier/rattachement-employe'},
+            {path: 'rattachement-article', pathMatch: 'full', redirectTo: 'fichier/rattachement-article'},
             //Fichier
             {path:'fichier', children:[
                     {path:'utilisateur',
