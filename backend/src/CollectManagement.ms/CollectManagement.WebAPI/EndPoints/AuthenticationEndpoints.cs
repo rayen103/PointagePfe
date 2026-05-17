@@ -30,7 +30,9 @@ public class AuthenticationEndpoints : ICarterModule
     {
         var command = new LoginQuery(
             loginRequest.Login, 
-            loginRequest.Password);
+            loginRequest.Password,
+            loginRequest.SocieteId,
+            loginRequest.NumeroChantier);
         
         var authenticationResponse = await sender.Send(command, cancellationToken)
             .ConfigureAwait(false);
@@ -45,7 +47,9 @@ public class AuthenticationEndpoints : ICarterModule
     {
         var command = new LoginQuery(
             loginRequest.Login, 
-            loginRequest.Password);
+            loginRequest.Password,
+            loginRequest.SocieteId,
+            loginRequest.NumeroChantier);
         
         var authenticationResponse = await sender.Send(command, cancellationToken)
             .ConfigureAwait(false);

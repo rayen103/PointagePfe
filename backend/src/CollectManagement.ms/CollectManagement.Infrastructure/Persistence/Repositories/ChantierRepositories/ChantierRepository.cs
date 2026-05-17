@@ -2,6 +2,7 @@ using System.ComponentModel;
 using CollectManagement.Application.Interfaces.Repositories.Chantiers;
 using CollectManagement.Domain.Chantiers;
 using CollectManagement.Domain.Chantiers.ValueObjects;
+using CollectManagement.Domain.Societes.ValueObjects;
 using CollectManagement.Infrastructure.Persistence.Context;
 
 namespace CollectManagement.Infrastructure.Persistence.Repositories.ChantierRepositories;
@@ -46,6 +47,18 @@ public class ChantierRepository : RepositoryBase<Chantier>, IChantierRepository
                 c.Status, c.IsActive, c.SocieteId))
             .FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
         return chantier!;
+    }
+
+    public Task<bool> ExistsActiveByNumeroAndSocieteAsync(
+        string numeroChantier,
+        SocieteId societeId,
+        CancellationToken cancellationToken)
+    {
+        return _dbSet.AnyAsync(
+            chantier => chantier.IsActive
+                        && chantier.SocieteId == societeId
+                        && chantier.NumeroChantier == numeroChantier,
+            cancellationToken);
     }
 
     public async Task UpdateBulkAsync(Chantier chantier, CancellationToken cancellationToken)

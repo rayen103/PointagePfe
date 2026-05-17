@@ -68,6 +68,7 @@ import { TranslocoDirective } from '@ngneat/transloco';
     animations : fuseAnimations
 })
 export class UtilisateurComponent implements OnInit, OnDestroy{
+    private readonly passwordComplexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
 
     @ViewChild(MatPaginator) private _paginator: MatPaginator;
     @ViewChild(MatSort) private _sort: MatSort;
@@ -155,7 +156,7 @@ export class UtilisateurComponent implements OnInit, OnDestroy{
             nom:[''],
             prenom:[null],
             email:['', [Validators.required]],
-            password:[''],
+            password:['', [Validators.pattern(this.passwordComplexityRegex)]],
             roleUtilisateurId:[null, [Validators.required]],
             isActive:[true, [Validators.required]],
             societeId: ['']
@@ -300,6 +301,18 @@ export class UtilisateurComponent implements OnInit, OnDestroy{
 
         this.saveClicked = true;
 
+        // Get the product object
+        const utilisateur = this.selectedUtilisateurForm.getRawValue();
+
+        const passwordControl = this.selectedUtilisateurForm.get('password');
+        const passwordValue = (passwordControl?.value ?? '').toString();
+        if (utilisateur.utilisateurId === 'new' && !passwordValue.trim()) {
+            passwordControl?.setErrors({ ...(passwordControl.errors ?? {}), required: true });
+        }
+        if (passwordValue.trim() && !this.passwordComplexityRegex.test(passwordValue)) {
+            passwordControl?.setErrors({ ...(passwordControl.errors ?? {}), pattern: true });
+        }
+
         if (this.selectedUtilisateurForm.invalid) {
             this._changeDetectorRef.markForCheck();
             setTimeout(()=> {
@@ -308,9 +321,6 @@ export class UtilisateurComponent implements OnInit, OnDestroy{
             }, 500);
             return;
         }
-
-        // Get the product object
-        const utilisateur = this.selectedUtilisateurForm.getRawValue();
 
         if(utilisateur.utilisateurId=== "new" && this.hasActionPermission(FuseNavigationAction.Add)) {
             this._utilisateurService.AddUtilisateur(utilisateur)

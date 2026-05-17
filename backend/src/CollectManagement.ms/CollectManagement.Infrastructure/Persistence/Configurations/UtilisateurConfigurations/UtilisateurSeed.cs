@@ -11,10 +11,10 @@ public static class UtilisateurSeed
         {
             Utilisateur.Create(
                 utilisateurId: new UtilisateurId(Ulid.Parse("01HC85BM5QVRW7ABRV33TR1GQ0")),
-                nomUtilisateur: "root",
-                nom:"CST",
+                nomUtilisateur: "admin",
+                nom:"Admin",
                 prenom:"CST",
-                email:"root@cst.tn",
+                email:"admin@cst.tn",
                 
                 //aymen
                 password:"E2CF9A6F4CFCA46F74FC0E4CF7A5B278D3C20D9178E0DB936DBB3CF8E614C89E4D1C33229F39A457014D2D581CAA3DCE7F49C53803A176A4F891A9EB1D5A34BA",
