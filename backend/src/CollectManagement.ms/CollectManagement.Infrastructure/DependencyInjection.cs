@@ -179,13 +179,35 @@ public static class DependencyInjection
                 
                 options.Events = new JwtBearerEvents()
                 {
-                    OnChallenge = context =>
+                    OnChallenge = async context =>
                     {
-                        throw new UnAuthorizedException("UnAuthorized User.");
+                        context.HandleResponse();
+
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        await context.Response.WriteAsJsonAsync(
+                            new ApiResponse<string>
+                            {
+                                Success = false,
+                                StatusCode = StatusCodes.Status401Unauthorized,
+                                Message = "UnAuthorized User.",
+                                Data = "",
+                                ValidationErrors = []
+                            },
+                            context.HttpContext.RequestAborted).ConfigureAwait(false);
                     },
-                    OnForbidden = _ =>
+                    OnForbidden = async context =>
                     {
-                        throw new ForbiddenException("Forbidden User.");
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        await context.Response.WriteAsJsonAsync(
+                            new ApiResponse<string>
+                            {
+                                Success = false,
+                                StatusCode = StatusCodes.Status403Forbidden,
+                                Message = "Forbidden User.",
+                                Data = "",
+                                ValidationErrors = []
+                            },
+                            context.HttpContext.RequestAborted).ConfigureAwait(false);
                     },
                 };
             });
