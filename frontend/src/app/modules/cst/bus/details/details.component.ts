@@ -32,6 +32,10 @@ import { Circuit } from '../../../../core/circuit/circuit.model';
 import { CircuitService } from '../../../../core/circuit/circuit.service';
 import { CircuitPointCollecteService } from '../../../../core/circuit/circuit-point-collecte.service';
 import { MapGeocodingService } from '../../../../core/common/map-geocoding.service';
+import { Modem } from '../../../../core/modem/modem.model';
+import { ModemService } from '../../../../core/modem/modem.service';
+import { Chauffeur } from '../../../../core/chauffeur/chauffeur.model';
+import { ChauffeurService } from '../../../../core/chauffeur/chauffeur.service';
 
 @Component({
   selector: 'app-details',
@@ -71,6 +75,8 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
     mapLatitude: number | null = null;
     mapLongitude: number | null = null;
     circuits: Circuit[] = [];
+    modems: Modem[] = [];
+    chauffeurs: Chauffeur[] = [];
     departurePoint: string = '';
     arrivalPoint: string = '';
     circuitRoutePoints: MapRoutePoint[] = [];
@@ -84,6 +90,8 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         private _circuitService: CircuitService,
         private _circuitPointCollecteService: CircuitPointCollecteService,
         private _mapGeocodingService: MapGeocodingService,
+        private _modemService: ModemService,
+        private _chauffeurService: ChauffeurService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _userService: UserService
     ) { }
@@ -101,6 +109,7 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
             imei: [''],
             capacite: [null],
             codeCircuit: [''],
+            codeChauffeur: [''],
             appSagem: [false],
             isActive: [true],
             latitude: [null],
@@ -122,6 +131,22 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
             .subscribe((pagedCircuits) => {
                 this.circuits = pagedCircuits?.circuits ?? [];
                 this.refreshSelectedCircuitRoute();
+                this._changeDetectorRef.markForCheck();
+            });
+
+        this._modemService
+            .GetModems()
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((pagedModems) => {
+                this.modems = (pagedModems?.modems ?? []).filter((m) => m.isActive);
+                this._changeDetectorRef.markForCheck();
+            });
+
+        this._chauffeurService
+            .GetChauffeurs()
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((pagedChauffeurs) => {
+                this.chauffeurs = (pagedChauffeurs?.chauffeurs ?? []).filter((c) => c.isActive);
                 this._changeDetectorRef.markForCheck();
             });
 

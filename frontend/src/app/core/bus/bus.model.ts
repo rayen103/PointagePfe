@@ -5,6 +5,7 @@ export interface Bus {
     imei?: string;
     capacite?: number;
     codeCircuit?: string;
+    codeChauffeur?: string;
     appSagem: boolean;
     isActive: boolean;
     latitude?: number;

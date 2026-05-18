@@ -29,6 +29,9 @@ public class BusConfiguration : IEntityTypeConfiguration<Bus>
         builder.Property(p => p.CodeCircuit)
             .HasMaxLength(50);
 
+        builder.Property(p => p.CodeChauffeur)
+            .HasMaxLength(50);
+
         builder.Property(p => p.AppSagem)
             .HasDefaultValue(false)
             .IsRequired();

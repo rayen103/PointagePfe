@@ -85,10 +85,17 @@
                                     class="icon-size-5"
                                     matPrefix
                                     [svgIcon]="'heroicons_solid:device-phone-mobile'"></mat-icon>
-                                <input
-                                    matInput
-                                    formControlName="imei"
-                                    [placeholder]="t('Enter-imei')">
+                                <mat-select formControlName="imei">
+                                    <mat-option [value]="''">-</mat-option>
+                                    @for (modem of modems; track modem.modemId) {
+                                        <mat-option [value]="modem.imei">
+                                            {{ modem.imei }}
+                                            @if (modem.modelModem) {
+                                                - {{ modem.modelModem }}
+                                            }
+                                        </mat-option>
+                                    }
+                                </mat-select>
                             </mat-form-field>
 
                             <!-- Capacite -->
@@ -142,6 +149,23 @@
                                     matInput
                                     [value]="departurePoint || '-'"
                                     readonly>
+                            </mat-form-field>
+
+                            <!-- Chauffeur -->
+                            <mat-form-field class="w-full">
+                                <mat-label>{{ t('Chauffeur') }}</mat-label>
+                                <mat-icon
+                                    class="icon-size-5"
+                                    matPrefix
+                                    [svgIcon]="'heroicons_solid:user'"></mat-icon>
+                                <mat-select formControlName="codeChauffeur">
+                                    <mat-option [value]="''">-</mat-option>
+                                    @for (chauffeur of chauffeurs; track chauffeur.chauffeurId) {
+                                        <mat-option [value]="chauffeur.codeChauffeur">
+                                            {{ chauffeur.codeChauffeur }} - {{ chauffeur.nom }} {{ chauffeur.prenom || '' }}
+                                        </mat-option>
+                                    }
+                                </mat-select>
                             </mat-form-field>
 
                             <!-- Arrival Point -->

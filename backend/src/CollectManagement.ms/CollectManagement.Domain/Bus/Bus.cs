@@ -19,6 +19,8 @@ public class Bus : AuditableEntity
 
     public string? CodeCircuit { get; private set; }
 
+    public string? CodeChauffeur { get; private set; }
+
     public bool AppSagem { get; private set; }
 
     public bool IsActive { get; private set; } = true;
@@ -38,6 +40,7 @@ public class Bus : AuditableEntity
         string? imei,
         int? capacite,
         string? codeCircuit,
+        string? codeChauffeur,
         bool appSagem,
         bool isActive,
         double? latitude,
@@ -50,6 +53,7 @@ public class Bus : AuditableEntity
         IMEI = imei;
         Capacite = capacite;
         CodeCircuit = codeCircuit;
+        CodeChauffeur = codeChauffeur;
         AppSagem = appSagem;
         IsActive = isActive;
         Latitude = latitude;
@@ -64,6 +68,7 @@ public class Bus : AuditableEntity
         string? imei,
         int? capacite,
         string? codeCircuit,
+        string? codeChauffeur,
         bool appSagem,
         bool isActive,
         double? latitude,
@@ -77,6 +82,7 @@ public class Bus : AuditableEntity
             imei,
             capacite,
             codeCircuit,
+            codeChauffeur,
             appSagem,
             isActive,
             latitude,
@@ -90,6 +96,7 @@ public class Bus : AuditableEntity
         string? imei,
         int? capacite,
         string? codeCircuit,
+        string? codeChauffeur,
         bool appSagem,
         bool isActive,
         double? latitude,
@@ -100,6 +107,7 @@ public class Bus : AuditableEntity
         IMEI = imei;
         Capacite = capacite;
         CodeCircuit = codeCircuit;
+        CodeChauffeur = codeChauffeur;
         AppSagem = appSagem;
         IsActive = isActive;
         Latitude = latitude;
@@ -113,6 +121,7 @@ public class Bus : AuditableEntity
         string? imei,
         int? capacite,
         string? codeCircuit,
+        string? codeChauffeur,
         bool appSagem,
         bool isActive,
         double? latitude,
@@ -126,6 +135,7 @@ public class Bus : AuditableEntity
             imei,
             capacite,
             codeCircuit,
+            codeChauffeur,
             appSagem,
             isActive,
             latitude,

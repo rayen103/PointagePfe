@@ -54,6 +54,7 @@ export class BusService {
             imei: '',
             capacite: null,
             codeCircuit: '',
+            codeChauffeur: '',
             appSagem: false,
             isActive: true,
             latitude: null,

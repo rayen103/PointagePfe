@@ -6,6 +6,7 @@ using CollectManagement.Application.Interfaces.Authentification;
 using CollectManagement.Application.Interfaces.Repositories;
 using CollectManagement.Application.Interfaces.Repositories.Circuits;
 using CollectManagement.Application.Interfaces.Repositories.CircuitsPointsCollecte;
+using CollectManagement.Application.Interfaces.Repositories.Chauffeurs;
 using CollectManagement.Application.Interfaces.Repositories.Employes;
 using CollectManagement.Application.Interfaces.Repositories.Bus;
 using CollectManagement.Application.Interfaces.Repositories.Chantiers;
@@ -30,6 +31,7 @@ using CollectManagement.Infrastructure.Persistence.Context;
 using CollectManagement.Infrastructure.Persistence.Repositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.BusRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.ChantierRepositories;
+using CollectManagement.Infrastructure.Persistence.Repositories.ChauffeurRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.CircuitRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.CircuitPointCollecteRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.EmployeRepositories;
@@ -140,6 +142,7 @@ public static class DependencyInjection
         services.AddScoped<IRegionRepository, RegionRepository>();
         services.AddScoped<IModemRepository, ModemRepository>();
         services.AddScoped<IGouvernoratRepository, GouvernoratRepository>();
+        services.AddScoped<IChauffeurRepository, ChauffeurRepository>();
 
 
         

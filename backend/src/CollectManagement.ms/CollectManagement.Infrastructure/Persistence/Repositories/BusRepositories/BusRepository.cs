@@ -55,6 +55,7 @@ public class BusRepository : RepositoryBase<Bus>, IBusRepository
                 c.IMEI,
                 c.Capacite,
                 c.CodeCircuit,
+                c.CodeChauffeur,
                 c.AppSagem,
                 c.IsActive,
                 c.Latitude,
@@ -80,6 +81,7 @@ public class BusRepository : RepositoryBase<Bus>, IBusRepository
                 c.IMEI,
                 c.Capacite,
                 c.CodeCircuit,
+                c.CodeChauffeur,
                 c.AppSagem,
                 c.IsActive,
                 c.Latitude,
@@ -102,6 +104,7 @@ public class BusRepository : RepositoryBase<Bus>, IBusRepository
                     .SetProperty(p => p.IMEI, bus.IMEI)
                     .SetProperty(p => p.Capacite, bus.Capacite)
                     .SetProperty(p => p.CodeCircuit, bus.CodeCircuit)
+                    .SetProperty(p => p.CodeChauffeur, bus.CodeChauffeur)
                     .SetProperty(p => p.AppSagem, bus.AppSagem)
                     .SetProperty(p => p.IsActive, bus.IsActive)
                     .SetProperty(p => p.Latitude, bus.Latitude)
