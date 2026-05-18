@@ -34,7 +34,7 @@ public class RegionEndpoints : ICarterModule
         CancellationToken cancellationToken)
     {
         var records = await repository.GetAllAsync(cancellationToken).ConfigureAwait(false);
-        var query = records.AsQueryable();
+        IEnumerable<Region> query = records;
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -45,10 +45,9 @@ public class RegionEndpoints : ICarterModule
         }
 
         var prop = TypeDescriptor.GetProperties(typeof(Region)).Find(sort ?? "CodeRegion", true);
-        if (prop is not null && order == "desc")
-            query = query.OrderByDescending(x => prop.GetValue(x));
-        else
-            query = query.OrderBy(x => prop?.GetValue(x));
+        query = prop is not null && order == "desc"
+            ? query.OrderByDescending(x => prop.GetValue(x))
+            : query.OrderBy(x => prop is null ? x.CodeRegion : prop.GetValue(x));
 
         var totalCount = query.Count();
         var data = query
