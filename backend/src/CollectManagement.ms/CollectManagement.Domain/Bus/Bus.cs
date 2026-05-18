@@ -29,6 +29,12 @@ public class Bus : AuditableEntity
 
     public double? Longitude { get; private set; }
 
+    public int CurrentOccupancy { get; private set; }
+
+    public DateTime? LastPositionAt { get; private set; }
+
+    public DateTime? LastOccupancyUpdateAt { get; private set; }
+
     public SocieteId SocieteId { get; private set; }
 
     public Societe? Societe { get; private set; }
@@ -45,6 +51,9 @@ public class Bus : AuditableEntity
         bool isActive,
         double? latitude,
         double? longitude,
+        int currentOccupancy,
+        DateTime? lastPositionAt,
+        DateTime? lastOccupancyUpdateAt,
         SocieteId societeId)
     {
         BusId = busId;
@@ -58,6 +67,9 @@ public class Bus : AuditableEntity
         IsActive = isActive;
         Latitude = latitude;
         Longitude = longitude;
+        CurrentOccupancy = currentOccupancy;
+        LastPositionAt = lastPositionAt;
+        LastOccupancyUpdateAt = lastOccupancyUpdateAt;
         SocieteId = societeId;
     }
 
@@ -87,6 +99,9 @@ public class Bus : AuditableEntity
             isActive,
             latitude,
             longitude,
+            0,
+            null,
+            null,
             societeId);
     }
 
@@ -114,6 +129,37 @@ public class Bus : AuditableEntity
         Longitude = longitude;
     }
 
+    public void UpdateRuntimeState(
+        string? imei,
+        double? latitude,
+        double? longitude,
+        int? occupancy,
+        DateTime eventDateUtc)
+    {
+        if (!string.IsNullOrWhiteSpace(imei))
+            IMEI = imei;
+
+        if (latitude is not null)
+            Latitude = latitude;
+
+        if (longitude is not null)
+            Longitude = longitude;
+
+        if (occupancy is not null)
+        {
+            CurrentOccupancy = Math.Max(0, occupancy.Value);
+            LastOccupancyUpdateAt = eventDateUtc;
+        }
+
+        LastPositionAt = eventDateUtc;
+    }
+
+    public void Empty(DateTime eventDateUtc)
+    {
+        CurrentOccupancy = 0;
+        LastOccupancyUpdateAt = eventDateUtc;
+    }
+
     public static Bus QueryCreate(
         BusId busId,
         string numeroIMM,
@@ -126,6 +172,9 @@ public class Bus : AuditableEntity
         bool isActive,
         double? latitude,
         double? longitude,
+        int currentOccupancy,
+        DateTime? lastPositionAt,
+        DateTime? lastOccupancyUpdateAt,
         SocieteId societeId)
     {
         return new Bus(
@@ -140,6 +189,9 @@ public class Bus : AuditableEntity
             isActive,
             latitude,
             longitude,
+            currentOccupancy,
+            lastPositionAt,
+            lastOccupancyUpdateAt,
             societeId);
     }
 

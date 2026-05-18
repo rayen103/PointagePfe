@@ -13,5 +13,8 @@ public class CreateBusResponse
     public bool IsActive { get; set; }
     public double? Latitude { get; set; }
     public double? Longitude { get; set; }
+    public int CurrentOccupancy { get; set; }
+    public DateTime? LastPositionAt { get; set; }
+    public DateTime? LastOccupancyUpdateAt { get; set; }
     public Ulid SocieteId { get; set; }
 }

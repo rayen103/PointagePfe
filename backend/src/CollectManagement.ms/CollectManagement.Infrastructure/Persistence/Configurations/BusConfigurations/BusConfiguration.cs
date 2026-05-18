@@ -44,6 +44,14 @@ public class BusConfiguration : IEntityTypeConfiguration<Bus>
 
         builder.Property(p => p.Longitude);
 
+        builder.Property(p => p.CurrentOccupancy)
+            .HasDefaultValue(0)
+            .IsRequired();
+
+        builder.Property(p => p.LastPositionAt);
+
+        builder.Property(p => p.LastOccupancyUpdateAt);
+
         builder.Property(p => p.SocieteId)
             .HasConversion(
                 c => c.Value.ToGuid(),

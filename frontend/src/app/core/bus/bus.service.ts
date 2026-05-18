@@ -1,6 +1,13 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable, of, tap } from 'rxjs';
-import { PagedBus, Bus } from './bus.model';
+import {
+    PagedBus,
+    Bus,
+    BusLivePositionSnapshot,
+    BusRuntimeEvent,
+    BusRuntimeState,
+    UpdateBusRuntimePositionPayload
+} from './bus.model';
 import { ApiService } from '../common/api.service';
 
 @Injectable({
@@ -124,5 +131,25 @@ export class BusService {
                 }),
                 map(r => r.success)
             );
+    }
+
+    UpdateRuntimePosition(payload: UpdateBusRuntimePositionPayload): Observable<BusRuntimeState> {
+        return this._apiservice.Post<BusRuntimeState>('bus/runtime/position', payload)
+            .pipe(map(r => r.data));
+    }
+
+    GetLivePositionsSnapshot(): Observable<BusLivePositionSnapshot> {
+        return this._apiservice.Get<BusLivePositionSnapshot>('bus/runtime/positions/stream')
+            .pipe(map(r => r.data));
+    }
+
+    EmptyBus(busId: string): Observable<BusRuntimeState> {
+        return this._apiservice.Post<BusRuntimeState>(`bus/${busId}/vider`, {})
+            .pipe(map(r => r.data));
+    }
+
+    GetBusRuntimeEvents(busId: string): Observable<BusRuntimeEvent[]> {
+        return this._apiservice.Get<BusRuntimeEvent[]>(`bus/${busId}/events`)
+            .pipe(map(r => r.data ?? []));
     }
 }
