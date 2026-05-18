@@ -11,158 +11,165 @@ namespace CollectManagement.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "CodeChauffeur",
-                table: "Bus",
-                type: "nvarchar(50)",
-                maxLength: 50,
-                nullable: true);
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Bus', 'CodeChauffeur') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Bus] ADD [CodeChauffeur] nvarchar(50) NULL;
+END;
+");
 
-            migrationBuilder.CreateTable(
-                name: "Chauffeur",
-                columns: table => new
-                {
-                    ChauffeurId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CodeChauffeur = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Nom = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Prenom = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    CIN = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    RFIDChauffeur = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Externe = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
-                    SocieteId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    InsererPar = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DateInsertion = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifierPar = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DateModification = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Chauffeur", x => x.ChauffeurId);
-                    table.ForeignKey(
-                        name: "FK_Chauffeur_Societe_SocieteId",
-                        column: x => x.SocieteId,
-                        principalTable: "Societe",
-                        principalColumn: "SocieteId",
-                        onDelete: ReferentialAction.Restrict);
-                });
+            migrationBuilder.Sql(@"
+IF OBJECT_ID(N'[dbo].[Chauffeur]', N'U') IS NULL
+BEGIN
+    CREATE TABLE [dbo].[Chauffeur] (
+        [ChauffeurId] uniqueidentifier NOT NULL,
+        [CodeChauffeur] nvarchar(50) NOT NULL,
+        [Nom] nvarchar(100) NOT NULL,
+        [Prenom] nvarchar(100) NULL,
+        [CIN] nvarchar(50) NULL,
+        [RFIDChauffeur] nvarchar(50) NULL,
+        [Externe] bit NOT NULL CONSTRAINT [DF_Chauffeur_Externe] DEFAULT CAST(0 AS bit),
+        [IsActive] bit NOT NULL CONSTRAINT [DF_Chauffeur_IsActive] DEFAULT CAST(1 AS bit),
+        [SocieteId] uniqueidentifier NOT NULL,
+        [InsererPar] nvarchar(max) NULL,
+        [DateInsertion] datetime2 NULL,
+        [ModifierPar] nvarchar(max) NULL,
+        [DateModification] datetime2 NULL,
+        CONSTRAINT [PK_Chauffeur] PRIMARY KEY ([ChauffeurId]),
+        CONSTRAINT [FK_Chauffeur_Societe_SocieteId] FOREIGN KEY ([SocieteId]) REFERENCES [dbo].[Societe] ([SocieteId]) ON DELETE NO ACTION
+    );
+END;
+");
 
-            migrationBuilder.CreateTable(
-                name: "Gouvernorat",
-                columns: table => new
-                {
-                    GouvernoratId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CodeGouvernorat = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    LibelleGouvernorat = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
-                    SocieteId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    InsererPar = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DateInsertion = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifierPar = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DateModification = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Gouvernorat", x => x.GouvernoratId);
-                    table.ForeignKey(
-                        name: "FK_Gouvernorat_Societe_SocieteId",
-                        column: x => x.SocieteId,
-                        principalTable: "Societe",
-                        principalColumn: "SocieteId",
-                        onDelete: ReferentialAction.Restrict);
-                });
+            migrationBuilder.Sql(@"
+IF OBJECT_ID(N'[dbo].[Gouvernorat]', N'U') IS NULL
+BEGIN
+    CREATE TABLE [dbo].[Gouvernorat] (
+        [GouvernoratId] uniqueidentifier NOT NULL,
+        [CodeGouvernorat] nvarchar(50) NOT NULL,
+        [LibelleGouvernorat] nvarchar(200) NULL,
+        [IsActive] bit NOT NULL CONSTRAINT [DF_Gouvernorat_IsActive] DEFAULT CAST(1 AS bit),
+        [SocieteId] uniqueidentifier NOT NULL,
+        [InsererPar] nvarchar(max) NULL,
+        [DateInsertion] datetime2 NULL,
+        [ModifierPar] nvarchar(max) NULL,
+        [DateModification] datetime2 NULL,
+        CONSTRAINT [PK_Gouvernorat] PRIMARY KEY ([GouvernoratId]),
+        CONSTRAINT [FK_Gouvernorat_Societe_SocieteId] FOREIGN KEY ([SocieteId]) REFERENCES [dbo].[Societe] ([SocieteId]) ON DELETE NO ACTION
+    );
+END;
+");
 
-            migrationBuilder.CreateTable(
-                name: "Modem",
-                columns: table => new
-                {
-                    ModemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IMEI = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    ModelModem = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    NumeroSim = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
-                    SocieteId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    InsererPar = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DateInsertion = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifierPar = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DateModification = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Modem", x => x.ModemId);
-                    table.ForeignKey(
-                        name: "FK_Modem_Societe_SocieteId",
-                        column: x => x.SocieteId,
-                        principalTable: "Societe",
-                        principalColumn: "SocieteId",
-                        onDelete: ReferentialAction.Restrict);
-                });
+            migrationBuilder.Sql(@"
+IF OBJECT_ID(N'[dbo].[Modem]', N'U') IS NULL
+BEGIN
+    CREATE TABLE [dbo].[Modem] (
+        [ModemId] uniqueidentifier NOT NULL,
+        [IMEI] nvarchar(50) NOT NULL,
+        [ModelModem] nvarchar(100) NULL,
+        [NumeroSim] nvarchar(50) NULL,
+        [IsActive] bit NOT NULL CONSTRAINT [DF_Modem_IsActive] DEFAULT CAST(1 AS bit),
+        [SocieteId] uniqueidentifier NOT NULL,
+        [InsererPar] nvarchar(max) NULL,
+        [DateInsertion] datetime2 NULL,
+        [ModifierPar] nvarchar(max) NULL,
+        [DateModification] datetime2 NULL,
+        CONSTRAINT [PK_Modem] PRIMARY KEY ([ModemId]),
+        CONSTRAINT [FK_Modem_Societe_SocieteId] FOREIGN KEY ([SocieteId]) REFERENCES [dbo].[Societe] ([SocieteId]) ON DELETE NO ACTION
+    );
+END;
+");
 
-            migrationBuilder.CreateTable(
-                name: "Region",
-                columns: table => new
-                {
-                    RegionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CodeRegion = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    LibelleRegion = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    CodeGouvernorat = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
-                    SocieteId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    InsererPar = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DateInsertion = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ModifierPar = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DateModification = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Region", x => x.RegionId);
-                    table.ForeignKey(
-                        name: "FK_Region_Societe_SocieteId",
-                        column: x => x.SocieteId,
-                        principalTable: "Societe",
-                        principalColumn: "SocieteId",
-                        onDelete: ReferentialAction.Restrict);
-                });
+            migrationBuilder.Sql(@"
+IF OBJECT_ID(N'[dbo].[Region]', N'U') IS NULL
+BEGIN
+    CREATE TABLE [dbo].[Region] (
+        [RegionId] uniqueidentifier NOT NULL,
+        [CodeRegion] nvarchar(50) NOT NULL,
+        [LibelleRegion] nvarchar(200) NULL,
+        [CodeGouvernorat] nvarchar(50) NULL,
+        [IsActive] bit NOT NULL CONSTRAINT [DF_Region_IsActive] DEFAULT CAST(1 AS bit),
+        [SocieteId] uniqueidentifier NOT NULL,
+        [InsererPar] nvarchar(max) NULL,
+        [DateInsertion] datetime2 NULL,
+        [ModifierPar] nvarchar(max) NULL,
+        [DateModification] datetime2 NULL,
+        CONSTRAINT [PK_Region] PRIMARY KEY ([RegionId]),
+        CONSTRAINT [FK_Region_Societe_SocieteId] FOREIGN KEY ([SocieteId]) REFERENCES [dbo].[Societe] ([SocieteId]) ON DELETE NO ACTION
+    );
+END;
+");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Chauffeur_SocieteId",
-                table: "Chauffeur",
-                column: "SocieteId");
+            migrationBuilder.Sql(@"
+IF OBJECT_ID(N'[dbo].[Chauffeur]', N'U') IS NOT NULL
+   AND NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_Chauffeur_SocieteId' AND object_id = OBJECT_ID(N'[dbo].[Chauffeur]'))
+BEGIN
+    CREATE INDEX [IX_Chauffeur_SocieteId] ON [dbo].[Chauffeur]([SocieteId]);
+END;
+");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Gouvernorat_SocieteId",
-                table: "Gouvernorat",
-                column: "SocieteId");
+            migrationBuilder.Sql(@"
+IF OBJECT_ID(N'[dbo].[Gouvernorat]', N'U') IS NOT NULL
+   AND NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_Gouvernorat_SocieteId' AND object_id = OBJECT_ID(N'[dbo].[Gouvernorat]'))
+BEGIN
+    CREATE INDEX [IX_Gouvernorat_SocieteId] ON [dbo].[Gouvernorat]([SocieteId]);
+END;
+");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Modem_SocieteId",
-                table: "Modem",
-                column: "SocieteId");
+            migrationBuilder.Sql(@"
+IF OBJECT_ID(N'[dbo].[Modem]', N'U') IS NOT NULL
+   AND NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_Modem_SocieteId' AND object_id = OBJECT_ID(N'[dbo].[Modem]'))
+BEGIN
+    CREATE INDEX [IX_Modem_SocieteId] ON [dbo].[Modem]([SocieteId]);
+END;
+");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Region_SocieteId",
-                table: "Region",
-                column: "SocieteId");
+            migrationBuilder.Sql(@"
+IF OBJECT_ID(N'[dbo].[Region]', N'U') IS NOT NULL
+   AND NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_Region_SocieteId' AND object_id = OBJECT_ID(N'[dbo].[Region]'))
+BEGIN
+    CREATE INDEX [IX_Region_SocieteId] ON [dbo].[Region]([SocieteId]);
+END;
+");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Chauffeur");
+            migrationBuilder.Sql(@"
+IF OBJECT_ID(N'[dbo].[Chauffeur]', N'U') IS NOT NULL
+BEGIN
+    DROP TABLE [dbo].[Chauffeur];
+END;
+");
 
-            migrationBuilder.DropTable(
-                name: "Gouvernorat");
+            migrationBuilder.Sql(@"
+IF OBJECT_ID(N'[dbo].[Gouvernorat]', N'U') IS NOT NULL
+BEGIN
+    DROP TABLE [dbo].[Gouvernorat];
+END;
+");
 
-            migrationBuilder.DropTable(
-                name: "Modem");
+            migrationBuilder.Sql(@"
+IF OBJECT_ID(N'[dbo].[Modem]', N'U') IS NOT NULL
+BEGIN
+    DROP TABLE [dbo].[Modem];
+END;
+");
 
-            migrationBuilder.DropTable(
-                name: "Region");
+            migrationBuilder.Sql(@"
+IF OBJECT_ID(N'[dbo].[Region]', N'U') IS NOT NULL
+BEGIN
+    DROP TABLE [dbo].[Region];
+END;
+");
 
-            migrationBuilder.DropColumn(
-                name: "CodeChauffeur",
-                table: "Bus");
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Bus', 'CodeChauffeur') IS NOT NULL
+BEGIN
+    ALTER TABLE [dbo].[Bus] DROP COLUMN [CodeChauffeur];
+END;
+");
         }
     }
 }
