@@ -17,7 +17,7 @@ public class ChantierEndpoints : ICarterModule
     {
         var group = app.MapGroup("cm/chantier").RequireAuthorization();
 
-        group.MapGet("list", ChantierList);
+        group.MapGet("list", ChantierList).AllowAnonymous();
         group.MapPost("add", CreateChantier);
         group.MapPatch("update", UpdateChantier);
         group.MapPost("{id}/delete", DeleteChantier);
