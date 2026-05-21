@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using CollectManagement.Application.Interfaces.Repositories.Utilisateurs;
+using CollectManagement.Domain.Societes.ValueObjects;
 using CollectManagement.Domain.Utilisateurs;
 using CollectManagement.Domain.Utilisateurs.Enums;
 using CollectManagement.Domain.Utilisateurs.ValueObjects;
@@ -63,10 +64,12 @@ public class UtilisateurRepository : RepositoryBase<Utilisateur>, IUtilisateurRe
 
     public Task<Utilisateur?> TryToLogin(
         string login, 
+        Ulid societeId,
         CancellationToken cancellationToken)
     {
         return _dbSet.Where(u=>
                 (u.Email==login || u.NomUtilisateur == login) &&
+                u.SocieteId == new SocieteId(societeId) &&
                 u.IsActive
             )
             .Include(i=>i.RoleUtilisateur)

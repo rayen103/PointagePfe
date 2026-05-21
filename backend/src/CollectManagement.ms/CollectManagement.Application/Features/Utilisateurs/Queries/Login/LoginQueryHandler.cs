@@ -1,9 +1,12 @@
 ﻿using CollectManagement.Application.Common;
 using CollectManagement.Application.Contracts.Authentication;
 using CollectManagement.Application.Exceptions;
+using CollectManagement.Application.Interfaces.Repositories.Chantiers;
 using CollectManagement.Application.Interfaces.Authentification;
 using CollectManagement.Application.Interfaces.Repositories.Utilisateurs;
 using CollectManagement.Application.Interfaces.Services;
+using CollectManagement.Domain.Societes.ValueObjects;
+using CollectManagement.Domain.Utilisateurs.ValueObjects;
 
 namespace CollectManagement.Application.Features.Utilisateurs.Queries.Login;
 
@@ -11,12 +14,18 @@ public sealed class LoginQueryHandler
     : IRequestHandler<LoginQuery, AuthenticationResponse>
 {
     private readonly IUtilisateurRepository _utilisateurRepository;
+    private readonly IChantierRepository _chantierRepository;
     private readonly IPasswordService _passwordService;
     private readonly IJwtTokenGenerator _tokenGenerator;
 
-    public LoginQueryHandler(IUtilisateurRepository utilisateurRepository, IPasswordService passwordService, IJwtTokenGenerator tokenGenerator)
+    public LoginQueryHandler(
+        IUtilisateurRepository utilisateurRepository,
+        IChantierRepository chantierRepository,
+        IPasswordService passwordService,
+        IJwtTokenGenerator tokenGenerator)
     {
         _utilisateurRepository = utilisateurRepository;
+        _chantierRepository = chantierRepository;
         _passwordService = passwordService;
         _tokenGenerator = tokenGenerator;
     }
@@ -27,12 +36,26 @@ public sealed class LoginQueryHandler
 
         var utilisateur = await _utilisateurRepository.TryToLogin(
             request.Login,
+            request.SocieteId,
+            cancellationToken).ConfigureAwait(false);
+
+        var hasActiveSite = await _chantierRepository.ExistsActiveByNumeroAndSocieteAsync(
+            request.NumeroChantier,
+            new SocieteId(request.SocieteId),
             cancellationToken).ConfigureAwait(false);
         
-        if(utilisateur is null || _passwordService.VerifyHashedPassword(
-               utilisateur.UtilisateurId,
-               utilisateur.Password,
-               request.Password) == PasswordVerificationResult.Failure)
+        var utilisateurIdForVerification = utilisateur?.UtilisateurId
+                                        ?? new UtilisateurId(Ulid.Parse("00000000000000000000000000"));
+        var hashedPasswordForVerification = utilisateur?.Password
+                                            ?? new string('0', 128);
+        var passwordVerificationResult = _passwordService.VerifyHashedPassword(
+            utilisateurIdForVerification,
+            hashedPasswordForVerification,
+            request.Password);
+
+        if (utilisateur is null
+            || passwordVerificationResult == PasswordVerificationResult.Failure
+            || !hasActiveSite)
             throw new BadCredentialException("Invalid User");
 
         var token = _tokenGenerator.GenerateToken(utilisateur);

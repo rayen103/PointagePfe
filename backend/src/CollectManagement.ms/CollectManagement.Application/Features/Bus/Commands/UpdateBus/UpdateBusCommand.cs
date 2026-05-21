@@ -7,6 +7,7 @@ public record UpdateBusCommand(
     string? IMEI,
     int? Capacite,
     string? CodeCircuit,
+    string? CodeChauffeur,
     bool AppSagem,
     bool IsActive,
     double? Latitude,

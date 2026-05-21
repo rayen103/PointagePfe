@@ -18,7 +18,7 @@ public class SocieteEndpoints :ICarterModule
     {
         var routeGroupBuilder = app.MapGroup("cm/societe").RequireAuthorization();
         
-        routeGroupBuilder.MapGet("list",SocieteList);
+        routeGroupBuilder.MapGet("list",SocieteList).AllowAnonymous();
         routeGroupBuilder.MapPost("add",CreateSociete);
         routeGroupBuilder.MapPatch("update", UpdateSociete);
         routeGroupBuilder.MapPost("{id}/delete", DeleteSociete);

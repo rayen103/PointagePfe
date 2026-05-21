@@ -13,6 +13,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
 import { FuseAlertComponent, FuseAlertType } from '@fuse/components/alert';
@@ -20,6 +21,10 @@ import { AuthService } from 'app/core/auth/auth.service';
 import { ApiResponse } from '../../../core/common/api-response';
 import { User } from '../../../core/user/user.types';
 import { HttpErrorResponse } from '@angular/common/http';
+import { SocieteService } from '../../../core/Societe/societe.service';
+import { Societe } from '../../../core/Societe/societe.model';
+import { ChantierService } from '../../../core/chantier/chantier.service';
+import { Chantier } from '../../../core/chantier/chantier.model';
 
 @Component({
     selector: 'auth-sign-in',
@@ -38,6 +43,7 @@ import { HttpErrorResponse } from '@angular/common/http';
         MatIconModule,
         MatCheckboxModule,
         MatProgressSpinnerModule,
+        MatSelectModule,
     ],
 })
 export class AuthSignInComponent implements OnInit {
@@ -49,6 +55,9 @@ export class AuthSignInComponent implements OnInit {
     isLocked: boolean = false;
     remainingTime: number = 30; // 30 secondes
     private lockTimer: any;
+    societes: Societe[] = [];
+    chantiers: Chantier[] = [];
+    filteredChantiers: Chantier[] = [];
 
     alert: { type: FuseAlertType; message: string } = {
         type: 'success',
@@ -64,7 +73,9 @@ export class AuthSignInComponent implements OnInit {
         private _activatedRoute: ActivatedRoute,
         private _authService: AuthService,
         private _formBuilder: UntypedFormBuilder,
-        private _router: Router
+        private _router: Router,
+        private _societeService: SocieteService,
+        private _chantierService: ChantierService
     ) {}
 
     // -----------------------------------------------------------------------------------------------------
@@ -82,7 +93,22 @@ export class AuthSignInComponent implements OnInit {
                 [Validators.required],
             ],
             password: ['', Validators.required],
+            societeId: ['', Validators.required],
+            numeroChantier: ['', Validators.required],
             rememberMe: [''],
+        });
+
+        this._societeService.GetSociete().subscribe((response) => {
+            this.societes = response?.societes ?? [];
+        });
+
+        this._chantierService.GetChantiers().subscribe((response) => {
+            this.chantiers = response?.chantiers ?? [];
+        });
+
+        this.signInForm.get('societeId')?.valueChanges.subscribe((societeId: string) => {
+            this.filteredChantiers = this.chantiers.filter((chantier) => chantier.societeId === societeId);
+            this.signInForm.patchValue({ numeroChantier: '' }, { emitEvent: false });
         });
     }
 

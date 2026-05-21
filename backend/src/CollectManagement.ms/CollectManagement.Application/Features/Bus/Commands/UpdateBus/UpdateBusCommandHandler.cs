@@ -31,6 +31,7 @@ public class UpdateBusCommandHandler
             request.IMEI,
             request.Capacite,
             request.CodeCircuit,
+            request.CodeChauffeur,
             request.AppSagem,
             request.IsActive,
             request.Latitude,

@@ -55,10 +55,14 @@ public class BusRepository : RepositoryBase<Bus>, IBusRepository
                 c.IMEI,
                 c.Capacite,
                 c.CodeCircuit,
+                c.CodeChauffeur,
                 c.AppSagem,
                 c.IsActive,
                 c.Latitude,
                 c.Longitude,
+                c.CurrentOccupancy,
+                c.LastPositionAt,
+                c.LastOccupancyUpdateAt,
                 c.SocieteId
             ))
             .ToListAsync(cancellationToken: cancellationToken)
@@ -80,10 +84,14 @@ public class BusRepository : RepositoryBase<Bus>, IBusRepository
                 c.IMEI,
                 c.Capacite,
                 c.CodeCircuit,
+                c.CodeChauffeur,
                 c.AppSagem,
                 c.IsActive,
                 c.Latitude,
                 c.Longitude,
+                c.CurrentOccupancy,
+                c.LastPositionAt,
+                c.LastOccupancyUpdateAt,
                 c.SocieteId
             ))
             .FirstOrDefaultAsync(cancellationToken)
@@ -102,10 +110,14 @@ public class BusRepository : RepositoryBase<Bus>, IBusRepository
                     .SetProperty(p => p.IMEI, bus.IMEI)
                     .SetProperty(p => p.Capacite, bus.Capacite)
                     .SetProperty(p => p.CodeCircuit, bus.CodeCircuit)
+                    .SetProperty(p => p.CodeChauffeur, bus.CodeChauffeur)
                     .SetProperty(p => p.AppSagem, bus.AppSagem)
                     .SetProperty(p => p.IsActive, bus.IsActive)
                     .SetProperty(p => p.Latitude, bus.Latitude)
-                    .SetProperty(p => p.Longitude, bus.Longitude),
+                    .SetProperty(p => p.Longitude, bus.Longitude)
+                    .SetProperty(p => p.CurrentOccupancy, bus.CurrentOccupancy)
+                    .SetProperty(p => p.LastPositionAt, bus.LastPositionAt)
+                    .SetProperty(p => p.LastOccupancyUpdateAt, bus.LastOccupancyUpdateAt),
                 cancellationToken)
             .ConfigureAwait(false);
     }

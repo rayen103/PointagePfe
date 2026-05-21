@@ -160,7 +160,13 @@
                                     @if(utilisateur.utilisateurId==='new'){
                                         <mat-form-field class="w-1/4 fuse-mat-dense">
                                             <mat-label>{{ t('Password') }}</mat-label>
-                                            <input matInput [formControlName]="'password'">
+                                            <input matInput type="password" [formControlName]="'password'">
+                                            @if (selectedUtilisateurForm.get('password')?.hasError('required')) {
+                                                <mat-error>Password is required</mat-error>
+                                            }
+                                            @if (selectedUtilisateurForm.get('password')?.hasError('pattern')) {
+                                                <mat-error>Password must contain uppercase, lowercase, number and special character (8+ chars)</mat-error>
+                                            }
                                         </mat-form-field>
                                     } @else {
                                         @if (isChangingPassword===false){
@@ -177,7 +183,10 @@
                                             </button>
                                             <mat-form-field class="w-1/4 fuse-mat-dense">
                                                 <mat-label> {{ t('New-Password') }}  </mat-label>
-                                                <input matInput [formControlName]="'password'">
+                                                <input matInput type="password" [formControlName]="'password'">
+                                                @if (selectedUtilisateurForm.get('password')?.hasError('pattern')) {
+                                                    <mat-error>Password must contain uppercase, lowercase, number and special character (8+ chars)</mat-error>
+                                                }
                                             </mat-form-field>
                                         }
                                     }
@@ -264,4 +273,3 @@
     </div>
 
 </div>
-

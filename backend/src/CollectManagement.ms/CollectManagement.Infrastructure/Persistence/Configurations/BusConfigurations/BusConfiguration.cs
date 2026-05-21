@@ -29,6 +29,9 @@ public class BusConfiguration : IEntityTypeConfiguration<Bus>
         builder.Property(p => p.CodeCircuit)
             .HasMaxLength(50);
 
+        builder.Property(p => p.CodeChauffeur)
+            .HasMaxLength(50);
+
         builder.Property(p => p.AppSagem)
             .HasDefaultValue(false)
             .IsRequired();
@@ -40,6 +43,14 @@ public class BusConfiguration : IEntityTypeConfiguration<Bus>
         builder.Property(p => p.Latitude);
 
         builder.Property(p => p.Longitude);
+
+        builder.Property(p => p.CurrentOccupancy)
+            .HasDefaultValue(0)
+            .IsRequired();
+
+        builder.Property(p => p.LastPositionAt);
+
+        builder.Property(p => p.LastOccupancyUpdateAt);
 
         builder.Property(p => p.SocieteId)
             .HasConversion(

@@ -15,7 +15,7 @@ public interface IUtilisateurRepository : IRepositoryBase<Utilisateur>
         int size,
         CancellationToken cancellationToken);
     
-    Task<Utilisateur?> TryToLogin(string login, CancellationToken cancellationToken);
+    Task<Utilisateur?> TryToLogin(string login, Ulid societeId, CancellationToken cancellationToken);
 
     Task<Utilisateur?> GetOneAsync(
         UtilisateurId utilisateurId,

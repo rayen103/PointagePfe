@@ -35,6 +35,8 @@ public class CreateUtilisateurCommandValidator
         RuleFor(r => r.Password)
             .NotEmpty()
             .NotNull()
-            .WithMessage("Passwoed is required.");
+            .WithMessage("Password is required.")
+            .Matches(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$")
+            .WithMessage("Password must contain at least 8 characters, with uppercase, lowercase, number and special character.");
     }
 }

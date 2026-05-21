@@ -16,5 +16,14 @@ public class LoginQueryValidator
             .NotEmpty()
             .NotNull()
             .WithMessage("Password is required.");
+
+        RuleFor(r => r.SocieteId)
+            .NotEmpty()
+            .WithMessage("Company is required.");
+
+        RuleFor(r => r.NumeroChantier)
+            .NotEmpty()
+            .NotNull()
+            .WithMessage("Site is required.");
     }
 }

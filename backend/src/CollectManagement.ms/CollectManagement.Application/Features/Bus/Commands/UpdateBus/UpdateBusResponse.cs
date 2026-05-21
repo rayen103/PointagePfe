@@ -8,6 +8,7 @@ public class UpdateBusResponse
     public string? IMEI { get; set; }
     public int? Capacite { get; set; }
     public string? CodeCircuit { get; set; }
+    public string? CodeChauffeur { get; set; }
     public bool AppSagem { get; set; }
     public bool IsActive { get; set; }
     public double? Latitude { get; set; }

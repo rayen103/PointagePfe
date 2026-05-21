@@ -36,6 +36,37 @@
             <form class="mt-8" [formGroup]="signInForm" #signInNgForm="ngForm" >
                 <!-- Email field -->
                 <mat-form-field class="w-full">
+                    <mat-label>Company</mat-label>
+                    <mat-select [formControlName]="'societeId'">
+                        @for (societe of societes; track societe.societeId) {
+                            <mat-option [value]="societe.societeId">
+                                {{ societe.nom }}
+                            </mat-option>
+                        }
+                    </mat-select>
+                    @if (signInForm.get('societeId')?.hasError('required')) {
+                        <mat-error> Company is required </mat-error>
+                    }
+                </mat-form-field>
+
+                <mat-form-field class="w-full">
+                    <mat-label>Site</mat-label>
+                    <mat-select [formControlName]="'numeroChantier'">
+                        @for (chantier of filteredChantiers; track chantier.chantierId) {
+                            <mat-option [value]="chantier.numeroChantier">
+                                {{ chantier.numeroChantier }}
+                                @if (chantier.libelleChantier) {
+                                    - {{ chantier.libelleChantier }}
+                                }
+                            </mat-option>
+                        }
+                    </mat-select>
+                    @if (signInForm.get('numeroChantier')?.hasError('required')) {
+                        <mat-error> Site is required </mat-error>
+                    }
+                </mat-form-field>
+
+                <mat-form-field class="w-full">
                     <mat-label>Email address</mat-label>
                     <input id="email" matInput [formControlName]="'login'" />
                     @if (signInForm.get('login').hasError('required')) {
