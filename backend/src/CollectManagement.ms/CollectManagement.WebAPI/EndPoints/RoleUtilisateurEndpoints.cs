@@ -10,6 +10,7 @@ using CollectManagement.Application.Features.RolesUtilisateur.Queries.GetOneRole
 using CollectManagement.Domain.Utilisateurs.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using CollectManagement.WebAPI.Authorization;
 
 namespace CollectManagement.WebAPI.EndPoints;
 
@@ -17,7 +18,7 @@ public class RoleUtilisateurEndpoints :ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var routeGroupBuilder = app.MapGroup("cm/role-utilisateur").RequireAuthorization();
+        var routeGroupBuilder = app.MapGroup("cm/role-utilisateur").RequireNavigationPermission("fichier.role-utilisateur");
 
         routeGroupBuilder.MapGet("list", RoleList);
         routeGroupBuilder.MapGet("all", AllRole);

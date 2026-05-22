@@ -8,6 +8,7 @@ using CollectManagement.Application.Features.Chantiers.Queries.GetOneChantier;
 using CollectManagement.Application.Features.Chantiers.Queries.GetPagedListChantier;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using CollectManagement.WebAPI.Authorization;
 
 namespace CollectManagement.WebAPI.EndPoints;
 
@@ -15,7 +16,7 @@ public class ChantierEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("cm/chantier").RequireAuthorization();
+        var group = app.MapGroup("cm/chantier").RequireNavigationPermission("fichier.chantier");
 
         group.MapGet("list", ChantierList).AllowAnonymous();
         group.MapPost("add", CreateChantier);

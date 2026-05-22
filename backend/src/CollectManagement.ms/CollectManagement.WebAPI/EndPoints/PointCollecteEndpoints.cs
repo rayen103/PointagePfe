@@ -8,6 +8,7 @@ using CollectManagement.Application.Features.PointsCollecte.Queries.GetOnePointC
 using CollectManagement.Application.Features.PointsCollecte.Queries.GetPagedListPointCollecte;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using CollectManagement.WebAPI.Authorization;
 
 namespace CollectManagement.WebAPI.EndPoints;
 
@@ -15,7 +16,7 @@ public class PointCollecteEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var routeGroupBuilder = app.MapGroup("cm/pointcollecte").RequireAuthorization();
+        var routeGroupBuilder = app.MapGroup("cm/pointcollecte").RequireNavigationPermission("fichier.pointcollecte");
 
         routeGroupBuilder.MapGet("list", PointCollecteList);
         routeGroupBuilder.MapPost("add", CreatePointCollecte);

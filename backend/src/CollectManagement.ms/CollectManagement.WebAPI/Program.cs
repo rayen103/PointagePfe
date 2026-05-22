@@ -2,6 +2,8 @@ using Carter;
 using CollectManagement.Application;
 using CollectManagement.Infrastructure;
 using CollectManagement.Infrastructure.Persistence.Context;
+using CollectManagement.WebAPI.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using CollectManagement.WebAPI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
@@ -19,6 +21,12 @@ builder.Services
     .AddPresentation();
 
 builder.Services.AddCors();
+builder.Services.AddSingleton<IAuthorizationHandler, NavigationPermissionHandler>();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(NavigationPermissionRequirement.PolicyName, policyBuilder =>
+        policyBuilder.RequireAuthenticatedUser().AddRequirements(new NavigationPermissionRequirement()));
+});
 
 builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));

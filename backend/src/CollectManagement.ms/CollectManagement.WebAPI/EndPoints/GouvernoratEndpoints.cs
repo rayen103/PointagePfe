@@ -8,6 +8,7 @@ using CollectManagement.Domain.Gouvernorats;
 using CollectManagement.Domain.Gouvernorats.ValueObjects;
 using CollectManagement.Domain.Societes.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
+using CollectManagement.WebAPI.Authorization;
 
 namespace CollectManagement.WebAPI.EndPoints;
 
@@ -15,7 +16,7 @@ public class GouvernoratEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var routeGroupBuilder = app.MapGroup("cm/gouvernorat").RequireAuthorization();
+        var routeGroupBuilder = app.MapGroup("cm/gouvernorat").RequireNavigationPermission("fichier.gouvernorat");
 
         routeGroupBuilder.MapGet("list", List);
         routeGroupBuilder.MapPost("add", Create);

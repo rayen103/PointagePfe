@@ -7,6 +7,7 @@ using CollectManagement.Application.Features.CircuitsPointsCollecte.Commands.Upd
 using CollectManagement.Application.Features.CircuitsPointsCollecte.Queries.GetByCircuit;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using CollectManagement.WebAPI.Authorization;
 
 namespace CollectManagement.WebAPI.EndPoints;
 
@@ -14,7 +15,7 @@ public class CircuitPointCollecteEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var routeGroupBuilder = app.MapGroup("cm/circuit-point-collecte").RequireAuthorization();
+        var routeGroupBuilder = app.MapGroup("cm/circuit-point-collecte").RequireNavigationPermission("fichier.circuit");
 
         routeGroupBuilder.MapGet("{circuitId}/list", GetByCircuit);
         routeGroupBuilder.MapPost("add", CreateCircuitPointCollecte);

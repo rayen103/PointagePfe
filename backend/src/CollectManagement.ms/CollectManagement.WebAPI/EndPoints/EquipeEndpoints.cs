@@ -8,6 +8,7 @@ using CollectManagement.Application.Features.Equipes.Queries.GetOneEquipe;
 using CollectManagement.Application.Features.Equipes.Queries.GetPagedListEquipe;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using CollectManagement.WebAPI.Authorization;
 
 namespace CollectManagement.WebAPI.EndPoints;
 
@@ -15,7 +16,7 @@ public class EquipeEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var routeGroupBuilder = app.MapGroup("cm/equipe").RequireAuthorization();
+        var routeGroupBuilder = app.MapGroup("cm/equipe").RequireNavigationPermission("fichier.equipe");
 
         routeGroupBuilder.MapGet("list", EquipeList);
         routeGroupBuilder.MapPost("add", CreateEquipe);

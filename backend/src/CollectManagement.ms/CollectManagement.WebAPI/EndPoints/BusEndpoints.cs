@@ -19,6 +19,7 @@ using CollectManagement.Domain.PointsCollecte;
 using CollectManagement.Domain.PointsCollecte.ValueObjects;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using CollectManagement.WebAPI.Authorization;
 
 namespace CollectManagement.WebAPI.EndPoints;
 
@@ -29,7 +30,7 @@ public class BusEndpoints : ICarterModule
 
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var routeGroupBuilder = app.MapGroup("cm/bus").RequireAuthorization();
+        var routeGroupBuilder = app.MapGroup("cm/bus").RequireNavigationPermission("fichier.bus");
 
         routeGroupBuilder.MapGet("list", BusList);
         routeGroupBuilder.MapPost("add", CreateBus);

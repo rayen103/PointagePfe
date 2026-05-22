@@ -56,5 +56,7 @@ public class SocieteConfiguration :IEntityTypeConfiguration<Societe>
         
         builder.Property(p => p.CodeSociete)
             .HasMaxLength(50);
+        
+        builder.HasData(SocieteSeed.Data);
     }
 }

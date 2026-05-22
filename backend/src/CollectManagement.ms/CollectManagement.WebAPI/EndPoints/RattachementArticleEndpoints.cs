@@ -8,6 +8,7 @@ using CollectManagement.Application.Features.RattachementArticles.Queries.GetOne
 using CollectManagement.Application.Features.RattachementArticles.Queries.GetPagedListRattachementArticle;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using CollectManagement.WebAPI.Authorization;
 
 namespace CollectManagement.WebAPI.EndPoints;
 
@@ -15,7 +16,7 @@ public class RattachementArticleEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var routeGroupBuilder = app.MapGroup("cm/rattachement-article").RequireAuthorization();
+        var routeGroupBuilder = app.MapGroup("cm/rattachement-article").RequireNavigationPermission("fichier.rattachement");
 
         routeGroupBuilder.MapGet("list", RattachementArticleList);
         routeGroupBuilder.MapPost("add", CreateRattachementArticle);
