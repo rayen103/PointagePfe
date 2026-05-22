@@ -6,6 +6,9 @@ public record GetOneSocieteResponse(
     string? LogoData,
     string? LogoExtension,
     string Nom,
+    string? Initiales,
+    string? Tva,
+    string? Rc,
     string? MatriculeFiscal,
     string? Rne,
     decimal? Capital,
@@ -16,4 +19,7 @@ public record GetOneSocieteResponse(
     string? Fax2,
     string? Email,
     string? Adresse,
+    string? CodePostal,
+    string? Ville,
+    string? Pays,
     string? CodeSociete);

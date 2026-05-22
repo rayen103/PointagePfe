@@ -23,14 +23,19 @@ public class SocieteRepository : RepositoryBase<Societe>, ISocieteRepository
         var where = _dbSet.Where(w=>
             string.IsNullOrWhiteSpace(search) ||
             w.Nom.Contains(search) ||
-            w.Email.Contains(search) ||
-            w.Fax1.Contains(search) ||
-            w.Fax2.Contains(search) ||
-            w.Adresse.Contains(search) ||
-            w.MatriculeFiscal.Contains(search) ||
-            w.Adresse.Contains(search) ||
-            w.Telephone2.Contains(search) ||
-            w.Telephone1.Contains(search)
+            (w.Email != null && w.Email.Contains(search)) ||
+            (w.Fax1 != null && w.Fax1.Contains(search)) ||
+            (w.Fax2 != null && w.Fax2.Contains(search)) ||
+            (w.Adresse != null && w.Adresse.Contains(search)) ||
+            (w.MatriculeFiscal != null && w.MatriculeFiscal.Contains(search)) ||
+            (w.Tva != null && w.Tva.Contains(search)) ||
+            (w.Rc != null && w.Rc.Contains(search)) ||
+            (w.Initiales != null && w.Initiales.Contains(search)) ||
+            (w.Ville != null && w.Ville.Contains(search)) ||
+            (w.Pays != null && w.Pays.Contains(search)) ||
+            (w.CodePostal != null && w.CodePostal.Contains(search)) ||
+            (w.Telephone2 != null && w.Telephone2.Contains(search)) ||
+            (w.Telephone1 != null && w.Telephone1.Contains(search))
         );
         
         var orderBy = where
@@ -59,6 +64,9 @@ public class SocieteRepository : RepositoryBase<Societe>, ISocieteRepository
                 c.SocieteId,
                 c.LogoPath,
                 c.Nom,
+                c.Initiales,
+                c.Tva,
+                c.Rc,
                 c.MatriculeFiscal,
                 c.Rne,
                 c.Capital,
@@ -69,6 +77,9 @@ public class SocieteRepository : RepositoryBase<Societe>, ISocieteRepository
                 c.Fax2,
                 c.Email,
                 c.Adresse,
+                c.CodePostal,
+                c.Ville,
+                c.Pays,
                 c.CodeSociete
             ))
             .ToListAsync(cancellationToken: cancellationToken)
@@ -91,6 +102,9 @@ public class SocieteRepository : RepositoryBase<Societe>, ISocieteRepository
                 calls => calls
                     .SetProperty(p=>p.Nom,societe.Nom)
                     .SetProperty(p=>p.LogoPath,societe.LogoPath)
+                    .SetProperty(p=>p.Initiales,societe.Initiales)
+                    .SetProperty(p=>p.Tva,societe.Tva)
+                    .SetProperty(p=>p.Rc,societe.Rc)
                     .SetProperty(p=>p.MatriculeFiscal,societe.MatriculeFiscal)
                     .SetProperty(p=>p.Rne,societe.Rne)
                     .SetProperty(p=>p.Capital,societe.Capital)
@@ -101,6 +115,9 @@ public class SocieteRepository : RepositoryBase<Societe>, ISocieteRepository
                     .SetProperty(p=>p.Fax2,societe.Fax2)
                     .SetProperty(p=>p.Email,societe.Email)
                     .SetProperty(p=>p.Adresse,societe.Adresse)
+                    .SetProperty(p=>p.CodePostal,societe.CodePostal)
+                    .SetProperty(p=>p.Ville,societe.Ville)
+                    .SetProperty(p=>p.Pays,societe.Pays)
                     .SetProperty(p=>p.CodeSociete,societe.CodeSociete)
                    
                 , cancellationToken)

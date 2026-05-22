@@ -24,9 +24,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { fuseAnimations } from '../../../../../@fuse/animations';
 import { MatPaginator } from '@angular/material/paginator';
-import { Societe } from '../../../../core/Societe/societe.model';
+import { Reseau, Site, Societe } from '../../../../core/Societe/societe.model';
 import { catchError, map, Observable, of, ReplaySubject, Subject, takeUntil } from 'rxjs';
 import { SocieteService } from '../../../../core/Societe/societe.service';
 import { FuseConfirmationService } from '../../../../../@fuse/services/confirmation';
@@ -56,6 +58,8 @@ import { SecurefilePipe } from '../../../../core/pipes/securefile.pipe';
         TranslocoModule,
         RouterLink,
         SecurefilePipe,
+        MatTabsModule,
+        MatCheckboxModule,
     ],
   templateUrl: './details.component.html',
   styleUrl: './details.component.scss',
@@ -77,6 +81,12 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit{
     societeId: string;
     showEmailError = false;
     logoSrc: string | ArrayBuffer | null = null;
+    siteForm: UntypedFormGroup;
+    reseauForm: UntypedFormGroup;
+    sites: Site[] = [];
+    reseaux: Reseau[] = [];
+    selectedSiteId: string | null = null;
+    selectedReseauId: string | null = null;
 
     constructor(
         private _activatedRoute: ActivatedRoute,
@@ -95,6 +105,9 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit{
             logoData: [null],
             logoExtension: [null],
             nom: ['', Validators.required],
+            initiales: [''],
+            tva: [''],
+            rc: [''],
             matriculeFiscal:['', Validators.required],
             rne: ['', Validators.required],
             capital: ['' ],
@@ -102,8 +115,37 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit{
             telephone1: ['' ],
             telephone2: ['' ],
             fax1: ['' ],
+            fax2: ['' ],
             email: ['' ],
             adresse: ['' ],
+            codePostal: ['' ],
+            ville: ['' ],
+            pays: ['' ],
+            codeSociete: ['' ],
+        });
+
+        this.siteForm = this.formBuilder.group({
+            siteId: [null],
+            code: ['', Validators.required],
+            site: ['', Validators.required],
+            siege: [false],
+            longitude: [null],
+            latitude: [null],
+            rayon: [null],
+            timeMinute: [null],
+            isActive: [true],
+        });
+
+        this.reseauForm = this.formBuilder.group({
+            reseauId: [null],
+            ipAddress: ['', Validators.required],
+            port: [null, Validators.required],
+            gmtPlus: [null],
+            latitude: [null],
+            longitude: [null],
+            rayon: [null],
+            timeToleranceMinute: [null],
+            isActive: [true],
         });
 
 
@@ -113,6 +155,13 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit{
             .subscribe((societe) => {
                 this.societe = societe;
                 this.societeForm.patchValue(societe);
+                if (societe?.societeId){
+                    this.loadSites(societe.societeId);
+                    this.loadReseaux(societe.societeId);
+                } else {
+                    this.sites = [];
+                    this.reseaux = [];
+                }
 
                 this._changeDetectorRef.markForCheck();
             });
@@ -218,5 +267,133 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit{
                 })
             )
             .subscribe();
+    }
+
+    saveSite(): void {
+        if (!this.societe?.societeId || this.siteForm.invalid) {
+            this.showFlashMessage('error');
+            return;
+        }
+
+        const payload: Site = {
+            ...this.siteForm.getRawValue(),
+            societeId: this.societe.societeId,
+        };
+
+        if (payload.siteId) {
+            this._societeService.UpdateSite(payload).subscribe(() => {
+                this.resetSiteForm();
+                this.loadSites(this.societe.societeId);
+                this.showFlashMessage('success');
+            });
+            return;
+        }
+
+        this._societeService.AddSite(payload).subscribe(() => {
+            this.resetSiteForm();
+            this.loadSites(this.societe.societeId);
+            this.showFlashMessage('success');
+        });
+    }
+
+    editSite(site: Site): void {
+        this.selectedSiteId = site.siteId ?? null;
+        this.siteForm.patchValue(site);
+    }
+
+    deleteSite(site: Site): void {
+        if (!site.siteId || !this.societe?.societeId) {
+            return;
+        }
+        this._societeService.DeleteSite(site.siteId).subscribe(() => {
+            this.resetSiteForm();
+            this.loadSites(this.societe.societeId);
+        });
+    }
+
+    resetSiteForm(): void {
+        this.selectedSiteId = null;
+        this.siteForm.reset({
+            siteId: null,
+            code: '',
+            site: '',
+            siege: false,
+            longitude: null,
+            latitude: null,
+            rayon: null,
+            timeMinute: null,
+            isActive: true,
+        });
+    }
+
+    saveReseau(): void {
+        if (!this.societe?.societeId || this.reseauForm.invalid) {
+            this.showFlashMessage('error');
+            return;
+        }
+
+        const payload: Reseau = {
+            ...this.reseauForm.getRawValue(),
+            societeId: this.societe.societeId,
+        };
+
+        if (payload.reseauId) {
+            this._societeService.UpdateReseau(payload).subscribe(() => {
+                this.resetReseauForm();
+                this.loadReseaux(this.societe.societeId);
+                this.showFlashMessage('success');
+            });
+            return;
+        }
+
+        this._societeService.AddReseau(payload).subscribe(() => {
+            this.resetReseauForm();
+            this.loadReseaux(this.societe.societeId);
+            this.showFlashMessage('success');
+        });
+    }
+
+    editReseau(reseau: Reseau): void {
+        this.selectedReseauId = reseau.reseauId ?? null;
+        this.reseauForm.patchValue(reseau);
+    }
+
+    deleteReseau(reseau: Reseau): void {
+        if (!reseau.reseauId || !this.societe?.societeId) {
+            return;
+        }
+        this._societeService.DeleteReseau(reseau.reseauId).subscribe(() => {
+            this.resetReseauForm();
+            this.loadReseaux(this.societe.societeId);
+        });
+    }
+
+    resetReseauForm(): void {
+        this.selectedReseauId = null;
+        this.reseauForm.reset({
+            reseauId: null,
+            ipAddress: '',
+            port: null,
+            gmtPlus: null,
+            latitude: null,
+            longitude: null,
+            rayon: null,
+            timeToleranceMinute: null,
+            isActive: true,
+        });
+    }
+
+    private loadSites(societeId: string): void {
+        this._societeService.GetSitesBySocieteId(societeId).subscribe((sites) => {
+            this.sites = sites;
+            this._changeDetectorRef.markForCheck();
+        });
+    }
+
+    private loadReseaux(societeId: string): void {
+        this._societeService.GetReseauxBySocieteId(societeId).subscribe((reseaux) => {
+            this.reseaux = reseaux;
+            this._changeDetectorRef.markForCheck();
+        });
     }
 }

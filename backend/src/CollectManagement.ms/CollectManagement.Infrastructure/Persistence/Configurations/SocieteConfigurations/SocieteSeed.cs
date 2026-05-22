@@ -11,6 +11,9 @@ public static class SocieteSeed
             societeId: new SocieteId(Ulid.Parse("01HC85BM5QVRW7ABRV33TR1GQ0")),
             logoPath: null,
             nom: "CST",
+            initiales: "CST",
+            tva: "TVA-CST-001",
+            rc: "RC-CST-001",
             matriculeFiscal: "MF-CST-001",
             rne: "RNE-CST-001",
             capital: 0m,
@@ -21,6 +24,9 @@ public static class SocieteSeed
             fax2: null,
             email: "admin@cst.tn",
             adresse: null,
+            codePostal: null,
+            ville: null,
+            pays: null,
             codeSociete: "CST")
     ];
 }

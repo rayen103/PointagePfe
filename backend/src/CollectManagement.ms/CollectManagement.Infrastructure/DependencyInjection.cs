@@ -19,6 +19,8 @@ using CollectManagement.Application.Interfaces.Repositories.Shifts;
 using CollectManagement.Application.Interfaces.Repositories.PointsCollecte;
 using CollectManagement.Application.Interfaces.Repositories.Rattachements;
 using CollectManagement.Application.Interfaces.Repositories.Regions;
+using CollectManagement.Application.Interfaces.Repositories.Reseaux;
+using CollectManagement.Application.Interfaces.Repositories.Sites;
 using CollectManagement.Application.Interfaces.Repositories.Societes;
 using CollectManagement.Application.Interfaces.Repositories.Utilisateurs;
 using CollectManagement.Application.Interfaces.Services;
@@ -44,6 +46,8 @@ using CollectManagement.Infrastructure.Persistence.Repositories.ShiftRepositorie
 using CollectManagement.Infrastructure.Persistence.Repositories.PointCollecteRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.RattachementRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.RegionRepositories;
+using CollectManagement.Infrastructure.Persistence.Repositories.ReseauRepositories;
+using CollectManagement.Infrastructure.Persistence.Repositories.SiteRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.SocieteRepositories;
 using CollectManagement.Infrastructure.Persistence.Repositories.UtilisateurRepositories;
 using CollectManagement.Infrastructure.PuppeteerConfig;
@@ -143,6 +147,8 @@ public static class DependencyInjection
         services.AddScoped<IModemRepository, ModemRepository>();
         services.AddScoped<IGouvernoratRepository, GouvernoratRepository>();
         services.AddScoped<IChauffeurRepository, ChauffeurRepository>();
+        services.AddScoped<ISiteRepository, SiteRepository>();
+        services.AddScoped<IReseauRepository, ReseauRepository>();
 
 
         

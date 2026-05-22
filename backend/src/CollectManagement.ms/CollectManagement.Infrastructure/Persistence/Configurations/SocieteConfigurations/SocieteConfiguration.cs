@@ -19,6 +19,15 @@ public class SocieteConfiguration :IEntityTypeConfiguration<Societe>
         builder.Property(p => p.Nom)
             .HasMaxLength(50)
             .IsRequired();
+
+        builder.Property(p => p.Initiales)
+            .HasMaxLength(20);
+
+        builder.Property(p => p.Tva)
+            .HasMaxLength(50);
+
+        builder.Property(p => p.Rc)
+            .HasMaxLength(50);
         
         builder.Property(p=>p.MatriculeFiscal)
             .HasMaxLength(50)
@@ -52,7 +61,16 @@ public class SocieteConfiguration :IEntityTypeConfiguration<Societe>
             .HasMaxLength(30);
         
         builder.Property(p => p.Adresse)
-            .HasMaxLength(50);
+            .HasMaxLength(150);
+
+        builder.Property(p => p.CodePostal)
+            .HasMaxLength(20);
+
+        builder.Property(p => p.Ville)
+            .HasMaxLength(100);
+
+        builder.Property(p => p.Pays)
+            .HasMaxLength(100);
         
         builder.Property(p => p.CodeSociete)
             .HasMaxLength(50);

@@ -1126,6 +1126,61 @@ namespace CollectManagement.Infrastructure.Migrations
                     b.ToTable("Region");
                 });
 
+            modelBuilder.Entity("CollectManagement.Domain.Reseaux.Reseau", b =>
+                {
+                    b.Property<Guid>("ReseauId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DateInsertion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModification")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("GmtPlus")
+                        .HasColumnType("int");
+
+                    b.Property<string>("InsererPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<decimal?>("Latitude")
+                        .HasColumnType("decimal(18,10)");
+
+                    b.Property<decimal?>("Longitude")
+                        .HasColumnType("decimal(18,10)");
+
+                    b.Property<string>("ModifierPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Port")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("Rayon")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<Guid>("SocieteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("TimeToleranceMinute")
+                        .HasColumnType("int");
+
+                    b.HasKey("ReseauId");
+
+                    b.HasIndex("SocieteId");
+
+                    b.ToTable("Reseau");
+                });
+
             modelBuilder.Entity("CollectManagement.Domain.Shifts.Shift", b =>
                 {
                     b.Property<Guid>("ShiftId")
@@ -1177,20 +1232,81 @@ namespace CollectManagement.Infrastructure.Migrations
                     b.ToTable("Shift");
                 });
 
+            modelBuilder.Entity("CollectManagement.Domain.Sites.Site", b =>
+                {
+                    b.Property<Guid>("SiteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("DateInsertion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModification")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InsererPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<decimal?>("Latitude")
+                        .HasColumnType("decimal(18,10)");
+
+                    b.Property<string>("LibelleSite")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<decimal?>("Longitude")
+                        .HasColumnType("decimal(18,10)");
+
+                    b.Property<string>("ModifierPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("Rayon")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<bool>("Siege")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("SocieteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("TimeMinute")
+                        .HasColumnType("int");
+
+                    b.HasKey("SiteId");
+
+                    b.HasIndex("SocieteId");
+
+                    b.ToTable("Site");
+                });
+
             modelBuilder.Entity("CollectManagement.Domain.Societes.Societe", b =>
                 {
                     b.Property<Guid>("SocieteId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Adresse")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<decimal?>("Capital")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("decimal(18,3)")
                         .HasDefaultValue(0m);
+
+                    b.Property<string>("CodePostal")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("CodeSociete")
                         .HasMaxLength(50)
@@ -1217,6 +1333,10 @@ namespace CollectManagement.Infrastructure.Migrations
                         .HasMaxLength(13)
                         .HasColumnType("nvarchar(13)");
 
+                    b.Property<string>("Initiales")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<string>("InsererPar")
                         .HasColumnType("nvarchar(max)");
 
@@ -1237,6 +1357,14 @@ namespace CollectManagement.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("Pays")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Rc")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<string>("Rne")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -1248,6 +1376,14 @@ namespace CollectManagement.Infrastructure.Migrations
                     b.Property<string>("Telephone2")
                         .HasMaxLength(13)
                         .HasColumnType("nvarchar(13)");
+
+                    b.Property<string>("Tva")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Ville")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("SocieteId");
 
@@ -1261,9 +1397,12 @@ namespace CollectManagement.Infrastructure.Migrations
                             CodeSociete = "CST",
                             DateOverture = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@cst.tn",
+                            Initiales = "CST",
                             MatriculeFiscal = "MF-CST-001",
                             Nom = "CST",
-                            Rne = "RNE-CST-001"
+                            Rc = "RC-CST-001",
+                            Rne = "RNE-CST-001",
+                            Tva = "TVA-CST-001"
                         });
                 });
 
@@ -1565,7 +1704,29 @@ namespace CollectManagement.Infrastructure.Migrations
                     b.Navigation("Societe");
                 });
 
+            modelBuilder.Entity("CollectManagement.Domain.Reseaux.Reseau", b =>
+                {
+                    b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
+                        .WithMany()
+                        .HasForeignKey("SocieteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Societe");
+                });
+
             modelBuilder.Entity("CollectManagement.Domain.Shifts.Shift", b =>
+                {
+                    b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
+                        .WithMany()
+                        .HasForeignKey("SocieteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Societe");
+                });
+
+            modelBuilder.Entity("CollectManagement.Domain.Sites.Site", b =>
                 {
                     b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
                         .WithMany()
