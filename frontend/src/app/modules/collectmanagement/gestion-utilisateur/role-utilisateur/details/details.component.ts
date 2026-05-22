@@ -110,7 +110,7 @@ export class RoleUtilisateurDetailsComponent implements OnInit, OnDestroy{
         this._roleUtilisateurService.actions$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((item)=>{
-                this.actions=item;
+                this.actions=[...(item ?? [])].sort((a, b) => a.id - b.id);
 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();

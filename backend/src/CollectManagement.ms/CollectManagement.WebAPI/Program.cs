@@ -21,7 +21,7 @@ builder.Services
     .AddPresentation();
 
 builder.Services.AddCors();
-builder.Services.AddSingleton<IAuthorizationHandler, NavigationPermissionHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, NavigationPermissionHandler>();
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy(NavigationPermissionRequirement.PolicyName, policyBuilder =>

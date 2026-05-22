@@ -109,7 +109,10 @@ public class RoleUtilisateurEndpoints :ICarterModule
     
     private static IResult NavigationActions()
     {
-        var smartEnumToList = EnumHelper.SmartEnumToList<NavigationAction>();
+        var smartEnumToList = EnumHelper
+            .SmartEnumToList<NavigationAction>()
+            .OrderBy(o => o.Id)
+            .ToList();
 
         return Results.Ok(new ApiResponse<List<EnumInfo>>(smartEnumToList));
     }

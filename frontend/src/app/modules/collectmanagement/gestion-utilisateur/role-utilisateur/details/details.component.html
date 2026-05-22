@@ -27,7 +27,7 @@
 
     </div>
 
-    <div class="relative flex flex-col flex-auto overflow-y-auto rounded-lg bg-card grow justify-between">
+    <div class="relative flex flex-col flex-auto overflow-y-auto overflow-x-auto rounded-lg bg-card grow justify-between">
 
         @if(flatNavigation.length > 0){
 
@@ -50,7 +50,7 @@
                 </div>
                 <div class="flex items-center grow">{{ t('Title') }}</div>
                 @for( item of actions; track item.id || $index){
-                    <div class="flex items-center justify-center grow-0 w-18">{{item.value}}</div>
+                    <div class="flex items-center justify-center grow-0 w-24">{{item.value}}</div>
                 }
             </div>
 
@@ -82,7 +82,7 @@
                         <div class="flex items-center grow">{{item.title}}</div>
 
                         @for( action of actions; track action.id || $index){
-                            <div class="flex items-center justify-center grow-0 w-18">
+                            <div class="flex items-center justify-center grow-0 w-24">
                                 @if(isActionExists(item, action.id)){
                                     @if (isActionChecked(item, action.id)) {
                                         <mat-pseudo-checkbox
@@ -144,7 +144,7 @@
                                     <div class="flex items-center grow">{{ section.title }}</div>
 
                                     @for( action of actions; track action.id || $index){
-                                        <div class="flex items-center justify-center grow-0 w-18">
+                                        <div class="flex items-center justify-center grow-0 w-24">
                                             @if(isActionExists(section, action.id)){
                                                 @if (isSectionActionChecked(item, section, action.id)) {
                                                     <mat-pseudo-checkbox
