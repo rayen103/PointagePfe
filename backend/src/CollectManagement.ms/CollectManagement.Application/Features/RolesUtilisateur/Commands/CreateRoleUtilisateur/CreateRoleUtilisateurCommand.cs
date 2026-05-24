@@ -1,7 +1,8 @@
-﻿namespace CollectManagement.Application.Features.RolesUtilisateur.Commands.CreateRoleUtilisateur;
+namespace CollectManagement.Application.Features.RolesUtilisateur.Commands.CreateRoleUtilisateur;
 
 public record CreateRoleUtilisateurCommand(
     string LibelleRoleUtilisateur,
+    Ulid? SocieteId,
     List<CreateRoleUtilisateurNavigation> Navigations
 ): IRequest<CreateRoleUtilisateurResponse>;
 

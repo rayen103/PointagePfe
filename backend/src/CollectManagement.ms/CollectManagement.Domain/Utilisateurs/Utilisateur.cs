@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using CollectManagement.Domain.Common;
 using CollectManagement.Domain.Societes;
 using CollectManagement.Domain.Societes.ValueObjects;
@@ -10,6 +10,8 @@ namespace CollectManagement.Domain.Utilisateurs;
 
 public sealed class Utilisateur : AuditableEntity
 {
+    private readonly List<UtilisateurSite> _sites = [];
+
    public UtilisateurId UtilisateurId { get; private set; }
     public string NomUtilisateur { get; private set; }
     public string Nom { get; private set; }
@@ -25,6 +27,8 @@ public sealed class Utilisateur : AuditableEntity
     
     public SocieteId SocieteId { get; private set; } // Clé étrangère
     public Societe? Societe { get; private set; }    // Navigation Property
+
+    public IEnumerable<UtilisateurSite> Sites => _sites;
 
       private Utilisateur(UtilisateurId utilisateurId,
         string nomUtilisateur,
@@ -56,9 +60,10 @@ public sealed class Utilisateur : AuditableEntity
         string password,
         RoleUtilisateurId? roleUtilisateurId,
         bool isActive,
-        SocieteId societeId)
+        SocieteId societeId,
+        List<UtilisateurSite> sites = null)
     {
-        return new Utilisateur(
+        var utilisateur = new Utilisateur(
             utilisateurId: utilisateurId,
             nomUtilisateur: nomUtilisateur,
             nom: nom,
@@ -68,6 +73,13 @@ public sealed class Utilisateur : AuditableEntity
             roleUtilisateurId: roleUtilisateurId,
             isActive: isActive,
             societeId:societeId);
+
+        if (sites != null)
+        {
+            utilisateur.UpdateSites(sites);
+        }
+
+        return utilisateur;
     }
 
     public static Utilisateur Create(UtilisateurId utilisateurId,
@@ -115,6 +127,12 @@ public sealed class Utilisateur : AuditableEntity
     public void Update(RoleUtilisateur roleUtilisateur)
     {
         RoleUtilisateur = roleUtilisateur;
+    }
+
+    public void UpdateSites(List<UtilisateurSite> sites)
+    {
+        _sites.Clear();
+        _sites.AddRange(sites);
     }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.

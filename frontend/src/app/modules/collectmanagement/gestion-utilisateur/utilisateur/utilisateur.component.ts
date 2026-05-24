@@ -36,7 +36,10 @@ import { FuseNavigationAction } from '../../../../../@fuse/components/navigation
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { PagedSociete, Societe } from '../../../../core/Societe/societe.model';
 import { SocieteService } from '../../../../core/Societe/societe.service';
+import { SiteService } from '../../../../core/site/site.service';
+import { Site } from '../../../../core/site/site.model';
 import { TranslocoDirective } from '@ngneat/transloco';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
     selector: 'app-utilisateur',
@@ -60,6 +63,7 @@ import { TranslocoDirective } from '@ngneat/transloco';
         MatAutocompleteTrigger,
         NgForOf,
         TranslocoDirective,
+        MatCheckboxModule,
     ],
     templateUrl: './utilisateur.component.html',
     styleUrl: './utilisateur.component.scss',
@@ -88,6 +92,8 @@ export class UtilisateurComponent implements OnInit, OnDestroy{
     roleNavigation: RoleNavigation;
     societe: Societe[]=[];
     filteredSocietes$: Observable<Societe[]>;
+    allSites: Site[] = [];
+    selectedSiteIds: string[] = [];
 
 
     constructor(
@@ -98,6 +104,7 @@ export class UtilisateurComponent implements OnInit, OnDestroy{
         private _fuseConfirmationService: FuseConfirmationService,
         private _formBuilder: UntypedFormBuilder,
         private _societeService : SocieteService,
+        private _siteService: SiteService,
 
     ) {
     }
@@ -159,7 +166,13 @@ export class UtilisateurComponent implements OnInit, OnDestroy{
             password:['', [Validators.pattern(this.passwordComplexityRegex)]],
             roleUtilisateurId:[null, [Validators.required]],
             isActive:[true, [Validators.required]],
-            societeId: ['']
+            societeId: [''],
+            siteIds: [[]]
+        });
+
+        this._siteService.GetAllSites().subscribe(sites => {
+            this.allSites = sites;
+            this._changeDetectorRef.markForCheck();
         });
 
         this.filteredSocietes$ = this.selectedUtilisateurForm.get('societeId')!.valueChanges.pipe(
@@ -245,6 +258,7 @@ export class UtilisateurComponent implements OnInit, OnDestroy{
         this._utilisateurService.CreateNewUtilisateur().subscribe((newUtilisateur)=>{
             this.selectedUtilisateur=newUtilisateur;
             this.selectedUtilisateurForm.patchValue(newUtilisateur);
+            this.selectedSiteIds = [];
             this._changeDetectorRef.markForCheck();
         });
     }
@@ -274,10 +288,45 @@ export class UtilisateurComponent implements OnInit, OnDestroy{
 
                 // Fill the form
                 this.selectedUtilisateurForm.patchValue(utilisateur);
+                this.selectedSiteIds = utilisateur.siteIds || [];
 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
+    }
+
+    /**
+     * Toggle site selection
+     */
+    toggleSite(siteId: string): void {
+        const index = this.selectedSiteIds.indexOf(siteId);
+        if (index > -1) {
+            this.selectedSiteIds.splice(index, 1);
+        } else {
+            this.selectedSiteIds.push(siteId);
+        }
+        this.selectedUtilisateurForm.get('siteIds').setValue(this.selectedSiteIds);
+        this._changeDetectorRef.markForCheck();
+    }
+
+    /**
+     * Toggle all sites
+     */
+    toggleAllSites(): void {
+        if (this.selectedSiteIds.length === this.allSites.length) {
+            this.selectedSiteIds = [];
+        } else {
+            this.selectedSiteIds = this.allSites.map(s => s.siteId);
+        }
+        this.selectedUtilisateurForm.get('siteIds').setValue(this.selectedSiteIds);
+        this._changeDetectorRef.markForCheck();
+    }
+
+    /**
+     * Check if site is selected
+     */
+    isSiteSelected(siteId: string): boolean {
+        return this.selectedSiteIds.includes(siteId);
     }
 
     /**

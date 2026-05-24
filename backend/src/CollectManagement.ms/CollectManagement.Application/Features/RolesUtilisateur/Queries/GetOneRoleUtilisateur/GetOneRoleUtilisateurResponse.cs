@@ -1,8 +1,9 @@
-﻿namespace CollectManagement.Application.Features.RolesUtilisateur.Queries.GetOneRoleUtilisateur;
+namespace CollectManagement.Application.Features.RolesUtilisateur.Queries.GetOneRoleUtilisateur;
 
 public record GetOneRoleUtilisateurResponse(
     Ulid RoleUtilisateurId,
     string LibelleRoleUtilisateur,
+    Ulid? SocieteId,
     IList<GetOneRoleUtilisateurNavigation> Navigations);
 
 public record GetOneRoleUtilisateurNavigation(

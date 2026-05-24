@@ -1,0 +1,99 @@
+<div class="flex flex-col flex-auto min-w-0" *transloco="let t">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
+        <div class="flex-1 min-w-0">
+            <!-- Breadcrumbs -->
+            <div class="flex flex-wrap items-center font-medium">
+                <div>
+                    <a class="whitespace-nowrap text-primary-500" routerLink="..">{{ t('Régions') }}</a>
+                </div>
+                <div class="flex items-center ml-1 whitespace-nowrap">
+                    <mat-icon
+                        class="icon-size-5 text-secondary"
+                        [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
+                    <span class="ml-1 text-secondary">{{ isNewRegion ? t('Add') : t('Edit') }}</span>
+                </div>
+            </div>
+            <!-- Title -->
+            <div class="mt-2">
+                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
+                    {{ isNewRegion ? t('New-Region') : region?.codeRegion }}
+                </h2>
+            </div>
+        </div>
+        <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+            <button
+                mat-flat-button
+                [color]="'primary'"
+                (click)="saveRegion()">
+                <mat-icon [svgIcon]="'heroicons_outline:check'"></mat-icon>
+                <span class="ml-2">{{ t('Save') }}</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="flex-auto p-6 sm:p-10">
+        <div class="max-w-3xl">
+            <form [formGroup]="regionForm" #regionFormDirective="ngForm">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+                    <!-- Code -->
+                    <mat-form-field class="fuse-mat-dense">
+                        <mat-label>{{ t('Code') }}</mat-label>
+                        <input matInput formControlName="codeRegion">
+                        <mat-icon
+                            matPrefix
+                            class="icon-size-5"
+                            [svgIcon]="'heroicons_solid:hashtag'"></mat-icon>
+                    </mat-form-field>
+
+                    <!-- Libelle -->
+                    <mat-form-field class="fuse-mat-dense">
+                        <mat-label>{{ t('Libelle') }}</mat-label>
+                        <input matInput formControlName="libelleRegion">
+                        <mat-icon
+                            matPrefix
+                            class="icon-size-5"
+                            [svgIcon]="'heroicons_solid:identification'"></mat-icon>
+                    </mat-form-field>
+
+                    <!-- Gouvernorat -->
+                    <mat-form-field class="fuse-mat-dense">
+                        <mat-label>{{ t('Gouvernorat') }}</mat-label>
+                        <mat-select formControlName="codeGouvernorat">
+                            @for(gouvernorat of gouvernorats; track gouvernorat.gouvernoratId){
+                                <mat-option [value]="gouvernorat.codeGouvernorat">{{ gouvernorat.libelleGouvernorat }}</mat-option>
+                            }
+                        </mat-select>
+                        <mat-icon
+                            matPrefix
+                            class="icon-size-5"
+                            [svgIcon]="'heroicons_solid:map-pin'"></mat-icon>
+                    </mat-form-field>
+
+                    <!-- Status -->
+                    <div class="flex items-center mt-4">
+                        <mat-slide-toggle
+                            [color]="'primary'"
+                            formControlName="isActive">
+                            {{ t('Active') }}
+                        </mat-slide-toggle>
+                    </div>
+                </div>
+
+                <!-- Flash message -->
+                @if (flashMessage) {
+                    <div
+                        class="mt-8 p-4 rounded-lg"
+                        [ngClass]="{
+                            'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100': flashMessage === 'success',
+                            'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100': flashMessage === 'error'
+                        }">
+                        {{ flashMessage === 'success' ? t('Successfully-saved') : t('Something-went-wrong') }}
+                    </div>
+                }
+            </form>
+        </div>
+    </div>
+</div>

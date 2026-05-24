@@ -1,9 +1,11 @@
-﻿using CollectManagement.Application.Exceptions;
+using CollectManagement.Application.Exceptions;
 using CollectManagement.Application.Interfaces.Repositories.Societes;
 using CollectManagement.Application.Interfaces.Repositories.Utilisateurs;
 using CollectManagement.Application.Interfaces.Services;
+using CollectManagement.Domain.Sites.ValueObjects;
 using CollectManagement.Domain.Societes.ValueObjects;
 using CollectManagement.Domain.Utilisateurs;
+using CollectManagement.Domain.Utilisateurs.Entities;
 using CollectManagement.Domain.Utilisateurs.ValueObjects;
 
 namespace CollectManagement.Application.Features.Utilisateurs.Commands.UpdateUtilisateur;
@@ -36,6 +38,10 @@ public class UpdateUtilisateurCommandHandler
         UpdateUtilisateur(request, utilisateur, utilisateurId, _passwordService
         );
 
+        if (request.SiteIds != null)
+        {
+            utilisateur.UpdateSites(request.SiteIds.Select(siteId => UtilisateurSite.Create(utilisateurId, new SiteId(siteId))).ToList());
+        }
     }
 
     private static void UpdateUtilisateur(

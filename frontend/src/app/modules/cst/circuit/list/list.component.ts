@@ -24,8 +24,10 @@ import { CircuitService } from '../../../../core/circuit/circuit.service';
 import { FuseConfirmationService } from '../../../../../@fuse/services/confirmation';
 import { RoleNavigation } from '../../../../core/role-utilisateur/role-utilisateur.model';
 import { FuseNavigationAction } from '../../../../../@fuse/components/navigation';
-import { MapViewerComponent, MapLocation } from '../../../../shared/components/map-viewer/map-viewer.component';
+import { MapViewerComponent, MapLocation, MapPointType } from '../../../../shared/components/map-viewer/map-viewer.component';
 import { MapGeocodingService } from '../../../../core/common/map-geocoding.service';
+import { CircuitPointCollecteService } from '../../../../core/circuit/circuit-point-collecte.service';
+import { CircuitPointCollecte } from '../../../../core/circuit/circuit-point-collecte.model';
 
 @Component({
   selector: 'app-list',
@@ -61,6 +63,7 @@ export class ListComponent implements OnInit, OnDestroy {
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     roleNavigation: RoleNavigation;
     selectedCircuit: Circuit | null = null;
+    selectedCircuitPoints: CircuitPointCollecte[] = [];
     isViewMode: boolean = false;
     showMapView: boolean = false; // Toggle between list and map view
     mapLocations: MapLocation[] = []; // Locations for map display
@@ -70,6 +73,7 @@ export class ListComponent implements OnInit, OnDestroy {
 
     constructor(
         private _circuitService: CircuitService,
+        private _circuitPointCollecteService: CircuitPointCollecteService,
         private _mapGeocodingService: MapGeocodingService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseConfirmationService: FuseConfirmationService
@@ -246,12 +250,61 @@ export class ListComponent implements OnInit, OnDestroy {
             map((circuits) => {
                 const index = circuits.findIndex(item => item.circuitId === circuitId);
                 return circuits[index];
-            })
-        )
-            .subscribe((circuit) => {
+            }),
+            switchMap((circuit) => {
                 this.selectedCircuit = circuit;
                 this.isViewMode = true;
+                
+                if (circuit?.circuitId) {
+                    return this._circuitPointCollecteService.getByCircuit(circuit.circuitId).pipe(
+                        map(points => ({ circuit, points }))
+                    );
+                }
+                return of({ circuit, points: [] });
+            })
+        )
+            .subscribe(({ circuit, points }) => {
+                this.selectedCircuitPoints = points;
+                
+                // Build map locations for the selected circuit
+                const locations: MapLocation[] = [];
+                const circuitColor = circuit.couleur || '#2563eb';
 
+                if (circuit.latitude != null && circuit.longitude != null) {
+                    locations.push({
+                        id: `${circuit.circuitId}-base`,
+                        circuitId: circuit.circuitId,
+                        pointType: 'base',
+                        name: `${circuit.codeCircuit}${circuit.libelleCircuit ? ` - ${circuit.libelleCircuit}` : ''}`,
+                        latitude: circuit.latitude,
+                        longitude: circuit.longitude,
+                        isActive: circuit.isActive,
+                        description: circuit.description,
+                        color: circuitColor
+                    });
+                }
+
+                // Add points to map locations
+                points.forEach((p, idx) => {
+                    if (p.latitude != null && p.longitude != null) {
+                        let pointType: MapPointType = 'base';
+                        if (idx === 0) pointType = 'departure';
+                        else if (idx === points.length - 1) pointType = 'arrival';
+
+                        locations.push({
+                            id: p.circuitPointCollecteId,
+                            circuitId: circuit.circuitId,
+                            pointType: pointType,
+                            name: p.libellePointCollecte || p.codePointCollecte,
+                            latitude: Number(p.latitude),
+                            longitude: Number(p.longitude),
+                            description: `Order: ${p.ordre}`,
+                            color: circuitColor
+                        });
+                    }
+                });
+
+                this.mapLocations = locations;
                 this._changeDetectorRef.markForCheck();
             });
     }
@@ -286,7 +339,9 @@ export class ListComponent implements OnInit, OnDestroy {
      */
     closeDetails(): void {
         this.selectedCircuit = null;
+        this.selectedCircuitPoints = [];
         this.isViewMode = false;
+        this.mapLocations = [];
     }
 
     /**

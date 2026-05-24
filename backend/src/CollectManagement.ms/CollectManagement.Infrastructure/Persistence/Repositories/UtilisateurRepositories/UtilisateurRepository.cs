@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using CollectManagement.Application.Interfaces.Repositories.Utilisateurs;
 using CollectManagement.Domain.Societes.ValueObjects;
 using CollectManagement.Domain.Utilisateurs;
@@ -45,6 +45,7 @@ public class UtilisateurRepository : RepositoryBase<Utilisateur>, IUtilisateurRe
         var readOnlyList = await orderBy
             .Skip((page - 1) * size)
             .Take(size)
+            .Include(i => i.Sites)
             .Select(c=> Utilisateur.QueryCreate(
                 c.UtilisateurId,
                 c.NomUtilisateur,
@@ -54,7 +55,8 @@ public class UtilisateurRepository : RepositoryBase<Utilisateur>, IUtilisateurRe
                 c.Password,
                 c.RoleUtilisateurId,
                 c.IsActive,
-                c.SocieteId
+                c.SocieteId,
+                c.Sites.ToList()
             ))
             .ToListAsync(cancellationToken: cancellationToken)
             .ConfigureAwait(false);
@@ -81,6 +83,7 @@ public class UtilisateurRepository : RepositoryBase<Utilisateur>, IUtilisateurRe
     {
         return _dbSet.Where(w=>w.UtilisateurId.Equals(utilisateurId))
             .Include(i=>i.RoleUtilisateur)
+            .Include(i=>i.Sites)
             .FirstOrDefaultAsync(cancellationToken);
     }
 

@@ -40,6 +40,7 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
     @Input() zoom: number = 7; // Show Tunisia
     @Input() height: string = '400px';
     @Input() routePoints: MapRoutePoint[] = [];
+    @Input() color: string = '#2563eb';
     @Output() locationChange = new EventEmitter<{ latitude: number; longitude: number }>();
 
     readonly mapElementId: string = `map-picker-${MapPickerComponent.nextMapId++}`;
@@ -62,7 +63,7 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
             this.syncMainMarkerPosition();
         }
 
-        if (changes['routePoints']) {
+        if (changes['routePoints'] || changes['color']) {
             this.updateRouteOverlay();
         }
     }
@@ -187,14 +188,14 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
                 routeWhileDragging: false,
                 createMarker: () => null,
                 lineOptions: {
-                    styles: [{ color: '#2563eb', weight: 4, opacity: 0.8 }],
+                    styles: [{ color: this.color, weight: 4, opacity: 0.8 }],
                     extendToWaypoints: true,
                     missingRouteTolerance: 0,
                 },
             } as any)
                 .on('routingerror', () => {
                     this.routePolyline = L.polyline(latLngs, {
-                        color: '#2563eb',
+                        color: this.color,
                         weight: 4,
                         opacity: 0.8,
                     }).addTo(this.map!);

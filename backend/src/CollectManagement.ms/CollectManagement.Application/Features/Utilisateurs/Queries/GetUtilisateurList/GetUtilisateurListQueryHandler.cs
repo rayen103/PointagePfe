@@ -1,4 +1,4 @@
-﻿using CollectManagement.Application.Interfaces.Repositories.Utilisateurs;
+using CollectManagement.Application.Interfaces.Repositories.Utilisateurs;
 
 namespace CollectManagement.Application.Features.Utilisateurs.Queries.GetUtilisateurList;
 
@@ -34,7 +34,8 @@ public sealed class GetUtilisateurListQueryHandler
                 s.RoleUtilisateurId?.Value,
                 s.RoleUtilisateur?.LibelleRoleUtilisateur,
                 s.IsActive,
-                s.SocieteId.Value
+                s.SocieteId.Value,
+                s.Sites.Select(si=>si.SiteId.Value).ToList()
             )).ToList(),
             length);
     }

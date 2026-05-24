@@ -1,4 +1,5 @@
-﻿using CollectManagement.Application.Interfaces.Repositories.Utilisateurs;
+using CollectManagement.Application.Interfaces.Repositories.Utilisateurs;
+using CollectManagement.Domain.Societes.ValueObjects;
 using CollectManagement.Domain.Utilisateurs.Entities;
 using CollectManagement.Domain.Utilisateurs.Enums;
 using CollectManagement.Domain.Utilisateurs.ValueObjects;
@@ -22,6 +23,7 @@ public class CreateRoleUtilisateurCommandHandler : IRequestHandler<CreateRoleUti
         ArgumentNullException.ThrowIfNull(request);
 
         var roleUtilisateurId = new RoleUtilisateurId(Ulid.NewUlid());
+        var societeId = request.SocieteId.HasValue ? new SocieteId(request.SocieteId.Value) : null;
 
         var role = RoleUtilisateur.Create(roleUtilisateurId,
             request.LibelleRoleUtilisateur, 
@@ -32,7 +34,8 @@ public class CreateRoleUtilisateurCommandHandler : IRequestHandler<CreateRoleUti
                 v.Sections.ConvertAll(s=> NavigationSection.Create(
                     s.SectionId, 
                     s.Actions.ConvertAll(a => (NavigationAction)a)))
-            )));
+            )),
+            societeId);
         
         await _roleUtilisateurRepository.AddAsync(role, cancellationToken);
         

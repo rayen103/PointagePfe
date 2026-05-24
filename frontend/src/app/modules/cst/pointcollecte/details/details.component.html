@@ -106,31 +106,39 @@
                                     [placeholder]="t('Enter-longitude')">
                             </mat-form-field>
 
-                            <!-- Code Gouvernorat -->
-                            <mat-form-field class="w-full">
-                                <mat-label>{{ t('Gouvernorat-Code') }}</mat-label>
-                                <mat-icon
-                                    class="icon-size-5"
-                                    matPrefix
-                                    [svgIcon]="'heroicons_solid:map'"></mat-icon>
-                                <input
-                                    matInput
-                                    formControlName="codeGouvernorat"
-                                    [placeholder]="t('Enter-gouvernorat-code')">
-                            </mat-form-field>
+                            <div class="flex flex-col sm:flex-row gap-4 sm:col-span-2">
+                                <mat-form-field class="flex-auto">
+                                    <mat-label>{{ t('Gouvernorat') }}</mat-label>
+                                    <mat-select [formControlName]="'codeGouvernorat'">
+                                        <mat-option [value]="null">Aucun</mat-option>
+                                        @for (gouvernorat of gouvernorats; track gouvernorat.gouvernoratId) {
+                                            <mat-option [value]="gouvernorat.codeGouvernorat">{{ gouvernorat.libelleGouvernorat }}</mat-option>
+                                        }
+                                    </mat-select>
+                                </mat-form-field>
+                                <mat-form-field class="flex-auto">
+                                    <mat-label>{{ t('Region') }}</mat-label>
+                                    <mat-select [formControlName]="'codeRegion'">
+                                        <mat-option [value]="null">Aucune</mat-option>
+                                        @for (region of regions; track region.regionId) {
+                                            <mat-option [value]="region.codeRegion">{{ region.libelleRegion }}</mat-option>
+                                        }
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
 
-                            <!-- Code Region -->
-                            <mat-form-field class="w-full">
-                                <mat-label>{{ t('Region-Code') }}</mat-label>
-                                <mat-icon
-                                    class="icon-size-5"
-                                    matPrefix
-                                    [svgIcon]="'heroicons_solid:map'"></mat-icon>
-                                <input
-                                    matInput
-                                    formControlName="codeRegion"
-                                    [placeholder]="t('Enter-region-code')">
-                            </mat-form-field>
+                            <div class="flex flex-col w-full mt-4 sm:col-span-2">
+                                <span class="mb-2 font-semibold">{{ t('Map-Location') }}</span>
+                                <div class="h-80 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700">
+                                    <app-map-viewer 
+                                        [locations]="mapLocations" 
+                                        [height]="'100%'" 
+                                        [zoom]="13"
+                                        (mapClick)="onMapClick($event)">
+                                    </app-map-viewer>
+                                </div>
+                                <span class="mt-1 text-sm text-secondary">{{ t('Map-Click-To-Set-Location') }}</span>
+                            </div>
 
                             <!-- Societe ID (hidden, populated from user context) -->
                             <input type="hidden" formControlName="societeId">
@@ -143,7 +151,6 @@
                                     {{ t('Active') }}
                                 </mat-slide-toggle>
                             </div>
-
                         </div>
                     </mat-card-content>
                 </mat-card>

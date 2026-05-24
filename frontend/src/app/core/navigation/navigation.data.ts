@@ -99,6 +99,38 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
             },
             {
+                id   : 'fichier.region',
+                title: 'Région',
+                type : 'basic',
+                icon : 'mat_outline:map',
+                link : '/fichier/region',
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
+            },
+            {
+                id   : 'fichier.gouvernorat',
+                title: 'Gouvernorat',
+                type : 'basic',
+                icon : 'mat_outline:location_city',
+                link : '/fichier/gouvernorat',
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
+            },
+            {
+                id   : 'fichier.chauffeur',
+                title: 'Chauffeur',
+                type : 'basic',
+                icon : 'mat_outline:person_pin',
+                link : '/fichier/chauffeur',
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
+            },
+            {
+                id   : 'fichier.modem',
+                title: 'Modem',
+                type : 'basic',
+                icon : 'mat_outline:router',
+                link : '/fichier/modem',
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
+            },
+            {
                 id   : 'fichier.chantier',
                 title: 'Chantier',
                 type : 'basic',
@@ -109,7 +141,80 @@ export const defaultNavigation: FuseNavigationItem[] = [
         ]
     },
 
+    {
+        id: 'monitoring',
+        title: 'Monitoring',
+        type: 'group',
+        icon: 'mat_outline:monitoring',
+        children: [
+            {
+                id: 'monitoring.bus-tracking',
+                title: 'Bus Tracking',
+                type: 'basic',
+                icon: 'mat_outline:location_searching',
+                link: '/monitoring/bus-tracking',
+                action: [
+                    FuseNavigationAction.View,
+                    FuseNavigationAction.Edit,
+                    FuseNavigationAction.Search,
+                    FuseNavigationAction.Export,
+                    FuseNavigationAction.Preview,
+                    FuseNavigationAction.Print,
+                ],
+            },
+        ],
+    },
 
+    {
+        id: 'analyse',
+        title: 'Analyse BI',
+        type: 'group',
+        icon: 'mat_outline:analytics',
+        children: [
+            {
+                id: 'analyse.bi-bus',
+                title: 'Bus',
+                type: 'basic',
+                icon: 'mat_outline:directions_bus',
+                link: '/analyse/bi-bus',
+                action: [
+                    FuseNavigationAction.View,
+                    FuseNavigationAction.Search,
+                    FuseNavigationAction.Export,
+                    FuseNavigationAction.Preview,
+                    FuseNavigationAction.Print,
+                ],
+            },
+            {
+                id: 'analyse.bi-employe',
+                title: 'Employé',
+                type: 'basic',
+                icon: 'mat_outline:badge',
+                link: '/analyse/bi-employe',
+                action: [
+                    FuseNavigationAction.View,
+                    FuseNavigationAction.Search,
+                    FuseNavigationAction.Export,
+                    FuseNavigationAction.Preview,
+                    FuseNavigationAction.Print,
+                ],
+            },
+            {
+                id: 'analyse.trace',
+                title: 'Trace',
+                type: 'basic',
+                icon: 'mat_outline:history',
+                link: '/analyse/trace',
+                action: [
+                    FuseNavigationAction.View,
+                    FuseNavigationAction.Search,
+                    FuseNavigationAction.Export,
+                    FuseNavigationAction.Preview,
+                    FuseNavigationAction.Print,
+                ],
+            },
+        ],
+    },
 
 ];
 

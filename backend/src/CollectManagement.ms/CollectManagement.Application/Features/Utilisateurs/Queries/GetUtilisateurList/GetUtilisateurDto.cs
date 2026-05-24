@@ -1,4 +1,4 @@
-﻿namespace CollectManagement.Application.Features.Utilisateurs.Queries.GetUtilisateurList;
+namespace CollectManagement.Application.Features.Utilisateurs.Queries.GetUtilisateurList;
 
 public record GetUtilisateurDto(
     Ulid UtilisateurId,
@@ -9,5 +9,6 @@ public record GetUtilisateurDto(
     Ulid? RoleUtilisateurId,
     string? LibelleRoleUtilisateur,
     bool IsActive,
-    Ulid SocieteId
+    Ulid SocieteId,
+    List<Ulid> SiteIds
     );

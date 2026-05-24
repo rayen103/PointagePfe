@@ -1,0 +1,163 @@
+<div class="absolute inset-0 min-w-0 px-4 sm:px-6 md:px-8 overflow-x-hidden overflow-y-auto flex flex-col flex-auto bg-default" *transloco="let t">
+
+    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-4 sm:py-8 px-4 sm:px-6 md:px-8" *transloco="let t">
+        <!-- Title -->
+        <div class="text-2xl sm:text-4xl font-extrabold tracking-tight">{{ t('Gouvernorats') }}</div>
+        <!-- Actions -->
+        <div class="button-container flex flex-col sm:flex-row items-end sm:items-center w-full sm:w-auto mt-4 sm:mt-0 sm:ml-4">
+            <!-- Search -->
+            <mat-form-field
+                class="fuse-mat-dense w-full sm:min-w-64"
+                [subscriptSizing]="'dynamic'">
+                <mat-icon
+                    class="icon-size-5"
+                    matPrefix
+                    [svgIcon]="'search'"></mat-icon>
+                <input
+                    matInput
+                    [formControl]="searchInputControl"
+                    [autocomplete]="'off'"
+                    [placeholder]="t('Search')"
+                    *transloco="let t">
+            </mat-form-field>
+            <!-- Add button -->
+            @if(hasActionPermission(FuseNavigationAction.Add)){
+            <button
+                class="btn-add mt-2 sm:mt-0 sm:ml-4 w-full sm:w-auto"
+                mat-flat-button
+                [color]="'primary'"
+                routerLink="ajouter">
+                <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                <span class="ml-2 mr-1">{{ t('Add') }}</span>
+            </button>
+            }
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="flex flex-auto">
+
+        <!-- Gouvernorat list -->
+        <div class="relative flex flex-col flex-auto sm:mb-18 overflow-hidden px-4 sm:px-8 pt-4 sm:pt-8 rounded-lg bg-card">
+            @if(gouvernorat$ | async; as gouvernorats){
+                @if(gouvernorats.length > 0){
+                    <div class="grid gap-4 pb-20">
+                        <fieldset class="flex flex-wrap items-center gap-2">
+                            <legend class="text-sm text-hint">{{ t('Sort') }}</legend>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-code-ascending')"
+                                [disabled]="sortActive === 'codeGouvernorat' && sortDirection === 'asc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'codeGouvernorat' && sortDirection === 'asc'}"
+                                (click)="setSort('codeGouvernorat','asc')">
+                                {{ t('Code') }} ↑
+                            </button>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-code-descending')"
+                                [disabled]="sortActive === 'codeGouvernorat' && sortDirection === 'desc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'codeGouvernorat' && sortDirection === 'desc'}"
+                                (click)="setSort('codeGouvernorat','desc')">
+                                {{ t('Code') }} ↓
+                            </button>
+                        </fieldset>
+
+                        @for(gouvernorat of gouvernorats; track gouvernorat.gouvernoratId || $index){
+                            <div class="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div class="grid flex-1 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
+                                        <div>
+                                            <p class="text-hint text-xs">{{ t('Code') }}</p>
+                                            <p class="font-medium truncate">{{gouvernorat.codeGouvernorat || '-'}}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-hint text-xs">{{ t('Libelle') }}</p>
+                                            <p class="truncate">{{gouvernorat.libelleGouvernorat || '-'}}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-hint text-xs">{{ t('Status') }}</p>
+                                            <p [ngClass]="gouvernorat.isActive ? 'text-green-600' : 'text-red-600'">
+                                                {{gouvernorat.isActive ? t('Active') : t('Inactive')}}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex justify-end gap-2 sm:gap-4 shrink-0">
+                                        <button
+                                            mat-icon-button
+                                            (click)="toggleDetails(gouvernorat.gouvernoratId)"
+                                            class="!w-6 !h-6 sm:!w-8 sm:!h-8">
+                                            <mat-icon
+                                                class="text-hint text-xs sm:text-sm lg:text-base"
+                                                [svgIcon]="selectedGouvernorat?.gouvernoratId === gouvernorat.gouvernoratId ? 'heroicons_solid:chevron-up' : 'remove_red_eye'">
+                                            </mat-icon>
+                                        </button>
+
+                                        <button
+                                            mat-icon-button
+                                            [routerLink]="gouvernorat.gouvernoratId"
+                                            class="!w-6 !h-6 sm:!w-8 sm:!h-8">
+                                            <mat-icon
+                                                class="text-hint text-xs sm:text-sm lg:text-base"
+                                                [svgIcon]="'edit_road'">
+                                            </mat-icon>
+                                        </button>
+
+                                        @if(hasActionPermission(FuseNavigationAction.Delete)){
+                                        <button
+                                            mat-icon-button
+                                            [color]="'warn'"
+                                            (click)="deleteSelectedGouvernorat(gouvernorat)"
+                                            class="!w-6 !h-6 sm:!w-8 sm:!h-8">
+                                            <mat-icon
+                                                class="text-hint text-xs sm:text-sm lg:text-base"
+                                                [svgIcon]="'heroicons_outline:trash'">
+                                            </mat-icon>
+                                        </button>
+                                        }
+                                    </div>
+                                </div>
+
+                                @if(selectedGouvernorat?.gouvernoratId === gouvernorat.gouvernoratId){
+                                    <div class="border-t dark:border-slate-700 pt-4 mt-4">
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div>
+                                                <span class="font-semibold">{{ t('Code') }}:</span>
+                                                <span class="ml-2">{{gouvernorat.codeGouvernorat}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Libelle') }}:</span>
+                                                <span class="ml-2">{{gouvernorat.libelleGouvernorat || '-'}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Status') }}:</span>
+                                                <span class="ml-2" [ngClass]="gouvernorat.isActive ? 'text-green-600' : 'text-red-600'">
+                                                    {{gouvernorat.isActive ? t('Active') : t('Inactive')}}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        <!-- Paginator -->
+                        <mat-paginator
+                            class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+                            [ngClass]="{'pointer-events-none': isLoading}"
+                            [length]="gouvernoratsLength"
+                            [pageIndex]="0"
+                            [pageSize]="10"
+                            [pageSizeOptions]="[5, 10, 25, 100]"
+                            [showFirstLastButtons]="true"
+                            (page)="SortChange()">
+                        </mat-paginator>
+                    </div>
+                }@else{
+                    <div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">{{ t('No-gouvernorats-found') }}</div>
+                }
+            }
+        </div>
+    </div>
+</div>

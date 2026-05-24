@@ -38,6 +38,14 @@ import { Circuit } from '../../../../core/circuit/circuit.model';
 import { CircuitService } from '../../../../core/circuit/circuit.service';
 import { Bus } from '../../../../core/bus/bus.model';
 import { BusService } from '../../../../core/bus/bus.service';
+import { ShiftService } from '../../../../core/shift/shift.service';
+import { Shift } from '../../../../core/shift/shift.model';
+import { PointCollecteService } from '../../../../core/point-collecte/point-collecte.service';
+import { PointCollecte } from '../../../../core/point-collecte/point-collecte.model';
+import { GouvernoratService } from '../../../../core/gouvernorat/gouvernorat.service';
+import { RegionService } from '../../../../core/region/region.service';
+import { Gouvernorat } from '../../../../core/gouvernorat/gouvernorat.model';
+import { Region } from '../../../../core/region/region.model';
 
 @Component({
     selector: 'app-employe',
@@ -83,6 +91,10 @@ export class EmployeComponent implements OnInit, OnDestroy {
     societe: Societe[] = [];
     circuits: Circuit[] = [];
     buses: Bus[] = [];
+    shifts: Shift[] = [];
+    pointsCollecte: PointCollecte[] = [];
+    gouvernorats: Gouvernorat[] = [];
+    regions: Region[] = [];
     filteredSocietes$: Observable<Societe[]>;
     isViewMode: boolean = false; // To distinguish between view and edit mode
     sortActive: string = 'matricule';
@@ -98,6 +110,10 @@ export class EmployeComponent implements OnInit, OnDestroy {
         private _societeService: SocieteService,
         private _circuitService: CircuitService,
         private _busService: BusService,
+        private _shiftService: ShiftService,
+        private _pointCollecteService: PointCollecteService,
+        private _gouvernoratService: GouvernoratService,
+        private _regionService: RegionService,
 
     ) {
     }
@@ -151,8 +167,8 @@ export class EmployeComponent implements OnInit, OnDestroy {
             nom: ['', [Validators.required, Validators.maxLength(100)]],
             prenom: ['', [Validators.required, Validators.maxLength(100)]],
             typeEmploye: ['EmployeSimple', [Validators.required]],
-            codeCircuit: ['', [Validators.maxLength(50)]],
-            codePointCollecte: ['', [Validators.maxLength(50)]],
+            codeCircuit: ['', [Validators.required, Validators.maxLength(50)]],
+            codePointCollecte: ['', [Validators.required, Validators.maxLength(50)]],
             codeBus: ['', [Validators.maxLength(50)]],
             codeShift: ['', [Validators.maxLength(50)]],
             adresse: ['', [Validators.maxLength(255)]],
@@ -223,6 +239,34 @@ export class EmployeComponent implements OnInit, OnDestroy {
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((pagedBus) => {
                 this.buses = pagedBus?.buses ?? [];
+                this._changeDetectorRef.markForCheck();
+            });
+
+        this._shiftService.GetShifts()
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((pagedShift) => {
+                this.shifts = pagedShift?.shifts ?? [];
+                this._changeDetectorRef.markForCheck();
+            });
+
+        this._pointCollecteService.GetPointsCollecte()
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((pagedPoint) => {
+                this.pointsCollecte = pagedPoint?.pointsCollecte ?? [];
+                this._changeDetectorRef.markForCheck();
+            });
+
+        this._gouvernoratService.GetGouvernorats()
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((pagedGouv) => {
+                this.gouvernorats = pagedGouv?.gouvernorats ?? [];
+                this._changeDetectorRef.markForCheck();
+            });
+
+        this._regionService.GetRegions()
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((pagedRegion) => {
+                this.regions = pagedRegion?.regions ?? [];
                 this._changeDetectorRef.markForCheck();
             });
 
@@ -471,6 +515,44 @@ export class EmployeComponent implements OnInit, OnDestroy {
         return this.buses.filter((bus) => bus.societeId === societeId);
     }
 
+    getFilteredShifts(): Shift[] {
+        const societeId = this.selectedEmployeForm?.get('societeId')?.value;
+        let filtered = this.shifts;
+        
+        if (societeId) {
+            filtered = filtered.filter((shift) => shift.societeId === societeId);
+        }
+
+        // Return unique shifts by codeShift for the dropdown
+        const uniqueShifts: Shift[] = [];
+        const codes = new Set<string>();
+        
+        filtered.forEach(shift => {
+            if (!codes.has(shift.codeShift)) {
+                codes.add(shift.codeShift);
+                uniqueShifts.push(shift);
+            }
+        });
+
+        return uniqueShifts;
+    }
+
+    getFilteredPointsCollecte(): PointCollecte[] {
+        const societeId = this.selectedEmployeForm?.get('societeId')?.value;
+        const codeCircuit = this.selectedEmployeForm?.get('codeCircuit')?.value;
+        
+        let filtered = this.pointsCollecte;
+        
+        if (societeId) {
+            filtered = filtered.filter((point) => point.societeId === societeId);
+        }
+
+        // Optional: Filter points by circuit if needed, but the requirement is "one circuit + one point"
+        // so we show all valid points for the society.
+
+        return filtered;
+    }
+
     hasExistingCircuitOption(codeCircuit: string | null | undefined): boolean {
         if (!codeCircuit) {
             return false;
@@ -485,6 +567,38 @@ export class EmployeComponent implements OnInit, OnDestroy {
         }
 
         return this.getFilteredBuses().some((bus) => bus.numeroIMM === codeBus);
+    }
+
+    hasExistingShiftOption(codeShift: string | null | undefined): boolean {
+        if (!codeShift) {
+            return false;
+        }
+
+        return this.getFilteredShifts().some((shift) => shift.codeShift === codeShift);
+    }
+
+    hasExistingPointOption(codePoint: string | null | undefined): boolean {
+        if (!codePoint) {
+            return false;
+        }
+
+        return this.getFilteredPointsCollecte().some((point) => point.codePointCollecte === codePoint);
+    }
+
+    hasExistingGouvOption(codeGouv: string | null | undefined): boolean {
+        if (!codeGouv) {
+            return false;
+        }
+
+        return this.gouvernorats.some((gouv) => gouv.codeGouvernorat === codeGouv);
+    }
+
+    hasExistingRegionOption(codeRegion: string | null | undefined): boolean {
+        if (!codeRegion) {
+            return false;
+        }
+
+        return this.regions.some((reg) => reg.codeRegion === codeRegion);
     }
 
     private validateBusCircuitAssignment(): boolean {

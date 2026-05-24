@@ -1,4 +1,4 @@
-﻿using CollectManagement.Application.Exceptions;
+using CollectManagement.Application.Exceptions;
 using CollectManagement.Application.Interfaces.Repositories.Utilisateurs;
 using CollectManagement.Domain.Utilisateurs.ValueObjects;
 
@@ -27,6 +27,7 @@ public class GetOneRoleUtilisateurQueryHandler  : IRequestHandler<GetOneRoleUtil
         return new GetOneRoleUtilisateurResponse(
             role.RoleUtilisateurId.Value,
             role.LibelleRoleUtilisateur,
+            role.SocieteId?.Value,
             role.Navigations.Select(s=> new GetOneRoleUtilisateurNavigation(
                 s.NavigationId,
                 s.Actions.Select(a=> (int)a).ToList(),

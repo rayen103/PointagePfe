@@ -1,0 +1,111 @@
+<div class="rounded-lg bg-card border border-slate-200 dark:border-slate-700 overflow-hidden h-full">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+        <div class="font-semibold">Détails</div>
+        @if (bus) {
+            <div class="text-xs text-hint">{{ bus.numeroIMM }}</div>
+        }
+    </div>
+
+    @if (!bus) {
+        <div class="p-6 text-sm text-hint">Sélectionnez un bus pour afficher les détails.</div>
+    } @else {
+        <div class="p-4 space-y-4">
+            <div class="flex items-start justify-between gap-4">
+                <div class="space-y-1">
+                    <div class="text-xs text-hint">IMEI</div>
+                    <div class="text-sm font-semibold">{{ bus.imei || '—' }}</div>
+                </div>
+
+                <button
+                    mat-flat-button
+                    [color]="'warn'"
+                    type="button"
+                    [disabled]="!canEmptyBus"
+                    (click)="emptyBus.emit()">
+                    <mat-icon [svgIcon]="'mat_outline:delete_sweep'"></mat-icon>
+                    <span class="ml-2">Vider le Bus</span>
+                </button>
+            </div>
+
+            <div class="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+                <div class="flex items-center justify-between">
+                    <div class="text-sm font-semibold">Taux d’occupation</div>
+                    <div class="text-sm font-semibold">
+                        @if (bus.currentOccupancy !== null && bus.currentOccupancy !== undefined && bus.capacite) {
+                            {{ bus.currentOccupancy }}/{{ bus.capacite }} ({{ getRatioPercent() }}%)
+                        } @else {
+                            —
+                        }
+                    </div>
+                </div>
+
+                @if (getRatioPercent() !== null) {
+                    <mat-progress-bar class="mt-3" mode="determinate" [value]="getRatioPercent()!"></mat-progress-bar>
+                }
+
+                <div class="grid grid-cols-2 gap-3 mt-4 text-xs">
+                    <div>
+                        <div class="text-hint">Latitude</div>
+                        <div class="font-semibold">{{ bus.latitude ?? '—' }}</div>
+                    </div>
+                    <div>
+                        <div class="text-hint">Longitude</div>
+                        <div class="font-semibold">{{ bus.longitude ?? '—' }}</div>
+                    </div>
+                    <div>
+                        <div class="text-hint">Dernière position</div>
+                        <div class="font-semibold">{{ bus.lastPositionAt || '—' }}</div>
+                    </div>
+                    <div>
+                        <div class="text-hint">Maj occupation</div>
+                        <div class="font-semibold">{{ bus.lastOccupancyUpdateAt || '—' }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+                <div class="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+                    <div class="font-semibold">Timeline</div>
+                    @if (eventsLoading) {
+                        <mat-progress-spinner diameter="18" mode="indeterminate"></mat-progress-spinner>
+                    } @else {
+                        <div class="text-xs text-hint">{{ (events?.length ?? 0) }} events</div>
+                    }
+                </div>
+
+                <div class="max-h-[38vh] overflow-auto">
+                    @if (!eventsLoading && (events?.length ?? 0) === 0) {
+                        <div class="p-4 text-sm text-hint">Aucun événement.</div>
+                    } @else {
+                        @for (ev of events; track ev.busRuntimeEventId) {
+                            <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="min-w-0">
+                                        <div class="font-semibold text-sm truncate">{{ ev.eventType }}</div>
+                                        <div class="text-xs text-hint mt-1">{{ ev.description }}</div>
+                                    </div>
+                                    <div class="text-[11px] text-hint whitespace-nowrap">
+                                        {{ ev.occurredAtUtc | date:'short' }}
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between text-[11px] text-hint mt-2">
+                                    <div>
+                                        Occupation: {{ ev.occupancy ?? '—' }}
+                                    </div>
+                                    <div>
+                                        @if (ev.latitude != null && ev.longitude != null) {
+                                            {{ ev.latitude | number:'1.4-4' }}, {{ ev.longitude | number:'1.4-4' }}
+                                        } @else {
+                                            —
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+

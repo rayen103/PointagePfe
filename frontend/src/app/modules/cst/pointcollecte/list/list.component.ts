@@ -24,6 +24,7 @@ import { PointCollecteService } from '../../../../core/point-collecte/point-coll
 import { FuseConfirmationService } from '../../../../../@fuse/services/confirmation';
 import { RoleNavigation } from '../../../../core/role-utilisateur/role-utilisateur.model';
 import { FuseNavigationAction } from '../../../../../@fuse/components/navigation';
+import { MapLocation, MapViewerComponent } from '../../../../shared/components/map-viewer/map-viewer.component';
 
 @Component({
   selector: 'app-list',
@@ -39,6 +40,7 @@ import { FuseNavigationAction } from '../../../../../@fuse/components/navigation
         MatPaginatorModule,
         TranslocoModule,
         RouterLink,
+        MapViewerComponent,
     ],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
@@ -61,6 +63,7 @@ export class ListComponent implements OnInit, OnDestroy {
     isViewMode: boolean = false;
     sortActive: string = 'codePointCollecte';
     sortDirection: 'asc' | 'desc' = 'asc';
+    mapLocations: MapLocation[] = [];
 
     constructor(
         private _pointCollecteService: PointCollecteService,
@@ -147,6 +150,18 @@ export class ListComponent implements OnInit, OnDestroy {
                 this.selectedPointCollecte = pointCollecte;
                 this.isViewMode = true;
 
+                if (pointCollecte && pointCollecte.latitude != null && pointCollecte.longitude != null) {
+                    this.mapLocations = [{
+                        id: pointCollecte.pointCollecteId,
+                        name: pointCollecte.libellePointCollecte || pointCollecte.codePointCollecte,
+                        latitude: Number(pointCollecte.latitude),
+                        longitude: Number(pointCollecte.longitude),
+                        pointType: 'base'
+                    }];
+                } else {
+                    this.mapLocations = [];
+                }
+
                 this._changeDetectorRef.markForCheck();
             });
     }
@@ -171,6 +186,7 @@ export class ListComponent implements OnInit, OnDestroy {
             .subscribe((pointCollecte) => {
                 this.selectedPointCollecte = pointCollecte;
                 this.isViewMode = false;
+                this.mapLocations = [];
 
                 this._changeDetectorRef.markForCheck();
             });
@@ -182,6 +198,7 @@ export class ListComponent implements OnInit, OnDestroy {
     closeDetails(): void {
         this.selectedPointCollecte = null;
         this.isViewMode = false;
+        this.mapLocations = [];
     }
 
     /**

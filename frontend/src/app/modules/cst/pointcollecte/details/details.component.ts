@@ -26,6 +26,11 @@ import { catchError, EMPTY, of, Subject, takeUntil } from 'rxjs';
 import { PointCollecteService } from '../../../../core/point-collecte/point-collecte.service';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UserService } from '../../../../core/user/user.service';
+import { MapLocation, MapViewerComponent } from '../../../../shared/components/map-viewer/map-viewer.component';
+import { GouvernoratService } from '../../../../core/gouvernorat/gouvernorat.service';
+import { RegionService } from '../../../../core/region/region.service';
+import { Gouvernorat } from '../../../../core/gouvernorat/gouvernorat.model';
+import { Region } from '../../../../core/region/region.model';
 
 @Component({
   selector: 'app-details',
@@ -47,6 +52,7 @@ import { UserService } from '../../../../core/user/user.service';
         MatSlideToggleModule,
         TranslocoModule,
         RouterLink,
+        MapViewerComponent,
     ],
   templateUrl: './details.component.html',
   styleUrl: './details.component.scss',
@@ -61,6 +67,9 @@ export class DetailsComponent implements OnInit, OnDestroy {
     pointCollecte: PointCollecte;
     flashMessage: 'success' | 'error' | null = null;
     isLoading: boolean = false;
+    gouvernorats: Gouvernorat[] = [];
+    regions: Region[] = [];
+    mapLocations: MapLocation[] = [];
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     constructor(
@@ -69,7 +78,9 @@ export class DetailsComponent implements OnInit, OnDestroy {
         private formBuilder: FormBuilder,
         private _pointCollecteService: PointCollecteService,
         private _changeDetectorRef: ChangeDetectorRef,
-        private _userService: UserService
+        private _userService: UserService,
+        private _gouvernoratService: GouvernoratService,
+        private _regionService: RegionService,
     ) { }
 
     ngOnInit(): void {
@@ -85,6 +96,33 @@ export class DetailsComponent implements OnInit, OnDestroy {
             isActive: [true],
             societeId: ['', Validators.required],
         });
+
+        // Load Gouvernorats and Regions
+        this._gouvernoratService.GetGouvernorats().subscribe((res) => {
+            this.gouvernorats = res.gouvernorats;
+            this._changeDetectorRef.markForCheck();
+        });
+
+        this._regionService.GetRegions().subscribe((res) => {
+            this.regions = res.regions;
+            this._changeDetectorRef.markForCheck();
+        });
+
+        // Update map locations when lat/lng change
+        this.pointCollecteForm.valueChanges
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((val) => {
+                if (val.latitude != null && val.longitude != null) {
+                    this.mapLocations = [{
+                        id: val.pointCollecteId || 'preview',
+                        name: val.libellePointCollecte || val.codePointCollecte || 'Point',
+                        latitude: Number(val.latitude),
+                        longitude: Number(val.longitude),
+                        pointType: 'base'
+                    }];
+                    this._changeDetectorRef.markForCheck();
+                }
+            });
 
         // Get current user's societeId
         this._userService.user$
@@ -112,9 +150,31 @@ export class DetailsComponent implements OnInit, OnDestroy {
                     this.pointCollecteForm.patchValue(pointCollecteWithoutSocieteId);
                 }
 
+                if (pointCollecte.latitude != null && pointCollecte.longitude != null) {
+                    this.mapLocations = [{
+                        id: pointCollecte.pointCollecteId,
+                        name: pointCollecte.libellePointCollecte || pointCollecte.codePointCollecte,
+                        latitude: Number(pointCollecte.latitude),
+                        longitude: Number(pointCollecte.longitude),
+                        pointType: 'base'
+                    }];
+                }
+
                 this._changeDetectorRef.markForCheck();
             });
 
+    }
+
+    onMapClick(event: any): void {
+        const lat = event.latlng.lat;
+        const lng = event.latlng.lng;
+        
+        this.pointCollecteForm.patchValue({
+            latitude: Number(lat.toFixed(6)),
+            longitude: Number(lng.toFixed(6))
+        });
+
+        this._changeDetectorRef.markForCheck();
     }
 
     onBackdropClicked(): void {

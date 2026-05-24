@@ -467,7 +467,7 @@ public class BusEndpoints : ICarterModule
         CancellationToken cancellationToken)
     {
         var generatedCode = BuildAutoPointCollecteCode(occurredAtUtc);
-        var label = $"AUTO {bus.NumeroIMM} {occurredAtUtc:yyyy-MM-dd HH:mm:ss}";
+        var label = $"Point Auto - {bus.NumeroIMM} ({occurredAtUtc:HH:mm:ss})";
         if (label.Length > 200)
             label = label[..200];
 
@@ -488,8 +488,7 @@ public class BusEndpoints : ICarterModule
 
     private static string BuildAutoPointCollecteCode(DateTime occurredAtUtc)
     {
-        var suffix = Ulid.NewUlid().ToString()[^6..];
-        var code = $"AUTO-{occurredAtUtc:yyyyMMddHHmmss}-{suffix}";
+        var code = $"PC-AUTO-{occurredAtUtc:yyyyMMddHHmmss}";
         return code.Length <= 50 ? code : code[..50];
     }
 

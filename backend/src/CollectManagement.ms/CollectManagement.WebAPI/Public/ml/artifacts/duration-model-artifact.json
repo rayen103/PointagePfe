@@ -1,0 +1,7 @@
+{
+  "modelVersion": "external-cold-start-v1",
+  "artifactType": "duration-regression",
+  "sampleCount": 12,
+  "keyCount": 12,
+  "globalDurationMean": 4.9
+}
