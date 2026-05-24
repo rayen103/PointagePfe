@@ -16,7 +16,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
                 icon : 'mat_outline:business',
                 link : '/fichier/societe',
-                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
             },
             {
                 id   : 'fichier.utilisateur',
@@ -24,7 +24,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
                 icon : 'mat_outline:group',
                 link : '/fichier/utilisateur',
-                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
             },
             {
                 id   : 'fichier.employe',
@@ -32,7 +32,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
                 icon : 'mat_outline:badge',
                 link : '/fichier/employe',
-                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
             },
             {
                 id   : 'fichier.role-utilisateur',
@@ -40,7 +40,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
                 icon : 'mat_outline:manage_accounts',
                 link : '/fichier/role-utilisateur',
-                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
             },
             {
                 id   : 'fichier.circuit',
@@ -48,7 +48,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
                 icon : 'mat_outline:alt_route',
                 link : '/fichier/circuit',
-                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
             },
             {
                 id   : 'fichier.pointcollecte',
@@ -56,7 +56,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
                 icon : 'mat_outline:location_on',
                 link : '/fichier/pointcollecte',
-                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
             },
             {
                 id   : 'fichier.equipe',
@@ -64,7 +64,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
                 icon : 'mat_outline:groups',
                 link : '/fichier/equipe',
-                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
             },
             {
                 id   : 'fichier.ordretravail',
@@ -72,7 +72,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
                 icon : 'mat_outline:assignment',
                 link : '/fichier/ordretravail',
-                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
             },
             {
                 id   : 'fichier.rattachement',
@@ -80,7 +80,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
                 icon : 'mat_outline:link',
                 link : '/fichier/rattachement',
-                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
             },
             {
                 id   : 'fichier.shift',
@@ -88,7 +88,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
                 icon : 'mat_outline:schedule',
                 link : '/fichier/shift',
-                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
             },
             {
                 id   : 'fichier.bus',
@@ -96,7 +96,39 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
                 icon : 'mat_outline:directions_bus',
                 link : '/fichier/bus',
-                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
+            },
+            {
+                id   : 'fichier.region',
+                title: 'Région',
+                type : 'basic',
+                icon : 'mat_outline:map',
+                link : '/fichier/region',
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
+            },
+            {
+                id   : 'fichier.gouvernorat',
+                title: 'Gouvernorat',
+                type : 'basic',
+                icon : 'mat_outline:location_city',
+                link : '/fichier/gouvernorat',
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
+            },
+            {
+                id   : 'fichier.chauffeur',
+                title: 'Chauffeur',
+                type : 'basic',
+                icon : 'mat_outline:person_pin',
+                link : '/fichier/chauffeur',
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
+            },
+            {
+                id   : 'fichier.modem',
+                title: 'Modem',
+                type : 'basic',
+                icon : 'mat_outline:router',
+                link : '/fichier/modem',
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
             },
             {
                 id   : 'fichier.chantier',
@@ -104,12 +136,85 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
                 icon : 'mat_outline:construction',
                 link : '/fichier/chantier',
-                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
             },
         ]
     },
 
+    {
+        id: 'monitoring',
+        title: 'Monitoring',
+        type: 'group',
+        icon: 'mat_outline:monitoring',
+        children: [
+            {
+                id: 'monitoring.bus-tracking',
+                title: 'Bus Tracking',
+                type: 'basic',
+                icon: 'mat_outline:location_searching',
+                link: '/monitoring/bus-tracking',
+                action: [
+                    FuseNavigationAction.View,
+                    FuseNavigationAction.Edit,
+                    FuseNavigationAction.Search,
+                    FuseNavigationAction.Export,
+                    FuseNavigationAction.Preview,
+                    FuseNavigationAction.Print,
+                ],
+            },
+        ],
+    },
 
+    {
+        id: 'analyse',
+        title: 'Analyse BI',
+        type: 'group',
+        icon: 'mat_outline:analytics',
+        children: [
+            {
+                id: 'analyse.bi-bus',
+                title: 'Bus',
+                type: 'basic',
+                icon: 'mat_outline:directions_bus',
+                link: '/analyse/bi-bus',
+                action: [
+                    FuseNavigationAction.View,
+                    FuseNavigationAction.Search,
+                    FuseNavigationAction.Export,
+                    FuseNavigationAction.Preview,
+                    FuseNavigationAction.Print,
+                ],
+            },
+            {
+                id: 'analyse.bi-employe',
+                title: 'Employé',
+                type: 'basic',
+                icon: 'mat_outline:badge',
+                link: '/analyse/bi-employe',
+                action: [
+                    FuseNavigationAction.View,
+                    FuseNavigationAction.Search,
+                    FuseNavigationAction.Export,
+                    FuseNavigationAction.Preview,
+                    FuseNavigationAction.Print,
+                ],
+            },
+            {
+                id: 'analyse.trace',
+                title: 'Trace',
+                type: 'basic',
+                icon: 'mat_outline:history',
+                link: '/analyse/trace',
+                action: [
+                    FuseNavigationAction.View,
+                    FuseNavigationAction.Search,
+                    FuseNavigationAction.Export,
+                    FuseNavigationAction.Preview,
+                    FuseNavigationAction.Print,
+                ],
+            },
+        ],
+    },
 
 ];
 

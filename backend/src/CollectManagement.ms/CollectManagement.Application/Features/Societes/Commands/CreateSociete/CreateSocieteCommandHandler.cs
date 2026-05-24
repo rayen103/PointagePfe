@@ -50,6 +50,9 @@ public class CreateSocieteCommandHandler
                societeId,
         imageName,
         request.Nom,
+        request.Initiales,
+        request.Tva,
+        request.Rc,
         request.MatriculeFiscal,
         request.Rne,
         request.Capital,
@@ -60,6 +63,9 @@ public class CreateSocieteCommandHandler
         request.Fax2,
         request.Email,
         request.Adresse,
+        request.CodePostal,
+        request.Ville,
+        request.Pays,
         request.CodeSociete
         );
 

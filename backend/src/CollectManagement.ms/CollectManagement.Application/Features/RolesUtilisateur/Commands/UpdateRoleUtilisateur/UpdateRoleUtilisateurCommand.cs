@@ -1,8 +1,9 @@
-﻿namespace CollectManagement.Application.Features.RolesUtilisateur.Commands.UpdateRoleUtilisateur;
+namespace CollectManagement.Application.Features.RolesUtilisateur.Commands.UpdateRoleUtilisateur;
 
 public record UpdateRoleUtilisateurCommand(
     Ulid RoleUtilisateurId,
     string LibelleRoleUtilisateur,
+    Ulid? SocieteId,
     List<UpdateRoleUtilisateurNavigation> Navigations
 ): IRequest;
 

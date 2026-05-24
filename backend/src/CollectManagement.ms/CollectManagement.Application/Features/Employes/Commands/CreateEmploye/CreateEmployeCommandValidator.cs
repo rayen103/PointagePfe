@@ -27,5 +27,13 @@ public class CreateEmployeCommandValidator : AbstractValidator<CreateEmployeComm
             .WithMessage("SocieteId is required.")
             .Must(value => Ulid.TryParse(value, out _))
             .WithMessage("SocieteId must be a valid ULID.");
+
+        RuleFor(r => r.CodeCircuit)
+            .NotEmpty()
+            .WithMessage("Le circuit est obligatoire.");
+
+        RuleFor(r => r.CodePointCollecte)
+            .NotEmpty()
+            .WithMessage("Le point de collecte est obligatoire.");
     }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable, of, tap } from 'rxjs';
-import { PagedSociete, Societe } from './societe.model';
+import { PagedSociete, Reseau, Site, Societe } from './societe.model';
 import { ApiService } from '../common/api.service';
 
 @Injectable({
@@ -52,6 +52,9 @@ export class SocieteService {
             logoData:"",
             logoExtension:"",
             nom:"",
+            initiales:"",
+            tva:"",
+            rc:"",
             matriculeFiscal:"",
             rne:"",
             capital:null,
@@ -62,6 +65,9 @@ export class SocieteService {
             fax2:"",
             email:"",
             adresse:"",
+            codePostal:"",
+            ville:"",
+            pays:"",
             codeSociete:""
         }
         this._societe.next(newSociete);
@@ -163,5 +169,45 @@ export class SocieteService {
                     return result.data;
                 })
             );
+    }
+
+    GetSitesBySocieteId(societeId: string): Observable<Site[]> {
+        return this._apiservice.Get<{sites: Site[]}>(`site/list`, { params: { societeId } })
+            .pipe(map(result => result.data?.sites ?? []));
+    }
+
+    AddSite(site: Site): Observable<Site> {
+        return this._apiservice.Post<Site>('site/add', site)
+            .pipe(map(result => result.data));
+    }
+
+    UpdateSite(site: Site): Observable<boolean> {
+        return this._apiservice.Patch<boolean>('site/update', site)
+            .pipe(map(result => !!result.success));
+    }
+
+    DeleteSite(siteId: string): Observable<boolean> {
+        return this._apiservice.Post<boolean>(`site/${siteId}/delete`, {})
+            .pipe(map(result => !!result.success));
+    }
+
+    GetReseauxBySocieteId(societeId: string): Observable<Reseau[]> {
+        return this._apiservice.Get<{reseaux: Reseau[]}>(`reseau/list`, { params: { societeId } })
+            .pipe(map(result => result.data?.reseaux ?? []));
+    }
+
+    AddReseau(reseau: Reseau): Observable<Reseau> {
+        return this._apiservice.Post<Reseau>('reseau/add', reseau)
+            .pipe(map(result => result.data));
+    }
+
+    UpdateReseau(reseau: Reseau): Observable<boolean> {
+        return this._apiservice.Patch<boolean>('reseau/update', reseau)
+            .pipe(map(result => !!result.success));
+    }
+
+    DeleteReseau(reseauId: string): Observable<boolean> {
+        return this._apiservice.Post<boolean>(`reseau/${reseauId}/delete`, {})
+            .pipe(map(result => !!result.success));
     }
 }

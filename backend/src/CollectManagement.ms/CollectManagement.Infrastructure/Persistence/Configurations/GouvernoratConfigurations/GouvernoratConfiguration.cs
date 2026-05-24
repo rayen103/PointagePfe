@@ -34,5 +34,7 @@ public class GouvernoratConfiguration : IEntityTypeConfiguration<Gouvernorat>
             .WithMany()
             .HasForeignKey(c => c.SocieteId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasData(GouvernoratSeed.Data);
     }
 }

@@ -1,0 +1,18 @@
+{
+  "modelVersion": "external-cold-start-v1",
+  "durationDatasetSource": "duration_external_dataset.json",
+  "absenceDatasetSource": "absence_external_dataset.json",
+  "trainedAtUtc": "2026-05-15T13:31:45.8092351Z",
+  "durationSampleCount": 12,
+  "absenceSampleCount": 12,
+  "durationMaeEstimate": 1.35,
+  "absenceAucEstimate": 0.646,
+  "usesExternalDataset": true,
+  "hybridTrainingReady": true,
+  "governanceChecks": [
+    "Dataset license reviewed",
+    "Identifiers anonymized in source files",
+    "Bias and fairness spot-check completed",
+    "Feature mapping validated for Tunisian operational context"
+  ]
+}

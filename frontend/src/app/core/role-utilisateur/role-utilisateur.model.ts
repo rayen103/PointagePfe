@@ -1,6 +1,7 @@
 export interface RoleUtilisateur {
     roleUtilisateurId: string;
     libelleRoleUtilisateur: string;
+    societeId?: string;
     navigations?: RoleNavigation[];
 }
 

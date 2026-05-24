@@ -39,12 +39,12 @@
 
         <!-- Shift list -->
         <div class="relative flex flex-col flex-auto sm:mb-18 overflow-hidden px-4 sm:px-8 pt-4 sm:pt-8 rounded-lg bg-card">
-            @if(shift$ | async; as shifts){
-                @if(shifts.length > 0){
+            @if(groupedShifts$ | async; as groups){
+                @if(groups.length > 0){
                     <div class="grid">
                         <!-- Header -->
                         <div
-                            class="shift-grid-header hidden sm:grid z-10 sticky top-0 mb-4 gap-4 text-md font-semibold text-hint bg-card"
+                            class="shift-grid-header hidden sm:grid z-10 sticky top-0 mb-4 gap-4 text-md font-semibold text-hint bg-card px-4"
                             *transloco="let t"
                             matSort
                             matSortActive="codeShift"
@@ -52,159 +52,82 @@
                             (matSortChange)="SortChange()"
                             matSortDisableClear="true">
 
-                            <div class="hidden" [mat-sort-header]="'shiftId'">Id</div>
                             <div [mat-sort-header]="'codeShift'">{{ t('Code') }}</div>
                             <div [mat-sort-header]="'libelleShift'">{{ t('Label') }}</div>
-                            <div [mat-sort-header]="'jourSemaine'">{{ t('Day') }}</div>
-                            <div [mat-sort-header]="'heureDebut'">{{ t('Start-Time') }}</div>
-                            <div [mat-sort-header]="'heureFin'">{{ t('End-Time') }}</div>
+                            <div class="text-center">{{ t('Days-Count') }}</div>
                             <div class="text-center">{{ t('Status') }}</div>
-                            <div class="hidden sm:block text-center">{{ t('Details') }}</div>
+                            <div class="text-center">{{ t('Actions') }}</div>
                         </div>
+
                         <!-- Rows -->
-                        @if(shift$ | async; as shifts){
-                            @for(shift of shifts; track shift.shiftId || $index){
-                                <div class="shift-grid-item sm:shift-grid grid sm:grid-cols-7 grid-cols-1 gap-2 sm:gap-4 p-3 sm:py-0.5"
-                                     [ngClass]="{'border-b dark:border-b-slate-700': $index+1 !== shifts.length}">
-
-                                    <!-- Mobile label + value -->
-                                    <div class="sm:hidden flex justify-between">
-                                        <span class="font-semibold">{{ t('Code') }}:</span>
-                                        <span>{{shift.codeShift}}</span>
+                        @for(group of groups; track group.codeShift){
+                            <div class="flex flex-col border-b dark:border-b-slate-700">
+                                <!-- Group Header Row -->
+                                <div class="shift-grid grid sm:grid-cols-5 grid-cols-1 gap-4 p-4 items-center hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                                     (click)="toggleGroup(group)">
+                                    
+                                    <div class="flex items-center gap-2">
+                                        <mat-icon 
+                                            class="icon-size-4 transition-transform" 
+                                            [ngClass]="{'rotate-90': group.isExpanded}"
+                                            [svgIcon]="'heroicons_mini:chevron-right'">
+                                        </mat-icon>
+                                        <span class="font-bold text-primary">{{group.codeShift}}</span>
                                     </div>
-                                    <!-- Desktop view -->
-                                    <div class="hidden sm:block truncate font-medium">{{shift.codeShift}}</div>
 
-                                    <!-- Mobile label + value -->
-                                    <div class="sm:hidden flex justify-between">
-                                        <span class="font-semibold">{{ t('Label') }}:</span>
-                                        <span class="truncate">{{shift.libelleShift || '-'}}</span>
-                                    </div>
-                                    <!-- Desktop view -->
-                                    <div class="hidden sm:block truncate">{{shift.libelleShift || '-'}}</div>
+                                    <div class="truncate">{{group.libelleShift || '-'}}</div>
 
-                                    <!-- Mobile label + value -->
-                                    <div class="sm:hidden flex justify-between">
-                                        <span class="font-semibold">{{ t('Day') }}:</span>
-                                        <span class="truncate">{{shift.jourSemaine || '-'}}</span>
-                                    </div>
-                                    <!-- Desktop view -->
-                                    <div class="hidden sm:block truncate">{{shift.jourSemaine || '-'}}</div>
-
-                                    <!-- Mobile label + value -->
-                                    <div class="sm:hidden flex justify-between">
-                                        <span class="font-semibold">{{ t('Start-Time') }}:</span>
-                                        <span class="truncate">{{shift.heureDebut || '-'}}</span>
-                                    </div>
-                                    <!-- Desktop view -->
-                                    <div class="hidden sm:block truncate">{{shift.heureDebut || '-'}}</div>
-
-                                    <!-- Mobile label + value -->
-                                    <div class="sm:hidden flex justify-between">
-                                        <span class="font-semibold">{{ t('End-Time') }}:</span>
-                                        <span class="truncate">{{shift.heureFin || '-'}}</span>
-                                    </div>
-                                    <!-- Desktop view -->
-                                    <div class="hidden sm:block truncate">{{shift.heureFin || '-'}}</div>
-
-                                    <!-- Mobile label + value -->
-                                    <div class="sm:hidden flex justify-between">
-                                        <span class="font-semibold">{{ t('Status') }}:</span>
-                                        <span [ngClass]="shift.isActive ? 'text-green-600' : 'text-red-600'">
-                                            {{shift.isActive ? t('Active') : t('Inactive')}}
-                                        </span>
-                                    </div>
-                                    <!-- Desktop view -->
-                                    <div class="hidden sm:flex justify-center">
-                                        <span [ngClass]="shift.isActive ? 'text-green-600' : 'text-red-600'">
-                                            {{shift.isActive ? t('Active') : t('Inactive')}}
+                                    <div class="text-center">
+                                        <span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">
+                                            {{group.shifts.length}} {{ t('Days') }}
                                         </span>
                                     </div>
 
-                                    <!-- Details & delete button -->
-                                    <div class="flex sm:justify-center justify-end gap-2 sm:gap-4 mt-2 sm:mt-0">
-                                        <!-- View button -->
-                                        <button
-                                            mat-icon-button
-                                            (click)="toggleDetails(shift.shiftId)"
-                                            class="!w-6 !h-6 sm:!w-8 sm:!h-8">
-                                            <mat-icon
-                                                class="text-hint text-xs sm:text-sm lg:text-base"
-                                                [svgIcon]="selectedShift?.shiftId === shift.shiftId ? 'heroicons_solid:chevron-up' : 'remove_red_eye'">
-                                            </mat-icon>
-                                        </button>
+                                    <div class="text-center">
+                                        <span [ngClass]="group.isActive ? 'text-green-600' : 'text-red-600'" class="text-sm font-medium">
+                                            {{group.isActive ? t('Active') : t('Inactive')}}
+                                        </span>
+                                    </div>
 
-                                        <!-- Edit button -->
-                                        <button
-                                            mat-icon-button
-                                            [routerLink]="shift.shiftId"
-                                            class="!w-6 !h-6 sm:!w-8 sm:!h-8">
-                                            <mat-icon
-                                                class="text-hint text-xs sm:text-sm lg:text-base"
-                                                [svgIcon]="'edit_road'">
-                                            </mat-icon>
+                                    <div class="flex justify-center gap-2">
+                                        <button mat-icon-button [routerLink]="group.shifts[0].shiftId" (click)="$event.stopPropagation()">
+                                            <mat-icon class="icon-size-5 text-hint" [svgIcon]="'heroicons_outline:pencil-square'"></mat-icon>
                                         </button>
+                                        <button mat-icon-button color="warn" (click)="deleteSelectedShift(group.shifts[0]); $event.stopPropagation()">
+                                            <mat-icon class="icon-size-5" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
 
-                                        <!-- Delete button -->
-                                        @if(hasActionPermission(FuseNavigationAction.Delete)){
-                                        <button
-                                            mat-icon-button
-                                            [color]="'warn'"
-                                            (click)="deleteSelectedShift(shift)"
-                                            class="!w-6 !h-6 sm:!w-8 sm:!h-8">
-                                            <mat-icon
-                                                class="text-hint text-xs sm:text-sm lg:text-base"
-                                                [svgIcon]="'heroicons_outline:trash'">
-                                            </mat-icon>
-                                        </button>
+                                <!-- Expanded Details (Détaille Poste) -->
+                                @if(group.isExpanded){
+                                    <div class="bg-gray-50 dark:bg-slate-900 px-12 py-4 space-y-2 border-t border-slate-200 dark:border-slate-800" 
+                                         [@expandCollapse]="group.isExpanded ? 'expanded' : 'collapsed'">
+                                        <h4 class="text-xs font-bold uppercase tracking-wider text-hint mb-2">{{ t('Poste-Details') }}</h4>
+                                        <div class="grid grid-cols-3 gap-4 text-xs font-semibold text-secondary pb-2 border-b">
+                                            <div>{{ t('Day') }}</div>
+                                            <div class="text-center">{{ t('Start-Time') }}</div>
+                                            <div class="text-center">{{ t('End-Time') }}</div>
+                                        </div>
+                                        @for(shift of group.shifts; track shift.shiftId){
+                                            <div class="grid grid-cols-3 gap-4 py-2 text-sm items-center hover:bg-white dark:hover:bg-slate-800 rounded px-2 transition-colors">
+                                                <div class="font-medium">{{shift.jourSemaine}}</div>
+                                                <div class="text-center text-primary font-mono">{{shift.heureDebut}}</div>
+                                                <div class="text-center text-primary font-mono">{{shift.heureFin}}</div>
+                                            </div>
                                         }
                                     </div>
-
-                                    <!-- Details panel (expanded) -->
-                                    @if(selectedShift?.shiftId === shift.shiftId){
-                                        <div class="col-span-full border-t border-b dark:border-slate-700 p-4 mt-2">
-                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Code') }}:</span>
-                                                    <span class="ml-2">{{shift.codeShift}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Label') }}:</span>
-                                                    <span class="ml-2">{{shift.libelleShift || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Day') }}:</span>
-                                                    <span class="ml-2">{{shift.jourSemaine || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Start-Time') }}:</span>
-                                                    <span class="ml-2">{{shift.heureDebut || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('End-Time') }}:</span>
-                                                    <span class="ml-2">{{shift.heureFin || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Status') }}:</span>
-                                                    <span class="ml-2" [ngClass]="shift.isActive ? 'text-green-600' : 'text-red-600'">
-                                                        {{shift.isActive ? t('Active') : t('Inactive')}}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    }
-                                </div>
-                            }
+                                }
+                            </div>
                         }
+                        
                         <!-- Paginator -->
                         <mat-paginator
-                            class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
-                            [ngClass]="{'pointer-events-none': isLoading}"
+                            class="absolute inset-x-0 bottom-0 border-t z-10 bg-gray-50 dark:bg-transparent"
                             [length]="shiftsLength"
                             [pageIndex]="0"
                             [pageSize]="10"
                             [pageSizeOptions]="[5, 10, 25, 100]"
-                            [showFirstLastButtons]="true"
                             (page)="SortChange()">
                         </mat-paginator>
                     </div>

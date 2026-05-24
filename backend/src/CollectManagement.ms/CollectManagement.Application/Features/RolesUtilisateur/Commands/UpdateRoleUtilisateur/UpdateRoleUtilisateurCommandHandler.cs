@@ -1,5 +1,6 @@
-﻿using CollectManagement.Application.Exceptions;
+using CollectManagement.Application.Exceptions;
 using CollectManagement.Application.Interfaces.Repositories.Utilisateurs;
+using CollectManagement.Domain.Societes.ValueObjects;
 using CollectManagement.Domain.Utilisateurs.Entities;
 using CollectManagement.Domain.Utilisateurs.Enums;
 using CollectManagement.Domain.Utilisateurs.ValueObjects;
@@ -21,6 +22,7 @@ public class UpdateRoleUtilisateurCommandHandler : IRequestHandler<UpdateRoleUti
         ArgumentNullException.ThrowIfNull(request);
 
         var roleUtilisateurId = new RoleUtilisateurId(request.RoleUtilisateurId);
+        var societeId = request.SocieteId.HasValue ? new SocieteId(request.SocieteId.Value) : null;
 
         var role = await _roleUtilisateurRepository.GetOneAsync(
                        roleUtilisateurId, cancellationToken)
@@ -37,6 +39,7 @@ public class UpdateRoleUtilisateurCommandHandler : IRequestHandler<UpdateRoleUti
                 v.Sections.ConvertAll(s=> NavigationSection.Create(
                     s.SectionId, 
                     s.Actions.ConvertAll(a => (NavigationAction)a)))
-            )));
+            )),
+            societeId);
     }
 }

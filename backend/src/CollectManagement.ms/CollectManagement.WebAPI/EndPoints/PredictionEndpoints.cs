@@ -4,6 +4,7 @@ using CollectManagement.Application.Common;
 using CollectManagement.Application.Contracts.Predictions;
 using CollectManagement.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
+using CollectManagement.WebAPI.Authorization;
 
 namespace CollectManagement.WebAPI.EndPoints;
 
@@ -11,7 +12,7 @@ public sealed class PredictionEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var routeGroupBuilder = app.MapGroup("cm/prediction").RequireAuthorization();
+        var routeGroupBuilder = app.MapGroup("cm/prediction").RequireNavigationPermission("fichier.bus");
 
         routeGroupBuilder.MapPost("duration", PredictDuration);
         routeGroupBuilder.MapPost("duration/batch", PredictDurationBatch);

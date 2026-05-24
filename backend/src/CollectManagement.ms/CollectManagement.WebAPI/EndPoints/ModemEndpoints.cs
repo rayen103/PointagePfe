@@ -8,6 +8,7 @@ using CollectManagement.Domain.Modems;
 using CollectManagement.Domain.Modems.ValueObjects;
 using CollectManagement.Domain.Societes.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
+using CollectManagement.WebAPI.Authorization;
 
 namespace CollectManagement.WebAPI.EndPoints;
 
@@ -15,7 +16,7 @@ public class ModemEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var routeGroupBuilder = app.MapGroup("cm/modem").RequireAuthorization();
+        var routeGroupBuilder = app.MapGroup("cm/modem").RequireNavigationPermission("fichier.modem");
 
         routeGroupBuilder.MapGet("list", List);
         routeGroupBuilder.MapPost("add", Create);

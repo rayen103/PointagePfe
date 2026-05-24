@@ -1,4 +1,4 @@
-﻿using CollectManagement.Application.Interfaces.Repositories.Utilisateurs;
+using CollectManagement.Application.Interfaces.Repositories.Utilisateurs;
 
 namespace CollectManagement.Application.Features.RolesUtilisateur.Queries.GetListRoleUtilisateur;
 
@@ -28,6 +28,7 @@ public class GetListRoleUtilisateurQueryHandler  : IRequestHandler<GetListRoleUt
             list.ConvertAll(v=> new GetListRoleUtilisateurDto(
                 v.RoleUtilisateurId.Value,
                 v.LibelleRoleUtilisateur,
+                v.SocieteId?.Value,
                 v.Navigations.Select(s=> new GetListRoleUtilisateurNavigation(
                     s.NavigationId, 
                     s.Actions.Select(a=> (int)a).ToList())).ToList()

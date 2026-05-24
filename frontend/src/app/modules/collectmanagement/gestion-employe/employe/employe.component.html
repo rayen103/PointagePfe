@@ -366,6 +366,9 @@
                                                     </mat-option>
                                                 }
                                             </mat-select>
+                                            @if (selectedEmployeForm.get('codeCircuit')?.hasError('required')) {
+                                                <mat-error>{{ t('Circuit') }} is required.</mat-error>
+                                            }
                                             @if (selectedEmployeForm.get('codeCircuit')?.hasError('maxlength')) {
                                                 <mat-error>{{ t('Circuit') }} must be at most 50 characters.</mat-error>
                                             }
@@ -377,7 +380,26 @@
 
                                         <mat-form-field class="w-1/3 fuse-mat-dense">
                                             <mat-label>{{ t('Collection-Point') }}</mat-label>
-                                            <input matInput [formControlName]="'codePointCollecte'">
+                                            <mat-select [formControlName]="'codePointCollecte'">
+                                                <mat-option [value]="''">--</mat-option>
+                                                @for (point of getFilteredPointsCollecte(); track point.pointCollecteId) {
+                                                    <mat-option [value]="point.codePointCollecte">
+                                                        {{ point.codePointCollecte }}
+                                                        @if (point.libellePointCollecte) {
+                                                            - {{ point.libellePointCollecte }}
+                                                        }
+                                                    </mat-option>
+                                                }
+                                                @if (selectedEmployeForm.get('codePointCollecte')?.value && !hasExistingPointOption(selectedEmployeForm.get('codePointCollecte')?.value)) {
+                                                    <mat-option disabled>— Current Value —</mat-option>
+                                                    <mat-option [value]="selectedEmployeForm.get('codePointCollecte')?.value">
+                                                        {{ selectedEmployeForm.get('codePointCollecte')?.value }}
+                                                    </mat-option>
+                                                }
+                                            </mat-select>
+                                            @if (selectedEmployeForm.get('codePointCollecte')?.hasError('required')) {
+                                                <mat-error>{{ t('Collection-Point') }} is required.</mat-error>
+                                            }
                                             @if (selectedEmployeForm.get('codePointCollecte')?.hasError('maxlength')) {
                                                 <mat-error>{{ t('Collection-Point') }} must be at most 50 characters.</mat-error>
                                             }
@@ -409,7 +431,23 @@
 
                                         <mat-form-field class="w-1/3 fuse-mat-dense">
                                             <mat-label>{{ t('Shift') }}</mat-label>
-                                            <input matInput [formControlName]="'codeShift'">
+                                            <mat-select [formControlName]="'codeShift'">
+                                                <mat-option [value]="''">--</mat-option>
+                                                @for (shift of getFilteredShifts(); track shift.shiftId) {
+                                                    <mat-option [value]="shift.codeShift">
+                                                        {{ shift.codeShift }}
+                                                        @if (shift.libelleShift) {
+                                                            - {{ shift.libelleShift }}
+                                                        }
+                                                    </mat-option>
+                                                }
+                                                @if (selectedEmployeForm.get('codeShift')?.value && !hasExistingShiftOption(selectedEmployeForm.get('codeShift')?.value)) {
+                                                    <mat-option disabled>— Current Value —</mat-option>
+                                                    <mat-option [value]="selectedEmployeForm.get('codeShift')?.value">
+                                                        {{ selectedEmployeForm.get('codeShift')?.value }}
+                                                    </mat-option>
+                                                }
+                                            </mat-select>
                                             @if (selectedEmployeForm.get('codeShift')?.hasError('maxlength')) {
                                                 <mat-error>{{ t('Shift') }} must be at most 50 characters.</mat-error>
                                             }
@@ -429,7 +467,20 @@
 
                                         <mat-form-field class="w-1/3 fuse-mat-dense">
                                             <mat-label>{{ t('Governorate') }}</mat-label>
-                                            <input matInput [formControlName]="'codeGouvernorat'">
+                                            <mat-select [formControlName]="'codeGouvernorat'">
+                                                <mat-option [value]="''">--</mat-option>
+                                                @for (gouv of gouvernorats; track gouv.gouvernoratId) {
+                                                    <mat-option [value]="gouv.codeGouvernorat">
+                                                        {{ gouv.libelleGouvernorat }}
+                                                    </mat-option>
+                                                }
+                                                @if (selectedEmployeForm.get('codeGouvernorat')?.value && !hasExistingGouvOption(selectedEmployeForm.get('codeGouvernorat')?.value)) {
+                                                    <mat-option disabled>— Current Value —</mat-option>
+                                                    <mat-option [value]="selectedEmployeForm.get('codeGouvernorat')?.value">
+                                                        {{ selectedEmployeForm.get('codeGouvernorat')?.value }}
+                                                    </mat-option>
+                                                }
+                                            </mat-select>
                                             @if (selectedEmployeForm.get('codeGouvernorat')?.hasError('maxlength')) {
                                                 <mat-error>{{ t('Governorate') }} must be at most 50 characters.</mat-error>
                                             }
@@ -437,7 +488,20 @@
 
                                         <mat-form-field class="w-1/3 fuse-mat-dense">
                                             <mat-label>{{ t('Region') }}</mat-label>
-                                            <input matInput [formControlName]="'codeRegion'">
+                                            <mat-select [formControlName]="'codeRegion'">
+                                                <mat-option [value]="''">--</mat-option>
+                                                @for (reg of regions; track reg.regionId) {
+                                                    <mat-option [value]="reg.codeRegion">
+                                                        {{ reg.libelleRegion }}
+                                                    </mat-option>
+                                                }
+                                                @if (selectedEmployeForm.get('codeRegion')?.value && !hasExistingRegionOption(selectedEmployeForm.get('codeRegion')?.value)) {
+                                                    <mat-option disabled>— Current Value —</mat-option>
+                                                    <mat-option [value]="selectedEmployeForm.get('codeRegion')?.value">
+                                                        {{ selectedEmployeForm.get('codeRegion')?.value }}
+                                                    </mat-option>
+                                                }
+                                            </mat-select>
                                             @if (selectedEmployeForm.get('codeRegion')?.hasError('maxlength')) {
                                                 <mat-error>{{ t('Region') }} must be at most 50 characters.</mat-error>
                                             }

@@ -8,6 +8,7 @@ using CollectManagement.Application.Features.Shifts.Queries.GetOneShift;
 using CollectManagement.Application.Features.Shifts.Queries.GetPagedListShift;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using CollectManagement.WebAPI.Authorization;
 
 namespace CollectManagement.WebAPI.EndPoints;
 
@@ -15,7 +16,7 @@ public class ShiftEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var routeGroupBuilder = app.MapGroup("cm/shift").RequireAuthorization();
+        var routeGroupBuilder = app.MapGroup("cm/shift").RequireNavigationPermission("fichier.shift");
 
         routeGroupBuilder.MapGet("list", ShiftList);
         routeGroupBuilder.MapPost("add", CreateShift);

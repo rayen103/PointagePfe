@@ -81,4 +81,10 @@ public class EmployeRepository : RepositoryBase<Employe>, IEmployeRepository
         return _dbSet.Where(w => w.EmployeId.Equals(employeId))
             .FirstOrDefaultAsync(cancellationToken);
     }
+
+    public Task<Employe?> GetByRFIDAsync(string rfid, CancellationToken cancellationToken)
+    {
+        return _dbSet.Where(w => w.RFID == rfid)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
 }

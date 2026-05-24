@@ -17,17 +17,28 @@
             <div class="text-4xl font-extrabold tracking-tight">{{(!!roleUtilisateur?.roleUtilisateurId ? t('Change-role') : t('new-role')) }} </div>
         </div>
 
-        <mat-form-field [subscriptSizing]="'dynamic'" class="fuse-mat-dense min-w-64">
-            <input
-                matInput
-                placeholder="Libelle"
-                [(ngModel)]="roleUtilisateur.libelleRoleUtilisateur"
-            />
-        </mat-form-field>
+        <div class="flex items-center gap-4">
+            <mat-form-field [subscriptSizing]="'dynamic'" class="fuse-mat-dense min-w-64">
+                <input
+                    matInput
+                    placeholder="Libelle"
+                    [(ngModel)]="roleUtilisateur.libelleRoleUtilisateur"
+                />
+            </mat-form-field>
+
+            <mat-form-field [subscriptSizing]="'dynamic'" class="fuse-mat-dense min-w-64">
+                <mat-select [placeholder]="'Société'" [(ngModel)]="roleUtilisateur.societeId">
+                    <mat-option [value]="null">Aucune</mat-option>
+                    @for (societe of societes; track societe.societeId) {
+                        <mat-option [value]="societe.societeId">{{societe.nom}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
 
     </div>
 
-    <div class="relative flex flex-col flex-auto overflow-y-auto rounded-lg bg-card grow justify-between">
+    <div class="relative flex flex-col flex-auto overflow-y-auto overflow-x-auto rounded-lg bg-card grow justify-between">
 
         @if(flatNavigation.length > 0){
 
@@ -50,7 +61,7 @@
                 </div>
                 <div class="flex items-center grow">{{ t('Title') }}</div>
                 @for( item of actions; track item.id || $index){
-                    <div class="flex items-center justify-center grow-0 w-18">{{item.value}}</div>
+                    <div class="flex items-center justify-center grow-0 w-24">{{item.value}}</div>
                 }
             </div>
 
@@ -82,7 +93,7 @@
                         <div class="flex items-center grow">{{item.title}}</div>
 
                         @for( action of actions; track action.id || $index){
-                            <div class="flex items-center justify-center grow-0 w-18">
+                            <div class="flex items-center justify-center grow-0 w-24">
                                 @if(isActionExists(item, action.id)){
                                     @if (isActionChecked(item, action.id)) {
                                         <mat-pseudo-checkbox
@@ -144,7 +155,7 @@
                                     <div class="flex items-center grow">{{ section.title }}</div>
 
                                     @for( action of actions; track action.id || $index){
-                                        <div class="flex items-center justify-center grow-0 w-18">
+                                        <div class="flex items-center justify-center grow-0 w-24">
                                             @if(isActionExists(section, action.id)){
                                                 @if (isSectionActionChecked(item, section, action.id)) {
                                                     <mat-pseudo-checkbox

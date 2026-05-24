@@ -22,6 +22,50 @@ namespace CollectManagement.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("CollectManagement.Domain.Analyse.ReportLayout", b =>
+                {
+                    b.Property<Guid>("ReportLayoutId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ConfigJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DateInsertion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModification")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InsererPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDefault")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("ModifierPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("ReportType")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("SocieteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ReportLayoutId");
+
+                    b.HasIndex("SocieteId", "ReportType");
+
+                    b.ToTable("ReportLayout");
+                });
+
             modelBuilder.Entity("CollectManagement.Domain.Bus.Bus", b =>
                 {
                     b.Property<Guid>("BusId")
@@ -488,6 +532,10 @@ namespace CollectManagement.Infrastructure.Migrations
 
                     b.HasKey("EmployeId");
 
+                    b.HasIndex("RFID")
+                        .IsUnique()
+                        .HasFilter("[RFID] IS NOT NULL");
+
                     b.HasIndex("SocieteId");
 
                     b.ToTable("Employe");
@@ -602,6 +650,200 @@ namespace CollectManagement.Infrastructure.Migrations
                     b.HasIndex("SocieteId");
 
                     b.ToTable("Gouvernorat");
+
+                    b.HasData(
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-dd24-f828-65edf521f802"),
+                            CodeGouvernorat = "11",
+                            IsActive = true,
+                            LibelleGouvernorat = "Tunis",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-52ac-1001-f0f10d980a15"),
+                            CodeGouvernorat = "12",
+                            IsActive = true,
+                            LibelleGouvernorat = "Ariana",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-5471-397d-a888b3c81b97"),
+                            CodeGouvernorat = "13",
+                            IsActive = true,
+                            LibelleGouvernorat = "Ben Arous",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-c9aa-ae58-405dd473b463"),
+                            CodeGouvernorat = "14",
+                            IsActive = true,
+                            LibelleGouvernorat = "Manouba",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-a9b9-1fca-4a12547b5651"),
+                            CodeGouvernorat = "21",
+                            IsActive = true,
+                            LibelleGouvernorat = "Nabeul",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-7d52-4ba2-3c7f260c1cf1"),
+                            CodeGouvernorat = "22",
+                            IsActive = true,
+                            LibelleGouvernorat = "Zaghouan",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-0831-d237-54336c6f9aed"),
+                            CodeGouvernorat = "23",
+                            IsActive = true,
+                            LibelleGouvernorat = "Bizerte",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-3d79-4ef8-4e66297e457e"),
+                            CodeGouvernorat = "31",
+                            IsActive = true,
+                            LibelleGouvernorat = "Béja",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-2146-0ace-b311c9afc436"),
+                            CodeGouvernorat = "32",
+                            IsActive = true,
+                            LibelleGouvernorat = "Jendouba",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-6fe1-c436-d858e86c3c08"),
+                            CodeGouvernorat = "33",
+                            IsActive = true,
+                            LibelleGouvernorat = "Le Kef",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-6e35-afa3-decb1fbe8416"),
+                            CodeGouvernorat = "34",
+                            IsActive = true,
+                            LibelleGouvernorat = "Siliana",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-9533-697b-0fb0a8c2092c"),
+                            CodeGouvernorat = "41",
+                            IsActive = true,
+                            LibelleGouvernorat = "Kairouan",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-8e16-a6e0-7f9583f9a656"),
+                            CodeGouvernorat = "42",
+                            IsActive = true,
+                            LibelleGouvernorat = "Kasserine",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-7ff4-9a7b-61eaeda6c6e9"),
+                            CodeGouvernorat = "43",
+                            IsActive = true,
+                            LibelleGouvernorat = "Sidi Bouzid",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-c1d8-9d96-9ac36a8cfc42"),
+                            CodeGouvernorat = "51",
+                            IsActive = true,
+                            LibelleGouvernorat = "Sousse",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-f1b0-15cf-1ee9f5a4e16e"),
+                            CodeGouvernorat = "52",
+                            IsActive = true,
+                            LibelleGouvernorat = "Monastir",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-3779-c619-776d451f5f00"),
+                            CodeGouvernorat = "53",
+                            IsActive = true,
+                            LibelleGouvernorat = "Mahdia",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-3b87-36b3-003afbb50bcc"),
+                            CodeGouvernorat = "61",
+                            IsActive = true,
+                            LibelleGouvernorat = "Sfax",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-a204-88f6-134826736c13"),
+                            CodeGouvernorat = "71",
+                            IsActive = true,
+                            LibelleGouvernorat = "Gafsa",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-d146-c65b-f9cdcb62b126"),
+                            CodeGouvernorat = "72",
+                            IsActive = true,
+                            LibelleGouvernorat = "Tozeur",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-9a12-35bd-657f354e8c61"),
+                            CodeGouvernorat = "73",
+                            IsActive = true,
+                            LibelleGouvernorat = "Kebili",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-26fa-52f9-53546ccd955b"),
+                            CodeGouvernorat = "81",
+                            IsActive = true,
+                            LibelleGouvernorat = "Gabès",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-fa87-c753-191c4bd2dc0c"),
+                            CodeGouvernorat = "82",
+                            IsActive = true,
+                            LibelleGouvernorat = "Médenine",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        },
+                        new
+                        {
+                            GouvernoratId = new Guid("019e5a15-28f3-1fe8-ecc1-bbcd5e5bc220"),
+                            CodeGouvernorat = "83",
+                            IsActive = true,
+                            LibelleGouvernorat = "Tataouine",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        });
                 });
 
             modelBuilder.Entity("CollectManagement.Domain.Modems.Modem", b =>
@@ -643,6 +885,9 @@ namespace CollectManagement.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("ModemId");
+
+                    b.HasIndex("IMEI")
+                        .IsUnique();
 
                     b.HasIndex("SocieteId");
 
@@ -1126,6 +1371,61 @@ namespace CollectManagement.Infrastructure.Migrations
                     b.ToTable("Region");
                 });
 
+            modelBuilder.Entity("CollectManagement.Domain.Reseaux.Reseau", b =>
+                {
+                    b.Property<Guid>("ReseauId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DateInsertion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModification")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("GmtPlus")
+                        .HasColumnType("int");
+
+                    b.Property<string>("InsererPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<decimal?>("Latitude")
+                        .HasColumnType("decimal(18,10)");
+
+                    b.Property<decimal?>("Longitude")
+                        .HasColumnType("decimal(18,10)");
+
+                    b.Property<string>("ModifierPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Port")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("Rayon")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<Guid>("SocieteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("TimeToleranceMinute")
+                        .HasColumnType("int");
+
+                    b.HasKey("ReseauId");
+
+                    b.HasIndex("SocieteId");
+
+                    b.ToTable("Reseau");
+                });
+
             modelBuilder.Entity("CollectManagement.Domain.Shifts.Shift", b =>
                 {
                     b.Property<Guid>("ShiftId")
@@ -1177,20 +1477,81 @@ namespace CollectManagement.Infrastructure.Migrations
                     b.ToTable("Shift");
                 });
 
+            modelBuilder.Entity("CollectManagement.Domain.Sites.Site", b =>
+                {
+                    b.Property<Guid>("SiteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("DateInsertion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModification")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InsererPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<decimal?>("Latitude")
+                        .HasColumnType("decimal(18,10)");
+
+                    b.Property<string>("LibelleSite")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<decimal?>("Longitude")
+                        .HasColumnType("decimal(18,10)");
+
+                    b.Property<string>("ModifierPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("Rayon")
+                        .HasColumnType("decimal(18,3)");
+
+                    b.Property<bool>("Siege")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("SocieteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("TimeMinute")
+                        .HasColumnType("int");
+
+                    b.HasKey("SiteId");
+
+                    b.HasIndex("SocieteId");
+
+                    b.ToTable("Site");
+                });
+
             modelBuilder.Entity("CollectManagement.Domain.Societes.Societe", b =>
                 {
                     b.Property<Guid>("SocieteId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Adresse")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<decimal?>("Capital")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("decimal(18,3)")
                         .HasDefaultValue(0m);
+
+                    b.Property<string>("CodePostal")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("CodeSociete")
                         .HasMaxLength(50)
@@ -1217,6 +1578,10 @@ namespace CollectManagement.Infrastructure.Migrations
                         .HasMaxLength(13)
                         .HasColumnType("nvarchar(13)");
 
+                    b.Property<string>("Initiales")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<string>("InsererPar")
                         .HasColumnType("nvarchar(max)");
 
@@ -1237,6 +1602,14 @@ namespace CollectManagement.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("Pays")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Rc")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<string>("Rne")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -1249,9 +1622,33 @@ namespace CollectManagement.Infrastructure.Migrations
                         .HasMaxLength(13)
                         .HasColumnType("nvarchar(13)");
 
+                    b.Property<string>("Tva")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Ville")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.HasKey("SocieteId");
 
                     b.ToTable("Societe");
+
+                    b.HasData(
+                        new
+                        {
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0"),
+                            Capital = 0m,
+                            CodeSociete = "CST",
+                            DateOverture = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "admin@cst.tn",
+                            Initiales = "CST",
+                            MatriculeFiscal = "MF-CST-001",
+                            Nom = "CST",
+                            Rc = "RC-CST-001",
+                            Rne = "RNE-CST-001",
+                            Tva = "TVA-CST-001"
+                        });
                 });
 
             modelBuilder.Entity("CollectManagement.Domain.Utilisateurs.Entities.RoleUtilisateur", b =>
@@ -1275,9 +1672,41 @@ namespace CollectManagement.Infrastructure.Migrations
                     b.Property<string>("ModifierPar")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("SocieteId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("RoleUtilisateurId");
 
+                    b.HasIndex("SocieteId");
+
                     b.ToTable("RoleUtilisateur");
+                });
+
+            modelBuilder.Entity("CollectManagement.Domain.Utilisateurs.Entities.UtilisateurSite", b =>
+                {
+                    b.Property<Guid>("UtilisateurId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SiteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DateInsertion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateModification")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InsererPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ModifierPar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UtilisateurId", "SiteId");
+
+                    b.HasIndex("SiteId");
+
+                    b.ToTable("UtilisateurSite");
                 });
 
             modelBuilder.Entity("CollectManagement.Domain.Utilisateurs.Utilisateur", b =>
@@ -1340,6 +1769,30 @@ namespace CollectManagement.Infrastructure.Migrations
                     b.HasIndex("SocieteId");
 
                     b.ToTable("Utilisateur");
+
+                    b.HasData(
+                        new
+                        {
+                            UtilisateurId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0"),
+                            Email = "admin@cst.tn",
+                            IsActive = true,
+                            Nom = "Admin",
+                            NomUtilisateur = "admin",
+                            Password = "E2CF9A6F4CFCA46F74FC0E4CF7A5B278D3C20D9178E0DB936DBB3CF8E614C89E4D1C33229F39A457014D2D581CAA3DCE7F49C53803A176A4F891A9EB1D5A34BA",
+                            Prenom = "CST",
+                            SocieteId = new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0")
+                        });
+                });
+
+            modelBuilder.Entity("CollectManagement.Domain.Analyse.ReportLayout", b =>
+                {
+                    b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
+                        .WithMany()
+                        .HasForeignKey("SocieteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Societe");
                 });
 
             modelBuilder.Entity("CollectManagement.Domain.Bus.Bus", b =>
@@ -1539,7 +1992,29 @@ namespace CollectManagement.Infrastructure.Migrations
                     b.Navigation("Societe");
                 });
 
+            modelBuilder.Entity("CollectManagement.Domain.Reseaux.Reseau", b =>
+                {
+                    b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
+                        .WithMany()
+                        .HasForeignKey("SocieteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Societe");
+                });
+
             modelBuilder.Entity("CollectManagement.Domain.Shifts.Shift", b =>
+                {
+                    b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
+                        .WithMany()
+                        .HasForeignKey("SocieteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Societe");
+                });
+
+            modelBuilder.Entity("CollectManagement.Domain.Sites.Site", b =>
                 {
                     b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
                         .WithMany()
@@ -1552,6 +2027,11 @@ namespace CollectManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("CollectManagement.Domain.Utilisateurs.Entities.RoleUtilisateur", b =>
                 {
+                    b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
+                        .WithMany()
+                        .HasForeignKey("SocieteId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.OwnsMany("CollectManagement.Domain.Utilisateurs.Entities.Navigation", "Navigations", b1 =>
                         {
                             b1.Property<string>("NavigationId")
@@ -1603,6 +2083,27 @@ namespace CollectManagement.Infrastructure.Migrations
                         });
 
                     b.Navigation("Navigations");
+
+                    b.Navigation("Societe");
+                });
+
+            modelBuilder.Entity("CollectManagement.Domain.Utilisateurs.Entities.UtilisateurSite", b =>
+                {
+                    b.HasOne("CollectManagement.Domain.Sites.Site", "Site")
+                        .WithMany()
+                        .HasForeignKey("SiteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CollectManagement.Domain.Utilisateurs.Utilisateur", "Utilisateur")
+                        .WithMany("Sites")
+                        .HasForeignKey("UtilisateurId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Site");
+
+                    b.Navigation("Utilisateur");
                 });
 
             modelBuilder.Entity("CollectManagement.Domain.Utilisateurs.Utilisateur", b =>
@@ -1631,6 +2132,11 @@ namespace CollectManagement.Infrastructure.Migrations
             modelBuilder.Entity("CollectManagement.Domain.OrdresTravail.OrdreTravail", b =>
                 {
                     b.Navigation("OrdreTravailDetails");
+                });
+
+            modelBuilder.Entity("CollectManagement.Domain.Utilisateurs.Utilisateur", b =>
+                {
+                    b.Navigation("Sites");
                 });
 #pragma warning restore 612, 618
         }

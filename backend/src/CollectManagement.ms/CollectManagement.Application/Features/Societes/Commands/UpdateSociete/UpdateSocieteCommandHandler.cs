@@ -43,6 +43,9 @@ public class UpdateSocieteCommandHandler
             societeId,
             newImageName,
             request.Nom,
+            request.Initiales,
+            request.Tva,
+            request.Rc,
             request.MatriculeFiscal,
             request.Rne,
             request.Capital,
@@ -53,6 +56,9 @@ public class UpdateSocieteCommandHandler
             request.Fax2,
             request.Email,
             request.Adresse,
+            request.CodePostal,
+            request.Ville,
+            request.Pays,
             request.CodeSociete
         );
         await _societeRepository.UpdateBulkAsync(societe, cancellationToken)

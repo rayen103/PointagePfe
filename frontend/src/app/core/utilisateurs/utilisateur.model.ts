@@ -10,8 +10,7 @@ export interface Utilisateur {
     isActive:boolean;
     etat:number;
     societeId: string;
-
-
+    siteIds?: string[];
 }
 
 export interface PagedUtilisateur {

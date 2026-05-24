@@ -8,6 +8,7 @@ using CollectManagement.Domain.Chauffeurs;
 using CollectManagement.Domain.Chauffeurs.ValueObjects;
 using CollectManagement.Domain.Societes.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
+using CollectManagement.WebAPI.Authorization;
 
 namespace CollectManagement.WebAPI.EndPoints;
 
@@ -15,7 +16,7 @@ public class ChauffeurEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var routeGroupBuilder = app.MapGroup("cm/chauffeur").RequireAuthorization();
+        var routeGroupBuilder = app.MapGroup("cm/chauffeur").RequireNavigationPermission("fichier.chauffeur");
 
         routeGroupBuilder.MapGet("list", List);
         routeGroupBuilder.MapPost("add", Create);

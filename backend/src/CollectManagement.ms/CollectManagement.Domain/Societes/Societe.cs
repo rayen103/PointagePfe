@@ -11,6 +11,12 @@ public class Societe : AuditableEntity
 
     public string Nom { get; private set; }
     
+    public string? Initiales { get; private set; }
+
+    public string? Tva { get; private set; }
+
+    public string? Rc { get; private set; }
+
     public string? MatriculeFiscal { get; private set; }
 
     public string? Rne { get; private set; }
@@ -30,6 +36,12 @@ public class Societe : AuditableEntity
     public string? Email { get; private set; }
     
     public string? Adresse { get; private set; }
+
+    public string? CodePostal { get; private set; }
+
+    public string? Ville { get; private set; }
+
+    public string? Pays { get; private set; }
     
     public string? CodeSociete { get; private set; }
 
@@ -38,6 +50,9 @@ public class Societe : AuditableEntity
         SocieteId societeId,
         string? logoPath,
         string nom,
+        string? initiales,
+        string? tva,
+        string? rc,
         string? matriculeFiscal,
         string? rne,
         decimal? capital,
@@ -48,11 +63,17 @@ public class Societe : AuditableEntity
         string? fax2,
         string? email,
         string? adresse,
+        string? codePostal,
+        string? ville,
+        string? pays,
         string? codeSociete)
     {
         SocieteId = societeId;
         LogoPath = logoPath;
         Nom = nom;
+        Initiales = initiales;
+        Tva = tva;
+        Rc = rc;
         MatriculeFiscal = matriculeFiscal;
         Rne = rne;
         Capital = capital;
@@ -63,6 +84,9 @@ public class Societe : AuditableEntity
         Fax2 = fax2;
         Email = email;
         Adresse = adresse;
+        CodePostal = codePostal;
+        Ville = ville;
+        Pays = pays;
         CodeSociete = codeSociete;
     }
 
@@ -70,6 +94,9 @@ public class Societe : AuditableEntity
         SocieteId societeId,
         string? logoPath,
         string nom,
+        string? initiales,
+        string? tva,
+        string? rc,
         string? matriculeFiscal,
         string? rne,
         decimal? capital,
@@ -80,12 +107,18 @@ public class Societe : AuditableEntity
         string? fax2,
         string? email,
         string? adresse,
+        string? codePostal,
+        string? ville,
+        string? pays,
         string? codeSociete)
     {
         return new Societe(
             societeId,
             logoPath,
             nom,
+            initiales,
+            tva,
+            rc,
             matriculeFiscal,
             rne,
             capital,
@@ -96,12 +129,18 @@ public class Societe : AuditableEntity
             fax2,
             email,
             adresse,
+            codePostal,
+            ville,
+            pays,
             codeSociete);
     }
 
     public void Update(
         string? logoPath,
         string nom,
+        string? initiales,
+        string? tva,
+        string? rc,
         string? matriculeFiscal,
         string? rne,
         decimal? capital,
@@ -112,11 +151,17 @@ public class Societe : AuditableEntity
         string? fax2,
         string? email,
         string? adresse,
+        string? codePostal,
+        string? ville,
+        string? pays,
         string? codeSociete
     )
     {
         LogoPath = logoPath;
         Nom = nom;
+        Initiales = initiales;
+        Tva = tva;
+        Rc = rc;
         MatriculeFiscal = matriculeFiscal;
         Rne = rne;
         Capital = capital;
@@ -127,6 +172,9 @@ public class Societe : AuditableEntity
         Fax2 = fax2;
         Email = email;
         Adresse = adresse;
+        CodePostal = codePostal;
+        Ville = ville;
+        Pays = pays;
         CodeSociete = codeSociete;
     }
     
@@ -134,6 +182,9 @@ public class Societe : AuditableEntity
         SocieteId societeId,
         string? logoPath,
         string nom,
+        string? initiales,
+        string? tva,
+        string? rc,
         string? matriculeFiscal,
         string? rne,
         decimal? capital,
@@ -144,15 +195,21 @@ public class Societe : AuditableEntity
         string? fax2,
         string? email,
         string? adresse,
+        string? codePostal,
+        string? ville,
+        string? pays,
         string? codeSociete)
     {
         return new Societe(
             societeId, 
             logoPath,
-            nom, 
-            matriculeFiscal, 
-            rne, 
-            capital, 
+            nom,
+            initiales,
+            tva,
+            rc,
+            matriculeFiscal,
+            rne,
+            capital,
             dateOverture,
             telephone1,
             telephone2,
@@ -160,6 +217,9 @@ public class Societe : AuditableEntity
             fax2,
             email,
             adresse,
+            codePostal,
+            ville,
+            pays,
             codeSociete
         );
     }

@@ -16,7 +16,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
                 icon : 'mat_outline:group',
                 link : '/fichier/societe',
-                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
             },
             {
                 id   : 'fichier.utilisateur',
@@ -24,7 +24,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
                 icon : 'mat_outline:group',
                 link : '/fichier/utilisateur',
-                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
             },
         ]
     },
@@ -41,7 +41,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
                 icon : 'mat_outline:group',
                 link : '/dashboards/dashboard',
-                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
             },
         ]
     },
@@ -58,7 +58,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
                 icon : 'mat_outline:developer_board',
                 link : 'configurations/base',
-                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
             },
             {
                 id   : 'configurations.formule',
@@ -66,7 +66,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
                 icon : 'mat_outline:developer_board',
                 link : 'configurations/formule',
-                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
             },
 
         ]
@@ -84,7 +84,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
                 icon : 'mat_outline:developer_board',
                 link : 'bonMelanges/bonMelange',
-                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
             },
             {
                 id   : 'bonMelanges.gestionBonMelange',
@@ -92,7 +92,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
                 icon : 'mat_outline:developer_board',
                 link : 'bonMelanges/gestionBonMelange',
-                action:[FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete]
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
             },
 
         ]

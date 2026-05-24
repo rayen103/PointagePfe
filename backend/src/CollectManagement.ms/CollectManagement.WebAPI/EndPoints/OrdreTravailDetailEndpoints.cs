@@ -7,6 +7,7 @@ using CollectManagement.Application.Features.OrdresTravailDetails.Commands.Updat
 using CollectManagement.Application.Features.OrdresTravailDetails.Queries.GetByOrdreTravail;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using CollectManagement.WebAPI.Authorization;
 
 namespace CollectManagement.WebAPI.EndPoints;
 
@@ -14,7 +15,7 @@ public class OrdreTravailDetailEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var routeGroupBuilder = app.MapGroup("cm/ordre-travail-detail").RequireAuthorization();
+        var routeGroupBuilder = app.MapGroup("cm/ordre-travail-detail").RequireNavigationPermission("fichier.ordretravail");
 
         routeGroupBuilder.MapGet("{ordreTravailId}/list", GetByOrdreTravail);
         routeGroupBuilder.MapPost("add", CreateOrdreTravailDetail);

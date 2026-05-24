@@ -69,6 +69,7 @@ export class UtilisateurService {
             isActive: true,
             etat: null,
             societeId: '',
+            siteIds: []
         };
         this._utilisateurs.next([newUtilisateur, ...this._utilisateurs.value]);
         return of(newUtilisateur);

@@ -1,0 +1,17 @@
+<div class="rounded-lg bg-card border border-slate-200 dark:border-slate-700 overflow-hidden h-full">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+        <div class="font-semibold">Carte</div>
+        <mat-slide-toggle [checked]="showAll" (change)="toggleShowAll.emit($event.checked)">
+            Tous
+        </mat-slide-toggle>
+    </div>
+
+    <div class="p-2">
+        @if ((locations?.length ?? 0) === 0) {
+            <div class="p-4 text-sm text-hint">Aucune position à afficher.</div>
+        } @else {
+            <app-map-viewer [locations]="locations" [height]="'520px'" [zoom]="7"></app-map-viewer>
+        }
+    </div>
+</div>
+

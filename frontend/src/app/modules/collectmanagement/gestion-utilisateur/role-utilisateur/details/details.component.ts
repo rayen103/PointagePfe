@@ -27,6 +27,8 @@ import { RoleNavigation, RoleUtilisateur } from '../../../../../core/role-utilis
 import { RoleUtilisateurService } from '../../../../../core/role-utilisateur/role-utilisateur.service';
 import { NavigationService } from '../../../../../core/navigation/navigation.service';
 import { Navigation } from '../../../../../core/navigation/navigation.types';
+import { SocieteService } from '../../../../../core/Societe/societe.service';
+import { Societe } from '../../../../../core/Societe/societe.model';
 import {
     FuseNavigationAction,
     FuseNavigationItem,
@@ -72,9 +74,11 @@ export class RoleUtilisateurDetailsComponent implements OnInit, OnDestroy{
     private _router = inject(Router);
     private _roleUtilisateurService = inject(RoleUtilisateurService);
     private _navigationService = inject(NavigationService);
+    private _societeService = inject(SocieteService);
     private _fuseNavigationService = inject(FuseNavigationService);
 
     roleUtilisateur: RoleUtilisateur;
+    societes: Societe[] = [];
     navigation: Navigation;
     flatNavigation: FuseNavigationItem[];
     actions: EnumValue[] = [];
@@ -97,6 +101,17 @@ export class RoleUtilisateurDetailsComponent implements OnInit, OnDestroy{
                 this._changeDetectorRef.markForCheck();
             });
 
+        this._societeService.societes$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((items)=>{
+                this.societes=items;
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
+
+        this._societeService.GetSociete().subscribe();
+
         this._activatedRoute.data
             .subscribe(async (data) => {
 
@@ -110,7 +125,7 @@ export class RoleUtilisateurDetailsComponent implements OnInit, OnDestroy{
         this._roleUtilisateurService.actions$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((item)=>{
-                this.actions=item;
+                this.actions=[...(item ?? [])].sort((a, b) => a.id - b.id);
 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();

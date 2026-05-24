@@ -2,6 +2,7 @@ import {
     AfterViewInit,
     ChangeDetectionStrategy, ChangeDetectorRef,
     Component,
+    inject,
     OnDestroy,
     OnInit,
     ViewChild,
@@ -21,17 +22,21 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
+import { catchError, EMPTY, finalize, forkJoin, map, Observable, of, Subject, take, takeUntil } from 'rxjs';
 import { fuseAnimations } from '../../../../../@fuse/animations';
 import { Circuit } from '../../../../core/circuit/circuit.model';
-import { CircuitPointCollecte } from '../../../../core/circuit/circuit-point-collecte.model';
-import { CircuitPointCollecteService } from '../../../../core/circuit/circuit-point-collecte.service';
-import { catchError, EMPTY, finalize, forkJoin, map, Observable, of, Subject, take, takeUntil } from 'rxjs';
 import { CircuitService } from '../../../../core/circuit/circuit.service';
+import { CircuitPointCollecteService } from '../../../../core/circuit/circuit-point-collecte.service';
+import { CircuitPointCollecte } from '../../../../core/circuit/circuit-point-collecte.model';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UserService } from '../../../../core/user/user.service';
 import { MapPickerComponent, MapRoutePoint } from '../../../../shared/components/map-picker/map-picker.component';
 import { MatTableModule } from '@angular/material/table';
 import { MapGeocodingService } from '../../../../core/common/map-geocoding.service';
+import { PointCollecteService } from '../../../../core/point-collecte/point-collecte.service';
+import { PointCollecte } from '../../../../core/point-collecte/point-collecte.model';
+import { SelectionModel } from '@angular/cdk/collections';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-details',
@@ -55,6 +60,7 @@ import { MapGeocodingService } from '../../../../core/common/map-geocoding.servi
         RouterLink,
         MapPickerComponent,
         MatTableModule,
+        MatCheckboxModule,
     ],
   templateUrl: './details.component.html',
   styleUrl: './details.component.scss',
@@ -75,6 +81,10 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
     circuitRoutePoints: MapRoutePoint[] = [];
     departureAddressNotFound: boolean = false;
     arrivalAddressNotFound: boolean = false;
+    allPoints: PointCollecte[] = [];
+    selection = new SelectionModel<PointCollecte>(true, []);
+    displayedColumns: string[] = ['select', 'ordre', 'code', 'label', 'coords'];
+    
     private departureAddressPoint: MapRoutePoint | null = null;
     private arrivalAddressPoint: MapRoutePoint | null = null;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
@@ -85,6 +95,7 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         private formBuilder: FormBuilder,
         private _circuitService: CircuitService,
         private _circuitPointCollecteService: CircuitPointCollecteService,
+        private _pointCollecteService: PointCollecteService,
         private _mapGeocodingService: MapGeocodingService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _userService: UserService
@@ -105,13 +116,30 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
             codePCArrivee: [''],
             distanceKm: [null],
             dureeMinutes: [null],
-            couleur: [''],
+            couleur: ['#2196F3'],
+        });
+
+        // Load all collection points
+        this._pointCollecteService.GetPointsCollecte().subscribe(res => {
+            this.allPoints = res.pointsCollecte;
+            this._changeDetectorRef.markForCheck();
         });
 
         this.circuitForm.get('codePCDepart')?.addValidators([Validators.required]);
         this.circuitForm.get('codePCArrivee')?.addValidators([Validators.required]);
-        this.circuitForm.get('codePCDepart')?.updateValueAndValidity({ emitEvent: false });
-        this.circuitForm.get('codePCArrivee')?.updateValueAndValidity({ emitEvent: false });
+        
+        // Update map when start/end points change
+        this.circuitForm.get('codePCDepart').valueChanges
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(() => this.updateStartEndPointsOnMap());
+
+        this.circuitForm.get('codePCArrivee').valueChanges
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(() => this.updateStartEndPointsOnMap());
+
+        this.circuitForm.get('couleur').valueChanges
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(() => this._changeDetectorRef.markForCheck());
 
         this.newPointForm = this.formBuilder.group({
             codePointCollecte: ['', Validators.required],
@@ -178,6 +206,43 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                 }
             });
 
+    }
+
+    updateStartEndPointsOnMap(): void {
+        const startCode = this.circuitForm.get('codePCDepart').value;
+        const endCode = this.circuitForm.get('codePCArrivee').value;
+        
+        const startPoint = this.allPoints.find(p => p.codePointCollecte === startCode);
+        const endPoint = this.allPoints.find(p => p.codePointCollecte === endCode);
+        
+        this.departureAddressPoint = startPoint ? {
+            latitude: Number(startPoint.latitude),
+            longitude: Number(startPoint.longitude),
+            label: `Departure: ${startPoint.libellePointCollecte || startPoint.codePointCollecte}`
+        } : null;
+        
+        this.arrivalAddressPoint = endPoint ? {
+            latitude: Number(endPoint.latitude),
+            longitude: Number(endPoint.longitude),
+            label: `Arrival: ${endPoint.libellePointCollecte || endPoint.codePointCollecte}`
+        } : null;
+        
+        this.composeCircuitRoutePoints();
+        this._changeDetectorRef.markForCheck();
+    }
+
+    /** Whether the number of selected elements matches the total number of rows. */
+    isAllSelected(): boolean {
+        const numSelected = this.selection.selected.length;
+        const numRows = this.allPoints.length;
+        return numSelected === numRows;
+    }
+
+    /** Selects all rows if they are not all selected; otherwise clear selection. */
+    masterToggle(): void {
+        this.isAllSelected() ?
+            this.selection.clear() :
+            this.allPoints.forEach(row => this.selection.select(row));
     }
 
     onBackdropClicked(): void {
@@ -277,6 +342,40 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
             .subscribe(() => {
                 this._changeDetectorRef.markForCheck();
             });
+    }
+
+    /**
+     * Add selected points to circuit
+     */
+    addSelectedPoints(): void {
+        if (!this.selection.hasValue()) return;
+
+        const selectedPoints = this.selection.selected;
+        const circuitId = this.circuit.circuitId;
+
+        // Add points one by one (or batch if supported, but here one by one for simplicity matching existing pattern)
+        const observables = selectedPoints.map((point, index) => {
+            const newPoint: CircuitPointCollecte = {
+                circuitPointCollecteId: null,
+                circuitId: circuitId,
+                codePointCollecte: point.codePointCollecte,
+                libellePointCollecte: point.libellePointCollecte,
+                ordre: this.circuitPoints.length + index + 1,
+                latitude: point.latitude,
+                longitude: point.longitude
+            };
+            return this._circuitPointCollecteService.add(newPoint);
+        });
+
+        forkJoin(observables).subscribe(() => {
+            this.selection.clear();
+            // Reload circuit points
+            this._circuitPointCollecteService.getByCircuit(circuitId).subscribe(points => {
+                this.circuitPoints = points ?? [];
+                this.composeCircuitRoutePoints();
+                this._changeDetectorRef.markForCheck();
+            });
+        });
     }
 
     addWaypoint(): void {

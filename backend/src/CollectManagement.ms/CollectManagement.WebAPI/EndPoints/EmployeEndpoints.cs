@@ -8,6 +8,7 @@ using CollectManagement.Application.Features.Employes.Queries.GetOneEmploye;
 using CollectManagement.Application.Features.Employes.Queries.GetPagedListEmploye;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using CollectManagement.WebAPI.Authorization;
 
 namespace CollectManagement.WebAPI.EndPoints;
 
@@ -15,7 +16,7 @@ public class EmployeEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var routeGroupBuilder = app.MapGroup("cm/employe").RequireAuthorization();
+        var routeGroupBuilder = app.MapGroup("cm/employe").RequireNavigationPermission("fichier.employe");
 
         routeGroupBuilder.MapGet("list", EmployeList);
         routeGroupBuilder.MapPost("add", CreateEmploye);

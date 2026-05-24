@@ -76,6 +76,7 @@ export class RoleUtilisateurService {
         const roleUtilisateur: RoleUtilisateur = {
             roleUtilisateurId: null,
             libelleRoleUtilisateur: null,
+            societeId: null,
             navigations: []
         };
 

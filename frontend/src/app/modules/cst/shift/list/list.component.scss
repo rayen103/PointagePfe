@@ -2,12 +2,14 @@
     grid-template-columns: 48px auto;
 
     @screen sm {
-        grid-template-columns: 1fr 2fr 1fr 80px 80px 100px 100px;
+        grid-template-columns: 1fr 2fr 100px 100px 120px;
     }
 }
 
 .shift-grid-header {
-    grid-template-columns: 1fr 2fr 1fr 80px 80px 100px 100px;
+    @screen sm {
+        grid-template-columns: 1fr 2fr 100px 100px 120px;
+    }
 }
 
 .shift-grid-item {

@@ -9,6 +9,7 @@ using CollectManagement.Application.Features.Societes.Queries.GetOneSociete;
 using CollectManagement.Application.Features.Societes.Queries.GetPagedListSociete;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using CollectManagement.WebAPI.Authorization;
 
 namespace CollectManagement.WebAPI.EndPoints;
 
@@ -16,7 +17,7 @@ public class SocieteEndpoints :ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var routeGroupBuilder = app.MapGroup("cm/societe").RequireAuthorization();
+        var routeGroupBuilder = app.MapGroup("cm/societe").RequireNavigationPermission("fichier.societe");
         
         routeGroupBuilder.MapGet("list",SocieteList).AllowAnonymous();
         routeGroupBuilder.MapPost("add",CreateSociete);

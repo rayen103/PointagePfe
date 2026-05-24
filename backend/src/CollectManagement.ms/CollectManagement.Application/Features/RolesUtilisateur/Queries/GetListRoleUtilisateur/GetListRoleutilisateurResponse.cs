@@ -1,4 +1,4 @@
-﻿namespace CollectManagement.Application.Features.RolesUtilisateur.Queries.GetListRoleUtilisateur;
+namespace CollectManagement.Application.Features.RolesUtilisateur.Queries.GetListRoleUtilisateur;
 
 public record GetListRoleutilisateurResponse(
     List<GetListRoleUtilisateurDto> RolesUtilisateur,
@@ -7,6 +7,7 @@ public record GetListRoleutilisateurResponse(
 public record GetListRoleUtilisateurDto(
     Ulid RoleUtilisateurId,
     string LibelleRoleUtilisateur,
+    Ulid? SocieteId,
     List<GetListRoleUtilisateurNavigation> Navigations);
 public record GetListRoleUtilisateurNavigation(
     string NavigationId,

@@ -8,6 +8,7 @@ using CollectManagement.Domain.Regions;
 using CollectManagement.Domain.Regions.ValueObjects;
 using CollectManagement.Domain.Societes.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
+using CollectManagement.WebAPI.Authorization;
 
 namespace CollectManagement.WebAPI.EndPoints;
 
@@ -15,7 +16,7 @@ public class RegionEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var routeGroupBuilder = app.MapGroup("cm/region").RequireAuthorization();
+        var routeGroupBuilder = app.MapGroup("cm/region").RequireNavigationPermission("fichier.region");
 
         routeGroupBuilder.MapGet("list", List);
         routeGroupBuilder.MapPost("add", Create);

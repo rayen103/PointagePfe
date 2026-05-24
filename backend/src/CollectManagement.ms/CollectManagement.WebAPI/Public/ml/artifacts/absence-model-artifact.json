@@ -1,0 +1,7 @@
+{
+  "modelVersion": "external-cold-start-v1",
+  "artifactType": "absence-binary-classifier",
+  "sampleCount": 12,
+  "keyCount": 12,
+  "globalAbsenceRate": 0.4167
+}

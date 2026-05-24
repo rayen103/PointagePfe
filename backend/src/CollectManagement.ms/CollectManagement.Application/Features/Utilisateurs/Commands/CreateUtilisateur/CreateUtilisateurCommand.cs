@@ -1,4 +1,4 @@
-﻿namespace CollectManagement.Application.Features.Utilisateurs.Commands.CreateUtilisateur;
+namespace CollectManagement.Application.Features.Utilisateurs.Commands.CreateUtilisateur;
 
 public record CreateUtilisateurCommand(
     string NomUtilisateur,
@@ -8,6 +8,6 @@ public record CreateUtilisateurCommand(
     string Password,
     Ulid? RoleUtilisateurId,
     bool IsActive,
-    Ulid SocieteId
-
+    Ulid SocieteId,
+    List<Ulid> SiteIds
 ):IRequest<CreateUtilisateurResponse>;

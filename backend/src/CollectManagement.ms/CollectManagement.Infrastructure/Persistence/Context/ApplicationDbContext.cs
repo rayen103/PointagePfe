@@ -1,4 +1,4 @@
-﻿using CollectManagement.Domain.Common;
+using CollectManagement.Domain.Common;
 
 namespace CollectManagement.Infrastructure.Persistence.Context;
 
@@ -10,6 +10,9 @@ public class ApplicationDbContext: DbContext
     {
         
     }
+
+    public DbSet<CollectManagement.Domain.Bus.BusRuntimeEvent> BusRuntimeEvent { get; set; }
+    public DbSet<CollectManagement.Domain.Analyse.ReportLayout> ReportLayout { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1,4 +1,4 @@
-﻿namespace CollectManagement.Application.Features.Utilisateurs.Commands.UpdateUtilisateur;
+namespace CollectManagement.Application.Features.Utilisateurs.Commands.UpdateUtilisateur;
 
 public record UpdateUtilisateurCommand(
     Ulid UtilisateurId,
@@ -9,5 +9,6 @@ public record UpdateUtilisateurCommand(
     string Password,
     Ulid? RoleUtilisateurId,
     bool IsActive,
-    Ulid SocieteId
+    Ulid SocieteId,
+    List<Ulid> SiteIds
 ) : IRequest;

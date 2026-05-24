@@ -30,5 +30,13 @@ public class UpdateEmployeCommandValidator : AbstractValidator<UpdateEmployeComm
             .NotEmpty()
             .NotNull()
             .WithMessage("SocieteId is required.");
+
+        RuleFor(r => r.CodeCircuit)
+            .NotEmpty()
+            .WithMessage("Le circuit est obligatoire.");
+
+        RuleFor(r => r.CodePointCollecte)
+            .NotEmpty()
+            .WithMessage("Le point de collecte est obligatoire.");
     }
 }

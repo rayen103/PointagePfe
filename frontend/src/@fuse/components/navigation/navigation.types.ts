@@ -41,11 +41,15 @@ export interface FuseNavigationItem {
 }
 
 export enum FuseNavigationAction {
-    Add = 0,
-    Edit = 1,
-    Delete = 2,
-    Print = 3,
-    Duplicate = 4
+    View = 0,
+    Add = 1,
+    Edit = 2,
+    Delete = 3,
+    Preview = 4,
+    Print = 5,
+    Export = 6,
+    Search = 7,
+    Duplicate = 8,
 }
 
 export type FuseVerticalNavigationAppearance =

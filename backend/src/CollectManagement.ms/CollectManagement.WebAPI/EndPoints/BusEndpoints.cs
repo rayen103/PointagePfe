@@ -19,6 +19,7 @@ using CollectManagement.Domain.PointsCollecte;
 using CollectManagement.Domain.PointsCollecte.ValueObjects;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using CollectManagement.WebAPI.Authorization;
 
 namespace CollectManagement.WebAPI.EndPoints;
 
@@ -29,7 +30,7 @@ public class BusEndpoints : ICarterModule
 
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var routeGroupBuilder = app.MapGroup("cm/bus").RequireAuthorization();
+        var routeGroupBuilder = app.MapGroup("cm/bus").RequireNavigationPermission("fichier.bus");
 
         routeGroupBuilder.MapGet("list", BusList);
         routeGroupBuilder.MapPost("add", CreateBus);
@@ -466,7 +467,7 @@ public class BusEndpoints : ICarterModule
         CancellationToken cancellationToken)
     {
         var generatedCode = BuildAutoPointCollecteCode(occurredAtUtc);
-        var label = $"AUTO {bus.NumeroIMM} {occurredAtUtc:yyyy-MM-dd HH:mm:ss}";
+        var label = $"Point Auto - {bus.NumeroIMM} ({occurredAtUtc:HH:mm:ss})";
         if (label.Length > 200)
             label = label[..200];
 
@@ -487,8 +488,7 @@ public class BusEndpoints : ICarterModule
 
     private static string BuildAutoPointCollecteCode(DateTime occurredAtUtc)
     {
-        var suffix = Ulid.NewUlid().ToString()[^6..];
-        var code = $"AUTO-{occurredAtUtc:yyyyMMddHHmmss}-{suffix}";
+        var code = $"PC-AUTO-{occurredAtUtc:yyyyMMddHHmmss}";
         return code.Length <= 50 ? code : code[..50];
     }
 

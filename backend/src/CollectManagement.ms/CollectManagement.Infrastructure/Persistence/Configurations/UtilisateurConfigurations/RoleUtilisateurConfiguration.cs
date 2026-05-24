@@ -1,4 +1,5 @@
-﻿using CollectManagement.Domain.Utilisateurs.Entities;
+using CollectManagement.Domain.Societes.ValueObjects;
+using CollectManagement.Domain.Utilisateurs.Entities;
 using CollectManagement.Domain.Utilisateurs.ValueObjects;
 using CollectManagement.Infrastructure.Persistence.Configurations.Common;
 
@@ -17,6 +18,15 @@ public class RoleUtilisateurConfiguration : IEntityTypeConfiguration<RoleUtilisa
         builder.Property(x => x.LibelleRoleUtilisateur)
             .HasColumnType("nvarchar(20)")
             .IsRequired();
+
+        builder.Property(p => p.SocieteId)
+            .HasConversion(c => c.Value.ToGuid(),
+                value => new SocieteId(new Ulid(value)));
+
+        builder.HasOne(x => x.Societe)
+            .WithMany()
+            .HasForeignKey(x => x.SocieteId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.OwnsMany(m => m.Navigations, navBuilder =>
         {

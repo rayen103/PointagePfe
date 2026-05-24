@@ -8,6 +8,7 @@ using CollectManagement.Application.Features.Circuits.Queries.GetOneCircuit;
 using CollectManagement.Application.Features.Circuits.Queries.GetPagedListCircuit;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using CollectManagement.WebAPI.Authorization;
 
 namespace CollectManagement.WebAPI.EndPoints;
 
@@ -15,7 +16,7 @@ public class CircuitEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var routeGroupBuilder = app.MapGroup("cm/circuit").RequireAuthorization();
+        var routeGroupBuilder = app.MapGroup("cm/circuit").RequireNavigationPermission("fichier.circuit");
 
         routeGroupBuilder.MapGet("list", CircuitList);
         routeGroupBuilder.MapPost("add", CreateCircuit);

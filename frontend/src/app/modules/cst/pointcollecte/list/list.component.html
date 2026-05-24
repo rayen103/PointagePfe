@@ -180,6 +180,12 @@
                                                 </span>
                                             </div>
                                         </div>
+
+                                        @if(mapLocations.length > 0){
+                                            <div class="mt-6 h-80 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700">
+                                                <app-map-viewer [locations]="mapLocations" [height]="'100%'" [zoom]="13"></app-map-viewer>
+                                            </div>
+                                        }
                                     </div>
                                 }
                             </div>

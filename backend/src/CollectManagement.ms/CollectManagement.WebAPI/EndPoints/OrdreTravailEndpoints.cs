@@ -8,6 +8,7 @@ using CollectManagement.Application.Features.OrdresTravail.Queries.GetOneOrdreTr
 using CollectManagement.Application.Features.OrdresTravail.Queries.GetPagedListOrdreTravail;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using CollectManagement.WebAPI.Authorization;
 
 namespace CollectManagement.WebAPI.EndPoints;
 
@@ -15,7 +16,7 @@ public class OrdreTravailEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var routeGroupBuilder = app.MapGroup("cm/ordretravail").RequireAuthorization();
+        var routeGroupBuilder = app.MapGroup("cm/ordretravail").RequireNavigationPermission("fichier.ordretravail");
 
         routeGroupBuilder.MapGet("list", OrdreTravailList);
         routeGroupBuilder.MapPost("add", CreateOrdreTravail);

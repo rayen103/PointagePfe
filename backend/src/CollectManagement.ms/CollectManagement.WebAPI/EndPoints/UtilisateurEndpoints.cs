@@ -8,6 +8,7 @@ using CollectManagement.Application.Features.Utilisateurs.Queries.GetUtilisateur
 using CollectManagement.Domain.Utilisateurs.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using CollectManagement.WebAPI.Authorization;
 
 namespace CollectManagement.WebAPI.EndPoints;
 
@@ -15,7 +16,7 @@ public class UtilisateurEndpoints : ICarterModule
 {
    public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var routeGroupBuilder = app.MapGroup("cm/utilisateur").RequireAuthorization();
+        var routeGroupBuilder = app.MapGroup("cm/utilisateur").RequireNavigationPermission("fichier.utilisateur");
 
         //routeGroupBuilder.MapPost("v1/create", CreateAdmin);
         routeGroupBuilder.MapPost("create", Create);

@@ -116,6 +116,10 @@ export const appRoutes: Route[] = [
             {path: 'rattachement', pathMatch: 'full', redirectTo: 'fichier/rattachement'},
             {path: 'shift', pathMatch: 'full', redirectTo: 'fichier/shift'},
             {path: 'bus', pathMatch: 'full', redirectTo: 'fichier/bus'},
+            {path: 'region', pathMatch: 'full', redirectTo: 'fichier/region'},
+            {path: 'gouvernorat', pathMatch: 'full', redirectTo: 'fichier/gouvernorat'},
+            {path: 'chauffeur', pathMatch: 'full', redirectTo: 'fichier/chauffeur'},
+            {path: 'modem', pathMatch: 'full', redirectTo: 'fichier/modem'},
             {path: 'chantier', pathMatch: 'full', redirectTo: 'fichier/chantier'},
             {path: 'rattachement-employe', pathMatch: 'full', redirectTo: 'fichier/rattachement-employe'},
             {path: 'rattachement-article', pathMatch: 'full', redirectTo: 'fichier/rattachement-article'},
@@ -154,6 +158,18 @@ export const appRoutes: Route[] = [
                     {path:'bus',
                         data:{navigationId:'fichier.bus'},
                         loadChildren:() => import('./modules/cst/bus/bus.routes')},
+                    {path:'region',
+                        data:{navigationId:'fichier.region'},
+                        loadChildren:() => import('./modules/cst/region/region.routes')},
+                    {path:'gouvernorat',
+                        data:{navigationId:'fichier.gouvernorat'},
+                        loadChildren:() => import('./modules/cst/gouvernorat/gouvernorat.routes')},
+                    {path:'chauffeur',
+                        data:{navigationId:'fichier.chauffeur'},
+                        loadChildren:() => import('./modules/cst/chauffeur/chauffeur.routes')},
+                    {path:'modem',
+                        data:{navigationId:'fichier.modem'},
+                        loadChildren:() => import('./modules/cst/modem/modem.routes')},
                     {path:'chantier',
                         data:{navigationId:'fichier.chantier'},
                         loadChildren:() => import('./modules/cst/chantier/chantier.routes')},
@@ -165,11 +181,27 @@ export const appRoutes: Route[] = [
                         loadChildren:() => import('./modules/cst/rattachement-article/rattachement-article.routes')},
                 ]},
 
+            // Monitoring
+            {
+                path: 'monitoring',
+                children: [
+                    {
+                        path: 'bus-tracking',
+                        data: { navigationId: 'monitoring.bus-tracking' },
+                        loadChildren: () =>
+                            import(
+                                'app/modules/collectmanagement/monitoring/bus-tracking/bus-tracking.routes'
+                            ),
+                    },
+                ],
+            },
 
-
-
-
-
+            // Analyse / BI
+            {
+                path: 'analyse',
+                data: { navigationId: 'analyse' },
+                loadChildren: () => import('app/modules/collectmanagement/analyse/analyse.routes'),
+            },
 
 
         ],

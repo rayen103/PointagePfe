@@ -8,6 +8,7 @@ using CollectManagement.Application.Features.RattachementEmployes.Queries.GetOne
 using CollectManagement.Application.Features.RattachementEmployes.Queries.GetPagedListRattachementEmploye;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using CollectManagement.WebAPI.Authorization;
 
 namespace CollectManagement.WebAPI.EndPoints;
 
@@ -15,7 +16,7 @@ public class RattachementEmployeEndpoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var routeGroupBuilder = app.MapGroup("cm/rattachement-employe").RequireAuthorization();
+        var routeGroupBuilder = app.MapGroup("cm/rattachement-employe").RequireNavigationPermission("fichier.rattachement");
 
         routeGroupBuilder.MapGet("list", RattachementEmployeList);
         routeGroupBuilder.MapPost("add", CreateRattachementEmploye);

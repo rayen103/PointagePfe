@@ -26,6 +26,14 @@ import { FuseConfirmationService } from '../../../../../@fuse/services/confirmat
 import { RoleNavigation } from '../../../../core/role-utilisateur/role-utilisateur.model';
 import { FuseNavigationAction } from '../../../../../@fuse/components/navigation';
 
+export interface GroupedShift {
+    codeShift: string;
+    libelleShift?: string;
+    isActive: boolean;
+    shifts: Shift[];
+    isExpanded?: boolean;
+}
+
 @Component({
   selector: 'app-list',
   standalone: true,
@@ -53,6 +61,7 @@ export class ListComponent implements OnInit, OnDestroy {
     @ViewChild(MatSort) private _sort: MatSort;
 
     shift$: Observable<Shift[]>;
+    groupedShifts$: Observable<GroupedShift[]>;
 
     flashMessage: 'success' | 'error' | null = null;
     isLoading: boolean = false;
@@ -98,6 +107,26 @@ export class ListComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.shift$ = this._shiftService.shifts$;
 
+        this.groupedShifts$ = this.shift$.pipe(
+            map((shifts) => {
+                if (!shifts) return [];
+                const groups: { [key: string]: GroupedShift } = {};
+                shifts.forEach((shift) => {
+                    if (!groups[shift.codeShift]) {
+                        groups[shift.codeShift] = {
+                            codeShift: shift.codeShift,
+                            libelleShift: shift.libelleShift,
+                            isActive: shift.isActive,
+                            shifts: [],
+                            isExpanded: false
+                        };
+                    }
+                    groups[shift.codeShift].shifts.push(shift);
+                });
+                return Object.values(groups);
+            })
+        );
+
         this._shiftService.shiftsLength$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((length) => {
@@ -115,6 +144,11 @@ export class ListComponent implements OnInit, OnDestroy {
                 })
             )
             .subscribe();
+    }
+
+    toggleGroup(group: GroupedShift): void {
+        group.isExpanded = !group.isExpanded;
+        this._changeDetectorRef.markForCheck();
     }
 
     toggleDetails(shiftId: string): void {

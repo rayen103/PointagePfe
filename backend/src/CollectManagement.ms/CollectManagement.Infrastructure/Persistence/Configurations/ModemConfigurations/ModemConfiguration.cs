@@ -18,6 +18,9 @@ public class ModemConfiguration : IEntityTypeConfiguration<Modem>
             .HasMaxLength(50)
             .IsRequired();
 
+        builder.HasIndex(p => p.IMEI)
+            .IsUnique();
+
         builder.Property(p => p.ModelModem)
             .HasMaxLength(100);
 

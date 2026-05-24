@@ -2,9 +2,11 @@ import {
     AfterViewInit,
     ChangeDetectionStrategy,
     Component,
+    EventEmitter,
     Input,
     OnChanges,
     OnDestroy,
+    Output,
     SimpleChanges,
     ViewEncapsulation,
 } from '@angular/core';
@@ -27,6 +29,7 @@ export interface MapLocation {
     longitude: number;
     isActive?: boolean;
     description?: string;
+    color?: string;
 }
 
 @Component({
@@ -41,6 +44,7 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
     @Input() locations: MapLocation[] = [];
     @Input() height: string = '600px';
     @Input() zoom: number = 7;
+    @Output() readonly mapClick = new EventEmitter<L.LeafletMouseEvent>();
 
     private map: LeafletMap | null = null;
     private markers: Marker[] = [];
@@ -73,6 +77,11 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
             attribution: '© OpenStreetMap contributors',
             maxZoom: 19,
         }).addTo(this.map);
+
+        // Register map click event
+        this.map.on('click', (event: L.LeafletMouseEvent) => {
+            this.mapClick.emit(event);
+        });
 
         // Add markers for locations
         this.updateMarkers();
@@ -141,6 +150,7 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
         locationsByCircuit.forEach((locations) => {
             const departure = locations.find((location) => location.pointType === 'departure');
             const arrival = locations.find((location) => location.pointType === 'arrival');
+            const circuitColor = locations[0]?.color || '#2563eb';
 
             if (!departure || !arrival) {
                 return;
@@ -159,7 +169,7 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
                 routeWhileDragging: false,
                 createMarker: () => null,
                 lineOptions: {
-                    styles: [{ color: '#2563eb', weight: 3, opacity: 0.8 }],
+                    styles: [{ color: circuitColor, weight: 3, opacity: 0.8 }],
                     extendToWaypoints: true,
                     missingRouteTolerance: 0,
                 },
@@ -171,7 +181,7 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
                             [arrival.latitude, arrival.longitude],
                         ],
                         {
-                            color: '#2563eb',
+                            color: circuitColor,
                             weight: 3,
                             opacity: 0.8,
                         }

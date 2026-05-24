@@ -34,6 +34,10 @@ public class EmployeConfiguration : IEntityTypeConfiguration<Employe>
             .HasMaxLength(100)
             .IsRequired();
 
+        builder.HasIndex(p => p.RFID)
+            .IsUnique()
+            .HasFilter("[RFID] IS NOT NULL");
+
         builder.Property(p => p.TypeEmploye)
             .HasConversion(v => v.ToString(), v => Enum.Parse<TypeEmploye>(v))
             .HasMaxLength(20)

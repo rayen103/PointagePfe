@@ -220,10 +220,25 @@
 
                                 </div>
 
-                                <div class="flex items-center w-full gap-2">
-
-
-
+                                <!-- Site Assignment Section -->
+                                <div class="flex flex-col w-full mt-4 border rounded-lg overflow-hidden">
+                                    <div class="flex items-center px-4 py-2 bg-slate-100 dark:bg-slate-800 border-b font-semibold">
+                                        <mat-checkbox 
+                                            [checked]="selectedSiteIds.length === allSites.length && allSites.length > 0"
+                                            [indeterminate]="selectedSiteIds.length > 0 && selectedSiteIds.length < allSites.length"
+                                            (change)="toggleAllSites()">
+                                            {{ t('Assign-Sites') }} ({{ t('Select-All') }})
+                                        </mat-checkbox>
+                                    </div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 max-h-60 overflow-y-auto">
+                                        @for (site of allSites; track site.siteId) {
+                                            <mat-checkbox 
+                                                [checked]="isSiteSelected(site.siteId)"
+                                                (change)="toggleSite(site.siteId)">
+                                                {{ site.libelleSite }} ({{ site.code }})
+                                            </mat-checkbox>
+                                        }
+                                    </div>
                                 </div>
 
                             </div>
