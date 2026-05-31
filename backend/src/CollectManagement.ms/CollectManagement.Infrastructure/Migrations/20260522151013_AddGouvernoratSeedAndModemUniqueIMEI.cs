@@ -34,6 +34,11 @@ BEGIN
     ALTER TABLE [dbo].[Region] ADD [IsActive] bit NOT NULL CONSTRAINT [DF_Region_IsActive] DEFAULT CAST(1 AS bit);
 END;
 
+IF COL_LENGTH('dbo.Region', 'CodeGouvernorat') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Region] ADD [CodeGouvernorat] nvarchar(50) NULL;
+END;
+
 IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'FK_Gouvernorat_Region_RegionId')
 BEGIN
     ALTER TABLE [dbo].[Gouvernorat] DROP CONSTRAINT [FK_Gouvernorat_Region_RegionId];

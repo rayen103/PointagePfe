@@ -36,7 +36,16 @@ var app = builder.Build();
 // Apply any pending EF Core migrations automatically on startup
 using (var scope = app.Services.CreateScope())
 {
-    scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.Migrate();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.Migrate();
+    
+    // Add missing CodeGouvernorat column if needed
+    dbContext.Database.ExecuteSqlRaw(@"
+IF COL_LENGTH('dbo.Region', 'CodeGouvernorat') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Region] ADD [CodeGouvernorat] nvarchar(50) NULL;
+END;
+");
 }
 
 //Handle exceptions priority it's important

@@ -1,0 +1,179 @@
+using System;
+using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace CollectManagement.Infrastructure.Migrations
+{
+    /// <inheritdoc />
+    public partial class FixSatelliteEntities : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            // Fix Region table
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Region', 'CodeGouvernorat') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Region] ADD [CodeGouvernorat] nvarchar(50) NULL;
+END;
+");
+
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Region', 'CodeRegion') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Region] ADD [CodeRegion] nvarchar(50) NOT NULL DEFAULT '';
+END;
+");
+
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Region', 'LibelleRegion') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Region] ADD [LibelleRegion] nvarchar(200) NULL;
+END;
+");
+
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Region', 'IsActive') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Region] ADD [IsActive] bit NOT NULL DEFAULT 1;
+END;
+");
+
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Region', 'SocieteId') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Region] ADD [SocieteId] uniqueidentifier NOT NULL;
+END;
+");
+
+            // Fix Modem table
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Modem', 'IMEI') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Modem] ADD [IMEI] nvarchar(50) NOT NULL DEFAULT '';
+END;
+");
+
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Modem', 'ModelModem') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Modem] ADD [ModelModem] nvarchar(100) NULL;
+END;
+");
+
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Modem', 'NumeroSim') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Modem] ADD [NumeroSim] nvarchar(50) NULL;
+END;
+");
+
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Modem', 'IsActive') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Modem] ADD [IsActive] bit NOT NULL DEFAULT 1;
+END;
+");
+
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Modem', 'SocieteId') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Modem] ADD [SocieteId] uniqueidentifier NOT NULL;
+END;
+");
+
+            // Fix Chauffeur table
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Chauffeur', 'CodeChauffeur') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Chauffeur] ADD [CodeChauffeur] nvarchar(50) NOT NULL DEFAULT '';
+END;
+");
+
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Chauffeur', 'Nom') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Chauffeur] ADD [Nom] nvarchar(100) NOT NULL DEFAULT '';
+END;
+");
+
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Chauffeur', 'Prenom') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Chauffeur] ADD [Prenom] nvarchar(100) NULL;
+END;
+");
+
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Chauffeur', 'CIN') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Chauffeur] ADD [CIN] nvarchar(50) NULL;
+END;
+");
+
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Chauffeur', 'RFIDChauffeur') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Chauffeur] ADD [RFIDChauffeur] nvarchar(50) NULL;
+END;
+");
+
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Chauffeur', 'Externe') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Chauffeur] ADD [Externe] bit NOT NULL DEFAULT 0;
+END;
+");
+
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Chauffeur', 'IsActive') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Chauffeur] ADD [IsActive] bit NOT NULL DEFAULT 1;
+END;
+");
+
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Chauffeur', 'SocieteId') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Chauffeur] ADD [SocieteId] uniqueidentifier NOT NULL;
+END;
+");
+
+            // Fix Gouvernorat table
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Gouvernorat', 'CodeGouvernorat') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Gouvernorat] ADD [CodeGouvernorat] nvarchar(50) NOT NULL DEFAULT '';
+END;
+");
+
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Gouvernorat', 'LibelleGouvernorat') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Gouvernorat] ADD [LibelleGouvernorat] nvarchar(200) NULL;
+END;
+");
+
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Gouvernorat', 'IsActive') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Gouvernorat] ADD [IsActive] bit NOT NULL DEFAULT 1;
+END;
+");
+
+            migrationBuilder.Sql(@"
+IF COL_LENGTH('dbo.Gouvernorat', 'SocieteId') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Gouvernorat] ADD [SocieteId] uniqueidentifier NOT NULL;
+END;
+");
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            // No down migration needed since this is a fix
+        }
+    }
+}
