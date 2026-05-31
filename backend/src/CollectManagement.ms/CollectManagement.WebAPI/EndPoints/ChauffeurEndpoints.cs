@@ -183,8 +183,8 @@ public class ChauffeurEndpoints : ICarterModule
         string? CIN,
         string? RFIDChauffeur,
         bool Externe,
-        bool IsActive = true,
-        Ulid SocieteId);
+        Ulid SocieteId,
+        bool IsActive = true);
 
     public record UpdateChauffeurRequest(
         Ulid ChauffeurId,

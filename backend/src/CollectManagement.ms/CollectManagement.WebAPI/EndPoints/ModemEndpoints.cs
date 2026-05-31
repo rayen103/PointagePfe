@@ -156,8 +156,8 @@ public class ModemEndpoints : ICarterModule
         string IMEI,
         string? ModelModem,
         string? NumeroSim,
-        bool IsActive = true,
-        Ulid SocieteId);
+        Ulid SocieteId,
+        bool IsActive = true);
 
     public record UpdateModemRequest(
         Ulid ModemId,
