@@ -156,7 +156,7 @@ public class RegionEndpoints : ICarterModule
         string CodeRegion,
         string? LibelleRegion,
         string? CodeGouvernorat,
-        bool IsActive,
+        bool IsActive = true,
         Ulid SocieteId);
 
     public record UpdateRegionRequest(

@@ -149,7 +149,7 @@ public class GouvernoratEndpoints : ICarterModule
     public record UpsertGouvernoratRequest(
         string CodeGouvernorat,
         string? LibelleGouvernorat,
-        bool IsActive,
+        bool IsActive = true,
         Ulid SocieteId);
 
     public record UpdateGouvernoratRequest(

@@ -39,11 +39,62 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     dbContext.Database.Migrate();
     
-    // Add missing CodeGouvernorat column if needed
-    dbContext.Database.ExecuteSqlRaw(@"
+    // Add missing columns and fix defaults
+        dbContext.Database.ExecuteSqlRaw(@"
+-- Fix Region table
 IF COL_LENGTH('dbo.Region', 'CodeGouvernorat') IS NULL
 BEGIN
     ALTER TABLE [dbo].[Region] ADD [CodeGouvernorat] nvarchar(50) NULL;
+END;
+IF COL_LENGTH('dbo.Region', 'IsActive') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Region] ADD [IsActive] bit NOT NULL CONSTRAINT [DF_Region_IsActive] DEFAULT CAST(1 AS bit);
+END
+ELSE
+BEGIN
+    IF OBJECT_ID('DF_Region_IsActive', 'D') IS NULL
+    BEGIN
+        ALTER TABLE [dbo].[Region] ADD CONSTRAINT [DF_Region_IsActive] DEFAULT CAST(1 AS bit) FOR [IsActive];
+    END;
+END;
+
+-- Fix Modem table
+IF COL_LENGTH('dbo.Modem', 'IsActive') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Modem] ADD [IsActive] bit NOT NULL CONSTRAINT [DF_Modem_IsActive] DEFAULT CAST(1 AS bit);
+END
+ELSE
+BEGIN
+    IF OBJECT_ID('DF_Modem_IsActive', 'D') IS NULL
+    BEGIN
+        ALTER TABLE [dbo].[Modem] ADD CONSTRAINT [DF_Modem_IsActive] DEFAULT CAST(1 AS bit) FOR [IsActive];
+    END;
+END;
+
+-- Fix Chauffeur table
+IF COL_LENGTH('dbo.Chauffeur', 'IsActive') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Chauffeur] ADD [IsActive] bit NOT NULL CONSTRAINT [DF_Chauffeur_IsActive] DEFAULT CAST(1 AS bit);
+END
+ELSE
+BEGIN
+    IF OBJECT_ID('DF_Chauffeur_IsActive', 'D') IS NULL
+    BEGIN
+        ALTER TABLE [dbo].[Chauffeur] ADD CONSTRAINT [DF_Chauffeur_IsActive] DEFAULT CAST(1 AS bit) FOR [IsActive];
+    END;
+END;
+
+-- Fix Gouvernorat table
+IF COL_LENGTH('dbo.Gouvernorat', 'IsActive') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Gouvernorat] ADD [IsActive] bit NOT NULL CONSTRAINT [DF_Gouvernorat_IsActive] DEFAULT CAST(1 AS bit);
+END
+ELSE
+BEGIN
+    IF OBJECT_ID('DF_Gouvernorat_IsActive', 'D') IS NULL
+    BEGIN
+        ALTER TABLE [dbo].[Gouvernorat] ADD CONSTRAINT [DF_Gouvernorat_IsActive] DEFAULT CAST(1 AS bit) FOR [IsActive];
+    END;
 END;
 ");
 }
