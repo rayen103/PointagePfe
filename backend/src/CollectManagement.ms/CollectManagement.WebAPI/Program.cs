@@ -59,6 +59,14 @@ BEGIN
 END;
 
 -- Fix Modem table
+IF COL_LENGTH('dbo.Modem', 'ModelModem') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Modem] ADD [ModelModem] nvarchar(100) NULL;
+END;
+IF COL_LENGTH('dbo.Modem', 'NumeroSim') IS NULL
+BEGIN
+    ALTER TABLE [dbo].[Modem] ADD [NumeroSim] nvarchar(50) NULL;
+END;
 IF COL_LENGTH('dbo.Modem', 'IsActive') IS NULL
 BEGIN
     ALTER TABLE [dbo].[Modem] ADD [IsActive] bit NOT NULL CONSTRAINT [DF_Modem_IsActive] DEFAULT CAST(1 AS bit);
