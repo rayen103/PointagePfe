@@ -51,3 +51,16 @@ public sealed record PredictionModelMetadataResponse(
     bool UsesExternalDataset,
     bool HybridTrainingReady,
     IReadOnlyList<string> GovernanceChecks);
+
+// Bus ETA Prediction Contracts
+public sealed record BusEtaPredictionRequest(
+    double Distance,
+    int Hour,
+    int DayOfWeek,
+    int IsWeekend,
+    double WeatherCondition,
+    double TrafficLevel);
+
+public sealed record BusEtaPredictionResponse(
+    double EtaMinutes,
+    double Confidence);

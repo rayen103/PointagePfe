@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using CollectManagement.Application.Contracts.Predictions;
 using CollectManagement.Application.Interfaces.Services;
@@ -11,10 +12,12 @@ public sealed class ExternalPredictionService : IExternalPredictionService
     private const string ModelVersion = "external-cold-start-v1";
     private const string DurationDatasetFileName = "duration_external_dataset.json";
     private const string AbsenceDatasetFileName = "absence_external_dataset.json";
+    private const string BusEtaApiUrl = "http://localhost:8000/predict";
     private readonly object _syncLock = new();
     private readonly string _datasetDirectory;
     private readonly string _artifactDirectory;
     private readonly ILogger<ExternalPredictionService> _logger;
+    private readonly HttpClient _httpClient;
 
     private bool _isInitialized;
     private PredictionModelMetadataResponse? _metadata;
@@ -25,9 +28,11 @@ public sealed class ExternalPredictionService : IExternalPredictionService
 
     public ExternalPredictionService(
         IWebHostEnvironment environment,
-        ILogger<ExternalPredictionService> logger)
+        ILogger<ExternalPredictionService> logger,
+        IHttpClientFactory httpClientFactory)
     {
         _logger = logger;
+        _httpClient = httpClientFactory.CreateClient();
         _datasetDirectory = Path.Combine(environment.ContentRootPath, "Public", "ml", "datasets");
         _artifactDirectory = Path.Combine(environment.ContentRootPath, "Public", "ml", "artifacts");
     }
@@ -135,6 +140,41 @@ public sealed class ExternalPredictionService : IExternalPredictionService
     {
         EnsureInitialized();
         return Task.FromResult(_metadata!);
+    }
+
+    public async Task<BusEtaPredictionResponse> PredictBusEtaAsync(
+        BusEtaPredictionRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(new
+            {
+                distance = request.Distance,
+                hour = request.Hour,
+                day_of_week = request.DayOfWeek,
+                is_weekend = request.IsWeekend,
+                weather_condition = request.WeatherCondition,
+                traffic_level = request.TrafficLevel
+            }, JsonOptions);
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync(BusEtaApiUrl, content, cancellationToken).ConfigureAwait(false);
+            
+            response.EnsureSuccessStatusCode();
+
+            var responseJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            var result = JsonSerializer.Deserialize<BusEtaPredictionResponse>(responseJson, JsonOptions);
+            
+            return result ?? new BusEtaPredictionResponse(0, 0);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error calling Bus ETA API");
+            // Fallback: compute simple estimate
+            var fallbackEta = request.Distance * 2; // 2 minutes per km
+            return new BusEtaPredictionResponse(fallbackEta, 0.3);
+        }
     }
 
     private void EnsureInitialized()

@@ -1,4 +1,4 @@
-﻿using System.IO.Abstractions;
+using System.IO.Abstractions;
 using System.Text.Json;
 using CollectManagement.Application.Common;
 using CollectManagement.Application.Exceptions;
@@ -93,6 +93,7 @@ public static class DependencyInjection
         services.AddScoped<IBrowserProvider, BrowserProvider>();
         services.AddScoped<IDocumentService, DocumentService>();
         services.AddScoped<IExternalPredictionService, ExternalPredictionService>();
+        services.AddHttpClient();
         services.AddHttpContextAccessor();
         
         

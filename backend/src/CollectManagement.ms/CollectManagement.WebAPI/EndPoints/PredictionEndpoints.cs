@@ -19,6 +19,7 @@ public sealed class PredictionEndpoints : ICarterModule
         routeGroupBuilder.MapPost("absence-risk", PredictAbsenceRisk);
         routeGroupBuilder.MapPost("absence-risk/batch", PredictAbsenceRiskBatch);
         routeGroupBuilder.MapGet("metadata", GetMetadata);
+        routeGroupBuilder.MapPost("bus-eta", PredictBusEta);
     }
 
     private static async Task<IResult> PredictDurationBatch(
@@ -78,5 +79,17 @@ public sealed class PredictionEndpoints : ICarterModule
             .ConfigureAwait(false);
 
         return Results.Ok(new ApiResponse<PredictionModelMetadataResponse>(metadata));
+    }
+
+    private static async Task<IResult> PredictBusEta(
+        [FromBody] [Required] BusEtaPredictionRequest request,
+        IExternalPredictionService externalPredictionService,
+        CancellationToken cancellationToken)
+    {
+        var prediction = await externalPredictionService
+            .PredictBusEtaAsync(request, cancellationToken)
+            .ConfigureAwait(false);
+
+        return Results.Ok(new ApiResponse<BusEtaPredictionResponse>(prediction));
     }
 }
