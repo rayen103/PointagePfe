@@ -22,4 +22,8 @@ public interface IExternalPredictionService
 
     Task<PredictionModelMetadataResponse> GetModelMetadataAsync(
         CancellationToken cancellationToken = default);
+
+    Task<BusEtaPredictionResponse> PredictBusEtaAsync(
+        BusEtaPredictionRequest request,
+        CancellationToken cancellationToken = default);
 }

@@ -13,6 +13,10 @@ public class ApplicationDbContext: DbContext
 
     public DbSet<CollectManagement.Domain.Bus.BusRuntimeEvent> BusRuntimeEvent { get; set; }
     public DbSet<CollectManagement.Domain.Analyse.ReportLayout> ReportLayout { get; set; }
+    public DbSet<CollectManagement.Domain.Regions.Region> Region { get; set; }
+    public DbSet<CollectManagement.Domain.Modems.Modem> Modem { get; set; }
+    public DbSet<CollectManagement.Domain.Chauffeurs.Chauffeur> Chauffeur { get; set; }
+    public DbSet<CollectManagement.Domain.Gouvernorats.Gouvernorat> Gouvernorat { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
