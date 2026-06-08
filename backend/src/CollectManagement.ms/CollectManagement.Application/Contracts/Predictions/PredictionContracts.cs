@@ -68,3 +68,14 @@ public sealed record BusEtaPredictionRequest(
 public sealed record BusEtaPredictionResponse(
     double eta_minutes,
     double confidence);
+
+public sealed record AvailableBusEtaPredictionDto(
+    string BusId,
+    string NumeroIMM,
+    string? CodeCircuit,
+    double DistanceFromStop,
+    double eta_minutes,
+    double confidence);
+
+public sealed record AvailableBusEtaPredictionResponse(
+    IReadOnlyList<AvailableBusEtaPredictionDto> Predictions);

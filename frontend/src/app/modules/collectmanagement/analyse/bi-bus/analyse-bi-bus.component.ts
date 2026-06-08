@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,7 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { AnalyseDesignerComponent, AnalyseFieldDef } from '../designer/analyse-designer.component';
 import { AnalyseApiService } from '../shared/analyse-api.service';
-import { BusEtaPredictionResponse } from '../shared/analyse.model';
+import { AvailableBusEtaPrediction, BusEtaPredictionResponse } from '../shared/analyse.model';
 
 @Component({
     selector: 'app-analyse-bi-bus',
@@ -29,7 +29,7 @@ import { BusEtaPredictionResponse } from '../shared/analyse.model';
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AnalyseBiBusComponent {
+export class AnalyseBiBusComponent implements OnInit {
     readonly fields: AnalyseFieldDef[] = [
         { key: 'numeroIMM', label: 'Bus', dataType: 'string', isNumeric: false },
         { key: 'modelBus', label: 'Modèle', dataType: 'string', isNumeric: false },
@@ -49,7 +49,9 @@ export class AnalyseBiBusComponent {
 
     etaForm: FormGroup;
     etaResult: BusEtaPredictionResponse | null = null;
+    availableEtaResults: AvailableBusEtaPrediction[] = [];
     isLoading = false;
+    isAvailableLoading = false;
 
     constructor(
         private fb: FormBuilder,
@@ -74,6 +76,10 @@ export class AnalyseBiBusComponent {
         return (hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 19);
     }
 
+    ngOnInit(): void {
+        this.predictAvailableBusesEta();
+    }
+
     predictEta(): void {
         this.isLoading = true;
         this.analyseApiService.predictBusEta(this.etaForm.value).subscribe({
@@ -86,5 +92,18 @@ export class AnalyseBiBusComponent {
             },
         });
     }
-}
 
+    predictAvailableBusesEta(): void {
+        this.isAvailableLoading = true;
+        this.analyseApiService.predictAvailableBusEta().subscribe({
+            next: (result) => {
+                this.availableEtaResults = result?.predictions ?? [];
+                this.isAvailableLoading = false;
+            },
+            error: () => {
+                this.availableEtaResults = [];
+                this.isAvailableLoading = false;
+            },
+        });
+    }
+}

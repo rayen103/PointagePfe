@@ -51,3 +51,15 @@ export interface BusEtaPredictionResponse {
     confidence: number;
 }
 
+export interface AvailableBusEtaPrediction {
+    busId: string;
+    numeroIMM: string;
+    codeCircuit?: string | null;
+    distanceFromStop: number;
+    eta_minutes: number;
+    confidence: number;
+}
+
+export interface AvailableBusEtaPredictionResponse {
+    predictions: AvailableBusEtaPrediction[];
+}

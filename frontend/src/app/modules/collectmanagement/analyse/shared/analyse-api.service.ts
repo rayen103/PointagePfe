@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { ApiService } from 'app/core/common/api.service';
 import {
+    AvailableBusEtaPredictionResponse,
     AnalyseQueryRequest,
     AnalyseQueryResponse,
     AnalyseReportType,
@@ -52,5 +53,10 @@ export class AnalyseApiService {
             map((r) => r.data)
         );
     }
-}
 
+    predictAvailableBusEta(): Observable<AvailableBusEtaPredictionResponse> {
+        return this._api.Get<AvailableBusEtaPredictionResponse>('prediction/bus-eta/available').pipe(
+            map((r) => r.data)
+        );
+    }
+}
