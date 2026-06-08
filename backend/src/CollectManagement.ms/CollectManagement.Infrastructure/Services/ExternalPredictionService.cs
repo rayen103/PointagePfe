@@ -148,18 +148,24 @@ public sealed class ExternalPredictionService : IExternalPredictionService
     {
         try
         {
+            // Map to snake_case for Python API
             var json = JsonSerializer.Serialize(new
             {
                 request.DistanceFromStop,
-                request.log_distance,
-                request.distance_over_300m,
-                request.hour,
-                request.hour_sin,
-                request.hour_cos,
-                request.is_rush_hour,
-                request.day_of_week,
-                request.DirectionRef,
-                request.is_weekend
+                log_distance = request.LogDistance,
+                distance_over_300m = request.DistanceOver300m,
+                hour = request.Hour,
+                hour_sin = request.HourSin,
+                hour_cos = request.HourCos,
+                is_rush_hour = request.IsRushHour,
+                day_of_week = request.DayOfWeek,
+                request.Latitude,
+                request.Longitude,
+                code_circuit = request.CodeCircuit,
+                model_bus = request.ModelBus,
+                request.Capacite,
+                current_occupancy = request.CurrentOccupancy,
+                last_position_at = request.LastPositionAt
             }, JsonOptions);
 
             var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -170,12 +176,12 @@ public sealed class ExternalPredictionService : IExternalPredictionService
             var responseJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             var result = JsonSerializer.Deserialize<BusEtaPredictionResponse>(responseJson, JsonOptions);
             
-            return result ?? new BusEtaPredictionResponse(0, 0);
+            return result ?? new BusEtaPredictionResponse(0, 0, 0.3, false);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error calling Bus ETA API");
-            return new BusEtaPredictionResponse(request.DistanceFromStop * 0.02, 0.3);
+            return new BusEtaPredictionResponse(0, 0, 0.3, false);
         }
     }
 

@@ -1,3 +1,4 @@
+
 import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -5,10 +6,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { AnalyseDesignerComponent, AnalyseFieldDef } from '../designer/analyse-designer.component';
 import { AnalyseApiService } from '../shared/analyse-api.service';
 import { AvailableBusEtaPrediction, BusEtaPredictionResponse } from '../shared/analyse.model';
+import { BusService } from 'app/core/bus/bus.service';
+import { BusDto } from 'app/core/bus/bus.model';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'app-analyse-bi-bus',
@@ -22,6 +27,7 @@ import { AvailableBusEtaPrediction, BusEtaPredictionResponse } from '../shared/a
         MatInputModule,
         MatButtonModule,
         MatIconModule,
+        MatSelectModule,
         DecimalPipe,
     ],
     templateUrl: './analyse-bi-bus.component.html',
@@ -52,37 +58,68 @@ export class AnalyseBiBusComponent implements OnInit {
     availableEtaResults: AvailableBusEtaPrediction[] = [];
     isLoading = false;
     isAvailableLoading = false;
+    buses$: Observable<BusDto[]>;
 
     constructor(
         private fb: FormBuilder,
-        private analyseApiService: AnalyseApiService
+        private analyseApiService: AnalyseApiService,
+        private busService: BusService
     ) {
-        const now = new Date();
         this.etaForm = this.fb.group({
-            DistanceFromStop: [500],
-            log_distance: [6.2],
-            distance_over_300m: [1],
-            hour: [now.getHours()],
-            hour_sin: [null],
-            hour_cos: [null],
-            is_rush_hour: [this.isRushHour(now.getHours()) ? 1 : 0],
-            day_of_week: [now.getDay()],
-            DirectionRef: [1],
-            is_weekend: [now.getDay() === 0 || now.getDay() === 6 ? 1 : 0],
+            selectedBus: [null],
+            Latitude: [null],
+            Longitude: [null],
+            CodeCircuit: [null],
+            ModelBus: [null],
+            Capacite: [null],
+            CurrentOccupancy: [null],
+            LastPositionAt: [null],
         });
-    }
 
-    private isRushHour(hour: number): boolean {
-        return (hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 19);
+        this.buses$ = this.busService.GetAll();
     }
 
     ngOnInit(): void {
         this.predictAvailableBusesEta();
     }
 
+    onBusSelect(bus: BusDto | null): void {
+        if (!bus) {
+            this.etaForm.patchValue({
+                Latitude: null,
+                Longitude: null,
+                CodeCircuit: null,
+                ModelBus: null,
+                Capacite: null,
+                CurrentOccupancy: null,
+                LastPositionAt: null,
+            });
+            return;
+        }
+
+        this.etaForm.patchValue({
+            Latitude: bus.latitude,
+            Longitude: bus.longitude,
+            CodeCircuit: bus.codeCircuit,
+            ModelBus: bus.modelBus,
+            Capacite: bus.capacite,
+            CurrentOccupancy: bus.currentOccupancy,
+            LastPositionAt: bus.lastPositionAt,
+        });
+    }
+
     predictEta(): void {
         this.isLoading = true;
-        this.analyseApiService.predictBusEta(this.etaForm.value).subscribe({
+        const rawValues = this.etaForm.getRawValue();
+        this.analyseApiService.predictBusEta({
+            Latitude: rawValues.Latitude,
+            Longitude: rawValues.Longitude,
+            CodeCircuit: rawValues.CodeCircuit,
+            ModelBus: rawValues.ModelBus,
+            Capacite: rawValues.Capacite,
+            CurrentOccupancy: rawValues.CurrentOccupancy,
+            LastPositionAt: rawValues.LastPositionAt,
+        }).subscribe({
             next: (result) => {
                 this.etaResult = result;
                 this.isLoading = false;
@@ -107,3 +144,4 @@ export class AnalyseBiBusComponent implements OnInit {
         });
     }
 }
+

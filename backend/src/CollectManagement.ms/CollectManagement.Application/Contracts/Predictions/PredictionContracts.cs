@@ -53,21 +53,34 @@ public sealed record PredictionModelMetadataResponse(
     IReadOnlyList<string> GovernanceChecks);
 
 // Bus ETA Prediction Contracts
-public sealed record BusEtaPredictionRequest(
-    double DistanceFromStop,
-    double log_distance,
-    int distance_over_300m,
-    int hour,
-    double? hour_sin,
-    double? hour_cos,
-    int is_rush_hour,
-    int day_of_week,
-    double DirectionRef,
-    int is_weekend);
+public sealed record BusEtaPredictionRequest
+{
+    // Legacy compatibility fields
+    public double? DistanceFromStop { get; init; }
+    public double? LogDistance { get; init; }
+    public int? DistanceOver300m { get; init; }
+    public int? Hour { get; init; }
+    public double? HourSin { get; init; }
+    public double? HourCos { get; init; }
+    public int? IsRushHour { get; init; }
+    public int? DayOfWeek { get; init; }
+    
+    // New raw database fields
+    public double? Latitude { get; init; }
+    public double? Longitude { get; init; }
+    public string? CodeCircuit { get; init; }
+    public string? ModelBus { get; init; }
+    public double? Capacite { get; init; }
+    public double? CurrentOccupancy { get; init; }
+    public DateTime? LastPositionAt { get; init; }
+}
 
 public sealed record BusEtaPredictionResponse(
-    double eta_minutes,
-    double confidence);
+    double EtaMinutes,
+    int EtaSeconds,
+    double Confidence,
+    bool UsedFallbackStop
+);
 
 public sealed record AvailableBusEtaPredictionDto(
     string BusId,

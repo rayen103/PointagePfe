@@ -1,3 +1,4 @@
+
 <div class="absolute inset-0 min-w-0 px-4 sm:px-6 md:px-8 overflow-x-hidden overflow-y-auto flex flex-col flex-auto bg-default">
     <div class="py-4 sm:py-8">
         <!-- ETA Prediction Card -->
@@ -7,6 +8,7 @@
                 <mat-card-title class="text-xl font-bold ml-3">Prédiction d'ETA</mat-card-title>
             </mat-card-header>
             <mat-card-content class="p-6">
+                <!-- Automatic available buses -->
                 <div class="mb-6 p-4 rounded-lg border border-indigo-100 bg-indigo-50">
                     <div class="flex items-center justify-between gap-3">
                         <div>
@@ -41,40 +43,53 @@
                     </div>
                 </div>
 
-                <form [formGroup]="etaForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <mat-form-field appearance="outline" class="w-full">
-                        <mat-label>Distance au stop (m)</mat-label>
-                        <input matInput type="number" formControlName="DistanceFromStop" />
-                    </mat-form-field>
-                    <mat-form-field appearance="outline" class="w-full">
-                        <mat-label>log(distance)</mat-label>
-                        <input matInput type="number" step="0.1" formControlName="log_distance" />
-                    </mat-form-field>
-                    <mat-form-field appearance="outline" class="w-full">
-                        <mat-label>Distance > 300m (0/1)</mat-label>
-                        <input matInput type="number" min="0" max="1" formControlName="distance_over_300m" />
-                    </mat-form-field>
-                    <mat-form-field appearance="outline" class="w-full">
-                        <mat-label>Heure</mat-label>
-                        <input matInput type="number" min="0" max="23" formControlName="hour" />
-                    </mat-form-field>
-                    <mat-form-field appearance="outline" class="w-full">
-                        <mat-label>Heure de pointe (0/1)</mat-label>
-                        <input matInput type="number" min="0" max="1" formControlName="is_rush_hour" />
-                    </mat-form-field>
-                    <mat-form-field appearance="outline" class="w-full">
-                        <mat-label>Jour de la semaine (0-6)</mat-label>
-                        <input matInput type="number" min="0" max="6" formControlName="day_of_week" />
-                    </mat-form-field>
-                    <mat-form-field appearance="outline" class="w-full">
-                        <mat-label>Direction</mat-label>
-                        <input matInput type="number" formControlName="DirectionRef" />
-                    </mat-form-field>
-                    <mat-form-field appearance="outline" class="w-full">
-                        <mat-label>Week-end (0/1)</mat-label>
-                        <input matInput type="number" min="0" max="1" formControlName="is_weekend" />
-                    </mat-form-field>
-                </form>
+                <div class="border-t border-gray-200 pt-6">
+                    <div class="mb-4 font-semibold text-gray-800">Prédiction personnalisée</div>
+                    <form [formGroup]="etaForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <mat-form-field appearance="outline" class="w-full lg:col-span-4">
+                            <mat-label>Sélectionner un bus</mat-label>
+                            <mat-select
+                                formControlName="selectedBus"
+                                (selectionChange)="onBusSelect($event.value)"
+                                placeholder="Choisir un bus pour charger ses données"
+                            >
+                                @for (bus of buses$ | async; track bus.busId) {
+                                    <mat-option [value]="bus">{{ bus.numeroIMM }}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="w-full">
+                            <mat-label>Latitude</mat-label>
+                            <input matInput type="number" formControlName="Latitude" />
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="w-full">
+                            <mat-label>Longitude</mat-label>
+                            <input matInput type="number" formControlName="Longitude" />
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="w-full">
+                            <mat-label>Code Circuit</mat-label>
+                            <input matInput formControlName="CodeCircuit" />
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="w-full">
+                            <mat-label>Modèle Bus</mat-label>
+                            <input matInput formControlName="ModelBus" />
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="w-full">
+                            <mat-label>Capacité</mat-label>
+                            <input matInput type="number" formControlName="Capacite" />
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="w-full">
+                            <mat-label>Occupation Courante</mat-label>
+                            <input matInput type="number" formControlName="CurrentOccupancy" />
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="w-full lg:col-span-2">
+                            <mat-label>Dernière Position</mat-label>
+                            <input matInput [value]="etaForm.get('LastPositionAt')?.value | date: 'medium'" disabled />
+                        </mat-form-field>
+                    </form>
+                </div>
+
                 <div class="flex items-center justify-between mt-6">
                     <button
                         mat-raised-button
@@ -92,10 +107,13 @@
                             <mat-icon svgIcon="heroicons_outline:check-circle" class="text-2xl text-green-600"></mat-icon>
                             <div class="flex flex-col">
                                 <span class="font-bold text-lg">
-                                    ETA: {{ etaResult.eta_minutes | number: '1.1-1' }} min
+                                    ETA: {{ etaResult.EtaMinutes | number: '1.1-1' }} min ({{ etaResult.EtaSeconds }} s)
                                 </span>
                                 <span class="text-sm text-green-700">
-                                    Confiance: {{ etaResult.confidence * 100 | number: '1.0-0' }}%
+                                    Confiance: {{ etaResult.Confidence * 100 | number: '1.0-0' }}%
+                                    @if (etaResult.UsedFallbackStop) {
+                                        <span class="ml-2 text-yellow-600">(Utilisé stop par défaut)</span>
+                                    }
                                 </span>
                             </div>
                         </div>
@@ -112,3 +130,4 @@
         ></app-analyse-designer>
     </div>
 </div>
+
