@@ -54,13 +54,17 @@ public sealed record PredictionModelMetadataResponse(
 
 // Bus ETA Prediction Contracts
 public sealed record BusEtaPredictionRequest(
-    double Distance,
-    int Hour,
-    int DayOfWeek,
-    int IsWeekend,
-    double WeatherCondition,
-    double TrafficLevel);
+    double DistanceFromStop,
+    double log_distance,
+    int distance_over_300m,
+    int hour,
+    double? hour_sin,
+    double? hour_cos,
+    int is_rush_hour,
+    int day_of_week,
+    double DirectionRef,
+    int is_weekend);
 
 public sealed record BusEtaPredictionResponse(
-    double EtaMinutes,
-    double Confidence);
+    double eta_minutes,
+    double confidence);

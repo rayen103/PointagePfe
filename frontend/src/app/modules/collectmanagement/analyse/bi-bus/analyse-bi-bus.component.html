@@ -1,10 +1,81 @@
 <div class="absolute inset-0 min-w-0 px-4 sm:px-6 md:px-8 overflow-x-hidden overflow-y-auto flex flex-col flex-auto bg-default">
     <div class="py-4 sm:py-8">
+        <!-- ETA Prediction Card -->
+        <mat-card class="eta-card mb-6">
+            <mat-card-header class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-t-lg">
+                <mat-icon svgIcon="heroicons_outline:clock" class="text-2xl"></mat-icon>
+                <mat-card-title class="text-xl font-bold ml-3">Prédiction d'ETA</mat-card-title>
+            </mat-card-header>
+            <mat-card-content class="p-6">
+                <form [formGroup]="etaForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <mat-form-field appearance="outline" class="w-full">
+                        <mat-label>Distance au stop (m)</mat-label>
+                        <input matInput type="number" formControlName="DistanceFromStop" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="w-full">
+                        <mat-label>log(distance)</mat-label>
+                        <input matInput type="number" step="0.1" formControlName="log_distance" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="w-full">
+                        <mat-label>Distance > 300m (0/1)</mat-label>
+                        <input matInput type="number" min="0" max="1" formControlName="distance_over_300m" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="w-full">
+                        <mat-label>Heure</mat-label>
+                        <input matInput type="number" min="0" max="23" formControlName="hour" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="w-full">
+                        <mat-label>Heure de pointe (0/1)</mat-label>
+                        <input matInput type="number" min="0" max="1" formControlName="is_rush_hour" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="w-full">
+                        <mat-label>Jour de la semaine (0-6)</mat-label>
+                        <input matInput type="number" min="0" max="6" formControlName="day_of_week" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="w-full">
+                        <mat-label>Direction</mat-label>
+                        <input matInput type="number" formControlName="DirectionRef" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="w-full">
+                        <mat-label>Week-end (0/1)</mat-label>
+                        <input matInput type="number" min="0" max="1" formControlName="is_weekend" />
+                    </mat-form-field>
+                </form>
+                <div class="flex items-center justify-between mt-6">
+                    <button
+                        mat-raised-button
+                        color="primary"
+                        (click)="predictEta()"
+                        [disabled]="isLoading"
+                        class="px-6 py-3"
+                    >
+                        <mat-icon svgIcon="heroicons_outline:play-circle" class="mr-2"></mat-icon>
+                        {{ isLoading ? 'Prédiction en cours...' : 'Prédire l\'ETA' }}
+                    </button>
+
+                    @if (etaResult) {
+                        <div class="flex items-center gap-2 bg-green-50 text-green-800 px-6 py-3 rounded-lg border border-green-200">
+                            <mat-icon svgIcon="heroicons_outline:check-circle" class="text-2xl text-green-600"></mat-icon>
+                            <div class="flex flex-col">
+                                <span class="font-bold text-lg">
+                                    ETA: {{ etaResult.eta_minutes | number: '1.1-1' }} min
+                                </span>
+                                <span class="text-sm text-green-700">
+                                    Confiance: {{ etaResult.confidence * 100 | number: '1.0-0' }}%
+                                </span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Existing Designer -->
         <app-analyse-designer
             [reportType]="'bus'"
             [title]="'Analyse BI · Bus'"
-            [fields]="fields">
-        </app-analyse-designer>
+            [fields]="fields"
+        ></app-analyse-designer>
     </div>
 </div>
 

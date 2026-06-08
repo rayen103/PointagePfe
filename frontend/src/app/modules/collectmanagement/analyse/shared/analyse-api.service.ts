@@ -1,7 +1,14 @@
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { ApiService } from 'app/core/common/api.service';
-import { AnalyseQueryRequest, AnalyseQueryResponse, AnalyseReportType, ReportLayout } from './analyse.model';
+import {
+    AnalyseQueryRequest,
+    AnalyseQueryResponse,
+    AnalyseReportType,
+    BusEtaPredictionRequest,
+    BusEtaPredictionResponse,
+    ReportLayout,
+} from './analyse.model';
 
 @Injectable({ providedIn: 'root' })
 export class AnalyseApiService {
@@ -37,6 +44,12 @@ export class AnalyseApiService {
     deleteLayout(type: AnalyseReportType, id: string): Observable<boolean> {
         return this._api.Post2<boolean>(`analyse/${type}/layouts/${id}/delete`, {}).pipe(
             map((r) => r.success)
+        );
+    }
+
+    predictBusEta(request: BusEtaPredictionRequest): Observable<BusEtaPredictionResponse> {
+        return this._api.Post2<BusEtaPredictionResponse>('prediction/bus-eta', request).pipe(
+            map((r) => r.data)
         );
     }
 }

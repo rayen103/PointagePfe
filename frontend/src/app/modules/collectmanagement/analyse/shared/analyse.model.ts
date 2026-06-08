@@ -33,3 +33,21 @@ export interface AnalyseDesignerConfig {
     dateTo?: string | null;
 }
 
+export interface BusEtaPredictionRequest {
+    DistanceFromStop: number;
+    log_distance: number;
+    distance_over_300m: number;
+    hour: number;
+    hour_sin?: number | null;
+    hour_cos?: number | null;
+    is_rush_hour: number;
+    day_of_week: number;
+    DirectionRef: number;
+    is_weekend: number;
+}
+
+export interface BusEtaPredictionResponse {
+    eta_minutes: number;
+    confidence: number;
+}
+

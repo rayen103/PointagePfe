@@ -1,0 +1,14 @@
+
+# ML Model Files
+*.pkl
+*.joblib
+*.pt
+*.pth
+
+# Python
+__pycache__/
+*.pyc
+
+# IDE
+.idea/
+.vscode/
