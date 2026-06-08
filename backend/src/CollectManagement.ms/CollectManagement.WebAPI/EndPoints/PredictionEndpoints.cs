@@ -133,6 +133,11 @@ public sealed class PredictionEndpoints : ICarterModule
         var pointsByCircuitCode = new Dictionary<string, IReadOnlyList<CircuitPointCollecte>>(StringComparer.OrdinalIgnoreCase);
         foreach (var circuit in circuits)
         {
+            if (string.IsNullOrWhiteSpace(circuit.CodeCircuit))
+            {
+                continue;
+            }
+
             pointsByCircuitCode[circuit.CodeCircuit] = await circuitPointCollecteRepository
                 .GetByCircuitAsync(circuit.CircuitId, cancellationToken)
                 .ConfigureAwait(false);
@@ -141,7 +146,11 @@ public sealed class PredictionEndpoints : ICarterModule
         var predictionTasks = buses.Select(async bus =>
         {
             circuitsByCode.TryGetValue(bus.CodeCircuit ?? string.Empty, out var circuit);
-            pointsByCircuitCode.TryGetValue(circuit?.CodeCircuit ?? string.Empty, out var circuitPoints);
+            IReadOnlyList<CircuitPointCollecte>? circuitPoints = null;
+            if (circuit is not null)
+            {
+                pointsByCircuitCode.TryGetValue(circuit.CodeCircuit, out circuitPoints);
+            }
 
             var distanceFromStop = EstimateDistanceFromStop(bus.Latitude, bus.Longitude, circuit, circuitPoints);
             var directionRef = DeriveDirectionRef(bus.CodeCircuit);
@@ -268,7 +277,7 @@ public sealed class PredictionEndpoints : ICarterModule
             return numericDirection;
         }
 
-        var hash = Math.Abs(codeCircuit.GetHashCode(StringComparison.OrdinalIgnoreCase));
+        var hash = Math.Abs(codeCircuit.ToUpperInvariant().GetHashCode());
         return (hash % 360) + 1;
     }
 
