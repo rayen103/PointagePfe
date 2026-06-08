@@ -150,12 +150,16 @@ public sealed class ExternalPredictionService : IExternalPredictionService
         {
             var json = JsonSerializer.Serialize(new
             {
-                distance = request.Distance,
-                hour = request.Hour,
-                day_of_week = request.DayOfWeek,
-                is_weekend = request.IsWeekend,
-                weather_condition = request.WeatherCondition,
-                traffic_level = request.TrafficLevel
+                request.DistanceFromStop,
+                request.log_distance,
+                request.distance_over_300m,
+                request.hour,
+                request.hour_sin,
+                request.hour_cos,
+                request.is_rush_hour,
+                request.day_of_week,
+                request.DirectionRef,
+                request.is_weekend
             }, JsonOptions);
 
             var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -171,9 +175,7 @@ public sealed class ExternalPredictionService : IExternalPredictionService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error calling Bus ETA API");
-            // Fallback: compute simple estimate
-            var fallbackEta = request.Distance * 2; // 2 minutes per km
-            return new BusEtaPredictionResponse(fallbackEta, 0.3);
+            return new BusEtaPredictionResponse(request.DistanceFromStop * 0.02, 0.3);
         }
     }
 
