@@ -178,8 +178,8 @@ public sealed class PredictionEndpoints : ICarterModule
                 bus.NumeroIMM,
                 bus.CodeCircuit,
                 Math.Round(distanceFromStop, 2),
-                prediction.eta_minutes,
-                prediction.confidence);
+                prediction.EtaMinutes,
+                prediction.Confidence);
         });
 
         var predictions = await Task.WhenAll(predictionTasks).ConfigureAwait(false);
