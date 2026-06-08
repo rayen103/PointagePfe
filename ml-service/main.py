@@ -32,6 +32,11 @@ ADDITIONAL_FEATURE_NAMES = ["occupancy_ratio", "route_encoded", "model_encoded"]
 
 DEFAULT_STOPS_CSV_PATH = "bus_stops.csv"
 DEFAULT_DISTANCE_FALLBACK_METERS = 500.0
+MIN_DISTANCE_METERS = 1.0
+MIN_CAPACITY = 1.0
+ENCODING_MODULO = 10000
+FEATURE_COUNT_WITH_ADDITIONAL = 11
+FEATURE_COUNT_WITH_LEGACY = 10
 
 
 # CHANGED: accept both legacy payload and new DB payload.
@@ -54,7 +59,6 @@ class ETAInput(BaseModel):
     Capacite: Optional[float] = None
     CurrentOccupancy: Optional[float] = None
     LastPositionAt: Optional[datetime] = None
-    StopsCsvPath: Optional[str] = DEFAULT_STOPS_CSV_PATH
 
     @model_validator(mode="after")
     def validate_input_shape(self):
@@ -89,12 +93,13 @@ class ETAOutput(BaseModel):
 def _stable_numeric_code(value: str) -> int:
     if not value:
         return 0
-    return sum((idx + 1) * ord(ch) for idx, ch in enumerate(value.strip().lower())) % 10000
+    return sum((idx + 1) * ord(ch) for idx, ch in enumerate(value.strip().lower())) % ENCODING_MODULO
 
 
 # CHANGED: load and cache stops CSV for Haversine next-stop lookup.
 def load_stops_csv(stops_csv_path: str = DEFAULT_STOPS_CSV_PATH) -> Optional[pd.DataFrame]:
-    path = (stops_csv_path or DEFAULT_STOPS_CSV_PATH).strip()
+    # CHANGED: only read from local service path to avoid path-injection from request payloads.
+    path = os.path.abspath((stops_csv_path or DEFAULT_STOPS_CSV_PATH).strip())
     if path in _stops_cache:
         return _stops_cache[path]
 
@@ -129,12 +134,20 @@ def calculate_distance_to_next_stop(
         return DEFAULT_DISTANCE_FALLBACK_METERS, True
 
     route_stops = route_stops.sort_values("StopOrder", kind="stable").reset_index(drop=True)
+    route_stops["Latitude"] = pd.to_numeric(route_stops["Latitude"], errors="coerce")
+    route_stops["Longitude"] = pd.to_numeric(route_stops["Longitude"], errors="coerce")
+    route_stops = route_stops.dropna(subset=["Latitude", "Longitude"])
+    if route_stops.empty:
+        return DEFAULT_DISTANCE_FALLBACK_METERS, True
     current = (latitude, longitude)
 
     route_stops["distance_to_bus"] = route_stops.apply(
         lambda row: haversine(current, (row["Latitude"], row["Longitude"]), unit=Unit.METERS),
         axis=1,
     )
+
+    if route_stops["distance_to_bus"].isna().all():
+        return DEFAULT_DISTANCE_FALLBACK_METERS, True
 
     nearest_idx = int(route_stops["distance_to_bus"].idxmin())
     nearest_order = route_stops.loc[nearest_idx, "StopOrder"]
@@ -150,11 +163,11 @@ def calculate_distance_to_next_stop(
         (float(next_stop["Latitude"]), float(next_stop["Longitude"])),
         unit=Unit.METERS,
     )
-    return max(distance_meters, 1.0), False
+    return max(distance_meters, MIN_DISTANCE_METERS), False
 
 
 def _parse_day_of_week(dt: datetime) -> int:
-    # CHANGED: keep .NET-style day index where Sunday = 0.
+    # CHANGED: convert Python weekday (Mon=0..Sun=6) to .NET style (Sun=0..Sat=6).
     return (dt.weekday() + 1) % 7
 
 
@@ -172,7 +185,7 @@ def engineer_features_from_raw(
     stops_df = load_stops_csv(stops_csv_path)
     distance_meters, used_fallback = calculate_distance_to_next_stop(latitude, longitude, code_circuit, stops_df)
 
-    safe_capacity = max(float(capacite or 0), 1.0)
+    safe_capacity = max(float(capacite or 0), MIN_CAPACITY)
     occupancy_ratio = float(current_occupancy or 0) / safe_capacity
 
     hour = int(last_position_at.hour)
@@ -180,7 +193,7 @@ def engineer_features_from_raw(
 
     features = {
         "DistanceFromStop": float(distance_meters),
-        "log_distance": float(math.log(max(distance_meters, 1.0))),
+        "log_distance": float(math.log(max(distance_meters, MIN_DISTANCE_METERS))),
         "distance_over_300m": int(distance_meters > 300),
         "hour": hour,
         "hour_sin": float(math.sin(2 * math.pi * hour / 24)),
@@ -216,7 +229,7 @@ def prepare_training_features(training_df: pd.DataFrame, stops_csv_path: str = D
     for row in training_df.itertuples(index=False):
         last_position_at = getattr(row, "LastPositionAt")
         if not isinstance(last_position_at, datetime):
-            last_position_at = pd.to_datetime(last_position_at, utc=False).to_pydatetime()
+            last_position_at = pd.to_datetime(last_position_at, utc=True).to_pydatetime()
 
         engineered_rows.append(
             engineer_features_from_raw(
@@ -242,9 +255,9 @@ def _resolve_feature_order() -> list[str]:
         return [str(col) for col in scaler.feature_names_in_]
 
     expected = getattr(scaler, "n_features_in_", len(BASE_FEATURE_NAMES)) if scaler is not None else len(BASE_FEATURE_NAMES)
-    if expected == 11:
+    if expected == FEATURE_COUNT_WITH_ADDITIONAL:
         return BASE_FEATURE_NAMES + ADDITIONAL_FEATURE_NAMES
-    if expected == 10:
+    if expected == FEATURE_COUNT_WITH_LEGACY:
         return BASE_FEATURE_NAMES + ["DirectionRef", "is_weekend"]
     return BASE_FEATURE_NAMES
 
@@ -310,7 +323,7 @@ async def predict_eta(input_data: ETAInput):
                 "used_fallback_stop": False,
             }
         else:
-            timestamp = input_data.LastPositionAt or datetime.utcnow()
+            timestamp = input_data.LastPositionAt
             feature_map = engineer_features_from_raw(
                 latitude=float(input_data.Latitude),
                 longitude=float(input_data.Longitude),
@@ -319,7 +332,7 @@ async def predict_eta(input_data: ETAInput):
                 capacite=float(input_data.Capacite),
                 current_occupancy=float(input_data.CurrentOccupancy),
                 last_position_at=timestamp,
-                stops_csv_path=input_data.StopsCsvPath or DEFAULT_STOPS_CSV_PATH,
+                stops_csv_path=DEFAULT_STOPS_CSV_PATH,
             )
 
         feature_order = _resolve_feature_order()
@@ -328,7 +341,10 @@ async def predict_eta(input_data: ETAInput):
         scaled = scaler.transform(features)
         prediction = model.predict(scaled)
 
-        eta = max(float(prediction[0]), 0.0)
+        raw_eta = float(prediction[0])
+        if raw_eta < 0:
+            print(f"[WARNING] Model predicted negative ETA ({raw_eta:.4f}); clamping to zero.")
+        eta = max(raw_eta, 0.0)
         eta_seconds = int(round(eta * 60))
         confidence = 0.7 if feature_map.get("used_fallback_stop", False) else 0.9
 
