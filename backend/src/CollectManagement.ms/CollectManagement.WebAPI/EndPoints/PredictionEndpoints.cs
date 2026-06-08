@@ -155,17 +155,19 @@ public sealed class PredictionEndpoints : ICarterModule
             var distanceFromStop = EstimateDistanceFromStop(bus.Latitude, bus.Longitude, circuit, circuitPoints);
             var directionRef = DeriveDirectionRef(bus.CodeCircuit);
 
-            var request = new BusEtaPredictionRequest(
-                DistanceFromStop: distanceFromStop,
-                log_distance: Math.Log(Math.Max(1, distanceFromStop)),
-                distance_over_300m: distanceFromStop > 300 ? 1 : 0,
-                hour: hour,
-                hour_sin: null,
-                hour_cos: null,
-                is_rush_hour: isRushHour,
-                day_of_week: dayOfWeek,
-                DirectionRef: directionRef,
-                is_weekend: isWeekend);
+            var request = new BusEtaPredictionRequest
+            {
+                DistanceFromStop = distanceFromStop,
+                LogDistance = Math.Log(Math.Max(1, distanceFromStop)),
+                DistanceOver300m = distanceFromStop > 300 ? 1 : 0,
+                Hour = hour,
+                HourSin = null,
+                HourCos = null,
+                IsRushHour = isRushHour,
+                DayOfWeek = dayOfWeek,
+                DirectionRef = directionRef,
+                IsWeekend = isWeekend
+            };
 
             var prediction = await externalPredictionService
                 .PredictBusEtaAsync(request, cancellationToken)

@@ -64,6 +64,8 @@ public sealed record BusEtaPredictionRequest
     public double? HourCos { get; init; }
     public int? IsRushHour { get; init; }
     public int? DayOfWeek { get; init; }
+    public double? DirectionRef { get; init; }
+    public int? IsWeekend { get; init; }
     
     // New raw database fields
     public double? Latitude { get; init; }

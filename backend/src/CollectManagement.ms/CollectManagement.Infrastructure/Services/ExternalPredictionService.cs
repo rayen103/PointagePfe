@@ -159,6 +159,8 @@ public sealed class ExternalPredictionService : IExternalPredictionService
                 hour_cos = request.HourCos,
                 is_rush_hour = request.IsRushHour,
                 day_of_week = request.DayOfWeek,
+                DirectionRef = request.DirectionRef,
+                is_weekend = request.IsWeekend,
                 request.Latitude,
                 request.Longitude,
                 code_circuit = request.CodeCircuit,
