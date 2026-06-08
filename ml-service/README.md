@@ -2,7 +2,7 @@
 
 ## Setup Instructions
 
-1. **Place your model files** in this directory:
+1. **Place your model files** in this directory (already done!):
    - `bus_eta_model.pkl`
    - `bus_eta_scaler.pkl`
 
@@ -18,9 +18,7 @@
    uvicorn main:app --host 0.0.0.0 --port 8000 --reload
    ```
 
-4. **Update `main.py`** to match your actual model's input features! Look for the `ETAInput` class and the feature array creation.
-
-5. **Visit API documentation**: http://localhost:8000/docs
+4. **Visit API documentation**: http://localhost:8000/docs
 
 ## API Endpoints
 
@@ -28,14 +26,32 @@
 - `GET /health`: Detailed health status
 - `POST /predict`: Predict ETA
 
+## Input Features (Exact from trained model)
+```typescript
+interface ETAInput {
+  DistanceFromStop: number;     // Meters to stop
+  log_distance: number;         // Log of distance
+  distance_over_300m: number;   // 0 or 1
+  hour: number;                 // 0-23
+  hour_sin?: number;            // Optional, auto-calculated
+  hour_cos?: number;            // Optional, auto-calculated
+  is_rush_hour: number;         // 0 or 1 (7-9 & 17-19)
+  day_of_week: number;          // 0-6 (Sunday is 0)
+  DirectionRef: number;         // Direction identifier
+  is_weekend: number;           // 0 or 1
+}
+```
+
 ## Example Request
 ```json
 {
-  "distance": 5.2,
+  "DistanceFromStop": 500,
+  "log_distance": 6.2,
+  "distance_over_300m": 1,
   "hour": 14,
+  "is_rush_hour": 0,
   "day_of_week": 2,
-  "is_weekend": 0,
-  "weather_condition": 0.5,
-  "traffic_level": 0.3
+  "DirectionRef": 1,
+  "is_weekend": 0
 }
 ```
