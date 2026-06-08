@@ -12,8 +12,9 @@ import { AnalyseDesignerComponent, AnalyseFieldDef } from '../designer/analyse-d
 import { AnalyseApiService } from '../shared/analyse-api.service';
 import { AvailableBusEtaPrediction, BusEtaPredictionResponse } from '../shared/analyse.model';
 import { BusService } from 'app/core/bus/bus.service';
-import { BusDto } from 'app/core/bus/bus.model';
+import { Bus } from 'app/core/bus/bus.model';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'app-analyse-bi-bus',
@@ -58,7 +59,7 @@ export class AnalyseBiBusComponent implements OnInit {
     availableEtaResults: AvailableBusEtaPrediction[] = [];
     isLoading = false;
     isAvailableLoading = false;
-    buses$: Observable<BusDto[]>;
+    buses$: Observable<Bus[]>;
 
     constructor(
         private fb: FormBuilder,
@@ -76,14 +77,14 @@ export class AnalyseBiBusComponent implements OnInit {
             LastPositionAt: [null],
         });
 
-        this.buses$ = this.busService.GetAll();
+        this.buses$ = this.busService.GetBuses().pipe(map(paged => paged.buses));
     }
 
     ngOnInit(): void {
         this.predictAvailableBusesEta();
     }
 
-    onBusSelect(bus: BusDto | null): void {
+    onBusSelect(bus: Bus | null): void {
         if (!bus) {
             this.etaForm.patchValue({
                 Latitude: null,
