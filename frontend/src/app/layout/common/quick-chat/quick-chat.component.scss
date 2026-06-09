@@ -1,3 +1,4 @@
+/* Floating panel styles (when used directly in layout) */
 quick-chat {
     z-index: 1000;
     position: fixed;
@@ -25,6 +26,22 @@ quick-chat {
 
     &.quick-chat-opened > div {
         transform: translateX(0);
+    }
+}
+
+/* Styles when used inside a MatDialog */
+.cdk-overlay-container quick-chat,
+.gemini-chat-dialog quick-chat {
+    position: relative !important;
+    z-index: auto !important;
+    width: 100% !important;
+    height: 100% !important;
+
+    > div {
+        position: relative !important;
+        width: 100% !important;
+        transform: none !important;
+        box-shadow: none !important;
     }
 }
 

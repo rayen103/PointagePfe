@@ -179,19 +179,30 @@ export class AccueilComponent {
             // Select the Gemini chat first
             this._dashboardService
                 .getGeminiChatId()
-                .pipe(take(1))
-                .subscribe((chatId) => {
-                    this._dashboardService.selectGeminiChat(chatId).pipe(take(1)).subscribe();
-                    
-                    // Open as a popup
-                    this._matDialog.open(this.geminiChatDialog, {
-                        width: '500px',
-                        height: '700px',
-                        panelClass: 'gemini-chat-dialog',
-                        autoFocus: false
-                    });
+                .pipe(
+                    take(1),
+                    switchMap((chatId) => 
+                        this._dashboardService.selectGeminiChat(chatId).pipe(
+                            take(1),
+                            map(() => chatId)
+                        )
+                    )
+                )
+                .subscribe({
+                    next: () => {
+                        // Open as a popup
+                        this._matDialog.open(this.geminiChatDialog, {
+                            width: '500px',
+                            height: '700px',
+                            panelClass: 'gemini-chat-dialog',
+                            autoFocus: false
+                        });
 
-                    this._changeDetectorRef.markForCheck();
+                        this._changeDetectorRef.markForCheck();
+                    },
+                    error: (err) => {
+                        console.error('Error opening Gemini chat:', err);
+                    }
                 });
             return;
         }

@@ -15,11 +15,11 @@ model = None
 scaler = None
 _stops_cache = {}
 
-# CHANGED: keep existing 8 feature names/order for compatibility.
+# Feature names/order from trained model's feature_info.pkl
 BASE_FEATURE_NAMES = [
-    "DistanceFromStop",
+    "DistanceToNextStop",
     "log_distance",
-    "distance_over_300m",
+    "distance_over_300",
     "hour",
     "hour_sin",
     "hour_cos",
@@ -37,6 +37,27 @@ MIN_CAPACITY = 1.0
 ENCODING_MODULO = 10000
 FEATURE_COUNT_WITH_ADDITIONAL = 11
 FEATURE_COUNT_WITH_LEGACY = 10
+
+# Min/Max values for feature normalization (inferred from Colab synthetic data)
+FEATURE_MIN_MAX = {
+    "DistanceToNextStop": (0.0, 2500.0),
+    "log_distance": (0.0, 8.0),  # log(1) to log(2500)
+    "distance_over_300": (0.0, 1.0),
+    "hour": (0.0, 23.0),
+    "hour_sin": (-1.0, 1.0),
+    "hour_cos": (-1.0, 1.0),
+    "is_rush_hour": (0.0, 1.0),
+    "day_of_week": (0.0, 6.0),
+}
+
+def normalize_feature(feature_name: str, value: float) -> float:
+    """Normalize a feature to 0-1 range using min-max scaling"""
+    min_val, max_val = FEATURE_MIN_MAX[feature_name]
+    # Clamp value to min/max to avoid out of range
+    clamped = max(min_val, min(max_val, value))
+    # Normalize
+    normalized = (clamped - min_val) / (max_val - min_val)
+    return normalized
 
 
 # CHANGED: accept both legacy payload and new DB payload.
@@ -62,6 +83,7 @@ class ETAInput(BaseModel):
     is_weekend: Optional[int] = Field(None, alias="is_weekend")
 
     # New database payload
+    DistanceToNextStop: Optional[float] = Field(None, alias="distance_to_next_stop")  # <-- NEW: accept pre-calculated distance
     Latitude: Optional[float] = Field(None, alias="latitude")
     Longitude: Optional[float] = Field(None, alias="longitude")
     CodeCircuit: Optional[str] = Field(None, alias="code_circuit")
@@ -131,8 +153,9 @@ def _parse_day_of_week(dt: datetime) -> int:
 
 # CHANGED: central feature engineering shared by prediction + training.
 def engineer_features_from_raw(
-    latitude: float,
-    longitude: float,
+    distance_to_next_stop: Optional[float] = None,
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
     code_circuit: Optional[str] = None,
     model_bus: Optional[str] = None,
     capacite: Optional[float] = None,
@@ -140,13 +163,18 @@ def engineer_features_from_raw(
     last_position_at: Optional[datetime] = None,
     stops_csv_path: str = DEFAULT_STOPS_CSV_PATH,
 ) -> dict:
-    stops_df = load_stops_csv(stops_csv_path)
-    distance_meters, used_fallback = calculate_distance_to_next_stop(
-        latitude or 0,
-        longitude or 0,
-        code_circuit or "",
-        stops_df
-    )
+    used_fallback = True
+    if distance_to_next_stop is not None:
+        distance_meters = distance_to_next_stop
+        used_fallback = False
+    else:
+        stops_df = load_stops_csv(stops_csv_path)
+        distance_meters, used_fallback = calculate_distance_to_next_stop(
+            latitude or 0,
+            longitude or 0,
+            code_circuit or "",
+            stops_df
+        )
 
     safe_capacity = max(float(capacite or MIN_CAPACITY), MIN_CAPACITY)
     occupancy_ratio = float(current_occupancy or 0) / safe_capacity
@@ -156,9 +184,11 @@ def engineer_features_from_raw(
     day_of_week = _parse_day_of_week(actual_last_position)
 
     features = {
-        "DistanceFromStop": float(distance_meters),
+        "DistanceToNextStop": float(distance_meters),
+        "DistanceFromStop": float(distance_meters),  # for legacy compatibility
         "log_distance": float(math.log(max(distance_meters, MIN_DISTANCE_METERS))),
-        "distance_over_300m": int(distance_meters > 300),
+        "distance_over_300": int(distance_meters > 300),
+        "distance_over_300m": int(distance_meters > 300),  # for legacy compatibility
         "hour": hour,
         "hour_sin": float(math.sin(2 * math.pi * hour / 24)),
         "hour_cos": float(math.cos(2 * math.pi * hour / 24)),
@@ -267,6 +297,7 @@ async def predict_eta(input_data: ETAInput):
     try:
         # Get all input values using model_dump
         input_dict = input_data.model_dump(by_alias=False)
+        print(f"\n[ML SERVICE] Received raw request: {input_dict}\n")
         
         # Check if we have legacy fields or raw fields
         has_legacy = all(input_dict.get(field) is not None for field in BASE_FEATURE_NAMES)
@@ -274,9 +305,11 @@ async def predict_eta(input_data: ETAInput):
         if has_legacy:
             hour = int(input_dict.get("hour") or 0)
             feature_map = {
-                "DistanceFromStop": float(input_dict.get("DistanceFromStop") or 0),
+                "DistanceToNextStop": float(input_dict.get("DistanceFromStop") or input_dict.get("DistanceToNextStop") or 0),
+                "DistanceFromStop": float(input_dict.get("DistanceFromStop") or input_dict.get("DistanceToNextStop") or 0),
                 "log_distance": float(input_dict.get("log_distance") or 0),
-                "distance_over_300m": int(input_dict.get("distance_over_300m") or 0),
+                "distance_over_300": int(input_dict.get("distance_over_300m") or input_dict.get("distance_over_300") or 0),
+                "distance_over_300m": int(input_dict.get("distance_over_300m") or input_dict.get("distance_over_300") or 0),
                 "hour": hour,
                 "hour_sin": float(input_dict.get("hour_sin")) if input_dict.get("hour_sin") is not None else float(math.sin(2 * math.pi * hour / 24)),
                 "hour_cos": float(input_dict.get("hour_cos")) if input_dict.get("hour_cos") is not None else float(math.cos(2 * math.pi * hour / 24)),
@@ -291,6 +324,7 @@ async def predict_eta(input_data: ETAInput):
             }
         else:
             feature_map = engineer_features_from_raw(
+                distance_to_next_stop=input_dict.get("DistanceToNextStop"),
                 latitude=input_dict.get("Latitude"),
                 longitude=input_dict.get("Longitude"),
                 code_circuit=input_dict.get("CodeCircuit"),
@@ -302,10 +336,26 @@ async def predict_eta(input_data: ETAInput):
             )
 
         feature_order = _resolve_feature_order()
-        features = np.array([float(feature_map.get(col, 0.0)) for col in feature_order], dtype=float).reshape(1, -1)
+        print(f"[DEBUG] Feature order: {feature_order}")
+        print(f"[DEBUG] Feature map: {feature_map}")
+        
+        # Normalize each feature to 0-1 range
+        normalized_features = []
+        for col in feature_order:
+            raw_val = float(feature_map.get(col, 0.0))
+            if col in FEATURE_MIN_MAX:
+                normalized_val = normalize_feature(col, raw_val)
+            else:
+                normalized_val = raw_val  # No normalization for other features
+            normalized_features.append(normalized_val)
+        
+        features = np.array(normalized_features, dtype=float).reshape(1, -1)
+        print(f"[DEBUG] Normalized features array: {features}")
 
         scaled = scaler.transform(features)
+        print(f"[DEBUG] Scaled features: {scaled}")
         prediction = model.predict(scaled)
+        print(f"[DEBUG] Raw prediction from model: {prediction}")
 
         raw_eta = float(prediction[0])
         if raw_eta < 0:

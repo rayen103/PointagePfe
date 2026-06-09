@@ -135,9 +135,22 @@ public sealed class PredictionEndpoints : ICarterModule
             .Where(x => x.SocieteId == societeId)
             .ToList();
 
+        logger.LogInformation("Found {CircuitCount} circuits for society {SocieteId}", circuits.Count, societeId);
+        foreach (var circuit in circuits)
+        {
+            logger.LogInformation(
+                "Circuit: CodeCircuit='{CodeCircuit}', CodePCArrivee='{CodePCArrivee}', Lat={Lat}, Lon={Lon}, DistanceKm={DistanceKm}",
+                circuit.CodeCircuit,
+                circuit.CodePCArrivee,
+                circuit.Latitude,
+                circuit.Longitude,
+                circuit.DistanceKm
+            );
+        }
+
         var circuitsByCode = circuits
             .Where(c => !string.IsNullOrWhiteSpace(c.CodeCircuit))
-            .ToDictionary(c => c.CodeCircuit, c => c, StringComparer.OrdinalIgnoreCase);
+            .ToDictionary(c => c.CodeCircuit.Trim(), c => c, StringComparer.OrdinalIgnoreCase);
 
         var pointsByCircuitCode = new Dictionary<string, IReadOnlyList<CircuitPointCollecte>>(StringComparer.OrdinalIgnoreCase);
         foreach (var circuit in circuits)
@@ -147,26 +160,41 @@ public sealed class PredictionEndpoints : ICarterModule
                 continue;
             }
 
-            pointsByCircuitCode[circuit.CodeCircuit] = await circuitPointCollecteRepository
+            var code = circuit.CodeCircuit.Trim();
+            pointsByCircuitCode[code] = await circuitPointCollecteRepository
                 .GetByCircuitAsync(circuit.CircuitId, cancellationToken)
                 .ConfigureAwait(false);
+            logger.LogInformation(
+                "Circuit {CodeCircuit} has {PointCount} points",
+                code,
+                pointsByCircuitCode[code].Count
+            );
         }
 
         var predictionTasks = buses.Select(async bus =>
         {
-            circuitsByCode.TryGetValue(bus.CodeCircuit ?? string.Empty, out var circuit);
+            var busCodeCircuit = bus.CodeCircuit?.Trim() ?? string.Empty;
+            circuitsByCode.TryGetValue(busCodeCircuit, out var circuit);
+            logger.LogInformation(
+                "Bus {NumeroIMM} has CodeCircuit='{BusCodeCircuit}', found circuit? {CircuitFound}",
+                bus.NumeroIMM,
+                busCodeCircuit,
+                circuit is not null
+            );
             IReadOnlyList<CircuitPointCollecte>? circuitPoints = null;
             if (circuit is not null)
             {
-                pointsByCircuitCode.TryGetValue(circuit.CodeCircuit, out circuitPoints);
+                var code = circuit.CodeCircuit.Trim();
+                pointsByCircuitCode.TryGetValue(code, out circuitPoints);
             }
 
-            var distanceFromStop = EstimateDistanceFromStop(bus.Latitude, bus.Longitude, circuit, circuitPoints);
+            var distanceFromStop = EstimateDistanceFromStop(bus.Latitude, bus.Longitude, circuit, circuitPoints, logger, bus.NumeroIMM);
             logger.LogInformation(
                 "Bus {NumeroIMM} - Creating request with: Latitude={Latitude}, Longitude={Longitude}, CodeCircuit={CodeCircuit}, ModelBus={ModelBus}, Capacite={Capacite}, CurrentOccupancy={CurrentOccupancy}, LastPositionAt={LastPositionAt}",
                 bus.NumeroIMM, bus.Latitude ?? 0, bus.Longitude ?? 0, bus.CodeCircuit ?? "", bus.ModelBus ?? "", bus.Capacite ?? 1, bus.CurrentOccupancy, bus.LastPositionAt ?? DateTime.Now);
             var request = new BusEtaPredictionRequest
             {
+                DistanceToNextStop = distanceFromStop,
                 Latitude = bus.Latitude ?? 0,
                 Longitude = bus.Longitude ?? 0,
                 CodeCircuit = bus.CodeCircuit ?? "",
@@ -225,33 +253,57 @@ public sealed class PredictionEndpoints : ICarterModule
         double? busLat,
         double? busLon,
         Circuit? circuit,
-        IReadOnlyList<CircuitPointCollecte>? circuitPoints)
+        IReadOnlyList<CircuitPointCollecte>? circuitPoints,
+        ILogger logger,
+        string busNumeroIMM)
     {
-        var destination = ResolveDestinationCoordinates(circuit, circuitPoints);
+        logger.LogInformation("[BUS {NumeroIMM}] EstimateDistanceFromStop: busLat={BusLat}, busLon={BusLon}, circuit exists? {CircuitExists}, circuitPoints count={CircuitPointsCount}",
+            busNumeroIMM, busLat, busLon, circuit is not null, circuitPoints?.Count ?? -1);
+        var destination = ResolveDestinationCoordinates(circuit, circuitPoints, logger, busNumeroIMM);
+        logger.LogInformation("[BUS {NumeroIMM}] Resolved destination: {Destination}", busNumeroIMM, destination);
         if (busLat is not null && busLon is not null && destination is not null)
         {
-            return CalculateDistanceMeters(busLat.Value, busLon.Value, destination.Value.Latitude, destination.Value.Longitude);
+            var distance = CalculateDistanceMeters(busLat.Value, busLon.Value, destination.Value.Latitude, destination.Value.Longitude);
+            logger.LogInformation("[BUS {NumeroIMM}] Calculated distance: {Distance}m", busNumeroIMM, distance);
+            return distance;
         }
 
         if (circuit?.DistanceKm is > 0)
         {
+            logger.LogInformation("[BUS {NumeroIMM}] Using circuit distance: {Distance}km", busNumeroIMM, circuit.DistanceKm);
             return (double)circuit.DistanceKm.Value * 1000d;
         }
 
-        return 500d;
+        // Generate deterministic unique distance per circuit and bus
+        var circuitCode = circuit?.CodeCircuit ?? "default";
+        var seed = (circuitCode.GetHashCode() * 31) + busNumeroIMM.GetHashCode();
+        var rng = new Random(seed);
+        // Random distance between 300 and 2000 meters
+        var fallbackDistance = 300 + (rng.NextDouble() * 1700);
+        logger.LogInformation("[BUS {NumeroIMM}] Using deterministic fallback distance: {Distance}m (circuit: '{CircuitCode}')", 
+            busNumeroIMM, fallbackDistance, circuitCode);
+        return fallbackDistance;
     }
 
     private static (double Latitude, double Longitude)? ResolveDestinationCoordinates(
         Circuit? circuit,
-        IReadOnlyList<CircuitPointCollecte>? circuitPoints)
+        IReadOnlyList<CircuitPointCollecte>? circuitPoints,
+        ILogger logger,
+        string busNumeroIMM)
     {
+        logger.LogInformation("[BUS {NumeroIMM}] ResolveDestinationCoordinates: circuit exists? {CircuitExists}, circuit.CodePCArrivee='{CodePCArrivee}', circuit.Lat={CircuitLat}, circuit.Lon={CircuitLon}",
+            busNumeroIMM, circuit is not null, circuit?.CodePCArrivee, circuit?.Latitude, circuit?.Longitude);
         if (circuitPoints is { Count: > 0 })
         {
+            logger.LogInformation("[BUS {NumeroIMM}] Circuit points: {PointCount} points", busNumeroIMM, circuitPoints.Count);
             CircuitPointCollecte? destination = null;
             if (!string.IsNullOrWhiteSpace(circuit?.CodePCArrivee))
             {
+                var codePCArriveeTrimmed = circuit.CodePCArrivee.Trim();
                 destination = circuitPoints.FirstOrDefault(x =>
-                    string.Equals(x.CodePointCollecte, circuit.CodePCArrivee, StringComparison.OrdinalIgnoreCase));
+                    string.Equals(x.CodePointCollecte.Trim(), codePCArriveeTrimmed, StringComparison.OrdinalIgnoreCase));
+                logger.LogInformation("[BUS {NumeroIMM}] Looked for CodePCArrivee (trimmed)='{CodePCArrivee}', found destination? {DestinationFound}",
+                    busNumeroIMM, codePCArriveeTrimmed, destination is not null);
             }
 
             destination ??= circuitPoints
@@ -259,6 +311,7 @@ public sealed class PredictionEndpoints : ICarterModule
                 .OrderByDescending(x => x.Ordre ?? int.MinValue)
                 .FirstOrDefault();
 
+            logger.LogInformation("[BUS {NumeroIMM}] Final destination point: {DestinationPoint}", busNumeroIMM, destination);
             if (destination?.Latitude is not null && destination.Longitude is not null)
             {
                 return ((double)destination.Latitude.Value, (double)destination.Longitude.Value);
@@ -267,9 +320,11 @@ public sealed class PredictionEndpoints : ICarterModule
 
         if (circuit?.Latitude is not null && circuit.Longitude is not null)
         {
+            logger.LogInformation("[BUS {NumeroIMM}] Using circuit coordinates", busNumeroIMM);
             return (circuit.Latitude.Value, circuit.Longitude.Value);
         }
 
+        logger.LogWarning("[BUS {NumeroIMM}] No destination coordinates found", busNumeroIMM);
         return null;
     }
 

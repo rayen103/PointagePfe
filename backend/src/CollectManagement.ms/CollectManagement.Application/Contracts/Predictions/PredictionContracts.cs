@@ -89,6 +89,9 @@ public sealed record BusEtaPredictionRequest
     public int? IsWeekend { get; init; }
     
     // New raw database fields
+    [JsonPropertyName("distance_to_next_stop")]
+    public double? DistanceToNextStop { get; init; }
+
     [JsonPropertyName("latitude")]
     public double? Latitude { get; init; }
 

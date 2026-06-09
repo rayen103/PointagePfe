@@ -36,7 +36,7 @@ export class ChatMockApi {
                     chatId: 'gemini-chat-id',
                     contactId: 'gemini-contact-id',
                     isMine: false,
-                    value: 'Bonjour Brian ! Je suis votre assistant Gemini spécialisé dans ce projet de gestion de collecte et de pointage. Je connais parfaitement la structure de votre backend .NET, de votre frontend Angular et de vos services de Machine Learning.',
+                    value: 'Bonjour Brian ! Je suis votre assistant Gemini spécialisé dans les données de votre application de gestion de collecte et de pointage. Je connais toutes les entités et leurs champs !',
                     createdAt: new Date().toISOString()
                 },
                 {
@@ -44,7 +44,7 @@ export class ChatMockApi {
                     chatId: 'gemini-chat-id',
                     contactId: 'gemini-contact-id',
                     isMine: false,
-                    value: 'Je peux vous aider sur les points suivants :\n- Explication de l\'architecture (CQRS, MediatR, Carter)\n- Détails des modules frontend (CollectManagement, CST)\n- Fonctionnement des modèles ML (STGCN, RL Dispatcher, Predictive Maintenance)\n- Gestion des utilisateurs et des rôles\n- Et bien plus encore !',
+                    value: 'Je peux vous aider sur :\n- Les entités et leurs champs (Bus, Employé, Circuit, etc.)\n- Les relations entre les données\n- Les informations stockées pour chaque enregistrement\n- Et bien plus encore !',
                     createdAt: new Date().toISOString()
                 },
                 {
@@ -52,7 +52,7 @@ export class ChatMockApi {
                     chatId: 'gemini-chat-id',
                     contactId: 'gemini-contact-id',
                     isMine: false,
-                    value: 'Quelle est votre question sur le projet ?',
+                    value: 'Par exemple, demandez-moi : "Quels champs a un Bus ?" ou "Quelles informations sont stockées pour un Employé ?"',
                     createdAt: new Date().toISOString()
                 }
             ] : this._messages.map((message) => ({
@@ -232,17 +232,72 @@ export class ChatMockApi {
 
                 let aiValue = '';
 
-                // Intelligent responses based on project context
-                if (userMessage.includes('architecture') || userMessage.includes('structure')) {
-                    aiValue = 'L\'architecture du projet est basée sur le **Clean Architecture** côté backend (.NET 8) avec CQRS (MediatR) et Carter pour les endpoints. Côté frontend, nous utilisons **Angular 18** avec une structure modulaire par domaine (CollectManagement, CST).';
-                } else if (userMessage.includes('ml') || userMessage.includes('ia') || userMessage.includes('machine learning')) {
-                    aiValue = 'Le projet intègre plusieurs services ML :\n- **STGCN** pour la prédiction du trafic.\n- **RL Dispatcher** pour l\'optimisation des tournées.\n- **Scoring d\'absence** via des modèles de classification.\n- **Maintenance prédictive** pour les bus.';
-                } else if (userMessage.includes('collect') || userMessage.includes('circuit')) {
-                    aiValue = 'Le module **CollectManagement** gère les circuits de collecte, le pointage des employés et les ordres de travail (OT). Les circuits sont visualisables sur une carte interactive via Leaflet.';
+                // Entity-specific responses
+                if (userMessage.includes('bus') && (userMessage.includes('champs') || userMessage.includes('champ') || userMessage.includes('informations') || userMessage.includes('données') || userMessage.includes('fields') || userMessage.includes('information') || userMessage.includes('data'))) {
+                    aiValue = '**Entité Bus** : Voici tous les champs stockés pour un bus :\n' +
+                        '- **BusId** : Identifiant unique du bus\n' +
+                        '- **NumeroIMM** : Numéro d\'immatriculation (obligatoire)\n' +
+                        '- **ModelBus** : Modèle du bus\n' +
+                        '- **IMEI** : Numéro IMEI du dispositif\n' +
+                        '- **Capacite** : Capacité maximale du bus\n' +
+                        '- **CodeCircuit** : Code du circuit associé\n' +
+                        '- **CodeChauffeur** : Code du chauffeur associé\n' +
+                        '- **AppSagem** : Booléen, si l\'app Sagem est utilisée\n' +
+                        '- **IsActive** : Booléen, si le bus est actif\n' +
+                        '- **Latitude / Longitude** : Position GPS du bus\n' +
+                        '- **CurrentOccupancy** : Nombre de passagers actuels\n' +
+                        '- **LastPositionAt** : Date de la dernière mise à jour de position\n' +
+                        '- **LastOccupancyUpdateAt** : Date de la dernière mise à jour d\'occupation\n' +
+                        '- **SocieteId** : Identifiant de la société propriétaire';
+                } else if (userMessage.includes('employé') || userMessage.includes('employe') && (userMessage.includes('champs') || userMessage.includes('champ') || userMessage.includes('informations') || userMessage.includes('données') || userMessage.includes('fields') || userMessage.includes('information') || userMessage.includes('data'))) {
+                    aiValue = '**Entité Employé** : Voici tous les champs stockés pour un employé :\n' +
+                        '- **EmployeId** : Identifiant unique\n' +
+                        '- **Matricule** : Matricule de l\'employé (obligatoire)\n' +
+                        '- **RFID** : Tag RFID pour pointage\n' +
+                        '- **Nom / Prenom** : Nom et prénom\n' +
+                        '- **TypeEmploye** : Type d\'employé (énumération)\n' +
+                        '- **CodeCircuit** : Circuit affecté\n' +
+                        '- **CodePointCollecte** : Point de collecte affecté\n' +
+                        '- **CodeBus** : Bus affecté\n' +
+                        '- **CodeShift** : Shift/horaire affecté\n' +
+                        '- **Adresse** : Adresse\n' +
+                        '- **CodeGouvernorat / CodeRegion** : Localisation\n' +
+                        '- **Latitude / Longitude** : Position GPS\n' +
+                        '- **SocieteId** : Société d\'affectation';
+                } else if (userMessage.includes('circuit') && (userMessage.includes('champs') || userMessage.includes('champ') || userMessage.includes('informations') || userMessage.includes('données') || userMessage.includes('fields') || userMessage.includes('information') || userMessage.includes('data'))) {
+                    aiValue = '**Entité Circuit** : Voici tous les champs stockés pour un circuit :\n' +
+                        '- **CircuitId** : Identifiant unique\n' +
+                        '- **CodeCircuit** : Code unique du circuit (obligatoire)\n' +
+                        '- **LibelleCircuit** : Libellé/nom du circuit\n' +
+                        '- **Description** : Description du circuit\n' +
+                        '- **IsActive** : Booléen (actif/inactif)\n' +
+                        '- **Latitude / Longitude** : Position GPS de référence\n' +
+                        '- **CodePCDepart** : Point de collecte de départ\n' +
+                        '- **CodePCArrivee** : Point de collecte d\'arrivée\n' +
+                        '- **DistanceKm** : Distance du circuit en kilomètres\n' +
+                        '- **DureeMinutes** : Durée estimée du circuit\n' +
+                        '- **Couleur** : Couleur pour l\'affichage\n' +
+                        '- **SocieteId** : Société propriétaire';
+                } else if (userMessage.includes('entité') || userMessage.includes('entity') || userMessage.includes('entites') || userMessage.includes('entities')) {
+                    aiValue = 'Voici la liste de toutes les entités principales de l\'application :\n' +
+                        '- **Bus** : Véhicules de collecte\n' +
+                        '- **Employé** : Personnel (chauffeurs, agents, etc.)\n' +
+                        '- **Circuit** : Itinéraires de collecte\n' +
+                        '- **PointCollecte** : Points où les bus s\'arrêtent\n' +
+                        '- **Chantier** : Chantiers de travail\n' +
+                        '- **Equipe** : Équipes de travail\n' +
+                        '- **Rattachement** : Affectations\n' +
+                        '- **OrdreTravail** : Ordres de travail (OT)\n' +
+                        '- **Utilisateur** : Comptes utilisateurs de l\'application\n' +
+                        '- **Societe** : Sociétés clientes\n' +
+                        'Demandez-moi les détails sur une entité spécifique !';
                 } else if (userMessage.includes('hello') || userMessage.includes('bonjour') || userMessage.includes('salut')) {
-                    aiValue = 'Bonjour ! Je suis prêt à vous guider à travers l\'application. Que voulez-vous savoir sur le système de pointage, les circuits ou les modèles d\'IA ?';
+                    aiValue = 'Bonjour ! Je suis prêt à vous aider avec les données de votre application. Posez-moi des questions sur les entités (Bus, Employé, Circuit, etc.) !';
                 } else {
-                    aiValue = 'C\'est une excellente question sur le projet PointagePfe. Pourriez-vous préciser si vous parlez du backend .NET, du frontend Angular ou d\'un service ML spécifique ? Je peux vous expliquer comment chaque partie communique via le Bus de données.';
+                    aiValue = 'Je suis ici pour vous aider avec vos données ! Essayez de demander :\n' +
+                        '"Quels champs a un Bus ?"\n' +
+                        '"Quelles informations pour un Employé ?"\n' +
+                        '"Quelles sont les entités de l\'application ?"';
                 }
 
                 const aiMessage = {
