@@ -109,6 +109,7 @@ public sealed class PredictionEndpoints : ICarterModule
         ICircuitPointCollecteRepository circuitPointCollecteRepository,
         ILoggedInUserService loggedInUserService,
         IUtilisateurRepository utilisateurRepository,
+        ILogger<PredictionEndpoints> logger,
         CancellationToken cancellationToken)
     {
         var societeId = await ResolveSocieteId(loggedInUserService, utilisateurRepository, cancellationToken).ConfigureAwait(false);
@@ -121,6 +122,14 @@ public sealed class PredictionEndpoints : ICarterModule
         var buses = (await busRepository.GetAllAsync(cancellationToken).ConfigureAwait(false))
             .Where(x => x.SocieteId == societeId && x.IsActive)
             .ToList();
+        logger.LogInformation("Found {BusCount} active buses for society {SocieteId}", buses.Count, societeId);
+        
+        foreach (var bus in buses)
+        {
+            logger.LogInformation(
+                "Bus {NumeroIMM} data: Latitude={Latitude}, Longitude={Longitude}, ModelBus={ModelBus}, Capacite={Capacite}, CurrentOccupancy={CurrentOccupancy}, LastPositionAt={LastPositionAt}",
+                bus.NumeroIMM, bus.Latitude, bus.Longitude, bus.ModelBus, bus.Capacite, bus.CurrentOccupancy, bus.LastPositionAt);
+        }
 
         var circuits = (await circuitRepository.GetAllAsync(cancellationToken).ConfigureAwait(false))
             .Where(x => x.SocieteId == societeId)
@@ -153,6 +162,9 @@ public sealed class PredictionEndpoints : ICarterModule
             }
 
             var distanceFromStop = EstimateDistanceFromStop(bus.Latitude, bus.Longitude, circuit, circuitPoints);
+            logger.LogInformation(
+                "Bus {NumeroIMM} - Creating request with: Latitude={Latitude}, Longitude={Longitude}, CodeCircuit={CodeCircuit}, ModelBus={ModelBus}, Capacite={Capacite}, CurrentOccupancy={CurrentOccupancy}, LastPositionAt={LastPositionAt}",
+                bus.NumeroIMM, bus.Latitude ?? 0, bus.Longitude ?? 0, bus.CodeCircuit ?? "", bus.ModelBus ?? "", bus.Capacite ?? 1, bus.CurrentOccupancy, bus.LastPositionAt ?? DateTime.Now);
             var request = new BusEtaPredictionRequest
             {
                 Latitude = bus.Latitude ?? 0,
@@ -167,6 +179,9 @@ public sealed class PredictionEndpoints : ICarterModule
             var prediction = await externalPredictionService
                 .PredictBusEtaAsync(request, cancellationToken)
                 .ConfigureAwait(false);
+            logger.LogInformation(
+                "Bus {NumeroIMM} prediction: EtaMinutes={EtaMinutes}, EtaSeconds={EtaSeconds}, Confidence={Confidence}",
+                bus.NumeroIMM, prediction.EtaMinutes, prediction.EtaSeconds, prediction.Confidence);
 
             return new AvailableBusEtaPredictionDto(
                 bus.BusId.Value.ToString(),
