@@ -43,6 +43,8 @@ export interface BusEtaPredictionRequest {
   HourCos?: number;
   IsRushHour?: number;
   DayOfWeek?: number;
+  DirectionRef?: number;
+  IsWeekend?: number;
 
   // New raw database fields
   Latitude?: number;

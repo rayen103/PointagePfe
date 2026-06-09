@@ -148,27 +148,16 @@ public sealed class ExternalPredictionService : IExternalPredictionService
     {
         try
         {
-            // Map to snake_case for Python API
-            var json = JsonSerializer.Serialize(new
+            // Use snake_case naming policy for ML service
+            var mlServiceJsonOptions = new JsonSerializerOptions
             {
-                request.DistanceFromStop,
-                log_distance = request.LogDistance,
-                distance_over_300m = request.DistanceOver300m,
-                hour = request.Hour,
-                hour_sin = request.HourSin,
-                hour_cos = request.HourCos,
-                is_rush_hour = request.IsRushHour,
-                day_of_week = request.DayOfWeek,
-                DirectionRef = request.DirectionRef,
-                is_weekend = request.IsWeekend,
-                request.Latitude,
-                request.Longitude,
-                code_circuit = request.CodeCircuit,
-                model_bus = request.ModelBus,
-                request.Capacite,
-                current_occupancy = request.CurrentOccupancy,
-                last_position_at = request.LastPositionAt
-            }, JsonOptions);
+                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+                WriteIndented = false,
+                PropertyNameCaseInsensitive = true
+            };
+            
+            // Serialize request with snake_case
+            var json = JsonSerializer.Serialize(request, mlServiceJsonOptions);
 
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync(BusEtaApiUrl, content, cancellationToken).ConfigureAwait(false);
@@ -176,7 +165,7 @@ public sealed class ExternalPredictionService : IExternalPredictionService
             response.EnsureSuccessStatusCode();
 
             var responseJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            var result = JsonSerializer.Deserialize<BusEtaPredictionResponse>(responseJson, JsonOptions);
+            var result = JsonSerializer.Deserialize<BusEtaPredictionResponse>(responseJson, mlServiceJsonOptions);
             
             return result ?? new BusEtaPredictionResponse(0, 0, 0.3, false);
         }
