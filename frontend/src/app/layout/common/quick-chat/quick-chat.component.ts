@@ -118,13 +118,17 @@ export class QuickChatComponent implements OnInit, AfterViewInit, OnDestroy {
             .subscribe((opened: boolean) => {
                 this.opened = opened;
 
-                // If the panel opens, show the overlay
-                if (opened) {
-                    this._showOverlay();
-                }
-                // Otherwise, hide the overlay
-                else {
-                    this._hideOverlay();
+                // Only show/hide overlay if NOT inside a dialog
+                const isInsideDialog = this._elementRef.nativeElement.closest('.cdk-overlay-container') !== null;
+                if (!isInsideDialog) {
+                    // If the panel opens, show the overlay
+                    if (opened) {
+                        this._showOverlay();
+                    }
+                    // Otherwise, hide the overlay
+                    else {
+                        this._hideOverlay();
+                    }
                 }
 
                 // Mark for check
@@ -154,6 +158,11 @@ export class QuickChatComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.selectedChat = chat;
                 this._changeDetectorRef.markForCheck();
             });
+
+        // Load chats if not already loaded
+        if (!this.chats || this.chats.length === 0) {
+            this._quickChatService.getChats().subscribe();
+        }
     }
 
     /**

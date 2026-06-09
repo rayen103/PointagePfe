@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { ApiService } from 'app/core/common/api.service';
 import {
+    AvailableBusEtaPredictionResponse,
     AnalyseQueryRequest,
     AnalyseQueryResponse,
     AnalyseReportType,
@@ -48,9 +49,41 @@ export class AnalyseApiService {
     }
 
     predictBusEta(request: BusEtaPredictionRequest): Observable<BusEtaPredictionResponse> {
-        return this._api.Post2<BusEtaPredictionResponse>('prediction/bus-eta', request).pipe(
+        // Map frontend camelCase to Python snake_case
+        const snakeCaseRequest = {
+            DistanceFromStop: request.DistanceFromStop,
+            log_distance: request.LogDistance,
+            distance_over_300m: request.DistanceOver300m,
+            hour: request.Hour,
+            hour_sin: request.HourSin,
+            hour_cos: request.HourCos,
+            is_rush_hour: request.IsRushHour,
+            day_of_week: request.DayOfWeek,
+            Latitude: request.Latitude,
+            Longitude: request.Longitude,
+            code_circuit: request.CodeCircuit,
+            model_bus: request.ModelBus,
+            Capacite: request.Capacite,
+            current_occupancy: request.CurrentOccupancy,
+            last_position_at: request.LastPositionAt ? new Date(request.LastPositionAt).toISOString() : undefined,
+        };
+
+        return this._api.Post2<any>('prediction/bus-eta', snakeCaseRequest).pipe(
+            map((r) => {
+                // Map Python snake_case back to frontend camelCase
+                return {
+                    EtaMinutes: r.data.eta_minutes,
+                    EtaSeconds: r.data.eta_seconds,
+                    Confidence: r.data.confidence,
+                    UsedFallbackStop: r.data.used_fallback_stop,
+                };
+            })
+        );
+    }
+
+    predictAvailableBusEta(): Observable<AvailableBusEtaPredictionResponse> {
+        return this._api.Get<AvailableBusEtaPredictionResponse>('prediction/bus-eta/available').pipe(
             map((r) => r.data)
         );
     }
 }
-

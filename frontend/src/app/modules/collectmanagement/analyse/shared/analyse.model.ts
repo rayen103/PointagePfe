@@ -34,20 +34,44 @@ export interface AnalyseDesignerConfig {
 }
 
 export interface BusEtaPredictionRequest {
-    DistanceFromStop: number;
-    log_distance: number;
-    distance_over_300m: number;
-    hour: number;
-    hour_sin?: number | null;
-    hour_cos?: number | null;
-    is_rush_hour: number;
-    day_of_week: number;
-    DirectionRef: number;
-    is_weekend: number;
+  // Legacy compatibility fields
+  DistanceFromStop?: number;
+  LogDistance?: number;
+  DistanceOver300m?: number;
+  Hour?: number;
+  HourSin?: number;
+  HourCos?: number;
+  IsRushHour?: number;
+  DayOfWeek?: number;
+  DirectionRef?: number;
+  IsWeekend?: number;
+
+  // New raw database fields
+  Latitude?: number;
+  Longitude?: number;
+  CodeCircuit?: string;
+  ModelBus?: string;
+  Capacite?: number;
+  CurrentOccupancy?: number;
+  LastPositionAt?: Date;
 }
 
 export interface BusEtaPredictionResponse {
-    eta_minutes: number;
+  EtaMinutes: number;
+  EtaSeconds: number;
+  Confidence: number;
+  UsedFallbackStop: boolean;
+}
+
+export interface AvailableBusEtaPrediction {
+    busId: string;
+    numeroIMM: string;
+    codeCircuit?: string | null;
+    distanceFromStop: number;
+    etaMinutes: number;
     confidence: number;
 }
 
+export interface AvailableBusEtaPredictionResponse {
+    predictions: AvailableBusEtaPrediction[];
+}

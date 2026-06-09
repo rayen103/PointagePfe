@@ -148,34 +148,44 @@ public sealed class ExternalPredictionService : IExternalPredictionService
     {
         try
         {
-            var json = JsonSerializer.Serialize(new
+            // Use snake_case naming policy for ML service
+            var mlServiceJsonOptions = new JsonSerializerOptions
             {
-                request.DistanceFromStop,
-                request.log_distance,
-                request.distance_over_300m,
-                request.hour,
-                request.hour_sin,
-                request.hour_cos,
-                request.is_rush_hour,
-                request.day_of_week,
-                request.DirectionRef,
-                request.is_weekend
-            }, JsonOptions);
+                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+                WriteIndented = true,
+                PropertyNameCaseInsensitive = true
+            };
+            
+            // Serialize request with snake_case
+            var json = JsonSerializer.Serialize(request, mlServiceJsonOptions);
+            _logger.LogInformation("Sending to ML service: {Json}", json);
 
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync(BusEtaApiUrl, content, cancellationToken).ConfigureAwait(false);
             
-            response.EnsureSuccessStatusCode();
-
-            var responseJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            var result = JsonSerializer.Deserialize<BusEtaPredictionResponse>(responseJson, JsonOptions);
+            _logger.LogInformation("ML service response status: {StatusCode}", response.StatusCode);
             
-            return result ?? new BusEtaPredictionResponse(0, 0);
+            var responseJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("ML service responded with error: {StatusCode} - {Body}", response.StatusCode, responseJson);
+            }
+            
+            response.EnsureSuccessStatusCode();
+            
+            _logger.LogInformation("ML service response body: {Json}", responseJson);
+            
+            var result = JsonSerializer.Deserialize<BusEtaPredictionResponse>(responseJson, mlServiceJsonOptions);
+            
+            _logger.LogInformation("Deserialized result: {@Result}", result);
+            
+            return result ?? new BusEtaPredictionResponse(0, 0, 0.3, false);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error calling Bus ETA API");
-            return new BusEtaPredictionResponse(request.DistanceFromStop * 0.02, 0.3);
+            throw; // Re-throw the exception instead of returning default
         }
     }
 
