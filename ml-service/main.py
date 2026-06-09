@@ -72,20 +72,7 @@ class ETAInput(BaseModel):
 
     @model_validator(mode="after")
     def validate_input_shape(self):
-        has_legacy = all(getattr(self, field) is not None for field in BASE_FEATURE_NAMES)
-        # For raw check, use default values if fields are missing
-        # We'll handle defaults in engineer_features_from_raw
-        has_raw = (
-            self.Latitude is not None
-            and self.Longitude is not None
-            and self.LastPositionAt is not None
-        )
-
-        if not has_legacy and not has_raw:
-            raise ValueError(
-                "Payload must contain either legacy ETA features or raw DB fields "
-                "(Latitude, Longitude, LastPositionAt, plus optional others)."
-            )
+        # Just check if model is valid - we'll handle defaults in the predict function
         return self
 
 
@@ -278,36 +265,39 @@ async def predict_eta(input_data: ETAInput):
         raise HTTPException(status_code=500, detail="Model not loaded")
 
     try:
-        # CHANGED: support both legacy feature payload and new raw DB payload.
-        has_legacy_payload = all(getattr(input_data, field) is not None for field in BASE_FEATURE_NAMES)
-
-        if has_legacy_payload:
-            hour = int(input_data.hour or 0)
+        # Get all input values using model_dump
+        input_dict = input_data.model_dump(by_alias=False)
+        
+        # Check if we have legacy fields or raw fields
+        has_legacy = all(input_dict.get(field) is not None for field in BASE_FEATURE_NAMES)
+        
+        if has_legacy:
+            hour = int(input_dict.get("hour") or 0)
             feature_map = {
-                "DistanceFromStop": float(input_data.DistanceFromStop or 0),
-                "log_distance": float(input_data.log_distance or 0),
-                "distance_over_300m": int(input_data.distance_over_300m or 0),
+                "DistanceFromStop": float(input_dict.get("DistanceFromStop") or 0),
+                "log_distance": float(input_dict.get("log_distance") or 0),
+                "distance_over_300m": int(input_dict.get("distance_over_300m") or 0),
                 "hour": hour,
-                "hour_sin": float(input_data.hour_sin) if input_data.hour_sin is not None else float(math.sin(2 * math.pi * hour / 24)),
-                "hour_cos": float(input_data.hour_cos) if input_data.hour_cos is not None else float(math.cos(2 * math.pi * hour / 24)),
-                "is_rush_hour": int(input_data.is_rush_hour or 0),
-                "day_of_week": int(input_data.day_of_week or 0),
+                "hour_sin": float(input_dict.get("hour_sin")) if input_dict.get("hour_sin") is not None else float(math.sin(2 * math.pi * hour / 24)),
+                "hour_cos": float(input_dict.get("hour_cos")) if input_dict.get("hour_cos") is not None else float(math.cos(2 * math.pi * hour / 24)),
+                "is_rush_hour": int(input_dict.get("is_rush_hour") or 0),
+                "day_of_week": int(input_dict.get("day_of_week") or 0),
                 "occupancy_ratio": 0.0,
                 "route_encoded": 0.0,
                 "model_encoded": 0.0,
                 "DirectionRef": 0.0,
-                "is_weekend": int(int(input_data.day_of_week or 0) in (0, 6)),
+                "is_weekend": int(int(input_dict.get("day_of_week") or 0) in (0, 6)),
                 "used_fallback_stop": False,
             }
         else:
             feature_map = engineer_features_from_raw(
-                latitude=input_data.Latitude,
-                longitude=input_data.Longitude,
-                code_circuit=input_data.CodeCircuit,
-                model_bus=input_data.ModelBus,
-                capacite=input_data.Capacite,
-                current_occupancy=input_data.CurrentOccupancy,
-                last_position_at=input_data.LastPositionAt,
+                latitude=input_dict.get("Latitude"),
+                longitude=input_dict.get("Longitude"),
+                code_circuit=input_dict.get("CodeCircuit"),
+                model_bus=input_dict.get("ModelBus"),
+                capacite=input_dict.get("Capacite"),
+                current_occupancy=input_dict.get("CurrentOccupancy"),
+                last_position_at=input_dict.get("LastPositionAt"),
                 stops_csv_path=DEFAULT_STOPS_CSV_PATH,
             )
 
