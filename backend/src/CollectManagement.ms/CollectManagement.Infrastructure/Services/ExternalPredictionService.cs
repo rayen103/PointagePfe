@@ -165,9 +165,15 @@ public sealed class ExternalPredictionService : IExternalPredictionService
             
             _logger.LogInformation("ML service response status: {StatusCode}", response.StatusCode);
             
-            response.EnsureSuccessStatusCode();
-
             var responseJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError("ML service responded with error: {StatusCode} - {Body}", response.StatusCode, responseJson);
+            }
+            
+            response.EnsureSuccessStatusCode();
+            
             _logger.LogInformation("ML service response body: {Json}", responseJson);
             
             var result = JsonSerializer.Deserialize<BusEtaPredictionResponse>(responseJson, mlServiceJsonOptions);

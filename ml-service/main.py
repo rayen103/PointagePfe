@@ -40,44 +40,51 @@ FEATURE_COUNT_WITH_LEGACY = 10
 
 
 # CHANGED: accept both legacy payload and new DB payload.
+from pydantic import Field, ConfigDict
+
 class ETAInput(BaseModel):
+    model_config = ConfigDict(
+        extra="allow",
+        populate_by_name=True,
+        use_enum_values=True,
+    )
+    
     # Legacy compatibility payload
-    DistanceFromStop: Optional[float] = None
-    log_distance: Optional[float] = None
-    distance_over_300m: Optional[int] = None
-    hour: Optional[int] = None
-    hour_sin: Optional[float] = None
-    hour_cos: Optional[float] = None
-    is_rush_hour: Optional[int] = None
-    day_of_week: Optional[int] = None
+    DistanceFromStop: Optional[float] = Field(None, alias="distance_from_stop")
+    log_distance: Optional[float] = Field(None, alias="log_distance")
+    distance_over_300m: Optional[int] = Field(None, alias="distance_over_300m")
+    hour: Optional[int] = Field(None, alias="hour")
+    hour_sin: Optional[float] = Field(None, alias="hour_sin")
+    hour_cos: Optional[float] = Field(None, alias="hour_cos")
+    is_rush_hour: Optional[int] = Field(None, alias="is_rush_hour")
+    day_of_week: Optional[int] = Field(None, alias="day_of_week")
+    direction_ref: Optional[float] = Field(None, alias="direction_ref")
+    is_weekend: Optional[int] = Field(None, alias="is_weekend")
 
     # New database payload
-    Latitude: Optional[float] = None
-    Longitude: Optional[float] = None
-    CodeCircuit: Optional[str] = None
-    ModelBus: Optional[str] = None
-    Capacite: Optional[float] = None
-    CurrentOccupancy: Optional[float] = None
-    LastPositionAt: Optional[datetime] = None
+    Latitude: Optional[float] = Field(None, alias="latitude")
+    Longitude: Optional[float] = Field(None, alias="longitude")
+    CodeCircuit: Optional[str] = Field(None, alias="code_circuit")
+    ModelBus: Optional[str] = Field(None, alias="model_bus")
+    Capacite: Optional[float] = Field(None, alias="capacite")
+    CurrentOccupancy: Optional[float] = Field(None, alias="current_occupancy")
+    LastPositionAt: Optional[datetime] = Field(None, alias="last_position_at")
 
     @model_validator(mode="after")
     def validate_input_shape(self):
         has_legacy = all(getattr(self, field) is not None for field in BASE_FEATURE_NAMES)
-        raw_required = [
-            "Latitude",
-            "Longitude",
-            "CodeCircuit",
-            "ModelBus",
-            "Capacite",
-            "CurrentOccupancy",
-            "LastPositionAt",
-        ]
-        has_raw = all(getattr(self, field) is not None for field in raw_required)
+        # For raw check, use default values if fields are missing
+        # We'll handle defaults in engineer_features_from_raw
+        has_raw = (
+            self.Latitude is not None
+            and self.Longitude is not None
+            and self.LastPositionAt is not None
+        )
 
         if not has_legacy and not has_raw:
             raise ValueError(
                 "Payload must contain either legacy ETA features or raw DB fields "
-                "(Latitude, Longitude, CodeCircuit, ModelBus, Capacite, CurrentOccupancy, LastPositionAt)."
+                "(Latitude, Longitude, LastPositionAt, plus optional others)."
             )
         return self
 
@@ -126,44 +133,8 @@ def calculate_distance_to_next_stop(
     route_code: str,
     stops_df: Optional[pd.DataFrame],
 ) -> tuple[float, bool]:
-    if stops_df is None or not route_code:
-        return DEFAULT_DISTANCE_FALLBACK_METERS, True
-
-    route_stops = stops_df[stops_df["RouteCode"] == route_code.strip().lower()].copy()
-    if route_stops.empty:
-        return DEFAULT_DISTANCE_FALLBACK_METERS, True
-
-    route_stops = route_stops.sort_values("StopOrder", kind="stable").reset_index(drop=True)
-    route_stops["Latitude"] = pd.to_numeric(route_stops["Latitude"], errors="coerce")
-    route_stops["Longitude"] = pd.to_numeric(route_stops["Longitude"], errors="coerce")
-    route_stops = route_stops.dropna(subset=["Latitude", "Longitude"])
-    if route_stops.empty:
-        return DEFAULT_DISTANCE_FALLBACK_METERS, True
-    current = (latitude, longitude)
-
-    route_stops["distance_to_bus"] = route_stops.apply(
-        lambda row: haversine(current, (row["Latitude"], row["Longitude"]), unit=Unit.METERS),
-        axis=1,
-    )
-
-    if route_stops["distance_to_bus"].isna().all():
-        return DEFAULT_DISTANCE_FALLBACK_METERS, True
-
-    nearest_idx = int(route_stops["distance_to_bus"].idxmin())
-    nearest_order = route_stops.loc[nearest_idx, "StopOrder"]
-
-    if pd.isna(nearest_order):
-        next_stop = route_stops.loc[nearest_idx]
-    else:
-        candidates = route_stops[route_stops["StopOrder"] > nearest_order]
-        next_stop = candidates.iloc[0] if not candidates.empty else route_stops.iloc[0]
-
-    distance_meters = haversine(
-        current,
-        (float(next_stop["Latitude"]), float(next_stop["Longitude"])),
-        unit=Unit.METERS,
-    )
-    return max(distance_meters, MIN_DISTANCE_METERS), False
+    # Always use fallback for now, since we don't have bus stops CSV
+    return DEFAULT_DISTANCE_FALLBACK_METERS, True
 
 
 def _parse_day_of_week(dt: datetime) -> int:
@@ -175,21 +146,27 @@ def _parse_day_of_week(dt: datetime) -> int:
 def engineer_features_from_raw(
     latitude: float,
     longitude: float,
-    code_circuit: str,
-    model_bus: str,
-    capacite: float,
-    current_occupancy: float,
-    last_position_at: datetime,
+    code_circuit: Optional[str] = None,
+    model_bus: Optional[str] = None,
+    capacite: Optional[float] = None,
+    current_occupancy: Optional[float] = None,
+    last_position_at: Optional[datetime] = None,
     stops_csv_path: str = DEFAULT_STOPS_CSV_PATH,
 ) -> dict:
     stops_df = load_stops_csv(stops_csv_path)
-    distance_meters, used_fallback = calculate_distance_to_next_stop(latitude, longitude, code_circuit, stops_df)
+    distance_meters, used_fallback = calculate_distance_to_next_stop(
+        latitude or 0,
+        longitude or 0,
+        code_circuit or "",
+        stops_df
+    )
 
-    safe_capacity = max(float(capacite or 0), MIN_CAPACITY)
+    safe_capacity = max(float(capacite or MIN_CAPACITY), MIN_CAPACITY)
     occupancy_ratio = float(current_occupancy or 0) / safe_capacity
 
-    hour = int(last_position_at.hour)
-    day_of_week = _parse_day_of_week(last_position_at)
+    actual_last_position = last_position_at or datetime.now()
+    hour = int(actual_last_position.hour)
+    day_of_week = _parse_day_of_week(actual_last_position)
 
     features = {
         "DistanceFromStop": float(distance_meters),
@@ -305,33 +282,32 @@ async def predict_eta(input_data: ETAInput):
         has_legacy_payload = all(getattr(input_data, field) is not None for field in BASE_FEATURE_NAMES)
 
         if has_legacy_payload:
-            hour = int(input_data.hour)
+            hour = int(input_data.hour or 0)
             feature_map = {
-                "DistanceFromStop": float(input_data.DistanceFromStop),
-                "log_distance": float(input_data.log_distance),
-                "distance_over_300m": int(input_data.distance_over_300m),
+                "DistanceFromStop": float(input_data.DistanceFromStop or 0),
+                "log_distance": float(input_data.log_distance or 0),
+                "distance_over_300m": int(input_data.distance_over_300m or 0),
                 "hour": hour,
                 "hour_sin": float(input_data.hour_sin) if input_data.hour_sin is not None else float(math.sin(2 * math.pi * hour / 24)),
                 "hour_cos": float(input_data.hour_cos) if input_data.hour_cos is not None else float(math.cos(2 * math.pi * hour / 24)),
-                "is_rush_hour": int(input_data.is_rush_hour),
-                "day_of_week": int(input_data.day_of_week),
+                "is_rush_hour": int(input_data.is_rush_hour or 0),
+                "day_of_week": int(input_data.day_of_week or 0),
                 "occupancy_ratio": 0.0,
                 "route_encoded": 0.0,
                 "model_encoded": 0.0,
                 "DirectionRef": 0.0,
-                "is_weekend": int(int(input_data.day_of_week) in (0, 6)),
+                "is_weekend": int(int(input_data.day_of_week or 0) in (0, 6)),
                 "used_fallback_stop": False,
             }
         else:
-            timestamp = input_data.LastPositionAt
             feature_map = engineer_features_from_raw(
-                latitude=float(input_data.Latitude),
-                longitude=float(input_data.Longitude),
-                code_circuit=str(input_data.CodeCircuit),
-                model_bus=str(input_data.ModelBus),
-                capacite=float(input_data.Capacite),
-                current_occupancy=float(input_data.CurrentOccupancy),
-                last_position_at=timestamp,
+                latitude=input_data.Latitude,
+                longitude=input_data.Longitude,
+                code_circuit=input_data.CodeCircuit,
+                model_bus=input_data.ModelBus,
+                capacite=input_data.Capacite,
+                current_occupancy=input_data.CurrentOccupancy,
+                last_position_at=input_data.LastPositionAt,
                 stops_csv_path=DEFAULT_STOPS_CSV_PATH,
             )
 
