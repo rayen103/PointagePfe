@@ -152,6 +152,7 @@ public sealed class PredictionEndpoints : ICarterModule
                 pointsByCircuitCode.TryGetValue(circuit.CodeCircuit, out circuitPoints);
             }
 
+            var distanceFromStop = EstimateDistanceFromStop(bus.Latitude, bus.Longitude, circuit, circuitPoints);
             var request = new BusEtaPredictionRequest
             {
                 Latitude = bus.Latitude ?? 0,
