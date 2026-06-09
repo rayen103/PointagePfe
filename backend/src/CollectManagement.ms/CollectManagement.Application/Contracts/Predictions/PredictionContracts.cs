@@ -89,8 +89,8 @@ public sealed record AvailableBusEtaPredictionDto(
     string NumeroIMM,
     string? CodeCircuit,
     double DistanceFromStop,
-    double eta_minutes,
-    double confidence);
+    double EtaMinutes,
+    double Confidence);
 
 public sealed record AvailableBusEtaPredictionResponse(
     IReadOnlyList<AvailableBusEtaPredictionDto> Predictions);

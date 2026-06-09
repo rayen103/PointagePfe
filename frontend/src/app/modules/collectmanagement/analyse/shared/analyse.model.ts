@@ -68,7 +68,7 @@ export interface AvailableBusEtaPrediction {
     numeroIMM: string;
     codeCircuit?: string | null;
     distanceFromStop: number;
-    eta_minutes: number;
+    etaMinutes: number;
     confidence: number;
 }
 

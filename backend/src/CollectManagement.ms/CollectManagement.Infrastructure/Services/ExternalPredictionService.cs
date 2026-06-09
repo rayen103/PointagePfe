@@ -152,27 +152,34 @@ public sealed class ExternalPredictionService : IExternalPredictionService
             var mlServiceJsonOptions = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
-                WriteIndented = false,
+                WriteIndented = true,
                 PropertyNameCaseInsensitive = true
             };
             
             // Serialize request with snake_case
             var json = JsonSerializer.Serialize(request, mlServiceJsonOptions);
+            _logger.LogInformation("Sending to ML service: {Json}", json);
 
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync(BusEtaApiUrl, content, cancellationToken).ConfigureAwait(false);
             
+            _logger.LogInformation("ML service response status: {StatusCode}", response.StatusCode);
+            
             response.EnsureSuccessStatusCode();
 
             var responseJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+            _logger.LogInformation("ML service response body: {Json}", responseJson);
+            
             var result = JsonSerializer.Deserialize<BusEtaPredictionResponse>(responseJson, mlServiceJsonOptions);
+            
+            _logger.LogInformation("Deserialized result: {@Result}", result);
             
             return result ?? new BusEtaPredictionResponse(0, 0, 0.3, false);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error calling Bus ETA API");
-            return new BusEtaPredictionResponse(0, 0, 0.3, false);
+            throw; // Re-throw the exception instead of returning default
         }
     }
 
