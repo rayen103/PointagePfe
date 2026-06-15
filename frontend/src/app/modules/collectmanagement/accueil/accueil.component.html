@@ -186,6 +186,570 @@
                 </div>
             </div>
 
+            <!-- Entities Cards Section -->
+            <div class="mt-8">
+                <h2 class="text-xl font-bold tracking-tight mb-6 flex items-center gap-3">
+                    <mat-icon svgIcon="mat_outline:dashboard" class="text-indigo-500"></mat-icon>
+                    Entités Principales
+                </h2>
+
+                <!-- Buses Cards -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2 border-l-4 border-indigo-500 pl-3">
+                        <mat-icon class="text-indigo-500" svgIcon="mat_outline:directions_bus"></mat-icon>
+                        Bus ({{ vm.data.buses.length }})
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        @for (bus of vm.data.buses.slice(0, 8); track bus.busId) {
+                            <div class="entity-card bg-card p-6 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+                                            <mat-icon class="text-white text-2xl" svgIcon="mat_outline:directions_bus"></mat-icon>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-lg">{{ bus.numeroIMM }}</div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">{{ bus.modelBus || 'Modèle inconnu' }}</div>
+                                        </div>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold" [ngClass]="bus.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'">
+                                        {{ bus.isActive ? 'Actif' : 'Inactif' }}
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:local_offer"></mat-icon>
+                                            Capacité
+                                        </div>
+                                        <div class="font-semibold">{{ bus.capacite || '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:route"></mat-icon>
+                                            Circuit
+                                        </div>
+                                        <div class="font-semibold">{{ bus.codeCircuit || '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:people"></mat-icon>
+                                            Occupation
+                                        </div>
+                                        <div class="font-semibold">{{ bus.currentOccupancy !== null && bus.currentOccupancy !== undefined ? bus.currentOccupancy : '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:person"></mat-icon>
+                                            Conducteur
+                                        </div>
+                                        <div class="font-semibold">{{ bus.codeChauffeur || '-' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (vm.data.buses.length === 0) {
+                            <div class="col-span-full text-center py-12 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
+                                <mat-icon class="icon-size-16 mb-3" svgIcon="mat_outline:directions_bus"></mat-icon>
+                                <div class="font-medium">Aucun bus disponible</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Employees Cards -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2 border-l-4 border-emerald-500 pl-3">
+                        <mat-icon class="text-emerald-500" svgIcon="mat_outline:badge"></mat-icon>
+                        Employés ({{ vm.data.employes.length }})
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        @for (employe of vm.data.employes.slice(0, 8); track employe.employeId) {
+                            <div class="entity-card bg-card p-6 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg">
+                                            <span class="text-white font-bold text-xl">{{ (employe.prenom?.[0] || 'A').toUpperCase() + (employe.nom?.[0] || 'N').toUpperCase() }}</span>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-lg">{{ employe.nom }} {{ employe.prenom }}</div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">{{ employe.typeEmploye }}</div>
+                                        </div>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold" [ngClass]="getRiskBadgeClass(employe.absenceRiskLevel)">
+                                        {{ getRiskLabel(employe.absenceRiskLevel) }}
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:badge"></mat-icon>
+                                            Matricule
+                                        </div>
+                                        <div class="font-semibold">{{ employe.matricule }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:contactless"></mat-icon>
+                                            RFID
+                                        </div>
+                                        <div class="font-semibold">{{ employe.rfid || '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:route"></mat-icon>
+                                            Circuit
+                                        </div>
+                                        <div class="font-semibold">{{ employe.codeCircuit || '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:directions_bus"></mat-icon>
+                                            Bus
+                                        </div>
+                                        <div class="font-semibold">{{ employe.codeBus || '-' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (vm.data.employes.length === 0) {
+                            <div class="col-span-full text-center py-12 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
+                                <mat-icon class="icon-size-16 mb-3" svgIcon="mat_outline:badge"></mat-icon>
+                                <div class="font-medium">Aucun employé disponible</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Circuits Cards -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2 border-l-4 border-orange-500 pl-3">
+                        <mat-icon class="text-orange-500" svgIcon="mat_outline:alt_route"></mat-icon>
+                        Circuits ({{ vm.data.circuits.length }})
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        @for (circuit of vm.data.circuits.slice(0, 8); track circuit.circuitId) {
+                            <div class="entity-card bg-card p-6 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg">
+                                            <mat-icon class="text-white text-2xl" svgIcon="mat_outline:alt_route"></mat-icon>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-lg">{{ circuit.codeCircuit }}</div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">{{ circuit.libelleCircuit || 'Circuit' }}</div>
+                                        </div>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold" [ngClass]="circuit.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'">
+                                        {{ circuit.isActive ? 'Actif' : 'Inactif' }}
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:straighten"></mat-icon>
+                                            Distance
+                                        </div>
+                                        <div class="font-semibold">{{ circuit.distanceKm ? (circuit.distanceKm + ' km') : '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:schedule"></mat-icon>
+                                            Durée
+                                        </div>
+                                        <div class="font-semibold">{{ circuit.dureeMinutes ? (circuit.dureeMinutes + ' min') : '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:place"></mat-icon>
+                                            Départ
+                                        </div>
+                                        <div class="font-semibold">{{ circuit.codePCDepart || '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:pin_drop"></mat-icon>
+                                            Arrivée
+                                        </div>
+                                        <div class="font-semibold">{{ circuit.codePCArrivee || '-' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (vm.data.circuits.length === 0) {
+                            <div class="col-span-full text-center py-12 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
+                                <mat-icon class="icon-size-16 mb-3" svgIcon="mat_outline:alt_route"></mat-icon>
+                                <div class="font-medium">Aucun circuit disponible</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Utilisateurs Cards -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2 border-l-4 border-blue-500 pl-3">
+                        <mat-icon class="text-blue-500" svgIcon="mat_outline:supervisor_account"></mat-icon>
+                        Utilisateurs ({{ vm.data.utilisateurs.length }})
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        @for (utilisateur of vm.data.utilisateurs.slice(0, 8); track utilisateur.utilisateurId) {
+                            <div class="entity-card bg-card p-6 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+                                            <span class="text-white font-bold text-xl">{{ (utilisateur.prenom?.[0] || 'A').toUpperCase() + (utilisateur.nom?.[0] || 'N').toUpperCase() }}</span>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-lg">{{ utilisateur.nom }} {{ utilisateur.prenom }}</div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">{{ utilisateur.nomUtilisateur }}</div>
+                                        </div>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold" [ngClass]="utilisateur.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'">
+                                        {{ utilisateur.isActive ? 'Actif' : 'Inactif' }}
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg col-span-2">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:email"></mat-icon>
+                                            Email
+                                        </div>
+                                        <div class="font-semibold text-sm truncate">{{ utilisateur.email || '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:admin_panel_settings"></mat-icon>
+                                            Rôle
+                                        </div>
+                                        <div class="font-semibold">{{ utilisateur.libelleRoleUtilisateur || '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:group_work"></mat-icon>
+                                            État
+                                        </div>
+                                        <div class="font-semibold">{{ utilisateur.etat }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (vm.data.utilisateurs.length === 0) {
+                            <div class="col-span-full text-center py-12 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
+                                <mat-icon class="icon-size-16 mb-3" svgIcon="mat_outline:supervisor_account"></mat-icon>
+                                <div class="font-medium">Aucun utilisateur disponible</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Chantiers Cards -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2 border-l-4 border-purple-500 pl-3">
+                        <mat-icon class="text-purple-500" svgIcon="mat_outline:apartment"></mat-icon>
+                        Chantiers ({{ vm.data.chantiers.length }})
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        @for (chantier of vm.data.chantiers.slice(0, 8); track chantier.chantierId) {
+                            <div class="entity-card bg-card p-6 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg">
+                                            <mat-icon class="text-white text-2xl" svgIcon="mat_outline:apartment"></mat-icon>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-lg">{{ chantier.numeroChantier }}</div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">{{ chantier.libelleChantier || 'Chantier' }}</div>
+                                        </div>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold" [ngClass]="chantier.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'">
+                                        {{ chantier.isActive ? 'Actif' : 'Inactif' }}
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:person"></mat-icon>
+                                            Client
+                                        </div>
+                                        <div class="font-semibold">{{ chantier.codeClient || '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:attach_money"></mat-icon>
+                                            Montant HT
+                                        </div>
+                                        <div class="font-semibold">{{ chantier.montantHT ? (chantier.montantHT + ' €') : '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:calendar_today"></mat-icon>
+                                            Date Début
+                                        </div>
+                                        <div class="font-semibold">{{ chantier.dateDebut ? (chantier.dateDebut | date: 'dd/MM/yyyy') : '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:calendar_today"></mat-icon>
+                                            Date Fin
+                                        </div>
+                                        <div class="font-semibold">{{ chantier.dateFin ? (chantier.dateFin | date: 'dd/MM/yyyy') : '-' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (vm.data.chantiers.length === 0) {
+                            <div class="col-span-full text-center py-12 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
+                                <mat-icon class="icon-size-16 mb-3" svgIcon="mat_outline:apartment"></mat-icon>
+                                <div class="font-medium">Aucun chantier disponible</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Equipes Cards -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2 border-l-4 border-cyan-500 pl-3">
+                        <mat-icon class="text-cyan-500" svgIcon="mat_outline:group"></mat-icon>
+                        Équipes ({{ vm.data.equipes.length }})
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        @for (equipe of vm.data.equipes.slice(0, 8); track equipe.equipeId) {
+                            <div class="entity-card bg-card p-6 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg">
+                                            <mat-icon class="text-white text-2xl" svgIcon="mat_outline:group"></mat-icon>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-lg">{{ equipe.codeEquipe }}</div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">{{ equipe.libelleEquipe || 'Équipe' }}</div>
+                                        </div>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold" [ngClass]="equipe.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'">
+                                        {{ equipe.isActive ? 'Actif' : 'Inactif' }}
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:person"></mat-icon>
+                                            Responsable
+                                        </div>
+                                        <div class="font-semibold">{{ equipe.responsable || '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:local_shipping"></mat-icon>
+                                            Véhicule
+                                        </div>
+                                        <div class="font-semibold">{{ equipe.codeVehicule || '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg col-span-2">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:public"></mat-icon>
+                                            Type
+                                        </div>
+                                        <div class="font-semibold">{{ equipe.isInternal ? 'Interne' : 'Externe' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (vm.data.equipes.length === 0) {
+                            <div class="col-span-full text-center py-12 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
+                                <mat-icon class="icon-size-16 mb-3" svgIcon="mat_outline:group"></mat-icon>
+                                <div class="font-medium">Aucune équipe disponible</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Points Collecte Cards -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2 border-l-4 border-rose-500 pl-3">
+                        <mat-icon class="text-rose-500" svgIcon="mat_outline:location_on"></mat-icon>
+                        Points Collecte ({{ vm.data.pointsCollecte.length }})
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        @for (pointCollecte of vm.data.pointsCollecte.slice(0, 8); track pointCollecte.pointCollecteId) {
+                            <div class="entity-card bg-card p-6 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-lg">
+                                            <mat-icon class="text-white text-2xl" svgIcon="mat_outline:location_on"></mat-icon>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-lg">{{ pointCollecte.codePointCollecte }}</div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">{{ pointCollecte.libellePointCollecte || 'Point Collecte' }}</div>
+                                        </div>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold" [ngClass]="pointCollecte.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'">
+                                        {{ pointCollecte.isActive ? 'Actif' : 'Inactif' }}
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:map"></mat-icon>
+                                            Gouvernorat
+                                        </div>
+                                        <div class="font-semibold">{{ pointCollecte.codeGouvernorat || '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:map"></mat-icon>
+                                            Région
+                                        </div>
+                                        <div class="font-semibold">{{ pointCollecte.codeRegion || '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg col-span-2">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:gps_fixed"></mat-icon>
+                                            Coordonnées
+                                        </div>
+                                        <div class="font-semibold text-sm">{{ pointCollecte.latitude && pointCollecte.longitude ? (pointCollecte.latitude + ', ' + pointCollecte.longitude) : '-' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (vm.data.pointsCollecte.length === 0) {
+                            <div class="col-span-full text-center py-12 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
+                                <mat-icon class="icon-size-16 mb-3" svgIcon="mat_outline:location_on"></mat-icon>
+                                <div class="font-medium">Aucun point collecte disponible</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Ordres Travail Cards -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2 border-l-4 border-teal-500 pl-3">
+                        <mat-icon class="text-teal-500" svgIcon="mat_outline:assignment"></mat-icon>
+                        Ordres de Travail ({{ vm.data.ordresTravail.length }})
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        @for (ordreTravail of vm.data.ordresTravail.slice(0, 8); track ordreTravail.ordreTravailId) {
+                            <div class="entity-card bg-card p-6 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-teal-500 to-green-600 flex items-center justify-center shadow-lg">
+                                            <mat-icon class="text-white text-2xl" svgIcon="mat_outline:assignment"></mat-icon>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-lg">{{ ordreTravail.numeroOrdreTravail }}</div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">{{ ordreTravail.libelle || 'Ordre de travail' }}</div>
+                                        </div>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold" [ngClass]="ordreTravail.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'">
+                                        {{ ordreTravail.isActive ? 'Actif' : 'Inactif' }}
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:apartment"></mat-icon>
+                                            Chantier
+                                        </div>
+                                        <div class="font-semibold">{{ ordreTravail.numeroChantier || '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:group"></mat-icon>
+                                            Équipe
+                                        </div>
+                                        <div class="font-semibold">{{ ordreTravail.codeEquipe || '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:calendar_today"></mat-icon>
+                                            Création
+                                        </div>
+                                        <div class="font-semibold">{{ ordreTravail.dateCreation ? (ordreTravail.dateCreation | date: 'dd/MM/yyyy') : '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:attach_money"></mat-icon>
+                                            Montant
+                                        </div>
+                                        <div class="font-semibold">{{ ordreTravail.montant ? (ordreTravail.montant + ' €') : '-' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (vm.data.ordresTravail.length === 0) {
+                            <div class="col-span-full text-center py-12 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
+                                <mat-icon class="icon-size-16 mb-3" svgIcon="mat_outline:assignment"></mat-icon>
+                                <div class="font-medium">Aucun ordre de travail disponible</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Rattachements Cards -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2 border-l-4 border-yellow-500 pl-3">
+                        <mat-icon class="text-yellow-500" svgIcon="mat_outline:link"></mat-icon>
+                        Rattachements ({{ vm.data.rattachements.length }})
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        @for (rattachement of vm.data.rattachements.slice(0, 8); track rattachement.rattachementId) {
+                            <div class="entity-card bg-card p-6 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-600 flex items-center justify-center shadow-lg">
+                                            <mat-icon class="text-white text-2xl" svgIcon="mat_outline:link"></mat-icon>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-lg">{{ rattachement.numeroRattachement }}</div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">{{ rattachement.type || 'Rattachement' }}</div>
+                                        </div>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold" [ngClass]="rattachement.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'">
+                                        {{ rattachement.isActive ? 'Actif' : 'Inactif' }}
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:calendar_today"></mat-icon>
+                                            Date
+                                        </div>
+                                        <div class="font-semibold">{{ rattachement.dateRattachement ? (rattachement.dateRattachement | date: 'dd/MM/yyyy') : '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:person"></mat-icon>
+                                            Responsable
+                                        </div>
+                                        <div class="font-semibold">{{ rattachement.responsable || '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:attach_money"></mat-icon>
+                                            Coût
+                                        </div>
+                                        <div class="font-semibold">{{ rattachement.cout ? (rattachement.cout + ' €') : '-' }}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:public"></mat-icon>
+                                            Type
+                                        </div>
+                                        <div class="font-semibold">{{ rattachement.isInternal ? 'Interne' : 'Externe' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        @if (vm.data.rattachements.length === 0) {
+                            <div class="col-span-full text-center py-12 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
+                                <mat-icon class="icon-size-16 mb-3" svgIcon="mat_outline:link"></mat-icon>
+                                <div class="font-medium">Aucun rattachement disponible</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+            </div>
+
             <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-6">
                 <div class="chart-card bg-card p-4">
                     <div class="flex items-start justify-between mb-3">

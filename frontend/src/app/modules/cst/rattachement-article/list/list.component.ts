@@ -59,6 +59,10 @@ export class ListComponent implements OnInit, OnDestroy {
     searchInputControl: UntypedFormControl = new UntypedFormControl();
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     roleNavigation: RoleNavigation;
+    selectedRattachementArticle: RattachementArticle | null = null;
+    isViewMode: boolean = false;
+    sortActive: string = 'codeArticle';
+    sortDirection: 'asc' | 'desc' = 'asc';
 
     constructor(
         private _rattachementArticleService: RattachementArticleService,
@@ -77,10 +81,16 @@ export class ListComponent implements OnInit, OnDestroy {
         return this._rattachementArticleService.GetRattachementArticles(
             (this._paginator?.pageIndex ?? 0) + 1,
             this._paginator?.pageSize,
-            this._sort?.active,
-            this._sort?.direction,
+            this.sortActive,
+            this.sortDirection,
             this.searchInputControl.value
         );
+    }
+
+    setSort(active: string, direction: 'asc' | 'desc'): void {
+        this.sortActive = active;
+        this.sortDirection = direction;
+        this.SortChange();
     }
 
     hasActionPermission(action: FuseNavigationAction): boolean {
@@ -103,6 +113,30 @@ export class ListComponent implements OnInit, OnDestroy {
                 map(() => { this.isLoading = false; })
             )
             .subscribe();
+    }
+
+    toggleDetails(rattachementArticleId: string): void {
+        if (this.selectedRattachementArticle && this.selectedRattachementArticle.rattachementArticleId === rattachementArticleId) {
+            this.closeDetails();
+            return;
+        }
+
+        this.rattachementArticles$.pipe(
+            map((rattachementArticles) => {
+                const index = rattachementArticles.findIndex(item => item.rattachementArticleId === rattachementArticleId);
+                return rattachementArticles[index];
+            })
+        )
+            .subscribe((rattachementArticle) => {
+                this.selectedRattachementArticle = rattachementArticle;
+                this.isViewMode = true;
+                this._changeDetectorRef.markForCheck();
+            });
+    }
+
+    closeDetails(): void {
+        this.selectedRattachementArticle = null;
+        this.isViewMode = false;
     }
 
     deleteRattachementArticle(rattachementArticle: RattachementArticle): void {

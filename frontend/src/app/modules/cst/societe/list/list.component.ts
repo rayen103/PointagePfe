@@ -65,6 +65,8 @@ export class ListComponent implements OnInit, OnDestroy{
     roleNavigation: RoleNavigation;
     selectedSociete: Societe | null = null;
     isViewMode: boolean = false; // Pour distinguer le mode visualisation du mode édition
+    sortActive: string = 'nom';
+    sortDirection: 'asc' | 'desc' = 'asc';
 
     constructor(
         private _societeService: SocieteService,
@@ -90,11 +92,18 @@ export class ListComponent implements OnInit, OnDestroy{
         return this._societeService.GetSociete(
             (this._paginator?.pageIndex | 0) + 1,
             this._paginator?.pageSize,
-            this._sort?.active,
-            this._sort?.direction,
+            this.sortActive,
+            this.sortDirection,
             this.searchInputControl.value
         );
     }
+
+    setSort(active: string, direction: 'asc' | 'desc'): void {
+        this.sortActive = active;
+        this.sortDirection = direction;
+        this.SortChange();
+    }
+
     hasActionPermission(action: FuseNavigationAction): boolean{
         return !this.roleNavigation || this.roleNavigation?.actions?.includes(action);
     }

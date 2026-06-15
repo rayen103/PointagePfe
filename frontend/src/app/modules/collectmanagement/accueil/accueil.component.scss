@@ -166,3 +166,20 @@
 :host-context(.dark) .loading-overlay {
     background: rgba(15, 23, 42, 0.55);
 }
+
+// Entity Card Styles
+.entity-card {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #6366f1, #8b5cf6, #a855f7);
+    }
+}

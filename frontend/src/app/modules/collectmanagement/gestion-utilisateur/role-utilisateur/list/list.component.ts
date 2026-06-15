@@ -74,6 +74,10 @@ export class RoleUtilisateurListComponent implements OnInit, OnDestroy {
     roleUtilisateurFilterForm: UntypedFormGroup;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     roleNavigation: RoleNavigation;
+    selectedRoleUtilisateur: RoleUtilisateur | null = null;
+    isViewMode: boolean = false;
+    sortActive: string = 'libelleRoleUtilisateur';
+    sortDirection: 'asc' | 'desc' = 'asc';
 
     constructor(
         private _roleUtilisateurService: RoleUtilisateurService,
@@ -87,10 +91,35 @@ export class RoleUtilisateurListComponent implements OnInit, OnDestroy {
     getRoleUtilisateurs(){
         return this._roleUtilisateurService.GetRoleUtilisateur(
             this.roleUtilisateurFilterForm.get('search').value,
-            this._sort.active,
-            this._sort.direction,
+            this.sortActive,
+            this.sortDirection,
             this._paginator?.pageIndex,
             this._paginator?.pageSize);
+    }
+
+    setSort(active: string, direction: 'asc' | 'desc'): void {
+        this.sortActive = active;
+        this.sortDirection = direction;
+        this.SortChange();
+    }
+
+    toggleDetails(roleUtilisateurId: string): void {
+        if (this.selectedRoleUtilisateur && this.selectedRoleUtilisateur.roleUtilisateurId === roleUtilisateurId) {
+            this.closeDetails();
+            return;
+        }
+
+        const selected = this.roleUtilisateurs.find(r => r.roleUtilisateurId === roleUtilisateurId);
+        if (selected) {
+            this.selectedRoleUtilisateur = selected;
+            this.isViewMode = true;
+            this._changeDetectorRef.markForCheck();
+        }
+    }
+
+    closeDetails(): void {
+        this.selectedRoleUtilisateur = null;
+        this.isViewMode = false;
     }
 
     SortChange(){

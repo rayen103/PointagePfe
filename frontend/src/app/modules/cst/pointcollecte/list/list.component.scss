@@ -1,17 +1,15 @@
-.pointcollecte-grid {
-    grid-template-columns: 48px auto;
+.entity-card {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
 
-    @screen sm {
-        grid-template-columns: 1fr 2fr 1fr 1fr 120px 100px;
-    }
-}
-
-.pointcollecte-grid-header {
-    grid-template-columns: 1fr 2fr 1fr 1fr 120px 100px;
-}
-
-.pointcollecte-grid-item {
-    &:hover {
-        @apply bg-gray-50 dark:bg-hover;
-    }
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #f43f5e, #ec4899);
+  }
 }

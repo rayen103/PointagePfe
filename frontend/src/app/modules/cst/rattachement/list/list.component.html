@@ -41,216 +41,175 @@
         <div class="relative flex flex-col flex-auto sm:mb-18 overflow-hidden px-4 sm:px-8 pt-4 sm:pt-8 rounded-lg bg-card">
             @if(rattachement$ | async; as rattachements){
                 @if(rattachements.length > 0){
-                    <div class="grid">
-                        <!-- Header -->
-                        <div
-                            class="rattachement-grid-header hidden sm:grid z-10 sticky top-0 mb-4 gap-4 text-md font-semibold text-hint bg-card"
-                            *transloco="let t"
-                            matSort
-                            matSortActive="numeroRattachement"
-                            matSortDirection="asc"
-                            (matSortChange)="SortChange()"
-                            matSortDisableClear="true">
+                    <div class="grid gap-4 pb-20">
+                        <fieldset class="flex flex-wrap items-center gap-2 mb-6">
+                            <legend class="text-sm text-hint">{{ t('Sort') }}</legend>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-numero-ascending')"
+                                [disabled]="sortActive === 'numeroRattachement' && sortDirection === 'asc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'numeroRattachement' && sortDirection === 'asc'}"
+                                (click)="setSort('numeroRattachement','asc')">
+                                {{ t('Numero') }} ↑
+                            </button>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-numero-descending')"
+                                [disabled]="sortActive === 'numeroRattachement' && sortDirection === 'desc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'numeroRattachement' && sortDirection === 'desc'}"
+                                (click)="setSort('numeroRattachement','desc')">
+                                {{ t('Numero') }} ↓
+                            </button>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-date-ascending')"
+                                [disabled]="sortActive === 'dateRattachement' && sortDirection === 'asc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'dateRattachement' && sortDirection === 'asc'}"
+                                (click)="setSort('dateRattachement','asc')">
+                                {{ t('Date') }} ↑
+                            </button>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-date-descending')"
+                                [disabled]="sortActive === 'dateRattachement' && sortDirection === 'desc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'dateRattachement' && sortDirection === 'desc'}"
+                                (click)="setSort('dateRattachement','desc')">
+                                {{ t('Date') }} ↓
+                            </button>
+                        </fieldset>
 
-                            <div class="hidden" [mat-sort-header]="'rattachementId'">Id</div>
-                            <div [mat-sort-header]="'numeroRattachement'">{{ t('Numero') }}</div>
-                            <div [mat-sort-header]="'exercice'">{{ t('Exercice') }}</div>
-                            <div [mat-sort-header]="'dateRattachement'">{{ t('Date') }}</div>
-                            <div [mat-sort-header]="'numeroChantier'">{{ t('Chantier') }}</div>
-                            <div [mat-sort-header]="'type'">{{ t('Type') }}</div>
-                            <div class="text-center">{{ t('Status') }}</div>
-                            <div class="hidden sm:block text-center">{{ t('Details') }}</div>
-                        </div>
-                        <!-- Rows -->
-                        @if(rattachement$ | async; as rattachements){
-                            @for(rattachement of rattachements; track rattachement.rattachementId || $index){
-                                <div class="rattachement-grid-item sm:rattachement-grid grid sm:grid-cols-8 grid-cols-1 gap-2 sm:gap-4 p-3 sm:py-0.5"
-                                     [ngClass]="{'border-b dark:border-b-slate-700': $index+1 !== rattachements.length}">
-
-                                    <!-- Mobile label + value -->
-                                    <div class="sm:hidden flex justify-between">
-                                        <span class="font-semibold">{{ t('Numero') }}:</span>
-                                        <span>{{rattachement.numeroRattachement}}</span>
-                                    </div>
-
-                                    <!-- Desktop view -->
-                                    <div class="hidden sm:block truncate font-medium">{{rattachement.numeroRattachement}}</div>
-
-                                    <!-- Mobile label + value -->
-                                    <div class="sm:hidden flex justify-between">
-                                        <span class="font-semibold">{{ t('Exercice') }}:</span>
-                                        <span class="truncate">{{rattachement.exercice || '-'}}</span>
-                                    </div>
-
-                                    <!-- Desktop view -->
-                                    <div class="hidden sm:block truncate">{{rattachement.exercice || '-'}}</div>
-
-                                    <!-- Mobile label + value -->
-                                    <div class="sm:hidden flex justify-between">
-                                        <span class="font-semibold">{{ t('Date') }}:</span>
-                                        <span class="truncate">{{rattachement.dateRattachement | date:'short' || '-'}}</span>
-                                    </div>
-
-                                    <!-- Desktop view -->
-                                    <div class="hidden sm:block truncate">{{rattachement.dateRattachement | date:'short' || '-'}}</div>
-
-                                    <!-- Mobile label + value -->
-                                    <div class="sm:hidden flex justify-between">
-                                        <span class="font-semibold">{{ t('Chantier') }}:</span>
-                                        <span class="truncate">{{rattachement.numeroChantier || '-'}}</span>
-                                    </div>
-
-                                    <!-- Desktop view -->
-                                    <div class="hidden sm:block truncate">{{rattachement.numeroChantier || '-'}}</div>
-
-                                    <!-- Mobile label + value -->
-                                    <div class="sm:hidden flex justify-between">
-                                        <span class="font-semibold">{{ t('Type') }}:</span>
-                                        <span class="truncate">{{rattachement.type || '-'}}</span>
-                                    </div>
-
-                                    <!-- Desktop view -->
-                                    <div class="hidden sm:block truncate">{{rattachement.type || '-'}}</div>
-
-                                    <!-- Mobile label + value -->
-                                    <div class="sm:hidden flex justify-between">
-                                        <span class="font-semibold">{{ t('Status') }}:</span>
-                                        <span [ngClass]="rattachement.isActive ? 'text-green-600' : 'text-red-600'">
-                                            {{rattachement.isActive ? t('Active') : t('Inactive')}}
-                                        </span>
-                                    </div>
-                                    <!-- Desktop view -->
-                                    <div class="hidden sm:flex justify-center">
-                                        <span [ngClass]="rattachement.isActive ? 'text-green-600' : 'text-red-600'">
-                                            {{rattachement.isActive ? t('Active') : t('Inactive')}}
-                                        </span>
-                                    </div>
-
-                                    <!-- Details & delete button -->
-                                    <div class="flex sm:justify-center justify-end gap-2 sm:gap-4 mt-2 sm:mt-0">
-                                        <!-- View button -->
-                                        <button
-                                            mat-icon-button
-                                            (click)="toggleDetails(rattachement.rattachementId)"
-                                            class="!w-6 !h-6 sm:!w-8 sm:!h-8">
-                                            <mat-icon
-                                                class="text-hint text-xs sm:text-sm lg:text-base"
-                                                [svgIcon]="selectedRattachement?.rattachementId === rattachement.rattachementId ? 'heroicons_solid:chevron-up' : 'remove_red_eye'">
-                                            </mat-icon>
-                                        </button>
-
-                                        <!-- Edit button -->
-                                        <button
-                                            mat-icon-button
-                                            [routerLink]="rattachement.rattachementId"
-                                            class="!w-6 !h-6 sm:!w-8 sm:!h-8">
-                                            <mat-icon
-                                                class="text-hint text-xs sm:text-sm lg:text-base"
-                                                [svgIcon]="'edit_road'">
-                                            </mat-icon>
-                                        </button>
-
-                                        <!-- Delete button -->
-                                        @if(hasActionPermission(FuseNavigationAction.Delete)){
-                                        <button
-                                            mat-icon-button
-                                            [color]="'warn'"
-                                            (click)="deleteSelectedRattachement(rattachement)"
-                                            class="!w-6 !h-6 sm:!w-8 sm:!h-8">
-                                            <mat-icon
-                                                class="text-hint text-xs sm:text-sm lg:text-base"
-                                                [svgIcon]="'heroicons_outline:trash'">
-                                            </mat-icon>
-                                        </button>
-                                        }
-                                    </div>
-
-                                    <!-- Details panel (expanded) -->
-                                    @if(selectedRattachement?.rattachementId === rattachement.rattachementId){
-                                        <div class="col-span-full border-t border-b dark:border-slate-700 p-4 mt-2">
-                                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Numero') }}:</span>
-                                                    <span class="ml-2">{{rattachement.numeroRattachement}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Exercice') }}:</span>
-                                                    <span class="ml-2">{{rattachement.exercice || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Date') }}:</span>
-                                                    <span class="ml-2">{{rattachement.dateRattachement | date:'medium' || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Chantier') }}:</span>
-                                                    <span class="ml-2">{{rattachement.numeroChantier || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Client') }}:</span>
-                                                    <span class="ml-2">{{rattachement.codeClient || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Type') }}:</span>
-                                                    <span class="ml-2">{{rattachement.type || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Nature') }}:</span>
-                                                    <span class="ml-2">{{rattachement.nature || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Responsable') }}:</span>
-                                                    <span class="ml-2">{{rattachement.responsable || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Cout') }}:</span>
-                                                    <span class="ml-2">{{rattachement.cout || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Heure-Debut') }}:</span>
-                                                    <span class="ml-2">{{rattachement.heureDebut || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Heure-Fin') }}:</span>
-                                                    <span class="ml-2">{{rattachement.heureFin || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Emplacement') }}:</span>
-                                                    <span class="ml-2">{{rattachement.emplacement || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Reference') }}:</span>
-                                                    <span class="ml-2">{{rattachement.reference || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Status-Field') }}:</span>
-                                                    <span class="ml-2">{{rattachement.status || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Date-Cloture') }}:</span>
-                                                    <span class="ml-2">{{rattachement.dateCloture | date:'medium' || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Internal') }}:</span>
-                                                    <span class="ml-2" [ngClass]="rattachement.isInternal ? 'text-green-600' : 'text-orange-600'">
-                                                        {{rattachement.isInternal ? t('Yes') : t('No')}}
-                                                    </span>
-                                                </div>
-                                                <div class="col-span-full">
-                                                    <span class="font-semibold">{{ t('Remarque') }}:</span>
-                                                    <span class="ml-2">{{rattachement.remarque || '-'}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Status') }}:</span>
-                                                    <span class="ml-2" [ngClass]="rattachement.isActive ? 'text-green-600' : 'text-red-600'">
-                                                        {{rattachement.isActive ? t('Active') : t('Inactive')}}
-                                                    </span>
-                                                </div>
-                                            </div>
+                        <!-- Cards Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
+                        @for(rattachement of rattachements; track rattachement.rattachementId || $index){
+                            <div class="entity-card bg-card p-6 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
+                                 (click)="toggleDetails(rattachement.rattachementId)">
+                                <div class="flex items-start justify-between gap-4 mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-600 flex items-center justify-center shadow-lg">
+                                            <mat-icon class="text-white text-2xl" svgIcon="mat_outline:link"></mat-icon>
                                         </div>
+                                        <div>
+                                            <div class="font-bold text-lg">{{rattachement.numeroRattachement}}</div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">{{rattachement.type || '-'}}</div>
+                                        </div>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+                                              [ngClass]="rattachement.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'">
+                                        {{rattachement.isActive ? t('Active') : t('Inactive')}}
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:calendar_today"></mat-icon>
+                                            Date
+                                        </div>
+                                        <div class="font-semibold">{{rattachement.dateRattachement ? (rattachement.dateRattachement | date:'short') : '-'}}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:apartment"></mat-icon>
+                                            Chantier
+                                        </div>
+                                        <div class="font-semibold">{{rattachement.numeroChantier || '-'}}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:person"></mat-icon>
+                                            Responsable
+                                        </div>
+                                        <div class="font-semibold">{{rattachement.responsable || '-'}}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:attach_money"></mat-icon>
+                                            Coût
+                                        </div>
+                                        <div class="font-semibold">{{rattachement.cout || '-'}}</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-700">
+                                    <button
+                                        mat-icon-button
+                                        [routerLink]="rattachement.rattachementId"
+                                        class="!w-8 !h-8"
+                                        (click)="$event.stopPropagation()">
+                                        <mat-icon
+                                            class="text-gray-500"
+                                            [svgIcon]="'edit_road'">
+                                        </mat-icon>
+                                    </button>
+                                    @if(hasActionPermission(FuseNavigationAction.Delete)){
+                                    <button
+                                        mat-icon-button
+                                        [color]="'warn'"
+                                        (click)="deleteSelectedRattachement(rattachement); $event.stopPropagation()"
+                                        class="!w-8 !h-8">
+                                        <mat-icon
+                                            [svgIcon]="'heroicons_outline:trash'">
+                                        </mat-icon>
+                                    </button>
                                     }
                                 </div>
-                            }
+                                @if(selectedRattachement?.rattachementId === rattachement.rattachementId){
+                                    <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                                            <div>
+                                                <span class="font-semibold">{{ t('Exercice') }}:</span>
+                                                <span class="ml-2">{{rattachement.exercice || '-'}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Client') }}:</span>
+                                                <span class="ml-2">{{rattachement.codeClient || '-'}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Nature') }}:</span>
+                                                <span class="ml-2">{{rattachement.nature || '-'}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Heure-Debut') }}:</span>
+                                                <span class="ml-2">{{rattachement.heureDebut || '-'}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Heure-Fin') }}:</span>
+                                                <span class="ml-2">{{rattachement.heureFin || '-'}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Emplacement') }}:</span>
+                                                <span class="ml-2">{{rattachement.emplacement || '-'}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Reference') }}:</span>
+                                                <span class="ml-2">{{rattachement.reference || '-'}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Status-Field') }}:</span>
+                                                <span class="ml-2">{{rattachement.status || '-'}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Date-Cloture') }}:</span>
+                                                <span class="ml-2">{{rattachement.dateCloture ? (rattachement.dateCloture | date:'medium') : '-'}}</span>
+                                            </div>
+                                            <div>
+                                                <span class="font-semibold">{{ t('Internal') }}:</span>
+                                                <span class="ml-2" [ngClass]="rattachement.isInternal ? 'text-green-600' : 'text-orange-600'">
+                                                    {{rattachement.isInternal ? t('Yes') : t('No')}}
+                                                </span>
+                                            </div>
+                                            <div class="col-span-full">
+                                                <span class="font-semibold">{{ t('Remarque') }}:</span>
+                                                <span class="ml-2">{{rattachement.remarque || '-'}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
                         }
+                        </div>
                         <!-- Paginator -->
                         <mat-paginator
                             class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
@@ -264,7 +223,10 @@
                         </mat-paginator>
                     </div>
                 }@else{
-                    <div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">{{ t('No-rattachements-found') }}</div>
+                    <div class="col-span-full text-center py-16 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
+                        <mat-icon class="icon-size-16 mb-3" svgIcon="mat_outline:link"></mat-icon>
+                        <div class="font-semibold text-2xl">{{ t('No-rattachements-found') }}</div>
+                    </div>
                 }
             }
         </div>

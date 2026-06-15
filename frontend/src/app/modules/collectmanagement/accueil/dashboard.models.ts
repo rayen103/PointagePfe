@@ -75,4 +75,13 @@ export interface DashboardData {
     systemActivity: DashboardActivityItem[];
     lastUpdated: Date;
     errorMessage?: string;
+    buses: any[];
+    employes: any[];
+    circuits: any[];
+    utilisateurs: any[];
+    chantiers: any[];
+    equipes: any[];
+    pointsCollecte: any[];
+    ordresTravail: any[];
+    rattachements: any[];
 }

@@ -59,6 +59,10 @@ export class ListComponent implements OnInit, OnDestroy {
     searchInputControl: UntypedFormControl = new UntypedFormControl();
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     roleNavigation: RoleNavigation;
+    selectedRattachementEmploye: RattachementEmploye | null = null;
+    isViewMode: boolean = false;
+    sortActive: string = 'matricule';
+    sortDirection: 'asc' | 'desc' = 'asc';
 
     constructor(
         private _rattachementEmployeService: RattachementEmployeService,
@@ -77,10 +81,16 @@ export class ListComponent implements OnInit, OnDestroy {
         return this._rattachementEmployeService.GetRattachementEmployes(
             (this._paginator?.pageIndex ?? 0) + 1,
             this._paginator?.pageSize,
-            this._sort?.active,
-            this._sort?.direction,
+            this.sortActive,
+            this.sortDirection,
             this.searchInputControl.value
         );
+    }
+
+    setSort(active: string, direction: 'asc' | 'desc'): void {
+        this.sortActive = active;
+        this.sortDirection = direction;
+        this.SortChange();
     }
 
     hasActionPermission(action: FuseNavigationAction): boolean {
@@ -103,6 +113,30 @@ export class ListComponent implements OnInit, OnDestroy {
                 map(() => { this.isLoading = false; })
             )
             .subscribe();
+    }
+
+    toggleDetails(rattachementEmployeId: string): void {
+        if (this.selectedRattachementEmploye && this.selectedRattachementEmploye.rattachementEmployeId === rattachementEmployeId) {
+            this.closeDetails();
+            return;
+        }
+
+        this.rattachementEmployes$.pipe(
+            map((rattachementEmployes) => {
+                const index = rattachementEmployes.findIndex(item => item.rattachementEmployeId === rattachementEmployeId);
+                return rattachementEmployes[index];
+            })
+        )
+            .subscribe((rattachementEmploye) => {
+                this.selectedRattachementEmploye = rattachementEmploye;
+                this.isViewMode = true;
+                this._changeDetectorRef.markForCheck();
+            });
+    }
+
+    closeDetails(): void {
+        this.selectedRattachementEmploye = null;
+        this.isViewMode = false;
     }
 
     deleteRattachementEmploye(rattachementEmploye: RattachementEmploye): void {

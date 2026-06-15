@@ -17,36 +17,107 @@
         <div class="relative flex flex-col flex-auto sm:mb-18 overflow-hidden px-4 sm:px-8 pt-4 sm:pt-8 rounded-lg bg-card">
             @if(chantiers$ | async; as chantiers){
                 @if(chantiers.length > 0){
-                    <div class="grid">
-                        <div class="chantier-grid-header hidden sm:grid z-10 sticky top-0 mb-4 gap-4 text-md font-semibold text-hint bg-card"
-                             matSort matSortActive="numeroChantier" matSortDirection="asc" (matSortChange)="SortChange()" matSortDisableClear="true">
-                            <div [mat-sort-header]="'numeroChantier'">{{ t('NumeroChantier') }}</div>
-                            <div [mat-sort-header]="'libelleChantier'">{{ t('Libelle') }}</div>
-                            <div [mat-sort-header]="'codeClient'">{{ t('Client') }}</div>
-                            <div [mat-sort-header]="'nature'">{{ t('Nature') }}</div>
-                            <div class="text-center">{{ t('Status') }}</div>
-                            <div class="hidden sm:block text-center">{{ t('Details') }}</div>
-                        </div>
+                    <div class="grid gap-4 pb-20">
+                        <fieldset class="flex flex-wrap items-center gap-2 mb-6">
+                            <legend class="text-sm text-hint">{{ t('Sort') }}</legend>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-numero-ascending')"
+                                [disabled]="sortActive === 'numeroChantier' && sortDirection === 'asc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'numeroChantier' && sortDirection === 'asc'}"
+                                (click)="setSort('numeroChantier','asc')">
+                                {{ t('NumeroChantier') }} ↑
+                            </button>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-numero-descending')"
+                                [disabled]="sortActive === 'numeroChantier' && sortDirection === 'desc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'numeroChantier' && sortDirection === 'desc'}"
+                                (click)="setSort('numeroChantier','desc')">
+                                {{ t('NumeroChantier') }} ↓
+                            </button>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-libelle-ascending')"
+                                [disabled]="sortActive === 'libelleChantier' && sortDirection === 'asc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'libelleChantier' && sortDirection === 'asc'}"
+                                (click)="setSort('libelleChantier','asc')">
+                                {{ t('Libelle') }} ↑
+                            </button>
+                            <button
+                                mat-stroked-button
+                                type="button"
+                                [attr.aria-label]="t('Sort-by-libelle-descending')"
+                                [disabled]="sortActive === 'libelleChantier' && sortDirection === 'desc'"
+                                [ngClass]="{'bg-primary text-white': sortActive === 'libelleChantier' && sortDirection === 'desc'}"
+                                (click)="setSort('libelleChantier','desc')">
+                                {{ t('Libelle') }} ↓
+                            </button>
+                        </fieldset>
+
+                        <!-- Cards Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
                         @for(chantier of chantiers; track chantier.chantierId || $index){
-                            <div class="chantier-grid-item sm:chantier-grid grid sm:grid-cols-6 grid-cols-1 gap-2 sm:gap-4 p-3 sm:py-0.5"
-                                 [ngClass]="{'border-b dark:border-b-slate-700': $index+1 !== chantiers.length}">
-                                <div class="hidden sm:block truncate font-medium">{{chantier.numeroChantier}}</div>
-                                <div class="hidden sm:block truncate">{{chantier.libelleChantier || '-'}}</div>
-                                <div class="hidden sm:block truncate">{{chantier.codeClient || '-'}}</div>
-                                <div class="hidden sm:block truncate">{{chantier.nature || '-'}}</div>
-                                <div class="flex justify-center items-center">
-                                    <span class="px-2 py-0.5 rounded text-xs font-medium" [ngClass]="chantier.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                            <div class="entity-card bg-card p-6 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                                <div class="flex items-start justify-between gap-4 mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg">
+                                            <mat-icon class="text-white text-2xl" svgIcon="mat_outline:apartment"></mat-icon>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold text-lg">{{chantier.numeroChantier}}</div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">{{chantier.libelleChantier || '-'}}</div>
+                                        </div>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+                                              [ngClass]="chantier.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'">
                                         {{chantier.isActive ? t('Active') : t('Inactive')}}
                                     </span>
                                 </div>
-                                <div class="flex justify-center items-center gap-2">
+                                <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:person"></mat-icon>
+                                            Client
+                                        </div>
+                                        <div class="font-semibold">{{chantier.codeClient || '-'}}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:description"></mat-icon>
+                                            Nature
+                                        </div>
+                                        <div class="font-semibold">{{chantier.nature || '-'}}</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-700">
                                     @if(hasActionPermission(FuseNavigationAction.Edit)){
-                                    <a mat-icon-button [routerLink]="chantier.chantierId"><mat-icon class="icon-size-5" [svgIcon]="'heroicons_outline:pencil-square'"></mat-icon></a>}
+                                    <a mat-icon-button [routerLink]="chantier.chantierId" class="!w-8 !h-8">
+                                        <mat-icon class="text-gray-500" svgIcon="heroicons_outline:pencil-square"></mat-icon>
+                                    </a>}
                                     @if(hasActionPermission(FuseNavigationAction.Delete)){
-                                    <button mat-icon-button (click)="deleteChantier(chantier)"><mat-icon class="icon-size-5" [svgIcon]="'heroicons_outline:trash'"></mat-icon></button>}
+                                    <button mat-icon-button color="warn" (click)="deleteChantier(chantier)" class="!w-8 !h-8">
+                                        <mat-icon svgIcon="heroicons_outline:trash"></mat-icon>
+                                    </button>}
                                 </div>
                             </div>
                         }
+                        </div>
+
+                        <!-- Paginator -->
+                        <mat-paginator
+                            class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+                            [ngClass]="{'pointer-events-none': isLoading}"
+                            [length]="chantiersLength"
+                            [pageIndex]="0"
+                            [pageSize]="10"
+                            [pageSizeOptions]="[5, 10, 25, 100]"
+                            [showFirstLastButtons]="true"
+                            (page)="SortChange()">
+                        </mat-paginator>
                     </div>
                 } @else {
                     <div class="flex flex-auto flex-col items-center justify-center bg-gray-50 dark:bg-transparent">

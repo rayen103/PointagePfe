@@ -312,6 +312,20 @@ export const horizontalNavigation: FuseNavigationItem[] = [
         type : 'group',
         icon : 'mat_outline:assignment',
         children: []
+    },
+    {
+        id   : 'monitoring',
+        title: 'Monitoring',
+        type : 'group',
+        icon : 'mat_outline:monitoring',
+        children: []
+    },
+    {
+        id   : 'analyse',
+        title: 'Anaalyse',
+        type : 'group',
+        icon : 'mat_outline:analytics',
+        children: []
     }
 
 

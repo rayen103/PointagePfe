@@ -42,7 +42,7 @@
             @if(gouvernorat$ | async; as gouvernorats){
                 @if(gouvernorats.length > 0){
                     <div class="grid gap-4 pb-20">
-                        <fieldset class="flex flex-wrap items-center gap-2">
+                        <fieldset class="flex flex-wrap items-center gap-2 mb-6">
                             <legend class="text-sm text-hint">{{ t('Sort') }}</legend>
                             <button
                                 mat-stroked-button
@@ -64,65 +64,59 @@
                             </button>
                         </fieldset>
 
+                        <!-- Cards Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
                         @for(gouvernorat of gouvernorats; track gouvernorat.gouvernoratId || $index){
-                            <div class="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-                                <div class="flex items-start justify-between gap-4">
-                                    <div class="grid flex-1 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
-                                        <div>
-                                            <p class="text-hint text-xs">{{ t('Code') }}</p>
-                                            <p class="font-medium truncate">{{gouvernorat.codeGouvernorat || '-'}}</p>
+                            <div class="entity-card bg-card p-6 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                                <div class="flex items-start justify-between gap-4 mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center shadow-lg">
+                                            <mat-icon class="text-white text-2xl" svgIcon="mat_outline:map"></mat-icon>
                                         </div>
                                         <div>
-                                            <p class="text-hint text-xs">{{ t('Libelle') }}</p>
-                                            <p class="truncate">{{gouvernorat.libelleGouvernorat || '-'}}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-hint text-xs">{{ t('Status') }}</p>
-                                            <p [ngClass]="gouvernorat.isActive ? 'text-green-600' : 'text-red-600'">
-                                                {{gouvernorat.isActive ? t('Active') : t('Inactive')}}
-                                            </p>
+                                            <div class="font-bold text-lg">{{gouvernorat.codeGouvernorat || '-'}}</div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">{{gouvernorat.libelleGouvernorat || '-'}}</div>
                                         </div>
                                     </div>
-
-                                    <div class="flex justify-end gap-2 sm:gap-4 shrink-0">
-                                        <button
-                                            mat-icon-button
-                                            (click)="toggleDetails(gouvernorat.gouvernoratId)"
-                                            class="!w-6 !h-6 sm:!w-8 sm:!h-8">
-                                            <mat-icon
-                                                class="text-hint text-xs sm:text-sm lg:text-base"
-                                                [svgIcon]="selectedGouvernorat?.gouvernoratId === gouvernorat.gouvernoratId ? 'heroicons_solid:chevron-up' : 'remove_red_eye'">
-                                            </mat-icon>
-                                        </button>
-
-                                        <button
-                                            mat-icon-button
-                                            [routerLink]="gouvernorat.gouvernoratId"
-                                            class="!w-6 !h-6 sm:!w-8 sm:!h-8">
-                                            <mat-icon
-                                                class="text-hint text-xs sm:text-sm lg:text-base"
-                                                [svgIcon]="'edit_road'">
-                                            </mat-icon>
-                                        </button>
-
-                                        @if(hasActionPermission(FuseNavigationAction.Delete)){
-                                        <button
-                                            mat-icon-button
-                                            [color]="'warn'"
-                                            (click)="deleteSelectedGouvernorat(gouvernorat)"
-                                            class="!w-6 !h-6 sm:!w-8 sm:!h-8">
-                                            <mat-icon
-                                                class="text-hint text-xs sm:text-sm lg:text-base"
-                                                [svgIcon]="'heroicons_outline:trash'">
-                                            </mat-icon>
-                                        </button>
-                                        }
-                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+                                              [ngClass]="gouvernorat.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'">
+                                        {{gouvernorat.isActive ? t('Active') : t('Inactive')}}
+                                    </span>
                                 </div>
-
+                                <div class="flex items-center justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-700">
+                                    <button
+                                        mat-icon-button
+                                        (click)="toggleDetails(gouvernorat.gouvernoratId)"
+                                        class="!w-8 !h-8">
+                                        <mat-icon
+                                            class="text-gray-500"
+                                            [svgIcon]="selectedGouvernorat?.gouvernoratId === gouvernorat.gouvernoratId ? 'heroicons_solid:chevron-up' : 'remove_red_eye'">
+                                        </mat-icon>
+                                    </button>
+                                    <button
+                                        mat-icon-button
+                                        [routerLink]="gouvernorat.gouvernoratId"
+                                        class="!w-8 !h-8">
+                                        <mat-icon
+                                            class="text-gray-500"
+                                            [svgIcon]="'edit_road'">
+                                        </mat-icon>
+                                    </button>
+                                    @if(hasActionPermission(FuseNavigationAction.Delete)){
+                                    <button
+                                        mat-icon-button
+                                        [color]="'warn'"
+                                        (click)="deleteSelectedGouvernorat(gouvernorat)"
+                                        class="!w-8 !h-8">
+                                        <mat-icon
+                                            [svgIcon]="'heroicons_outline:trash'">
+                                        </mat-icon>
+                                    </button>
+                                    }
+                                </div>
                                 @if(selectedGouvernorat?.gouvernoratId === gouvernorat.gouvernoratId){
-                                    <div class="border-t dark:border-slate-700 pt-4 mt-4">
-                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                                        <div class="text-sm">
                                             <div>
                                                 <span class="font-semibold">{{ t('Code') }}:</span>
                                                 <span class="ml-2">{{gouvernorat.codeGouvernorat}}</span>
@@ -131,17 +125,13 @@
                                                 <span class="font-semibold">{{ t('Libelle') }}:</span>
                                                 <span class="ml-2">{{gouvernorat.libelleGouvernorat || '-'}}</span>
                                             </div>
-                                            <div>
-                                                <span class="font-semibold">{{ t('Status') }}:</span>
-                                                <span class="ml-2" [ngClass]="gouvernorat.isActive ? 'text-green-600' : 'text-red-600'">
-                                                    {{gouvernorat.isActive ? t('Active') : t('Inactive')}}
-                                                </span>
-                                            </div>
                                         </div>
                                     </div>
                                 }
                             </div>
                         }
+                        </div>
+
                         <!-- Paginator -->
                         <mat-paginator
                             class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"

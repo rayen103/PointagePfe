@@ -42,7 +42,7 @@
             @if(modem$ | async; as modems){
                 @if(modems.length > 0){
                     <div class="grid gap-4 pb-20">
-                        <fieldset class="flex flex-wrap items-center gap-2">
+                        <fieldset class="flex flex-wrap items-center gap-2 mb-6">
                             <legend class="text-sm text-hint">{{ t('Sort') }}</legend>
                             <button
                                 mat-stroked-button
@@ -64,69 +64,61 @@
                             </button>
                         </fieldset>
 
+                        <!-- Cards Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
                         @for(modem of modems; track modem.modemId || $index){
-                            <div class="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-                                <div class="flex items-start justify-between gap-4">
-                                    <div class="grid flex-1 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
-                                        <div>
-                                            <p class="text-hint text-xs">{{ t('IMEI') }}</p>
-                                            <p class="font-medium truncate">{{modem.imei || '-'}}</p>
+                            <div class="entity-card bg-card p-6 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
+                                 (click)="toggleDetails(modem.modemId)">
+                                <div class="flex items-start justify-between gap-4 mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+                                            <mat-icon class="text-white text-2xl" svgIcon="mat_outline:wifi"></mat-icon>
                                         </div>
                                         <div>
-                                            <p class="text-hint text-xs">{{ t('Model') }}</p>
-                                            <p class="truncate">{{modem.modelModem || '-'}}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-hint text-xs">{{ t('Numero-Sim') }}</p>
-                                            <p class="truncate">{{modem.numeroSim || '-'}}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-hint text-xs">{{ t('Status') }}</p>
-                                            <p [ngClass]="modem.isActive ? 'text-green-600' : 'text-red-600'">
-                                                {{modem.isActive ? t('Active') : t('Inactive')}}
-                                            </p>
+                                            <div class="font-bold text-lg">{{modem.imei || '-'}}</div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">{{modem.modelModem || '-'}}</div>
                                         </div>
                                     </div>
-
-                                    <div class="flex justify-end gap-2 sm:gap-4 shrink-0">
-                                        <button
-                                            mat-icon-button
-                                            (click)="toggleDetails(modem.modemId)"
-                                            class="!w-6 !h-6 sm:!w-8 sm:!h-8">
-                                            <mat-icon
-                                                class="text-hint text-xs sm:text-sm lg:text-base"
-                                                [svgIcon]="selectedModem?.modemId === modem.modemId ? 'heroicons_solid:chevron-up' : 'remove_red_eye'">
-                                            </mat-icon>
-                                        </button>
-
-                                        <button
-                                            mat-icon-button
-                                            [routerLink]="modem.modemId"
-                                            class="!w-6 !h-6 sm:!w-8 sm:!h-8">
-                                            <mat-icon
-                                                class="text-hint text-xs sm:text-sm lg:text-base"
-                                                [svgIcon]="'edit_road'">
-                                            </mat-icon>
-                                        </button>
-
-                                        @if(hasActionPermission(FuseNavigationAction.Delete)){
-                                        <button
-                                            mat-icon-button
-                                            [color]="'warn'"
-                                            (click)="deleteSelectedModem(modem)"
-                                            class="!w-6 !h-6 sm:!w-8 sm:!h-8">
-                                            <mat-icon
-                                                class="text-hint text-xs sm:text-sm lg:text-base"
-                                                [svgIcon]="'heroicons_outline:trash'">
-                                            </mat-icon>
-                                        </button>
-                                        }
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+                                          [ngClass]="modem.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'">
+                                        {{modem.isActive ? t('Active') : t('Inactive')}}
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:sim_card"></mat-icon>
+                                            {{ t('Numero-Sim') }}
+                                        </div>
+                                        <div class="font-semibold">{{modem.numeroSim || '-'}}</div>
                                     </div>
                                 </div>
-
+                                <div class="flex items-center justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-700">
+                                    <button
+                                        mat-icon-button
+                                        [routerLink]="modem.modemId"
+                                        class="!w-8 !h-8"
+                                        (click)="$event.stopPropagation()">
+                                        <mat-icon
+                                            class="text-gray-500"
+                                            [svgIcon]="'edit_road'">
+                                        </mat-icon>
+                                    </button>
+                                    @if(hasActionPermission(FuseNavigationAction.Delete)){
+                                    <button
+                                        mat-icon-button
+                                        [color]="'warn'"
+                                        (click)="deleteSelectedModem(modem); $event.stopPropagation()"
+                                        class="!w-8 !h-8">
+                                        <mat-icon
+                                            [svgIcon]="'heroicons_outline:trash'">
+                                        </mat-icon>
+                                    </button>
+                                    }
+                                </div>
                                 @if(selectedModem?.modemId === modem.modemId){
-                                    <div class="border-t dark:border-slate-700 pt-4 mt-4">
-                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                                             <div>
                                                 <span class="font-semibold">{{ t('IMEI') }}:</span>
                                                 <span class="ml-2">{{modem.imei}}</span>
@@ -150,6 +142,8 @@
                                 }
                             </div>
                         }
+                        </div>
+
                         <!-- Paginator -->
                         <mat-paginator
                             class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
@@ -163,7 +157,10 @@
                         </mat-paginator>
                     </div>
                 }@else{
-                    <div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">{{ t('No-modems-found') }}</div>
+                    <div class="col-span-full text-center py-16 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
+                        <mat-icon class="icon-size-16 mb-3" svgIcon="mat_outline:wifi"></mat-icon>
+                        <div class="font-semibold text-2xl">{{ t('No-modems-found') }}</div>
+                    </div>
                 }
             }
         </div>

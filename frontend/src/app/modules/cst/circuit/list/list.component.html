@@ -78,29 +78,48 @@
                             </div>
 
                             @for(circuit of circuits; track circuit.circuitId || $index){
-                                <div class="rounded-lg border p-4 cursor-pointer transition-colors"
-                                     [ngClass]="selectedCircuit?.circuitId === circuit.circuitId ? 'bg-primary-50 border-primary dark:bg-primary-900' : 'border-slate-200 dark:border-slate-700'"
+                                <div class="entity-card bg-card p-6 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
+                                     [ngClass]="selectedCircuit?.circuitId === circuit.circuitId ? 'ring-2 ring-indigo-500' : ''"
                                      (click)="toggleDetails(circuit.circuitId)">
                                     
-                                    <div class="flex items-start justify-between gap-4">
-                                        <div class="flex-1 min-w-0">
-                                            <p class="font-bold truncate text-primary">{{circuit.codeCircuit}}</p>
-                                            <p class="text-sm truncate">{{circuit.libelleCircuit || '-'}}</p>
-                                        </div>
-                                        <div class="flex flex-col items-end gap-1">
-                                            <span class="text-xs px-2 py-0.5 rounded-full" 
-                                                  [ngClass]="circuit.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
-                                                {{circuit.isActive ? t('Active') : t('Inactive')}}
-                                            </span>
-                                            <div class="flex gap-1 mt-2">
-                                                <button mat-icon-button [routerLink]="circuit.circuitId" (click)="$event.stopPropagation()" class="!w-8 !h-8">
-                                                    <mat-icon class="icon-size-4" [svgIcon]="'heroicons_outline:pencil'"></mat-icon>
-                                                </button>
-                                                <button mat-icon-button color="warn" (click)="deleteSelectedCircuit(circuit); $event.stopPropagation()" class="!w-8 !h-8">
-                                                    <mat-icon class="icon-size-4" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
-                                                </button>
+                                    <div class="flex items-start justify-between gap-4 mb-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg">
+                                                <mat-icon class="text-white text-2xl" svgIcon="mat_outline:alt_route"></mat-icon>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="font-bold text-lg truncate">{{circuit.codeCircuit}}</p>
+                                                <p class="text-sm truncate text-gray-500 dark:text-gray-400">{{circuit.libelleCircuit || '-'}}</p>
                                             </div>
                                         </div>
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold" 
+                                                  [ngClass]="circuit.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'">
+                                                {{circuit.isActive ? t('Active') : t('Inactive')}}
+                                        </span>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+                                        <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                            <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                                <mat-icon class="icon-size-4" svgIcon="mat_outline:straighten"></mat-icon>
+                                                Distance
+                                            </div>
+                                            <div class="font-semibold">{{circuit.distanceKm ? (circuit.distanceKm + ' km') : '-'}}</div>
+                                        </div>
+                                        <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                            <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                                <mat-icon class="icon-size-4" svgIcon="mat_outline:schedule"></mat-icon>
+                                                Durée
+                                            </div>
+                                            <div class="font-semibold">{{circuit.dureeMinutes ? (circuit.dureeMinutes + ' min') : '-'}}</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-2">
+                                        <button mat-icon-button [routerLink]="circuit.circuitId" (click)="$event.stopPropagation()" class="!w-8 !h-8">
+                                            <mat-icon class="text-gray-500" [svgIcon]="'heroicons_outline:pencil'"></mat-icon>
+                                        </button>
+                                        <button mat-icon-button color="warn" (click)="deleteSelectedCircuit(circuit); $event.stopPropagation()" class="!w-8 !h-8">
+                                            <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                                        </button>
                                     </div>
                                 </div>
                             }

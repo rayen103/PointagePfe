@@ -94,6 +94,8 @@ export class UtilisateurComponent implements OnInit, OnDestroy{
     filteredSocietes$: Observable<Societe[]>;
     allSites: Site[] = [];
     selectedSiteIds: string[] = [];
+    sortActive: string = 'nomUtilisateur';
+    sortDirection: 'asc' | 'desc' = 'asc';
 
 
     constructor(
@@ -129,9 +131,15 @@ export class UtilisateurComponent implements OnInit, OnDestroy{
         return this._utilisateurService.GetUtilisateur(
             (this._paginator?.pageIndex | 0) + 1,
             this._paginator?.pageSize,
-            this._sort?.active,
-            this._sort?.direction,
+            this.sortActive,
+            this.sortDirection,
             this.searchInputControl.value);
+    }
+
+    setSort(active: string, direction: 'asc' | 'desc'): void {
+        this.sortActive = active;
+        this.sortDirection = direction;
+        this.SortChange();
     }
 
     hasActionPermission(action: FuseNavigationAction): boolean{

@@ -165,6 +165,32 @@ export class AccueilComponent {
         this._refresh$.next();
     }
 
+    getRiskBadgeClass(riskLevel: string | undefined): string {
+        switch (riskLevel) {
+            case 'low':
+                return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+            case 'medium':
+                return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+            case 'high':
+                return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+            default:
+                return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+        }
+    }
+
+    getRiskLabel(riskLevel: string | undefined): string {
+        switch (riskLevel) {
+            case 'low':
+                return 'Faible';
+            case 'medium':
+                return 'Moyen';
+            case 'high':
+                return 'Élevé';
+            default:
+                return 'Inconnu';
+        }
+    }
+
     /**
      * Execute AI Feature
      * @param feature
@@ -377,6 +403,15 @@ export class AccueilComponent {
             systemActivity: [],
             lastUpdated: new Date(),
             errorMessage: 'Impossible de charger les données du tableau de bord. Veuillez réessayer.',
+            buses: [],
+            employes: [],
+            circuits: [],
+            utilisateurs: [],
+            chantiers: [],
+            equipes: [],
+            pointsCollecte: [],
+            ordresTravail: [],
+            rattachements: [],
         };
     }
 }

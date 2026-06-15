@@ -42,7 +42,7 @@
             @if(chauffeur$ | async; as chauffeurs){
                 @if(chauffeurs.length > 0){
                     <div class="grid gap-4 pb-20">
-                        <fieldset class="flex flex-wrap items-center gap-2">
+                        <fieldset class="flex flex-wrap items-center gap-2 mb-6">
                             <legend class="text-sm text-hint">{{ t('Sort') }}</legend>
                             <button
                                 mat-stroked-button
@@ -64,75 +64,80 @@
                             </button>
                         </fieldset>
 
+                        <!-- Cards Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
                         @for(chauffeur of chauffeurs; track chauffeur.chauffeurId || $index){
-                            <div class="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-                                <div class="flex items-start justify-between gap-4">
-                                    <div class="grid flex-1 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
-                                        <div>
-                                            <p class="text-hint text-xs">{{ t('Code') }}</p>
-                                            <p class="font-medium truncate">{{chauffeur.codeChauffeur || '-'}}</p>
+                            <div class="entity-card bg-card p-6 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                                <div class="flex items-start justify-between gap-4 mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-500 to-teal-600 flex items-center justify-center shadow-lg">
+                                            <span class="text-white font-bold text-xl">{{ (chauffeur.prenom?.[0] || 'A').toUpperCase() }}{{ (chauffeur.nom?.[0] || 'N').toUpperCase() }}</span>
                                         </div>
                                         <div>
-                                            <p class="text-hint text-xs">{{ t('Nom') }}</p>
-                                            <p class="truncate">{{chauffeur.nom || '-'}} {{chauffeur.prenom || ''}}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-hint text-xs">{{ t('CIN') }}</p>
-                                            <p class="truncate">{{chauffeur.cin || '-'}}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-hint text-xs">{{ t('Status') }}</p>
-                                            <p [ngClass]="chauffeur.isActive ? 'text-green-600' : 'text-red-600'">
-                                                {{chauffeur.isActive ? t('Active') : t('Inactive')}}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <p class="text-hint text-xs">{{ t('Externe') }}</p>
-                                            <p [ngClass]="chauffeur.externe ? 'text-blue-600' : 'text-gray-600'">
-                                                {{chauffeur.externe ? t('Yes') : t('No')}}
-                                            </p>
+                                            <div class="font-bold text-lg">{{chauffeur.codeChauffeur || '-'}}</div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">{{chauffeur.nom || '-'}} {{chauffeur.prenom || ''}}</div>
                                         </div>
                                     </div>
-
-                                    <div class="flex justify-end gap-2 sm:gap-4 shrink-0">
-                                        <button
-                                            mat-icon-button
-                                            (click)="toggleDetails(chauffeur.chauffeurId)"
-                                            class="!w-6 !h-6 sm:!w-8 sm:!h-8">
-                                            <mat-icon
-                                                class="text-hint text-xs sm:text-sm lg:text-base"
-                                                [svgIcon]="selectedChauffeur?.chauffeurId === chauffeur.chauffeurId ? 'heroicons_solid:chevron-up' : 'remove_red_eye'">
-                                            </mat-icon>
-                                        </button>
-
-                                        <button
-                                            mat-icon-button
-                                            [routerLink]="chauffeur.chauffeurId"
-                                            class="!w-6 !h-6 sm:!w-8 sm:!h-8">
-                                            <mat-icon
-                                                class="text-hint text-xs sm:text-sm lg:text-base"
-                                                [svgIcon]="'edit_road'">
-                                            </mat-icon>
-                                        </button>
-
-                                        @if(hasActionPermission(FuseNavigationAction.Delete)){
-                                        <button
-                                            mat-icon-button
-                                            [color]="'warn'"
-                                            (click)="deleteSelectedChauffeur(chauffeur)"
-                                            class="!w-6 !h-6 sm:!w-8 sm:!h-8">
-                                            <mat-icon
-                                                class="text-hint text-xs sm:text-sm lg:text-base"
-                                                [svgIcon]="'heroicons_outline:trash'">
-                                            </mat-icon>
-                                        </button>
-                                        }
+                                    <div class="flex flex-col items-end gap-1">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
+                                                  [ngClass]="chauffeur.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'">
+                                            {{chauffeur.isActive ? t('Active') : t('Inactive')}}
+                                        </span>
+                                        <span class="text-xs text-gray-500 dark:text-gray-400" [ngClass]="chauffeur.externe ? 'text-blue-600' : 'text-gray-600'">
+                                            {{chauffeur.externe ? t('Yes') : t('No')}} ({{ t('Externe') }})
+                                        </span>
                                     </div>
                                 </div>
-
+                                <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:credit_card"></mat-icon>
+                                            CIN
+                                        </div>
+                                        <div class="font-semibold">{{chauffeur.cin || '-'}}</div>
+                                    </div>
+                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
+                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:contactless"></mat-icon>
+                                            RFID
+                                        </div>
+                                        <div class="font-semibold">{{chauffeur.rfidChauffeur || '-'}}</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-700">
+                                    <button
+                                        mat-icon-button
+                                        (click)="toggleDetails(chauffeur.chauffeurId)"
+                                        class="!w-8 !h-8">
+                                        <mat-icon
+                                            class="text-gray-500"
+                                            [svgIcon]="selectedChauffeur?.chauffeurId === chauffeur.chauffeurId ? 'heroicons_solid:chevron-up' : 'remove_red_eye'">
+                                        </mat-icon>
+                                    </button>
+                                    <button
+                                        mat-icon-button
+                                        [routerLink]="chauffeur.chauffeurId"
+                                        class="!w-8 !h-8">
+                                        <mat-icon
+                                            class="text-gray-500"
+                                            [svgIcon]="'edit_road'">
+                                        </mat-icon>
+                                    </button>
+                                    @if(hasActionPermission(FuseNavigationAction.Delete)){
+                                    <button
+                                        mat-icon-button
+                                        [color]="'warn'"
+                                        (click)="deleteSelectedChauffeur(chauffeur)"
+                                        class="!w-8 !h-8">
+                                        <mat-icon
+                                            [svgIcon]="'heroicons_outline:trash'">
+                                        </mat-icon>
+                                    </button>
+                                    }
+                                </div>
                                 @if(selectedChauffeur?.chauffeurId === chauffeur.chauffeurId){
-                                    <div class="border-t dark:border-slate-700 pt-4 mt-4">
-                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                                             <div>
                                                 <span class="font-semibold">{{ t('Code') }}:</span>
                                                 <span class="ml-2">{{chauffeur.codeChauffeur}}</span>
@@ -141,31 +146,13 @@
                                                 <span class="font-semibold">{{ t('Nom') }}:</span>
                                                 <span class="ml-2">{{chauffeur.nom}} {{chauffeur.prenom || ''}}</span>
                                             </div>
-                                            <div>
-                                                <span class="font-semibold">{{ t('CIN') }}:</span>
-                                                <span class="ml-2">{{chauffeur.cin || '-'}}</span>
-                                            </div>
-                                            <div>
-                                                <span class="font-semibold">{{ t('RFID') }}:</span>
-                                                <span class="ml-2">{{chauffeur.rfidChauffeur || '-'}}</span>
-                                            </div>
-                                            <div>
-                                                <span class="font-semibold">{{ t('Status') }}:</span>
-                                                <span class="ml-2" [ngClass]="chauffeur.isActive ? 'text-green-600' : 'text-red-600'">
-                                                    {{chauffeur.isActive ? t('Active') : t('Inactive')}}
-                                                </span>
-                                            </div>
-                                            <div>
-                                                <span class="font-semibold">{{ t('Externe') }}:</span>
-                                                <span class="ml-2" [ngClass]="chauffeur.externe ? 'text-blue-600' : 'text-gray-600'">
-                                                    {{chauffeur.externe ? t('Yes') : t('No')}}
-                                                </span>
-                                            </div>
                                         </div>
                                     </div>
                                 }
                             </div>
                         }
+                        </div>
+
                         <!-- Paginator -->
                         <mat-paginator
                             class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
@@ -179,7 +166,10 @@
                         </mat-paginator>
                     </div>
                 }@else{
-                    <div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">{{ t('No-chauffeurs-found') }}</div>
+                    <div class="col-span-full text-center py-16 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
+                        <mat-icon class="icon-size-16 mb-3" svgIcon="mat_outline:person"></mat-icon>
+                        <div class="font-semibold text-2xl">{{ t('No-chauffeurs-found') }}</div>
+                    </div>
                 }
             }
         </div>

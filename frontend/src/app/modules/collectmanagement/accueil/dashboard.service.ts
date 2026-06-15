@@ -7,12 +7,18 @@ import { EmployeService } from 'app/core/employes/employe.service';
 import { OrdreTravailService } from 'app/core/ordre-travail/ordre-travail.service';
 import { RattachementService } from 'app/core/rattachement/rattachement.service';
 import { UtilisateurService } from 'app/core/utilisateurs/utilisateur.service';
+import { ChantierService } from 'app/core/chantier/chantier.service';
+import { EquipeService } from 'app/core/equipe/equipe.service';
+import { PointCollecteService } from 'app/core/point-collecte/point-collecte.service';
 import { Bus, PagedBus } from 'app/core/bus/bus.model';
 import { Circuit, PagedCircuit } from 'app/core/circuit/circuit.model';
 import { Employe, PagedEmploye } from 'app/core/employes/employe.model';
 import { OrdreTravail, PagedOrdreTravail } from 'app/core/ordre-travail/ordre-travail.model';
 import { PagedRattachement } from 'app/core/rattachement/rattachement.model';
 import { PagedUtilisateur } from 'app/core/utilisateurs/utilisateur.model';
+import { PagedChantier } from 'app/core/chantier/chantier.model';
+import { PagedEquipe } from 'app/core/equipe/equipe.model';
+import { PagedPointCollecte } from 'app/core/point-collecte/point-collecte.model';
 import {
     DashboardActivityItem,
     DashboardAiFeature,
@@ -42,7 +48,10 @@ export class DashboardService {
         private _circuitService: CircuitService,
         private _ordreTravailService: OrdreTravailService,
         private _rattachementService: RattachementService,
-        private _quickChatService: QuickChatService
+        private _quickChatService: QuickChatService,
+        private _chantierService: ChantierService,
+        private _equipeService: EquipeService,
+        private _pointCollecteService: PointCollecteService
     ) {}
 
     getDashboardData(): Observable<DashboardData> {
@@ -53,6 +62,9 @@ export class DashboardService {
             circuits: this._circuitService.GetCircuit(1, this.DASHBOARD_FETCH_LIMIT),
             ordresTravail: this._ordreTravailService.GetOrdresTravail(1, this.DASHBOARD_FETCH_LIMIT),
             rattachements: this._rattachementService.GetRattachements(1, this.DASHBOARD_FETCH_LIMIT),
+            chantiers: this._chantierService.GetChantiers(1, this.DASHBOARD_FETCH_LIMIT),
+            equipes: this._equipeService.GetEquipes(1, this.DASHBOARD_FETCH_LIMIT),
+            pointsCollecte: this._pointCollecteService.GetPointsCollecte(1, this.DASHBOARD_FETCH_LIMIT),
         }).pipe(
             map((payload) => this._buildDashboardData(payload)),
             catchError(() =>
@@ -93,6 +105,9 @@ export class DashboardService {
         circuits: PagedCircuit;
         ordresTravail: PagedOrdreTravail;
         rattachements: PagedRattachement;
+        chantiers: PagedChantier;
+        equipes: PagedEquipe;
+        pointsCollecte: PagedPointCollecte;
     }): DashboardData {
         const utilisateurs = payload.utilisateurs?.utilisateurs ?? [];
         const employes = payload.employes?.employes ?? [];
@@ -100,6 +115,9 @@ export class DashboardService {
         const circuits = payload.circuits?.circuits ?? [];
         const ordresTravail = payload.ordresTravail?.ordresTravail ?? [];
         const rattachements = payload.rattachements?.rattachements ?? [];
+        const chantiers = payload.chantiers?.chantiers ?? [];
+        const equipes = payload.equipes?.equipes ?? [];
+        const pointsCollecte = payload.pointsCollecte?.pointsCollecte ?? [];
 
         const totalUsers = this._resolveTotal(payload.utilisateurs?.length, utilisateurs);
         const totalEmployees = this._resolveTotal(payload.employes?.total, employes);
@@ -295,6 +313,15 @@ export class DashboardService {
             recentUpdated,
             systemActivity,
             lastUpdated: new Date(),
+            buses,
+            employes,
+            circuits,
+            utilisateurs,
+            chantiers,
+            equipes,
+            pointsCollecte,
+            ordresTravail,
+            rattachements,
         };
     }
 
@@ -589,6 +616,15 @@ export class DashboardService {
             systemActivity: [],
             lastUpdated: new Date(),
             errorMessage,
+            buses: [],
+            employes: [],
+            circuits: [],
+            utilisateurs: [],
+            chantiers: [],
+            equipes: [],
+            pointsCollecte: [],
+            ordresTravail: [],
+            rattachements: [],
         };
     }
 
