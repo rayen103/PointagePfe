@@ -40,6 +40,8 @@ import { SiteService } from '../../../../core/site/site.service';
 import { Site } from '../../../../core/site/site.model';
 import { TranslocoDirective } from '@ngneat/transloco';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { UtilisateurDialogComponent } from './utilisateur-dialog.component';
 
 @Component({
     selector: 'app-utilisateur',
@@ -64,6 +66,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
         NgForOf,
         TranslocoDirective,
         MatCheckboxModule,
+        MatDialogModule,
     ],
     templateUrl: './utilisateur.component.html',
     styleUrl: './utilisateur.component.scss',
@@ -107,7 +110,7 @@ export class UtilisateurComponent implements OnInit, OnDestroy{
         private _formBuilder: UntypedFormBuilder,
         private _societeService : SocieteService,
         private _siteService: SiteService,
-
+        private _dialog: MatDialog
     ) {
     }
 
@@ -263,11 +266,23 @@ export class UtilisateurComponent implements OnInit, OnDestroy{
             return;
         }
 
-        this._utilisateurService.CreateNewUtilisateur().subscribe((newUtilisateur)=>{
-            this.selectedUtilisateur=newUtilisateur;
-            this.selectedUtilisateurForm.patchValue(newUtilisateur);
-            this.selectedSiteIds = [];
-            this._changeDetectorRef.markForCheck();
+        const dialogRef = this._dialog.open(UtilisateurDialogComponent, {
+            width: '800px',
+            data: {
+                utilisateur: null,
+                roleUtilisateurs: this.roleUtilisateurs,
+                societes: this.societe,
+                sites: this.allSites
+            }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                this._utilisateurService.AddUtilisateur(result)
+                    .subscribe(() => {
+                        this.SortChange();
+                    });
+            }
         });
     }
 
@@ -278,7 +293,6 @@ export class UtilisateurComponent implements OnInit, OnDestroy{
      */
     toggleDetails(utilisateurId: string): void
     {
-        this.isChangingPassword=false;
         // If the product is already selected...
         if ( this.selectedUtilisateur && this.selectedUtilisateur.utilisateurId === utilisateurId )
         {
@@ -290,16 +304,24 @@ export class UtilisateurComponent implements OnInit, OnDestroy{
         // Get the region by id
         this._utilisateurService.GetUtilisateurById(utilisateurId)
             .subscribe((utilisateur) => {
+                const dialogRef = this._dialog.open(UtilisateurDialogComponent, {
+                    width: '800px',
+                    data: {
+                        utilisateur: utilisateur,
+                        roleUtilisateurs: this.roleUtilisateurs,
+                        societes: this.societe,
+                        sites: this.allSites
+                    }
+                });
 
-                // Set the selected product
-                this.selectedUtilisateur = utilisateur;
-
-                // Fill the form
-                this.selectedUtilisateurForm.patchValue(utilisateur);
-                this.selectedSiteIds = utilisateur.siteIds || [];
-
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
+                dialogRef.afterClosed().subscribe(result => {
+                    if (result) {
+                        this._utilisateurService.UpdateUtilisateur(result)
+                            .subscribe(() => {
+                                this.SortChange();
+                            });
+                    }
+                });
             });
     }
 

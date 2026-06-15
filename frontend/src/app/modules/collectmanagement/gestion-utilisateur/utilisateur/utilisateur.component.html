@@ -20,7 +20,7 @@
                     [placeholder]="t('Search')">
             </mat-form-field>
 
-            @if(hasActionPermission(FuseNavigationAction.Add)){
+            @if(hasActionPermission(FuseNavigationAction.Add)) {
                 <!-- Add product button -->
                 <button
                     class="ml-4"
@@ -107,7 +107,7 @@
                                             mat-icon-button
                                             (click)="$event.stopPropagation(); toggleDetails(utilisateur.utilisateurId)"
                                             class="!w-8 !h-8">
-                                            <mat-icon class="text-gray-500" [svgIcon]="selectedUtilisateur?.utilisateurId === utilisateur.utilisateurId ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'"></mat-icon>
+                                            <mat-icon class="text-gray-500" svgIcon="heroicons_outline:pencil"></mat-icon>
                                         </button>
                                         @if(hasActionPermission(FuseNavigationAction.Delete)){
                                             <button
@@ -119,9 +119,6 @@
                                             </button>
                                         }
                                     </div>
-                                    @if (selectedUtilisateur?.utilisateurId === utilisateur.utilisateurId){
-                                        <ng-container *ngTemplateOutlet="rowDetailsTemplate; context: {$implicit: utilisateur}"></ng-container>
-                                    }
                                 </div>
                             }
                         </div>
@@ -133,176 +130,6 @@
                     </div>
                 }
             }
-
-            <ng-template #rowDetailsTemplate let-utilisateur>
-                <div @expandCollapse class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                    <div class="flex">
-                        <!-- Selected region form -->
-                        <form class="flex flex-col w-full" [formGroup]="selectedUtilisateurForm">
-
-                            <div class="flex flex-col w-full gap-2">
-
-                                <div class="flex items-center w-full gap-2">
-
-                                    <!-- Libelle -->
-                                    @if(utilisateur.utilisateurId==='new'){
-                                        <mat-form-field class="w-1/4 fuse-mat-dense">
-                                            <mat-label>{{ t('Username') }}</mat-label>
-                                            <input matInput [formControlName]="'nomUtilisateur'">
-                                        </mat-form-field>
-                                    } @else {
-                                        <mat-form-field class="w-1/4 fuse-mat-dense">
-                                            <mat-label>{{ t('Username') }}</mat-label>
-                                            <input matInput [formControlName]="'nomUtilisateur'" >
-                                        </mat-form-field>
-                                    }
-
-                                    <mat-form-field class="w-1/4 fuse-mat-dense">
-                                        <mat-label>{{ t('Name') }}</mat-label>
-                                        <input matInput [formControlName]="'nom'">
-                                    </mat-form-field>
-
-                                    <mat-form-field class="w-1/4 fuse-mat-dense">
-                                        <mat-label>{{ t('First-Name') }}</mat-label>
-                                        <input matInput [formControlName]="'prenom'">
-                                    </mat-form-field>
-
-                                    <mat-form-field class="w-1/4 fuse-mat-dense">
-                                        <mat-label>{{ t('E-mail') }}</mat-label>
-                                        <input matInput [formControlName]="'email'">
-                                    </mat-form-field>
-                                </div>
-
-                                <div class="flex items-center w-full gap-2">
-
-                                    <mat-form-field class="w-1/4 fuse-mat-dense">
-                                        <mat-label>{{ t('Role') }}</mat-label>
-                                        <mat-select [formControlName]="'roleUtilisateurId'">
-                                            @for (role of roleUtilisateurs;track role.roleUtilisateurId){
-                                                <mat-option [value]="role.roleUtilisateurId" >
-                                                    {{role.libelleRoleUtilisateur}}
-                                                </mat-option>
-                                            }
-                                        </mat-select>
-                                    </mat-form-field>
-
-                                    @if(utilisateur.utilisateurId==='new'){
-                                        <mat-form-field class="w-1/4 fuse-mat-dense">
-                                            <mat-label>{{ t('Password') }}</mat-label>
-                                            <input matInput type="password" [formControlName]="'password'">
-                                            @if (selectedUtilisateurForm.get('password')?.hasError('required')) {
-                                                <mat-error>Password is required</mat-error>
-                                            }
-                                            @if (selectedUtilisateurForm.get('password')?.hasError('pattern')) {
-                                                <mat-error>Password must contain uppercase, lowercase, number and special character (8+ chars)</mat-error>
-                                            }
-                                        </mat-form-field>
-                                    } @else {
-                                        @if (isChangingPassword===false){
-                                            <button mat-flat-button [color]="'accent'" (click)="toggleChangePassword()">
-                                                {{ t('Change-Password') }}
-                                            </button>
-                                            <mat-form-field class="w-1/4 hidden fuse-mat-dense">
-                                                <mat-label>Mot de passe</mat-label>
-                                                <input matInput [formControlName]="'password'">
-                                            </mat-form-field>
-                                        } @else {
-                                            <button mat-flat-button hidden="hidden" [color]="'accent'" (click)="toggleChangePassword()">
-                                                {{ t('Change-Password') }}
-                                            </button>
-                                            <mat-form-field class="w-1/4 fuse-mat-dense">
-                                                <mat-label> {{ t('New-Password') }}  </mat-label>
-                                                <input matInput type="password" [formControlName]="'password'">
-                                                @if (selectedUtilisateurForm.get('password')?.hasError('pattern')) {
-                                                    <mat-error>Password must contain uppercase, lowercase, number and special character (8+ chars)</mat-error>
-                                                }
-                                            </mat-form-field>
-                                        }
-                                    }
-
-                                    <mat-form-field class="w-1/4 fuse-mat-dense">
-                                        <mat-label> {{ t('Company') }} </mat-label>
-                                        <input
-                                            type="text"
-                                            matInput
-                                            [formControlName]="'societeId'"
-                                            [matAutocomplete]="autoSociete"
-                                            placeholder="Rechercher une société..."
-                                        />
-
-                                        <mat-autocomplete
-                                            #autoSociete="matAutocomplete"
-                                            [displayWith]="displaySociete">
-                                            <mat-option
-                                                *ngFor="let option of filteredSocietes$ | async"
-                                                [value]="option.societeId">
-                                                {{ option.nom }}
-                                            </mat-option>
-                                        </mat-autocomplete>
-                                    </mat-form-field>
-
-
-                                    <mat-slide-toggle
-                                        [formControlName]="'isActive'">
-                                        {{ t('Active') }}
-                                    </mat-slide-toggle>
-
-                                </div>
-
-                                <!-- Site Assignment Section -->
-                                <div class="flex flex-col w-full mt-4 border rounded-lg overflow-hidden">
-                                    <div class="flex items-center px-4 py-2 bg-slate-100 dark:bg-slate-800 border-b font-semibold">
-                                        <mat-checkbox 
-                                            [checked]="selectedSiteIds.length === allSites.length && allSites.length > 0"
-                                            [indeterminate]="selectedSiteIds.length > 0 && selectedSiteIds.length < allSites.length"
-                                            (change)="toggleAllSites()">
-                                            {{ t('Assign-Sites') }} ({{ t('Select-All') }})
-                                        </mat-checkbox>
-                                    </div>
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 max-h-60 overflow-y-auto">
-                                        @for (site of allSites; track site.siteId) {
-                                            <mat-checkbox 
-                                                [checked]="isSiteSelected(site.siteId)"
-                                                (change)="toggleSite(site.siteId)">
-                                                {{ site.libelleSite }} ({{ site.code }})
-                                            </mat-checkbox>
-                                        }
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            @if( (hasActionPermission(FuseNavigationAction.Edit) && utilisateur.utilisateurId !== 'new') ||
-                            (hasActionPermission(FuseNavigationAction.Add) && utilisateur.utilisateurId === 'new')){
-                                <div class="flex justify-end w-full border-t gap-4 px-8 py-4">
-
-                                    @if (selectedUtilisateurForm.invalid) {
-                                        <div class="flex items-start gap-2 p-6 rounded-lg border border-rose-500 bg-rose-100 text-rose-950 animate-pulse">
-                                            <mat-icon
-                                                class="text-red-900"
-                                                [svgIcon]="'heroicons_outline:exclamation-triangle'"
-                                            ></mat-icon>
-                                            <div class="flex flex-col">
-                                                <span class="font-semibold">{{ t('Alert') }} </span>
-                                                <p> {{ t('Mandatory-fields-not-filled-in!') }} !</p>
-                                            </div>
-                                        </div>
-                                    }
-
-                                    <button
-                                        [@shake]="saveClicked && selectedUtilisateurForm.invalid"
-                                        [disabled]="saveClicked && selectedUtilisateurForm.valid"
-                                        mat-flat-button
-                                        [color]="'primary'"
-                                        (click)="SaveSelectedUtilisateur()">
-                                        {{ t('Save') }}
-                                    </button>
-                                </div>
-                            }
-                        </form>
-                    </div>
-                </div>
-            </ng-template>
 
             <mat-paginator
                 class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
