@@ -284,6 +284,7 @@ export class EmployeComponent implements OnInit, OnDestroy {
 
         const dialogRef = this._dialog.open(EmployeDialogComponent, {
             width: '800px',
+            maxHeight: '80vh',
             data: {
                 employe: null,
                 societes: this.societe,
@@ -325,18 +326,19 @@ export class EmployeComponent implements OnInit, OnDestroy {
         this._employeService.GetEmployeById(employeId)
             .subscribe((employe) => {
                 const dialogRef = this._dialog.open(EmployeDialogComponent, {
-                    width: '800px',
-                    data: {
-                        employe: employe,
-                        societes: this.societe,
-                        circuits: this.circuits,
-                        buses: this.buses,
-                        shifts: this.shifts,
-                        pointsCollecte: this.pointsCollecte,
-                        gouvernorats: this.gouvernorats,
-                        regions: this.regions
-                    }
-                });
+                width: '800px',
+                maxHeight: '80vh',
+                data: {
+                    employe: employe,
+                    societes: this.societe,
+                    circuits: this.circuits,
+                    buses: this.buses,
+                    shifts: this.shifts,
+                    pointsCollecte: this.pointsCollecte,
+                    gouvernorats: this.gouvernorats,
+                    regions: this.regions
+                }
+            });
 
                 dialogRef.afterClosed().subscribe(result => {
                     if (result) {

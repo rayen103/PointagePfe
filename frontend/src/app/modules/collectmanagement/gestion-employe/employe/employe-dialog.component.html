@@ -1,4 +1,4 @@
-<div class="p-6" *transloco="let t">
+<div class="p-6 flex flex-col h-full" *transloco="let t">
     <!-- Title -->
     <div class="flex items-center justify-between mb-6">
         <h2 class="text-2xl font-bold">{{ data.employe?.employeId === 'new' || !data.employe ? t('Ajouter un employé') : t('Modifier un employé') }}</h2>
@@ -8,8 +8,9 @@
     </div>
 
     <!-- Form -->
-    <form [formGroup]="form" (ngSubmit)="save()">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <form [formGroup]="form" (ngSubmit)="save()" class="flex-1 flex flex-col overflow-hidden">
+        <div class="flex-1 overflow-y-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Matricule -->
             <mat-form-field class="w-full fuse-mat-dense">
                 <mat-label>{{ t('ID-Number') }}</mat-label>
@@ -244,6 +245,7 @@
             <div class="flex items-center">
                 <mat-slide-toggle formControlName="isActive" color="primary">{{ t('Active') }}</mat-slide-toggle>
             </div>
+        </div>
         </div>
 
         <!-- Buttons -->
