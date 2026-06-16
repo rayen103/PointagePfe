@@ -116,6 +116,7 @@ export class EmployeService {
             latitude: null,
             longitude: null,
             societeId: '',
+            isActive: true,
         };
         this._employes.next([newEmploye, ...this._employes.value]);
         return of(newEmploye);

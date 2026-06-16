@@ -17,6 +17,7 @@ export interface Employe {
     latitude?: number;
     longitude?: number;
     societeId: string;
+    isActive: boolean;
     absenceRiskScore?: number;
     absenceRiskLevel?: 'low' | 'medium' | 'high';
     absencePredictionConfidence?: number;
