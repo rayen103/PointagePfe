@@ -1,3 +1,5 @@
+import { CircuitPointCollecte } from "./circuit-point-collecte.model";
+
 export interface Circuit {
     circuitId: string;
     codeCircuit: string;
@@ -12,6 +14,7 @@ export interface Circuit {
     distanceKm?: number;
     dureeMinutes?: number;
     couleur?: string;
+    circuitPointsCollecte?: CircuitPointCollecte[];
 }
 
 export interface PagedCircuit {

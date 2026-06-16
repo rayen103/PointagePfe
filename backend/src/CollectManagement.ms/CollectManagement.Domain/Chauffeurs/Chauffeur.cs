@@ -1,3 +1,6 @@
+using BusEntity = CollectManagement.Domain.Bus.Bus;
+using CollectManagement.Domain.Bus;
+using CollectManagement.Domain.Bus.ValueObjects;
 using CollectManagement.Domain.Chauffeurs.ValueObjects;
 using CollectManagement.Domain.Common;
 using CollectManagement.Domain.Societes;
@@ -23,6 +26,10 @@ public class Chauffeur : AuditableEntity
 
     public bool IsActive { get; private set; } = true;
 
+    public BusId? BusId { get; private set; }
+
+    public BusEntity? Bus { get; private set; }
+
     public SocieteId SocieteId { get; private set; }
 
     public Societe? Societe { get; private set; }
@@ -36,7 +43,8 @@ public class Chauffeur : AuditableEntity
         string? rfidChauffeur,
         bool externe,
         bool isActive,
-        SocieteId societeId)
+        SocieteId societeId,
+        BusId? busId = null)
     {
         ChauffeurId = chauffeurId;
         CodeChauffeur = codeChauffeur;
@@ -47,6 +55,7 @@ public class Chauffeur : AuditableEntity
         Externe = externe;
         IsActive = isActive;
         SocieteId = societeId;
+        BusId = busId;
     }
 
     public static Chauffeur Create(
@@ -58,7 +67,8 @@ public class Chauffeur : AuditableEntity
         string? rfidChauffeur,
         bool externe,
         bool isActive,
-        SocieteId societeId)
+        SocieteId societeId,
+        BusId? busId = null)
     {
         return new Chauffeur(
             chauffeurId,
@@ -69,7 +79,8 @@ public class Chauffeur : AuditableEntity
             rfidChauffeur,
             externe,
             isActive,
-            societeId);
+            societeId,
+            busId);
     }
 
     public void Update(
@@ -79,7 +90,8 @@ public class Chauffeur : AuditableEntity
         string? cin,
         string? rfidChauffeur,
         bool externe,
-        bool isActive)
+        bool isActive,
+        BusId? busId = null)
     {
         CodeChauffeur = codeChauffeur;
         Nom = nom;
@@ -88,6 +100,7 @@ public class Chauffeur : AuditableEntity
         RFIDChauffeur = rfidChauffeur;
         Externe = externe;
         IsActive = isActive;
+        BusId = busId;
     }
 
     public static Chauffeur QueryCreate(
@@ -99,7 +112,8 @@ public class Chauffeur : AuditableEntity
         string? rfidChauffeur,
         bool externe,
         bool isActive,
-        SocieteId societeId)
+        SocieteId societeId,
+        BusId? busId = null)
     {
         return new Chauffeur(
             chauffeurId,
@@ -110,7 +124,8 @@ public class Chauffeur : AuditableEntity
             rfidChauffeur,
             externe,
             isActive,
-            societeId);
+            societeId,
+            busId);
     }
 
 #pragma warning disable CS8618

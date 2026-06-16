@@ -53,7 +53,8 @@ export class CircuitService {
             libelleCircuit: "",
             description: "",
             isActive: true,
-            societeId: ""
+            societeId: "",
+            circuitPointsCollecte: []
         }
         this._circuit.next(newCircuit);
 

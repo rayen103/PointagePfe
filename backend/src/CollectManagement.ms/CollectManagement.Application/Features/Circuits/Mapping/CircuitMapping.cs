@@ -2,6 +2,7 @@ using CollectManagement.Application.Features.Circuits.Commands.CreateCircuit;
 using CollectManagement.Application.Features.Circuits.Commands.UpdateCircuit;
 using CollectManagement.Application.Features.Circuits.Queries.GetOneCircuit;
 using CollectManagement.Application.Features.Circuits.Queries.GetPagedListCircuit;
+using CollectManagement.Application.Features.CircuitsPointsCollecte.Queries.GetByCircuit;
 using CollectManagement.Domain.Circuits;
 
 namespace CollectManagement.Application.Features.Circuits.Mapping;
@@ -23,7 +24,8 @@ public class CircuitMapping : IRegister
             .Map(d => d.LibelleCircuit, s => s.LibelleCircuit)
             .Map(d => d.Description, s => s.Description)
             .Map(d => d.IsActive, s => s.IsActive)
-            .Map(d => d.SocieteId, s => s.SocieteId.Value);
+            .Map(d => d.SocieteId, s => s.SocieteId.Value)
+            .Map(d => d.CircuitPointsCollecte, s => s.CircuitPointsCollecte);
 
         config.NewConfig<Circuit, GetOneCircuitDto>()
             .Map(d => d.CircuitId, s => s.CircuitId.Value)
@@ -31,6 +33,7 @@ public class CircuitMapping : IRegister
             .Map(d => d.LibelleCircuit, s => s.LibelleCircuit)
             .Map(d => d.Description, s => s.Description)
             .Map(d => d.IsActive, s => s.IsActive)
-            .Map(d => d.SocieteId, s => s.SocieteId.Value);
+            .Map(d => d.SocieteId, s => s.SocieteId.Value)
+            .Map(d => d.CircuitPointsCollecte, s => s.CircuitPointsCollecte);
     }
 }

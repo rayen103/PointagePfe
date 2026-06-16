@@ -1,5 +1,3 @@
-using CollectManagement.Domain.Employes.Enums;
-
 namespace CollectManagement.Application.Features.Employes.Queries.GetPagedListEmploye;
 
 public record GetPagedListEmployeDto(
@@ -8,7 +6,6 @@ public record GetPagedListEmployeDto(
     string? RFID,
     string Nom,
     string Prenom,
-    TypeEmploye TypeEmploye,
     string? CodeCircuit,
     string? CodePointCollecte,
     string? CodeBus,

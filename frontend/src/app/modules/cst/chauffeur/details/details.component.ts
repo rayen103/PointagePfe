@@ -21,8 +21,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { fuseAnimations } from '../../../../../@fuse/animations';
 import { Chauffeur } from '../../../../core/chauffeur/chauffeur.model';
+import { Bus } from '../../../../core/bus/bus.model';
 import { catchError, EMPTY, Subject, takeUntil } from 'rxjs';
 import { ChauffeurService } from '../../../../core/chauffeur/chauffeur.service';
+import { BusService } from '../../../../core/bus/bus.service';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UserService } from '../../../../core/user/user.service';
 
@@ -56,6 +58,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
     chauffeurForm: UntypedFormGroup;
     isNewChauffeur: boolean = false;
     chauffeur: Chauffeur;
+    buses: Bus[] = [];
     flashMessage: 'success' | 'error' | null = null;
     isLoading: boolean = false;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
@@ -65,6 +68,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
         private _router: Router,
         private formBuilder: FormBuilder,
         private _chauffeurService: ChauffeurService,
+        private _busService: BusService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _userService: UserService
     ) { }
@@ -80,7 +84,15 @@ export class DetailsComponent implements OnInit, OnDestroy {
             externe: [false],
             isActive: [true],
             societeId: ['', Validators.required],
+            busId: [null],
         });
+
+        // Load buses
+        this._busService.GetBuses(1, 1000)
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe(pagedBus => {
+                this.buses = pagedBus.buses || [];
+            });
 
         this._userService.user$
             .pipe(takeUntil(this._unsubscribeAll))

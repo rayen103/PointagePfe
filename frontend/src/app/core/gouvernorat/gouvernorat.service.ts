@@ -37,10 +37,21 @@ export class GouvernoratService {
         })
             .pipe(
                 tap((gouvernorats) => {
-                    this._gouvernorats.next(gouvernorats.data?.gouvernorats);
-                    this._gouvernoratsLength.next(gouvernorats.data?.totalCount);
+                    // Deduplicate by codeGouvernorat on frontend as well
+                    const uniqueGouvernorats = (gouvernorats.data?.gouvernorats || []).filter((value, index, self) => 
+                        index === self.findIndex((t) => t.codeGouvernorat === value.codeGouvernorat)
+                    );
+                    this._gouvernorats.next(uniqueGouvernorats);
+                    this._gouvernoratsLength.next(uniqueGouvernorats.length);
                 }),
-                map(r => r.data)
+                map(r => ({
+                    gouvernorats: (r.data?.gouvernorats || []).filter((value, index, self) => 
+                        index === self.findIndex((t) => t.codeGouvernorat === value.codeGouvernorat)
+                    ),
+                    totalCount: (r.data?.gouvernorats || []).filter((value, index, self) => 
+                        index === self.findIndex((t) => t.codeGouvernorat === value.codeGouvernorat)
+                    ).length
+                }))
             );
     }
 

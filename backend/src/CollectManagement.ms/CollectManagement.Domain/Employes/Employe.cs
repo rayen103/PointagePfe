@@ -1,5 +1,4 @@
 using CollectManagement.Domain.Common;
-using CollectManagement.Domain.Employes.Enums;
 using CollectManagement.Domain.Employes.ValueObjects;
 using CollectManagement.Domain.Societes;
 using CollectManagement.Domain.Societes.ValueObjects;
@@ -17,8 +16,6 @@ public class Employe : AuditableEntity
     public string Nom { get; private set; }
     
     public string Prenom { get; private set; }
-    
-    public TypeEmploye TypeEmploye { get; private set; }
     
     public string? CodeCircuit { get; private set; }
     
@@ -48,7 +45,6 @@ public class Employe : AuditableEntity
         string? rfid,
         string nom,
         string prenom,
-        TypeEmploye typeEmploye,
         string? codeCircuit,
         string? codePointCollecte,
         string? codeBus,
@@ -65,7 +61,6 @@ public class Employe : AuditableEntity
         RFID = rfid;
         Nom = nom;
         Prenom = prenom;
-        TypeEmploye = typeEmploye;
         CodeCircuit = codeCircuit;
         CodePointCollecte = codePointCollecte;
         CodeBus = codeBus;
@@ -84,7 +79,6 @@ public class Employe : AuditableEntity
         string? rfid,
         string nom,
         string prenom,
-        TypeEmploye typeEmploye,
         string? codeCircuit,
         string? codePointCollecte,
         string? codeBus,
@@ -102,7 +96,6 @@ public class Employe : AuditableEntity
             rfid,
             nom,
             prenom,
-            typeEmploye,
             codeCircuit,
             codePointCollecte,
             codeBus,
@@ -120,7 +113,6 @@ public class Employe : AuditableEntity
         string? rfid,
         string nom,
         string prenom,
-        TypeEmploye typeEmploye,
         string? codeCircuit,
         string? codePointCollecte,
         string? codeBus,
@@ -136,7 +128,6 @@ public class Employe : AuditableEntity
         RFID = rfid;
         Nom = nom;
         Prenom = prenom;
-        TypeEmploye = typeEmploye;
         CodeCircuit = codeCircuit;
         CodePointCollecte = codePointCollecte;
         CodeBus = codeBus;
@@ -155,7 +146,6 @@ public class Employe : AuditableEntity
         string? rfid,
         string nom,
         string prenom,
-        TypeEmploye typeEmploye,
         string? codeCircuit,
         string? codePointCollecte,
         string? codeBus,
@@ -173,7 +163,6 @@ public class Employe : AuditableEntity
             rfid,
             nom,
             prenom,
-            typeEmploye,
             codeCircuit,
             codePointCollecte,
             codeBus,

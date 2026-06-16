@@ -7,10 +7,19 @@
             {{isNewCircuit ? t('Add-Circuit') : t('Edit-Circuit')}}
         </div>
         <!-- Actions -->
-        <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+        <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4 gap-3">
+            <!-- Delete button (only for existing circuits) -->
+            @if(!isNewCircuit) {
+                <button
+                    mat-flat-button
+                    color="warn"
+                    (click)="deleteCircuit()">
+                    <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                    <span class="ml-2">{{ t('Delete') }}</span>
+                </button>
+            }
             <!-- Back button -->
             <button
-                class="ml-4"
                 mat-flat-button
                 (click)="onBackdropClicked()">
                 <mat-icon [svgIcon]="'heroicons_outline:arrow-left'"></mat-icon>
@@ -250,114 +259,112 @@
 
             </form>
 
-            <!-- Waypoints section — only for existing circuits -->
-            @if(!isNewCircuit){
-                <mat-card class="p-6 mt-6">
-                    <mat-card-header class="mb-4 flex items-center justify-between">
-                        <mat-card-title>{{ t('Circuit-Points-Collecte') }}</mat-card-title>
-                    </mat-card-header>
-                    <mat-card-content>
+            <!-- Waypoints section -->
+            <mat-card class="p-6 mt-6">
+                <mat-card-header class="mb-4 flex items-center justify-between">
+                    <mat-card-title>{{ t('Circuit-Points-Collecte') }}</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
 
-                        <!-- Selected Points Table -->
-                        @if(circuitPoints.length > 0){
-                            <div class="overflow-x-auto border rounded-lg">
-                                <table mat-table [dataSource]="circuitPoints" class="w-full">
-                                    
-                                    <!-- Order Column -->
-                                    <ng-container matColumnDef="ordre">
-                                        <th mat-header-cell *matHeaderCellDef> {{ t('Order') }} </th>
-                                        <td mat-cell *matHeaderCellDef="let point"> {{point.ordre}} </td>
-                                    </ng-container>
-
-                                    <!-- Code Column -->
-                                    <ng-container matColumnDef="code">
-                                        <th mat-header-cell *matHeaderCellDef> {{ t('Code') }} </th>
-                                        <td mat-cell *matHeaderCellDef="let point"> {{point.codePointCollecte}} </td>
-                                    </ng-container>
-
-                                    <!-- Label Column -->
-                                    <ng-container matColumnDef="label">
-                                        <th mat-header-cell *matHeaderCellDef> {{ t('Label') }} </th>
-                                        <td mat-cell *matHeaderCellDef="let point"> {{point.libellePointCollecte || '-'}} </td>
-                                    </ng-container>
-
-                                    <!-- Actions Column -->
-                                    <ng-container matColumnDef="actions">
-                                        <th mat-header-cell *matHeaderCellDef> </th>
-                                        <td mat-cell *matHeaderCellDef="let point" class="text-right">
-                                            <button mat-icon-button color="warn" (click)="removeWaypoint(point.circuitPointCollecteId)">
-                                                <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
-                                            </button>
-                                        </td>
-                                    </ng-container>
-
-                                    <tr mat-header-row *matHeaderRowDef="['ordre', 'code', 'label', 'actions']"></tr>
-                                    <tr mat-row *matRowDef="let point; columns: ['ordre', 'code', 'label', 'actions']"></tr>
-                                </table>
-                            </div>
-                        } @else {
-                            <p class="text-hint text-sm mb-4">{{ t('No-waypoints-assigned') }}</p>
-                        }
-
-                        <mat-divider class="my-6"></mat-divider>
-
-                        <!-- Add Points Selection Table -->
-                        <h3 class="text-lg font-semibold mb-4">{{ t('Assign-New-Points') }}</h3>
-                        <div class="max-h-96 overflow-auto border rounded-lg">
-                            <table mat-table [dataSource]="allPoints" class="w-full">
+                    <!-- Selected Points Table -->
+                    @if(circuitPoints.length > 0){
+                        <div class="overflow-x-auto border rounded-lg">
+                            <table mat-table [dataSource]="circuitPoints" class="w-full">
                                 
-                                <!-- Checkbox Column -->
-                                <ng-container matColumnDef="select">
-                                    <th mat-header-cell *matHeaderCellDef>
-                                        <mat-checkbox (change)="$event ? masterToggle() : null"
-                                                      [checked]="selection.hasValue() && isAllSelected()"
-                                                      [indeterminate]="selection.hasValue() && !isAllSelected()">
-                                        </mat-checkbox>
-                                    </th>
-                                    <td mat-cell *matCellDef="let row">
-                                        <mat-checkbox (click)="$event.stopPropagation()"
-                                                      (change)="$event ? selection.toggle(row) : null"
-                                                      [checked]="selection.isSelected(row)">
-                                        </mat-checkbox>
-                                    </td>
+                                <!-- Order Column -->
+                                <ng-container matColumnDef="ordre">
+                                    <th mat-header-cell *matHeaderCellDef> {{ t('Order') }} </th>
+                                    <td mat-cell *matCellDef="let point"> {{point.ordre}} </td>
                                 </ng-container>
 
                                 <!-- Code Column -->
                                 <ng-container matColumnDef="code">
                                     <th mat-header-cell *matHeaderCellDef> {{ t('Code') }} </th>
-                                    <td mat-cell *matHeaderCellDef="let row"> {{row.codePointCollecte}} </td>
+                                    <td mat-cell *matCellDef="let point"> {{point.codePointCollecte}} </td>
                                 </ng-container>
 
                                 <!-- Label Column -->
                                 <ng-container matColumnDef="label">
                                     <th mat-header-cell *matHeaderCellDef> {{ t('Label') }} </th>
-                                    <td mat-cell *matHeaderCellDef="let row"> {{row.libellePointCollecte}} </td>
+                                    <td mat-cell *matCellDef="let point"> {{point.libellePointCollecte || '-'}} </td>
                                 </ng-container>
 
-                                <!-- Coordinates Column -->
-                                <ng-container matColumnDef="coords">
-                                    <th mat-header-cell *matHeaderCellDef> {{ t('Coordinates') }} </th>
-                                    <td mat-cell *matHeaderCellDef="let row" class="text-xs text-secondary">
-                                        {{row.latitude}}, {{row.longitude}}
+                                <!-- Actions Column -->
+                                <ng-container matColumnDef="actions">
+                                    <th mat-header-cell *matHeaderCellDef> </th>
+                                    <td mat-cell *matCellDef="let point" class="text-right">
+                                        <button mat-icon-button color="warn" (click)="removeWaypoint(point)">
+                                            <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                                        </button>
                                     </td>
                                 </ng-container>
 
-                                <tr mat-header-row *matRowDef="let row; columns: ['select', 'code', 'label', 'coords']"></tr>
-                                <tr mat-row *matRowDef="let row; columns: ['select', 'code', 'label', 'coords']"
-                                    (click)="selection.toggle(row)">
-                                </tr>
+                                <tr mat-header-row *matHeaderRowDef="['ordre', 'code', 'label', 'actions']"></tr>
+                                <tr mat-row *matRowDef="let point; columns: ['ordre', 'code', 'label', 'actions']"></tr>
                             </table>
                         </div>
+                    } @else {
+                        <p class="text-hint text-sm mb-4">{{ t('No-waypoints-assigned') }}</p>
+                    }
 
-                        <div class="mt-4 flex justify-end">
-                            <button mat-flat-button color="primary" [disabled]="!selection.hasValue()" (click)="addSelectedPoints()">
-                                <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-                                <span class="ml-2">{{ t('Assign-Selected-Points') }} ({{selection.selected.length}})</span>
-                            </button>
-                        </div>
-                    </mat-card-content>
-                </mat-card>
-            }
+                    <mat-divider class="my-6"></mat-divider>
+
+                    <!-- Add Points Selection Table -->
+                    <h3 class="text-lg font-semibold mb-4">{{ t('Assign-New-Points') }}</h3>
+                    <div class="max-h-96 overflow-auto border rounded-lg">
+                        <table mat-table [dataSource]="allPoints" class="w-full">
+                            
+                            <!-- Checkbox Column -->
+                            <ng-container matColumnDef="select">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    <mat-checkbox (change)="$event ? masterToggle() : null"
+                                                  [checked]="selection.hasValue() && isAllSelected()"
+                                                  [indeterminate]="selection.hasValue() && !isAllSelected()">
+                                    </mat-checkbox>
+                                </th>
+                                <td mat-cell *matCellDef="let row">
+                                    <mat-checkbox (click)="$event.stopPropagation()"
+                                                  (change)="$event ? selection.toggle(row) : null"
+                                                  [checked]="selection.isSelected(row)">
+                                    </mat-checkbox>
+                                </td>
+                            </ng-container>
+
+                            <!-- Code Column -->
+                            <ng-container matColumnDef="code">
+                                <th mat-header-cell *matHeaderCellDef> {{ t('Code') }} </th>
+                                <td mat-cell *matCellDef="let row"> {{row.codePointCollecte}} </td>
+                            </ng-container>
+
+                            <!-- Label Column -->
+                            <ng-container matColumnDef="label">
+                                <th mat-header-cell *matHeaderCellDef> {{ t('Label') }} </th>
+                                <td mat-cell *matCellDef="let row"> {{row.libellePointCollecte}} </td>
+                            </ng-container>
+
+                            <!-- Coordinates Column -->
+                            <ng-container matColumnDef="coords">
+                                <th mat-header-cell *matHeaderCellDef> {{ t('Coordinates') }} </th>
+                                <td mat-cell *matCellDef="let row" class="text-xs text-secondary">
+                                    {{row.latitude}}, {{row.longitude}}
+                                </td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="['select', 'code', 'label', 'coords']"></tr>
+                            <tr mat-row *matRowDef="let row; columns: ['select', 'code', 'label', 'coords']"
+                                (click)="selection.toggle(row)">
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="mt-4 flex justify-end">
+                        <button mat-flat-button color="primary" [disabled]="!selection.hasValue()" (click)="addSelectedPoints()">
+                            <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                            <span class="ml-2">{{ t('Assign-Selected-Points') }} ({{selection.selected.length}})</span>
+                        </button>
+                    </div>
+                </mat-card-content>
+            </mat-card>
 
         </div>
     </div>

@@ -56,18 +56,6 @@
                 }
             </mat-form-field>
 
-            <!-- Type Employé -->
-            <mat-form-field class="w-full fuse-mat-dense">
-                <mat-label>{{ t('Employee-Type') }}</mat-label>
-                <mat-select formControlName="typeEmploye">
-                    <mat-option value="EmployeSimple">{{ t('Simple-Employee') }}</mat-option>
-                    <mat-option value="Chauffeur">{{ t('Driver') }}</mat-option>
-                </mat-select>
-                @if (form.get('typeEmploye')?.hasError('required')) {
-                    <mat-error>{{ t('Employee-Type') }} is required.</mat-error>
-                }
-            </mat-form-field>
-
             <!-- Circuit -->
             <mat-form-field class="w-full fuse-mat-dense">
                 <mat-label>{{ t('Circuit') }}</mat-label>

@@ -22,7 +22,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
-import { catchError, EMPTY, finalize, forkJoin, map, Observable, of, Subject, take, takeUntil } from 'rxjs';
+import { catchError, EMPTY, finalize, forkJoin, map, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
 import { fuseAnimations } from '../../../../../@fuse/animations';
 import { Circuit } from '../../../../core/circuit/circuit.model';
 import { CircuitService } from '../../../../core/circuit/circuit.service';
@@ -37,6 +37,8 @@ import { PointCollecteService } from '../../../../core/point-collecte/point-coll
 import { PointCollecte } from '../../../../core/point-collecte/point-collecte.model';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { FuseConfirmationService } from '../../../../../@fuse/services/confirmation';
+import { FuseNavigationAction } from '../../../../../@fuse/components/navigation';
 
 @Component({
   selector: 'app-details',
@@ -98,8 +100,13 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         private _pointCollecteService: PointCollecteService,
         private _mapGeocodingService: MapGeocodingService,
         private _changeDetectorRef: ChangeDetectorRef,
-        private _userService: UserService
+        private _userService: UserService,
+        private _fuseConfirmationService: FuseConfirmationService
     ) { }
+
+    hasActionPermission(action: FuseNavigationAction): boolean {
+        return true;
+    }
 
     ngOnInit(): void {
 
@@ -253,6 +260,33 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         this._changeDetectorRef.markForCheck();
     }
 
+    deleteCircuit(): void {
+        if (!this.hasActionPermission || !this.circuit?.circuitId) {
+            return;
+        }
+
+        const confirmation = this._fuseConfirmationService.open({
+            title: 'Delete Circuit',
+            message:
+                'Are you sure you want to remove this circuit? This action cannot be undone!',
+            actions: {
+                confirm: {
+                    label: 'Delete',
+                },
+            },
+        });
+
+        confirmation.afterClosed().subscribe((result) => {
+            if (result === 'confirmed') {
+                this._circuitService
+                    .DeleteCircuit({ circuitId: this.circuit.circuitId })
+                    .subscribe(() => {
+                        this.onBackdropClicked();
+                    });
+            }
+        });
+    }
+
     showFlashMessage(type: 'success' | 'error'): void {
         this.flashMessage = type;
         this._changeDetectorRef.markForCheck();
@@ -289,14 +323,31 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                     this._circuitService
                         .AddCircuit(circuit)
                         .pipe(
+                            switchMap((createdCircuit) => {
+                                console.log('Circuit added successfully:', createdCircuit);
+                                if (this.circuitPoints.length > 0) {
+                                    // Save all temporary points
+                                    const pointObservables = this.circuitPoints.map((point, index) => {
+                                        const newPoint: CircuitPointCollecte = {
+                                            ...point,
+                                            circuitId: createdCircuit.circuitId,
+                                            ordre: index + 1
+                                        };
+                                        return this._circuitPointCollecteService.add(newPoint);
+                                    });
+                                    return forkJoin(pointObservables).pipe(
+                                        map(() => createdCircuit)
+                                    );
+                                }
+                                return of(createdCircuit);
+                            }),
                             catchError((error) => {
-                                console.error('Error adding circuit:', error);
+                                console.error('Error adding circuit or points:', error);
                                 this.showFlashMessage('error');
                                 return EMPTY;
                             })
                         )
-                        .subscribe((response) => {
-                            console.log('Circuit added successfully:', response);
+                        .subscribe(() => {
                             this.showFlashMessage('success');
                             setTimeout(() => {
                                 this.onBackdropClicked();
@@ -353,29 +404,48 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         const selectedPoints = this.selection.selected;
         const circuitId = this.circuit.circuitId;
 
-        // Add points one by one (or batch if supported, but here one by one for simplicity matching existing pattern)
-        const observables = selectedPoints.map((point, index) => {
-            const newPoint: CircuitPointCollecte = {
-                circuitPointCollecteId: null,
-                circuitId: circuitId,
-                codePointCollecte: point.codePointCollecte,
-                libellePointCollecte: point.libellePointCollecte,
-                ordre: this.circuitPoints.length + index + 1,
-                latitude: point.latitude,
-                longitude: point.longitude
-            };
-            return this._circuitPointCollecteService.add(newPoint);
-        });
-
-        forkJoin(observables).subscribe(() => {
-            this.selection.clear();
-            // Reload circuit points
-            this._circuitPointCollecteService.getByCircuit(circuitId).subscribe(points => {
-                this.circuitPoints = points ?? [];
-                this.composeCircuitRoutePoints();
-                this._changeDetectorRef.markForCheck();
+        if (circuitId) {
+            // Existing circuit: add via API
+            const observables = selectedPoints.map((point, index) => {
+                const newPoint: CircuitPointCollecte = {
+                    circuitPointCollecteId: null,
+                    circuitId: circuitId,
+                    codePointCollecte: point.codePointCollecte,
+                    libellePointCollecte: point.libellePointCollecte,
+                    ordre: this.circuitPoints.length + index + 1,
+                    latitude: point.latitude,
+                    longitude: point.longitude
+                };
+                return this._circuitPointCollecteService.add(newPoint);
             });
-        });
+
+            forkJoin(observables).subscribe(() => {
+                this.selection.clear();
+                // Reload circuit points
+                this._circuitPointCollecteService.getByCircuit(circuitId).subscribe(points => {
+                    this.circuitPoints = points ?? [];
+                    this.composeCircuitRoutePoints();
+                    this._changeDetectorRef.markForCheck();
+                });
+            });
+        } else {
+            // New circuit: add temporarily
+            selectedPoints.forEach((point, index) => {
+                const newPoint: CircuitPointCollecte = {
+                    circuitPointCollecteId: null,
+                    circuitId: null,
+                    codePointCollecte: point.codePointCollecte,
+                    libellePointCollecte: point.libellePointCollecte,
+                    ordre: this.circuitPoints.length + index + 1,
+                    latitude: point.latitude,
+                    longitude: point.longitude
+                };
+                this.circuitPoints.push(newPoint);
+            });
+            this.selection.clear();
+            this.composeCircuitRoutePoints();
+            this._changeDetectorRef.markForCheck();
+        }
     }
 
     addWaypoint(): void {
@@ -404,21 +474,28 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
             });
     }
 
-    removeWaypoint(id: string): void {
-        this._circuitPointCollecteService.delete(id)
-            .pipe(
-                catchError(() => {
-                    this.showFlashMessage('error');
-                    return EMPTY;
-                })
-            )
-            .subscribe((success) => {
-                if (success) {
-                    this.circuitPoints = this.circuitPoints.filter(p => p.circuitPointCollecteId !== id);
-                    this.composeCircuitRoutePoints();
-                    this._changeDetectorRef.markForCheck();
-                }
-            });
+    removeWaypoint(point: CircuitPointCollecte): void {
+        const id = point.circuitPointCollecteId;
+        if (id) {
+            this._circuitPointCollecteService.delete(id)
+                .pipe(
+                    catchError(() => {
+                        this.showFlashMessage('error');
+                        return EMPTY;
+                    })
+                )
+                .subscribe((success) => {
+                    if (success) {
+                        this.circuitPoints = this.circuitPoints.filter(p => p.circuitPointCollecteId !== id);
+                        this.composeCircuitRoutePoints();
+                        this._changeDetectorRef.markForCheck();
+                    }
+                });
+        } else {
+            this.circuitPoints = this.circuitPoints.filter(p => p !== point);
+            this.composeCircuitRoutePoints();
+            this._changeDetectorRef.markForCheck();
+        }
     }
 
     private resolveAddressPoints(requireBoth: boolean): Observable<boolean> {

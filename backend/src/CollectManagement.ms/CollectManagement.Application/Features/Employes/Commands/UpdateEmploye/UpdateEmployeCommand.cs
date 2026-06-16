@@ -1,5 +1,3 @@
-using CollectManagement.Domain.Employes.Enums;
-
 namespace CollectManagement.Application.Features.Employes.Commands.UpdateEmploye;
 
 public record UpdateEmployeCommand(
@@ -8,7 +6,6 @@ public record UpdateEmployeCommand(
     string? RFID,
     string Nom,
     string Prenom,
-    TypeEmploye TypeEmploye,
     string? CodeCircuit,
     string? CodePointCollecte,
     string? CodeBus,

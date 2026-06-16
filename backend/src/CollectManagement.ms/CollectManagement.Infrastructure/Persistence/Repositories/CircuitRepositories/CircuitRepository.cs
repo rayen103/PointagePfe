@@ -62,7 +62,8 @@ public class CircuitRepository : RepositoryBase<Circuit>, ICircuitRepository
                 c.CodePCArrivee,
                 c.DistanceKm,
                 c.DureeMinutes,
-                c.Couleur
+                c.Couleur,
+                c.CircuitPointsCollecte
             ))
             .ToListAsync(cancellationToken: cancellationToken)
             .ConfigureAwait(false);
@@ -89,7 +90,8 @@ public class CircuitRepository : RepositoryBase<Circuit>, ICircuitRepository
                 c.CodePCArrivee,
                 c.DistanceKm,
                 c.DureeMinutes,
-                c.Couleur
+                c.Couleur,
+                c.CircuitPointsCollecte
             ))
             .FirstOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
