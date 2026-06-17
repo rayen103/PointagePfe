@@ -54,7 +54,11 @@ export class CircuitService {
             description: "",
             isActive: true,
             societeId: "",
-            circuitPointsCollecte: []
+            codePCDepart: "",
+            codePCArrivee: "",
+            distanceKm: null,
+            dureeMinutes: null,
+            couleur: "#2196F3"
         }
         this._circuit.next(newCircuit);
 

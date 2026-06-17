@@ -31,7 +31,7 @@ public class CircuitPointCollecteConfiguration : IEntityTypeConfiguration<Circui
                 value => new CircuitId(new Ulid(value)));
 
         builder.HasOne<Circuit>()
-            .WithMany(c => c.CircuitPointsCollecte)
+            .WithMany()
             .HasForeignKey(c => c.CircuitId)
             .OnDelete(DeleteBehavior.Cascade);
     }

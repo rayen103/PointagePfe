@@ -2,7 +2,6 @@ import {
     AfterViewInit,
     ChangeDetectionStrategy, ChangeDetectorRef,
     Component,
-    inject,
     OnDestroy,
     OnInit,
     ViewChild,
@@ -22,23 +21,17 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
-import { catchError, EMPTY, finalize, forkJoin, map, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
+import { catchError, EMPTY, finalize, forkJoin, map, Observable, of, Subject, take, takeUntil } from 'rxjs';
 import { fuseAnimations } from '../../../../../@fuse/animations';
 import { Circuit } from '../../../../core/circuit/circuit.model';
 import { CircuitService } from '../../../../core/circuit/circuit.service';
-import { CircuitPointCollecteService } from '../../../../core/circuit/circuit-point-collecte.service';
-import { CircuitPointCollecte } from '../../../../core/circuit/circuit-point-collecte.model';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UserService } from '../../../../core/user/user.service';
 import { MapPickerComponent, MapRoutePoint } from '../../../../shared/components/map-picker/map-picker.component';
-import { MatTableModule } from '@angular/material/table';
 import { MapGeocodingService } from '../../../../core/common/map-geocoding.service';
 import { PointCollecteService } from '../../../../core/point-collecte/point-collecte.service';
 import { PointCollecte } from '../../../../core/point-collecte/point-collecte.model';
-import { SelectionModel } from '@angular/cdk/collections';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FuseConfirmationService } from '../../../../../@fuse/services/confirmation';
-import { FuseNavigationAction } from '../../../../../@fuse/components/navigation';
 
 @Component({
   selector: 'app-details',
@@ -61,8 +54,6 @@ import { FuseNavigationAction } from '../../../../../@fuse/components/navigation
         TranslocoModule,
         RouterLink,
         MapPickerComponent,
-        MatTableModule,
-        MatCheckboxModule,
     ],
   templateUrl: './details.component.html',
   styleUrl: './details.component.scss',
@@ -73,10 +64,8 @@ import { FuseNavigationAction } from '../../../../../@fuse/components/navigation
 export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
     @ViewChild('circuitFormDirective') circuitFormDirective: FormGroupDirective;
     circuitForm: UntypedFormGroup;
-    newPointForm: UntypedFormGroup;
     isNewCircuit: boolean = false;
     circuit: Circuit;
-    circuitPoints: CircuitPointCollecte[] = [];
     flashMessage: 'success' | 'error' | null = null;
     isLoading: boolean = false;
     isGeocodingAddresses: boolean = false;
@@ -84,8 +73,6 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
     departureAddressNotFound: boolean = false;
     arrivalAddressNotFound: boolean = false;
     allPoints: PointCollecte[] = [];
-    selection = new SelectionModel<PointCollecte>(true, []);
-    displayedColumns: string[] = ['select', 'ordre', 'code', 'label', 'coords'];
     
     private departureAddressPoint: MapRoutePoint | null = null;
     private arrivalAddressPoint: MapRoutePoint | null = null;
@@ -96,17 +83,12 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         private _router: Router,
         private formBuilder: FormBuilder,
         private _circuitService: CircuitService,
-        private _circuitPointCollecteService: CircuitPointCollecteService,
         private _pointCollecteService: PointCollecteService,
         private _mapGeocodingService: MapGeocodingService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _userService: UserService,
         private _fuseConfirmationService: FuseConfirmationService
     ) { }
-
-    hasActionPermission(action: FuseNavigationAction): boolean {
-        return true;
-    }
 
     ngOnInit(): void {
 
@@ -148,14 +130,6 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe(() => this._changeDetectorRef.markForCheck());
 
-        this.newPointForm = this.formBuilder.group({
-            codePointCollecte: ['', Validators.required],
-            libellePointCollecte: [''],
-            ordre: [null],
-            latitude: [null],
-            longitude: [null],
-        });
-
         // Get current user's societeId
         this._userService.user$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -195,24 +169,6 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                 this._changeDetectorRef.markForCheck();
             });
 
-        // Load waypoints for existing circuits
-        this._circuitService.circuit$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((circuit) => {
-                if (circuit?.circuitId) {
-                    this._circuitPointCollecteService.getByCircuit(circuit.circuitId)
-                        .pipe(takeUntil(this._unsubscribeAll))
-                        .subscribe((points) => {
-                            this.circuitPoints = points ?? [];
-                            this.composeCircuitRoutePoints();
-                            this._changeDetectorRef.markForCheck();
-                        });
-                } else {
-                    this.circuitPoints = [];
-                    this.composeCircuitRoutePoints();
-                }
-            });
-
     }
 
     updateStartEndPointsOnMap(): void {
@@ -238,20 +194,6 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         this._changeDetectorRef.markForCheck();
     }
 
-    /** Whether the number of selected elements matches the total number of rows. */
-    isAllSelected(): boolean {
-        const numSelected = this.selection.selected.length;
-        const numRows = this.allPoints.length;
-        return numSelected === numRows;
-    }
-
-    /** Selects all rows if they are not all selected; otherwise clear selection. */
-    masterToggle(): void {
-        this.isAllSelected() ?
-            this.selection.clear() :
-            this.allPoints.forEach(row => this.selection.select(row));
-    }
-
     onBackdropClicked(): void {
         // Go back to the list
         this._router.navigate(['./'], { relativeTo: this._activatedRoute.parent });
@@ -261,7 +203,7 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     deleteCircuit(): void {
-        if (!this.hasActionPermission || !this.circuit?.circuitId) {
+        if (!this.circuit?.circuitId) {
             return;
         }
 
@@ -323,26 +265,8 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                     this._circuitService
                         .AddCircuit(circuit)
                         .pipe(
-                            switchMap((createdCircuit) => {
-                                console.log('Circuit added successfully:', createdCircuit);
-                                if (this.circuitPoints.length > 0) {
-                                    // Save all temporary points
-                                    const pointObservables = this.circuitPoints.map((point, index) => {
-                                        const newPoint: CircuitPointCollecte = {
-                                            ...point,
-                                            circuitId: createdCircuit.circuitId,
-                                            ordre: index + 1
-                                        };
-                                        return this._circuitPointCollecteService.add(newPoint);
-                                    });
-                                    return forkJoin(pointObservables).pipe(
-                                        map(() => createdCircuit)
-                                    );
-                                }
-                                return of(createdCircuit);
-                            }),
                             catchError((error) => {
-                                console.error('Error adding circuit or points:', error);
+                                console.error('Error adding circuit:', error);
                                 this.showFlashMessage('error');
                                 return EMPTY;
                             })
@@ -393,109 +317,6 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
             .subscribe(() => {
                 this._changeDetectorRef.markForCheck();
             });
-    }
-
-    /**
-     * Add selected points to circuit
-     */
-    addSelectedPoints(): void {
-        if (!this.selection.hasValue()) return;
-
-        const selectedPoints = this.selection.selected;
-        const circuitId = this.circuit.circuitId;
-
-        if (circuitId) {
-            // Existing circuit: add via API
-            const observables = selectedPoints.map((point, index) => {
-                const newPoint: CircuitPointCollecte = {
-                    circuitPointCollecteId: null,
-                    circuitId: circuitId,
-                    codePointCollecte: point.codePointCollecte,
-                    libellePointCollecte: point.libellePointCollecte,
-                    ordre: this.circuitPoints.length + index + 1,
-                    latitude: point.latitude,
-                    longitude: point.longitude
-                };
-                return this._circuitPointCollecteService.add(newPoint);
-            });
-
-            forkJoin(observables).subscribe(() => {
-                this.selection.clear();
-                // Reload circuit points
-                this._circuitPointCollecteService.getByCircuit(circuitId).subscribe(points => {
-                    this.circuitPoints = points ?? [];
-                    this.composeCircuitRoutePoints();
-                    this._changeDetectorRef.markForCheck();
-                });
-            });
-        } else {
-            // New circuit: add temporarily
-            selectedPoints.forEach((point, index) => {
-                const newPoint: CircuitPointCollecte = {
-                    circuitPointCollecteId: null,
-                    circuitId: null,
-                    codePointCollecte: point.codePointCollecte,
-                    libellePointCollecte: point.libellePointCollecte,
-                    ordre: this.circuitPoints.length + index + 1,
-                    latitude: point.latitude,
-                    longitude: point.longitude
-                };
-                this.circuitPoints.push(newPoint);
-            });
-            this.selection.clear();
-            this.composeCircuitRoutePoints();
-            this._changeDetectorRef.markForCheck();
-        }
-    }
-
-    addWaypoint(): void {
-        if (this.newPointForm.invalid || !this.circuit?.circuitId) {
-            return;
-        }
-        const point: CircuitPointCollecte = {
-            circuitPointCollecteId: null,
-            circuitId: this.circuit.circuitId,
-            ...this.newPointForm.getRawValue(),
-        };
-        this._circuitPointCollecteService.add(point)
-            .pipe(
-                catchError(() => {
-                    this.showFlashMessage('error');
-                    return EMPTY;
-                })
-            )
-            .subscribe((created) => {
-                if (created) {
-                    this.circuitPoints = [...this.circuitPoints, created];
-                    this.newPointForm.reset();
-                    this.composeCircuitRoutePoints();
-                    this._changeDetectorRef.markForCheck();
-                }
-            });
-    }
-
-    removeWaypoint(point: CircuitPointCollecte): void {
-        const id = point.circuitPointCollecteId;
-        if (id) {
-            this._circuitPointCollecteService.delete(id)
-                .pipe(
-                    catchError(() => {
-                        this.showFlashMessage('error');
-                        return EMPTY;
-                    })
-                )
-                .subscribe((success) => {
-                    if (success) {
-                        this.circuitPoints = this.circuitPoints.filter(p => p.circuitPointCollecteId !== id);
-                        this.composeCircuitRoutePoints();
-                        this._changeDetectorRef.markForCheck();
-                    }
-                });
-        } else {
-            this.circuitPoints = this.circuitPoints.filter(p => p !== point);
-            this.composeCircuitRoutePoints();
-            this._changeDetectorRef.markForCheck();
-        }
     }
 
     private resolveAddressPoints(requireBoth: boolean): Observable<boolean> {
@@ -584,21 +405,10 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     private composeCircuitRoutePoints(): void {
-        const waypointPoints: MapRoutePoint[] = [...(this.circuitPoints ?? [])]
-            .sort((a, b) => (a.ordre ?? 0) - (b.ordre ?? 0))
-            .filter((point) => point.latitude != null && point.longitude != null)
-            .map((point) => ({
-                latitude: point.latitude!,
-                longitude: point.longitude!,
-                label: point.libellePointCollecte || point.codePointCollecte,
-            }));
-
         const routePoints: MapRoutePoint[] = [];
         if (this.departureAddressPoint) {
             routePoints.push(this.departureAddressPoint);
         }
-
-        routePoints.push(...waypointPoints);
 
         if (this.arrivalAddressPoint) {
             routePoints.push(this.arrivalAddressPoint);

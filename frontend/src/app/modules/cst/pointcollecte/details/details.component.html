@@ -126,6 +126,21 @@
                                     </mat-select>
                                 </mat-form-field>
                             </div>
+                            <div class="sm:col-span-2">
+                                <mat-form-field class="w-full">
+                                    <mat-label>Circuit</mat-label>
+                                    <mat-icon
+                                        class="icon-size-5"
+                                        matPrefix
+                                        [svgIcon]="'heroicons_solid:route'"></mat-icon>
+                                    <mat-select formControlName="circuitId">
+                                        <mat-option [value]="null">Aucun circuit</mat-option>
+                                        @for (circuit of circuits; track circuit.circuitId) {
+                                            <mat-option [value]="circuit.circuitId">{{ circuit.libelleCircuit || circuit.codeCircuit }}</mat-option>
+                                        }
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
 
                             <div class="flex flex-col w-full mt-4 sm:col-span-2">
                                 <span class="mb-2 font-semibold">{{ t('Map-Location') }}</span>

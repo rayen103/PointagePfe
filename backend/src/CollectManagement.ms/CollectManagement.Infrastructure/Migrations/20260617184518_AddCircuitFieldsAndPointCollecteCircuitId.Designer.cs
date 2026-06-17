@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CollectManagement.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260616182649_AddBusIdToChauffeurAndRemoveTypeEmployeFromEmploye")]
-    partial class AddBusIdToChauffeurAndRemoveTypeEmployeFromEmploye
+    [Migration("20260617184518_AddCircuitFieldsAndPointCollecteCircuitId")]
+    partial class AddCircuitFieldsAndPointCollecteCircuitId
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -655,7 +655,7 @@ namespace CollectManagement.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-6f82-354e-cdb254a4146e"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-d204-e41e-784755b9c57d"),
                             CodeGouvernorat = "11",
                             IsActive = true,
                             LibelleGouvernorat = "Tunis",
@@ -663,7 +663,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-9f61-48f6-798327190d5e"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-52d7-edce-e37a6f2c0334"),
                             CodeGouvernorat = "12",
                             IsActive = true,
                             LibelleGouvernorat = "Ariana",
@@ -671,7 +671,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-2113-e089-95c0e8ff4f0e"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-313a-a06c-edb5114d1ef2"),
                             CodeGouvernorat = "13",
                             IsActive = true,
                             LibelleGouvernorat = "Ben Arous",
@@ -679,7 +679,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-5c51-23e1-1ed1a0f3b0fb"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-3e91-39d7-df663cb8455e"),
                             CodeGouvernorat = "14",
                             IsActive = true,
                             LibelleGouvernorat = "Manouba",
@@ -687,7 +687,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-9b47-5efb-af5831b6dccf"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-9cd1-9373-733b992d452f"),
                             CodeGouvernorat = "21",
                             IsActive = true,
                             LibelleGouvernorat = "Nabeul",
@@ -695,7 +695,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-74fd-d7d2-7e9e8ed854ea"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-4edf-72ca-463f4dfa3247"),
                             CodeGouvernorat = "22",
                             IsActive = true,
                             LibelleGouvernorat = "Zaghouan",
@@ -703,7 +703,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-8b32-3058-0ff50c486fec"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-8be2-5869-bde0f44b3ace"),
                             CodeGouvernorat = "23",
                             IsActive = true,
                             LibelleGouvernorat = "Bizerte",
@@ -711,7 +711,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-9011-fc90-503ed43af708"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-bac1-b487-1d66ea245d68"),
                             CodeGouvernorat = "31",
                             IsActive = true,
                             LibelleGouvernorat = "Béja",
@@ -719,7 +719,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-8be2-5896-3f97d044ccda"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-9a32-25c6-abe83475ef30"),
                             CodeGouvernorat = "32",
                             IsActive = true,
                             LibelleGouvernorat = "Jendouba",
@@ -727,7 +727,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-05c0-e44a-ee6ae1d3efe4"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-cf70-4400-e58a76b42afc"),
                             CodeGouvernorat = "33",
                             IsActive = true,
                             LibelleGouvernorat = "Le Kef",
@@ -735,7 +735,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-78dd-c8f4-011a5fcd8534"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-d510-e8f2-470f82022a6b"),
                             CodeGouvernorat = "34",
                             IsActive = true,
                             LibelleGouvernorat = "Siliana",
@@ -743,7 +743,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-00ed-362d-c4e52bda5c5a"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-abd9-2d0e-a953b17b15d4"),
                             CodeGouvernorat = "41",
                             IsActive = true,
                             LibelleGouvernorat = "Kairouan",
@@ -751,7 +751,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-6d5f-9916-5f666fb8d871"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-a18f-0e8a-f45be5cd62bd"),
                             CodeGouvernorat = "42",
                             IsActive = true,
                             LibelleGouvernorat = "Kasserine",
@@ -759,7 +759,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-34b0-617e-877b08f6d078"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-c855-1014-b19f9e181a0d"),
                             CodeGouvernorat = "43",
                             IsActive = true,
                             LibelleGouvernorat = "Sidi Bouzid",
@@ -767,7 +767,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-c652-5e57-251ebdf95041"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-9e81-b9a2-69b5bd9d2dab"),
                             CodeGouvernorat = "51",
                             IsActive = true,
                             LibelleGouvernorat = "Sousse",
@@ -775,7 +775,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-22bf-b5c5-7fa4fba12245"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-4622-c615-fe61f74345c3"),
                             CodeGouvernorat = "52",
                             IsActive = true,
                             LibelleGouvernorat = "Monastir",
@@ -783,7 +783,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-bad1-bc90-2b47b3f346d8"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-bd8c-d4ac-6dc266bfb48b"),
                             CodeGouvernorat = "53",
                             IsActive = true,
                             LibelleGouvernorat = "Mahdia",
@@ -791,7 +791,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-5bbf-52f8-9a2b537b355a"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-379b-b7c6-a7eae62667b0"),
                             CodeGouvernorat = "61",
                             IsActive = true,
                             LibelleGouvernorat = "Sfax",
@@ -799,7 +799,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-3aa2-651d-e3f98db0e914"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-793f-38c0-19bc38c24e59"),
                             CodeGouvernorat = "71",
                             IsActive = true,
                             LibelleGouvernorat = "Gafsa",
@@ -807,7 +807,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-3299-b212-078dc7d0c660"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-d6a0-3373-58f74e175fd6"),
                             CodeGouvernorat = "72",
                             IsActive = true,
                             LibelleGouvernorat = "Tozeur",
@@ -815,7 +815,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-970c-b400-4a85bb4677d4"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-465a-fa89-32c17bae932d"),
                             CodeGouvernorat = "73",
                             IsActive = true,
                             LibelleGouvernorat = "Kebili",
@@ -823,7 +823,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-997f-c041-9d6c9f66443e"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-c04f-17d1-c134b4ef11ff"),
                             CodeGouvernorat = "81",
                             IsActive = true,
                             LibelleGouvernorat = "Gabès",
@@ -831,7 +831,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-10bf-8b4e-83d34034e020"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-3a4e-1301-2578bb037299"),
                             CodeGouvernorat = "82",
                             IsActive = true,
                             LibelleGouvernorat = "Médenine",
@@ -839,7 +839,7 @@ namespace CollectManagement.Infrastructure.Migrations
                         },
                         new
                         {
-                            GouvernoratId = new Guid("019ed1af-9eb1-0e19-c18e-0900dc0bfa39"),
+                            GouvernoratId = new Guid("019ed6e6-e92a-57da-2f4f-0d0fd5db9811"),
                             CodeGouvernorat = "83",
                             IsActive = true,
                             LibelleGouvernorat = "Tataouine",
@@ -1035,6 +1035,9 @@ namespace CollectManagement.Infrastructure.Migrations
                     b.Property<Guid>("PointCollecteId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("CircuitId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("CodeGouvernorat")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -1080,6 +1083,8 @@ namespace CollectManagement.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("PointCollecteId");
+
+                    b.HasIndex("CircuitId");
 
                     b.HasIndex("SocieteId");
 
@@ -1859,7 +1864,7 @@ namespace CollectManagement.Infrastructure.Migrations
             modelBuilder.Entity("CollectManagement.Domain.Circuits.CircuitPointCollecte", b =>
                 {
                     b.HasOne("CollectManagement.Domain.Circuits.Circuit", null)
-                        .WithMany("CircuitPointsCollecte")
+                        .WithMany()
                         .HasForeignKey("CircuitId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1931,11 +1936,18 @@ namespace CollectManagement.Infrastructure.Migrations
 
             modelBuilder.Entity("CollectManagement.Domain.PointsCollecte.PointCollecte", b =>
                 {
+                    b.HasOne("CollectManagement.Domain.Circuits.Circuit", "Circuit")
+                        .WithMany()
+                        .HasForeignKey("CircuitId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("CollectManagement.Domain.Societes.Societe", "Societe")
                         .WithMany()
                         .HasForeignKey("SocieteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Circuit");
 
                     b.Navigation("Societe");
                 });
@@ -2130,11 +2142,6 @@ namespace CollectManagement.Infrastructure.Migrations
                     b.Navigation("RoleUtilisateur");
 
                     b.Navigation("Societe");
-                });
-
-            modelBuilder.Entity("CollectManagement.Domain.Circuits.Circuit", b =>
-                {
-                    b.Navigation("CircuitPointsCollecte");
                 });
 
             modelBuilder.Entity("CollectManagement.Domain.OrdresTravail.OrdreTravail", b =>

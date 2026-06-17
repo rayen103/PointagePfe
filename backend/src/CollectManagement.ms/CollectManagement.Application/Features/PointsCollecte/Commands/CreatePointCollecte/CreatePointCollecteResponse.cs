@@ -11,4 +11,5 @@ public class CreatePointCollecteResponse
     public string? CodeRegion { get; set; }
     public bool IsActive { get; set; }
     public Ulid SocieteId { get; set; }
+    public Ulid? CircuitId { get; set; }
 }

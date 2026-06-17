@@ -35,8 +35,6 @@ public class Circuit : AuditableEntity
     
     public Societe? Societe { get; private set; }
 
-    public ICollection<CircuitPointCollecte>? CircuitPointsCollecte { get; private set; }
-
     private Circuit(
         CircuitId circuitId,
         string codeCircuit,
@@ -50,8 +48,7 @@ public class Circuit : AuditableEntity
         string? codePCArrivee = null,
         decimal? distanceKm = null,
         int? dureeMinutes = null,
-        string? couleur = null,
-        ICollection<CircuitPointCollecte>? circuitPointsCollecte = null)
+        string? couleur = null)
     {
         CircuitId = circuitId;
         CodeCircuit = codeCircuit;
@@ -66,7 +63,6 @@ public class Circuit : AuditableEntity
         DistanceKm = distanceKm;
         DureeMinutes = dureeMinutes;
         Couleur = couleur;
-        CircuitPointsCollecte = circuitPointsCollecte;
     }
 
     public static Circuit Create(
@@ -139,8 +135,7 @@ public class Circuit : AuditableEntity
         string? codePCArrivee = null,
         decimal? distanceKm = null,
         int? dureeMinutes = null,
-        string? couleur = null,
-        ICollection<CircuitPointCollecte>? circuitPointsCollecte = null)
+        string? couleur = null)
     {
         return new Circuit(
             circuitId,
@@ -155,8 +150,7 @@ public class Circuit : AuditableEntity
             codePCArrivee,
             distanceKm,
             dureeMinutes,
-            couleur,
-            circuitPointsCollecte);
+            couleur);
     }
 
 #pragma warning disable CS8618

@@ -138,6 +138,12 @@ namespace CollectManagement.Infrastructure.Migrations
                 table: "Employe");
 
             migrationBuilder.AddColumn<Guid>(
+                name: "CircuitId",
+                table: "PointCollecte",
+                type: "uniqueidentifier",
+                nullable: true);
+
+            migrationBuilder.AddColumn<Guid>(
                 name: "BusId",
                 table: "Chauffeur",
                 type: "uniqueidentifier",
@@ -148,31 +154,36 @@ namespace CollectManagement.Infrastructure.Migrations
                 columns: new[] { "GouvernoratId", "CodeGouvernorat", "DateInsertion", "DateModification", "InsererPar", "IsActive", "LibelleGouvernorat", "ModifierPar", "SocieteId" },
                 values: new object[,]
                 {
-                    { new Guid("019ed1af-9eb1-00ed-362d-c4e52bda5c5a"), "41", null, null, null, true, "Kairouan", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-05c0-e44a-ee6ae1d3efe4"), "33", null, null, null, true, "Le Kef", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-0e19-c18e-0900dc0bfa39"), "83", null, null, null, true, "Tataouine", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-10bf-8b4e-83d34034e020"), "82", null, null, null, true, "Médenine", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-2113-e089-95c0e8ff4f0e"), "13", null, null, null, true, "Ben Arous", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-22bf-b5c5-7fa4fba12245"), "52", null, null, null, true, "Monastir", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-3299-b212-078dc7d0c660"), "72", null, null, null, true, "Tozeur", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-34b0-617e-877b08f6d078"), "43", null, null, null, true, "Sidi Bouzid", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-3aa2-651d-e3f98db0e914"), "71", null, null, null, true, "Gafsa", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-5bbf-52f8-9a2b537b355a"), "61", null, null, null, true, "Sfax", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-5c51-23e1-1ed1a0f3b0fb"), "14", null, null, null, true, "Manouba", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-6d5f-9916-5f666fb8d871"), "42", null, null, null, true, "Kasserine", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-6f82-354e-cdb254a4146e"), "11", null, null, null, true, "Tunis", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-74fd-d7d2-7e9e8ed854ea"), "22", null, null, null, true, "Zaghouan", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-78dd-c8f4-011a5fcd8534"), "34", null, null, null, true, "Siliana", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-8b32-3058-0ff50c486fec"), "23", null, null, null, true, "Bizerte", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-8be2-5896-3f97d044ccda"), "32", null, null, null, true, "Jendouba", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-9011-fc90-503ed43af708"), "31", null, null, null, true, "Béja", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-970c-b400-4a85bb4677d4"), "73", null, null, null, true, "Kebili", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-997f-c041-9d6c9f66443e"), "81", null, null, null, true, "Gabès", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-9b47-5efb-af5831b6dccf"), "21", null, null, null, true, "Nabeul", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-9f61-48f6-798327190d5e"), "12", null, null, null, true, "Ariana", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-bad1-bc90-2b47b3f346d8"), "53", null, null, null, true, "Mahdia", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
-                    { new Guid("019ed1af-9eb1-c652-5e57-251ebdf95041"), "51", null, null, null, true, "Sousse", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") }
+                    { new Guid("019ed6e6-0db7-0a4d-6e4b-484381fc4b8b"), "43", null, null, null, true, "Sidi Bouzid", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-0c5e-a04a-da14b21bee8d"), "53", null, null, null, true, "Mahdia", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-1178-292b-001fe869dc44"), "41", null, null, null, true, "Kairouan", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-1bff-a2c1-feda6713e704"), "12", null, null, null, true, "Ariana", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-2de5-146b-d32144dc8d15"), "61", null, null, null, true, "Sfax", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-40ad-c634-92926a6dcf71"), "33", null, null, null, true, "Le Kef", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-492a-4e6a-60bd1e57c5d9"), "14", null, null, null, true, "Manouba", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-6409-3952-adac5807a1ad"), "73", null, null, null, true, "Kebili", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-64d2-9455-1ace978c0656"), "71", null, null, null, true, "Gafsa", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-6e87-765e-d00e09ee2ac5"), "82", null, null, null, true, "Médenine", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-7635-316e-408e81392354"), "42", null, null, null, true, "Kasserine", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-904a-111f-87ba4971ee7f"), "51", null, null, null, true, "Sousse", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-9c79-47d0-98f866d6e2ce"), "31", null, null, null, true, "Béja", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-9e4c-1fec-3f336e9778f3"), "81", null, null, null, true, "Gabès", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-a3ed-bd12-ef88c13846a8"), "11", null, null, null, true, "Tunis", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-aadf-2f5b-e0d3d715b0dd"), "13", null, null, null, true, "Ben Arous", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-b8d2-ffa1-558e2b244cd4"), "22", null, null, null, true, "Zaghouan", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-be8b-1423-99169eb6ec54"), "32", null, null, null, true, "Jendouba", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-c41a-7898-223217b2a26a"), "83", null, null, null, true, "Tataouine", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-d01c-6ad8-c557efb0d8e1"), "23", null, null, null, true, "Bizerte", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-da13-2540-b97a0727adc1"), "52", null, null, null, true, "Monastir", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-db07-2e03-bb8459c229e0"), "72", null, null, null, true, "Tozeur", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-e8e7-e143-e219469b8582"), "21", null, null, null, true, "Nabeul", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") },
+                    { new Guid("019ed6e6-0db7-ed93-5f33-d06d6b23078f"), "34", null, null, null, true, "Siliana", null, new Guid("018b1055-d0b7-de38-752f-1b18f580c2e0") }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PointCollecte_CircuitId",
+                table: "PointCollecte",
+                column: "CircuitId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Chauffeur_BusId",
@@ -186,6 +197,14 @@ namespace CollectManagement.Infrastructure.Migrations
                 principalTable: "Bus",
                 principalColumn: "BusId",
                 onDelete: ReferentialAction.SetNull);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_PointCollecte_Circuit_CircuitId",
+                table: "PointCollecte",
+                column: "CircuitId",
+                principalTable: "Circuit",
+                principalColumn: "CircuitId",
+                onDelete: ReferentialAction.SetNull);
         }
 
         /// <inheritdoc />
@@ -195,6 +214,14 @@ namespace CollectManagement.Infrastructure.Migrations
                 name: "FK_Chauffeur_Bus_BusId",
                 table: "Chauffeur");
 
+            migrationBuilder.DropForeignKey(
+                name: "FK_PointCollecte_Circuit_CircuitId",
+                table: "PointCollecte");
+
+            migrationBuilder.DropIndex(
+                name: "IX_PointCollecte_CircuitId",
+                table: "PointCollecte");
+
             migrationBuilder.DropIndex(
                 name: "IX_Chauffeur_BusId",
                 table: "Chauffeur");
@@ -202,122 +229,126 @@ namespace CollectManagement.Infrastructure.Migrations
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-00ed-362d-c4e52bda5c5a"));
+                keyValue: new Guid("019ed6e6-0db7-0a4d-6e4b-484381fc4b8b"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-05c0-e44a-ee6ae1d3efe4"));
+                keyValue: new Guid("019ed6e6-0db7-0c5e-a04a-da14b21bee8d"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-0e19-c18e-0900dc0bfa39"));
+                keyValue: new Guid("019ed6e6-0db7-1178-292b-001fe869dc44"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-10bf-8b4e-83d34034e020"));
+                keyValue: new Guid("019ed6e6-0db7-1bff-a2c1-feda6713e704"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-2113-e089-95c0e8ff4f0e"));
+                keyValue: new Guid("019ed6e6-0db7-2de5-146b-d32144dc8d15"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-22bf-b5c5-7fa4fba12245"));
+                keyValue: new Guid("019ed6e6-0db7-40ad-c634-92926a6dcf71"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-3299-b212-078dc7d0c660"));
+                keyValue: new Guid("019ed6e6-0db7-492a-4e6a-60bd1e57c5d9"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-34b0-617e-877b08f6d078"));
+                keyValue: new Guid("019ed6e6-0db7-6409-3952-adac5807a1ad"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-3aa2-651d-e3f98db0e914"));
+                keyValue: new Guid("019ed6e6-0db7-64d2-9455-1ace978c0656"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-5bbf-52f8-9a2b537b355a"));
+                keyValue: new Guid("019ed6e6-0db7-6e87-765e-d00e09ee2ac5"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-5c51-23e1-1ed1a0f3b0fb"));
+                keyValue: new Guid("019ed6e6-0db7-7635-316e-408e81392354"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-6d5f-9916-5f666fb8d871"));
+                keyValue: new Guid("019ed6e6-0db7-904a-111f-87ba4971ee7f"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-6f82-354e-cdb254a4146e"));
+                keyValue: new Guid("019ed6e6-0db7-9c79-47d0-98f866d6e2ce"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-74fd-d7d2-7e9e8ed854ea"));
+                keyValue: new Guid("019ed6e6-0db7-9e4c-1fec-3f336e9778f3"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-78dd-c8f4-011a5fcd8534"));
+                keyValue: new Guid("019ed6e6-0db7-a3ed-bd12-ef88c13846a8"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-8b32-3058-0ff50c486fec"));
+                keyValue: new Guid("019ed6e6-0db7-aadf-2f5b-e0d3d715b0dd"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-8be2-5896-3f97d044ccda"));
+                keyValue: new Guid("019ed6e6-0db7-b8d2-ffa1-558e2b244cd4"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-9011-fc90-503ed43af708"));
+                keyValue: new Guid("019ed6e6-0db7-be8b-1423-99169eb6ec54"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-970c-b400-4a85bb4677d4"));
+                keyValue: new Guid("019ed6e6-0db7-c41a-7898-223217b2a26a"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-997f-c041-9d6c9f66443e"));
+                keyValue: new Guid("019ed6e6-0db7-d01c-6ad8-c557efb0d8e1"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-9b47-5efb-af5831b6dccf"));
+                keyValue: new Guid("019ed6e6-0db7-da13-2540-b97a0727adc1"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-9f61-48f6-798327190d5e"));
+                keyValue: new Guid("019ed6e6-0db7-db07-2e03-bb8459c229e0"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-bad1-bc90-2b47b3f346d8"));
+                keyValue: new Guid("019ed6e6-0db7-e8e7-e143-e219469b8582"));
 
             migrationBuilder.DeleteData(
                 table: "Gouvernorat",
                 keyColumn: "GouvernoratId",
-                keyValue: new Guid("019ed1af-9eb1-c652-5e57-251ebdf95041"));
+                keyValue: new Guid("019ed6e6-0db7-ed93-5f33-d06d6b23078f"));
+
+            migrationBuilder.DropColumn(
+                name: "CircuitId",
+                table: "PointCollecte");
 
             migrationBuilder.DropColumn(
                 name: "BusId",

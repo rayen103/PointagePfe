@@ -36,6 +36,9 @@ public class CircuitConfiguration : IEntityTypeConfiguration<Circuit>
         builder.Property(p => p.DistanceKm)
             .HasPrecision(10, 2);
 
+        builder.Property(p => p.Latitude);
+        builder.Property(p => p.Longitude);
+        builder.Property(p => p.DureeMinutes);
         builder.Property(p => p.Couleur)
             .HasMaxLength(20);
 

@@ -31,6 +31,8 @@ import { GouvernoratService } from '../../../../core/gouvernorat/gouvernorat.ser
 import { RegionService } from '../../../../core/region/region.service';
 import { Gouvernorat } from '../../../../core/gouvernorat/gouvernorat.model';
 import { Region } from '../../../../core/region/region.model';
+import { Circuit } from '../../../../core/circuit/circuit.model';
+import { CircuitService } from '../../../../core/circuit/circuit.service';
 
 @Component({
   selector: 'app-details',
@@ -69,6 +71,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
     isLoading: boolean = false;
     gouvernorats: Gouvernorat[] = [];
     regions: Region[] = [];
+    circuits: Circuit[] = [];
     mapLocations: MapLocation[] = [];
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -77,6 +80,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
         private _router: Router,
         private formBuilder: FormBuilder,
         private _pointCollecteService: PointCollecteService,
+        private _circuitService: CircuitService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _userService: UserService,
         private _gouvernoratService: GouvernoratService,
@@ -95,9 +99,10 @@ export class DetailsComponent implements OnInit, OnDestroy {
             codeRegion: [''],
             isActive: [true],
             societeId: ['', Validators.required],
+            circuitId: [null],
         });
 
-        // Load Gouvernorats and Regions
+        // Load Gouvernorats and Regions and Circuits
         this._gouvernoratService.GetGouvernorats().subscribe((res) => {
             this.gouvernorats = res.gouvernorats;
             this._changeDetectorRef.markForCheck();
@@ -105,6 +110,11 @@ export class DetailsComponent implements OnInit, OnDestroy {
 
         this._regionService.GetRegions().subscribe((res) => {
             this.regions = res.regions;
+            this._changeDetectorRef.markForCheck();
+        });
+
+        this._circuitService.GetCircuit().subscribe((res) => {
+            this.circuits = res.circuits;
             this._changeDetectorRef.markForCheck();
         });
 
