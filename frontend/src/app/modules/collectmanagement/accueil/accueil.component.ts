@@ -1,8 +1,13 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewEncapsulation } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DecimalPipe } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelectModule } from '@angular/material/select';
 import { Router, RouterLink } from '@angular/router';
 import {
     ApexAxisChartSeries,
@@ -21,6 +26,10 @@ import {
 import { BehaviorSubject, catchError, finalize, map, Observable, of, shareReplay, startWith, Subject, switchMap, tap } from 'rxjs';
 import { DashboardAxisChart, DashboardData, DashboardPieChart, DashboardQuickAction } from './dashboard.models';
 import { DashboardService } from './dashboard.service';
+import { AnalyseApiService } from '../analyse/shared/analyse-api.service';
+import { AvailableBusEtaPrediction, BusEtaPredictionResponse } from '../analyse/shared/analyse.model';
+import { BusService } from '../../../core/bus/bus.service';
+import { Bus, PagedBus } from '../../../core/bus/bus.model';
 
 type AxisChartOptions = {
     series: ApexAxisChartSeries;
@@ -68,6 +77,12 @@ interface DashboardViewModel {
         MatButtonModule,
         MatIconModule,
         MatProgressBarModule,
+        MatCardModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        ReactiveFormsModule,
+        DecimalPipe,
         NgApexchartsModule,
     ],
     templateUrl: './accueil.component.html',
@@ -134,10 +149,21 @@ export class AccueilComponent {
 
     private readonly _refresh$ = new Subject<void>();
 
+    // ETA Prediction properties
+    etaForm: FormGroup;
+    etaResult: BusEtaPredictionResponse | null = null;
+    availableEtaResults: AvailableBusEtaPrediction[] = [];
+    isEtaLoading = false;
+    isAvailableEtaLoading = false;
+    buses$: Observable<Bus[]>;
+
     constructor(
         private _dashboardService: DashboardService,
         private _router: Router,
         private _changeDetectorRef: ChangeDetectorRef,
+        private fb: FormBuilder,
+        private analyseApiService: AnalyseApiService,
+        private busService: BusService,
     ) {
         this.viewModel$ = this._refresh$.pipe(
             startWith(void 0),
@@ -151,10 +177,93 @@ export class AccueilComponent {
             ),
             shareReplay({ bufferSize: 1, refCount: true })
         );
+
+        // Initialize ETA form
+        this.etaForm = this.fb.group({
+            selectedBus: [null],
+            Latitude: [null],
+            Longitude: [null],
+            CodeCircuit: [null],
+            ModelBus: [null],
+            Capacite: [null],
+            CurrentOccupancy: [null],
+            LastPositionAt: [null],
+        });
+
+        this.buses$ = this.busService.GetBuses().pipe(map((paged: PagedBus) => paged.buses));
+        
+        // Load available ETA predictions on init
+        this.predictAvailableBusesEta();
     }
 
     refresh(): void {
         this._refresh$.next();
+        this.predictAvailableBusesEta();
+    }
+
+    onBusSelect(bus: Bus | null): void {
+        if (!bus) {
+            this.etaForm.patchValue({
+                Latitude: null,
+                Longitude: null,
+                CodeCircuit: null,
+                ModelBus: null,
+                Capacite: null,
+                CurrentOccupancy: null,
+                LastPositionAt: null,
+            });
+            return;
+        }
+
+        this.etaForm.patchValue({
+            Latitude: bus.latitude,
+            Longitude: bus.longitude,
+            CodeCircuit: bus.codeCircuit,
+            ModelBus: bus.modelBus,
+            Capacite: bus.capacite,
+            CurrentOccupancy: bus.currentOccupancy,
+            LastPositionAt: bus.lastPositionAt,
+        });
+    }
+
+    predictEta(): void {
+        this.isEtaLoading = true;
+        const rawValues = this.etaForm.getRawValue();
+        this.analyseApiService.predictBusEta({
+            Latitude: rawValues.Latitude,
+            Longitude: rawValues.Longitude,
+            CodeCircuit: rawValues.CodeCircuit,
+            ModelBus: rawValues.ModelBus,
+            Capacite: rawValues.Capacite,
+            CurrentOccupancy: rawValues.CurrentOccupancy,
+            LastPositionAt: rawValues.LastPositionAt,
+        }).subscribe({
+            next: (result) => {
+                this.etaResult = result;
+                this.isEtaLoading = false;
+                this._changeDetectorRef.markForCheck();
+            },
+            error: () => {
+                this.isEtaLoading = false;
+                this._changeDetectorRef.markForCheck();
+            },
+        });
+    }
+
+    predictAvailableBusesEta(): void {
+        this.isAvailableEtaLoading = true;
+        this.analyseApiService.predictAvailableBusEta().subscribe({
+            next: (result) => {
+                this.availableEtaResults = result?.predictions ?? [];
+                this.isAvailableEtaLoading = false;
+                this._changeDetectorRef.markForCheck();
+            },
+            error: () => {
+                this.availableEtaResults = [];
+                this.isAvailableEtaLoading = false;
+                this._changeDetectorRef.markForCheck();
+            },
+        });
     }
 
     private _buildViewModel(data: DashboardData): DashboardViewModel {

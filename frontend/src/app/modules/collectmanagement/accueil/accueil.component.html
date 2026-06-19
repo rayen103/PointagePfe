@@ -66,6 +66,124 @@
                 }
             </div>
 
+            <!-- ETA Prediction Section -->
+            <mat-card class="eta-card mt-6">
+                <mat-card-header class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-t-lg">
+                    <mat-icon svgIcon="heroicons_outline:clock" class="text-2xl"></mat-icon>
+                    <mat-card-title class="text-xl font-bold ml-3">Prédiction d'ETA</mat-card-title>
+                </mat-card-header>
+                <mat-card-content class="p-6">
+                    <!-- Automatic available buses -->
+                    <div class="mb-6 p-4 rounded-lg border border-indigo-100 bg-indigo-50">
+                        <div class="flex items-center justify-between gap-3">
+                            <div>
+                                <div class="font-semibold text-indigo-800">Bus disponibles</div>
+                                <div class="text-sm text-indigo-700">Prédire automatiquement l'ETA des bus actifs existants</div>
+                            </div>
+                            <button
+                                mat-raised-button
+                                color="accent"
+                                (click)="predictAvailableBusesEta()"
+                                [disabled]="isAvailableEtaLoading">
+                                {{ isAvailableEtaLoading ? 'Chargement...' : 'Prédire les bus disponibles' }}
+                            </button>
+                        </div>
+
+                        <div class="mt-4 space-y-2">
+                            @for (prediction of availableEtaResults; track prediction.busId) {
+                                <div class="flex items-center justify-between bg-white rounded-md border border-indigo-100 px-4 py-3">
+                                    <div>
+                                        <div class="font-semibold">{{ prediction.numeroIMM }}</div>
+                                        <div class="text-xs text-secondary">
+                                            Circuit: {{ prediction.codeCircuit || '-' }} · Distance: {{ prediction.distanceFromStop | number: '1.0-0' }} m
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="font-bold text-indigo-700">{{ prediction.etaMinutes | number: '1.1-1' }} min</div>
+                                        <div class="text-xs text-secondary">Confiance: {{ prediction.confidence * 100 | number: '1.0-0' }}%</div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="border-t border-gray-200 pt-6">
+                        <div class="mb-4 font-semibold text-gray-800">Prédiction personnalisée</div>
+                        <form [formGroup]="etaForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <mat-form-field appearance="outline" class="w-full lg:col-span-4">
+                                <mat-label>Sélectionner un bus</mat-label>
+                                <mat-select
+                                    formControlName="selectedBus"
+                                    (selectionChange)="onBusSelect($event.value)"
+                                    placeholder="Choisir un bus pour charger ses données">
+                                    @for (bus of buses$ | async; track bus.busId) {
+                                        <mat-option [value]="bus">{{ bus.numeroIMM }}</mat-option>
+                                    }
+                                </mat-select>
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline" class="w-full">
+                                <mat-label>Latitude</mat-label>
+                                <input matInput type="number" formControlName="Latitude" />
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" class="w-full">
+                                <mat-label>Longitude</mat-label>
+                                <input matInput type="number" formControlName="Longitude" />
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" class="w-full">
+                                <mat-label>Code Circuit</mat-label>
+                                <input matInput formControlName="CodeCircuit" />
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" class="w-full">
+                                <mat-label>Modèle Bus</mat-label>
+                                <input matInput formControlName="ModelBus" />
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" class="w-full">
+                                <mat-label>Capacité</mat-label>
+                                <input matInput type="number" formControlName="Capacite" />
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" class="w-full">
+                                <mat-label>Occupation Courante</mat-label>
+                                <input matInput type="number" formControlName="CurrentOccupancy" />
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" class="w-full lg:col-span-2">
+                                <mat-label>Dernière Position</mat-label>
+                                <input matInput [value]="etaForm.get('LastPositionAt')?.value | date: 'medium'" disabled />
+                            </mat-form-field>
+                        </form>
+                    </div>
+
+                    <div class="flex items-center justify-between mt-6">
+                        <button
+                            mat-raised-button
+                            color="primary"
+                            (click)="predictEta()"
+                            [disabled]="isEtaLoading"
+                            class="px-6 py-3">
+                            <mat-icon svgIcon="heroicons_outline:play-circle" class="mr-2"></mat-icon>
+                            {{ isEtaLoading ? 'Prédiction en cours...' : 'Prédire l\'ETA' }}
+                        </button>
+
+                        @if (etaResult) {
+                            <div class="flex items-center gap-2 bg-green-50 text-green-800 px-6 py-3 rounded-lg border border-green-200">
+                                <mat-icon svgIcon="heroicons_outline:check-circle" class="text-2xl text-green-600"></mat-icon>
+                                <div class="flex flex-col">
+                                    <span class="font-bold text-lg">
+                                        ETA: {{ etaResult.EtaMinutes | number: '1.1-1' }} min ({{ etaResult.EtaSeconds }} s)
+                                    </span>
+                                    <span class="text-sm text-green-700">
+                                        Confiance: {{ etaResult.Confidence * 100 | number: '1.0-0' }}%
+                                        @if (etaResult.UsedFallbackStop) {
+                                            <span class="ml-2 text-yellow-600">(Utilisé stop par défaut)</span>
+                                        }
+                                    </span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </mat-card-content>
+            </mat-card>
+
             <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-6">
                 <div class="chart-card bg-card p-4">
                     <div class="flex items-start justify-between mb-3">

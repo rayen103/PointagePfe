@@ -38,6 +38,34 @@ export interface AnalyseFieldDef {
     isNumeric: boolean;
 }
 
+interface ColorScheme {
+    primary: string;
+    secondary: string;
+    accent: string;
+    gradient: string;
+}
+
+const colorSchemes: Record<AnalyseReportType, ColorScheme> = {
+    bus: {
+        primary: '#3b82f6',
+        secondary: '#1d4ed8',
+        accent: '#93c5fd',
+        gradient: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'
+    },
+    employe: {
+        primary: '#10b981',
+        secondary: '#059669',
+        accent: '#6ee7b7',
+        gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+    },
+    trace: {
+        primary: '#f59e0b',
+        secondary: '#d97706',
+        accent: '#fcd34d',
+        gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+    }
+};
+
 @Component({
     selector: 'app-analyse-designer',
     standalone: true,
@@ -66,6 +94,10 @@ export class AnalyseDesignerComponent implements OnInit, OnDestroy {
     @Input({ required: true }) reportType: AnalyseReportType;
     @Input({ required: true }) title: string;
     @Input({ required: true }) fields: AnalyseFieldDef[] = [];
+    
+    get colors(): ColorScheme {
+        return colorSchemes[this.reportType];
+    }
 
     readonly form: UntypedFormGroup;
     readonly searchFieldControl = new UntypedFormControl('');

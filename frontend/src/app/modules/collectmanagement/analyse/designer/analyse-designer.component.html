@@ -1,6 +1,6 @@
 <div class="analyse-container">
     <!-- Header -->
-    <div class="analyse-header">
+    <div class="analyse-header" [style.background]="colors.gradient">
         <div class="analyse-header-left">
             <div class="analyse-title">
                 <mat-icon svgIcon="heroicons_outline:chart-bar" class="title-icon"></mat-icon>
@@ -35,7 +35,7 @@
                 </mat-slide-toggle>
             </div>
 
-            <button mat-raised-button color="primary" type="button" (click)="saveLayout()" [disabled]="isLoading" class="btn-primary">
+            <button mat-raised-button type="button" (click)="saveLayout()" [disabled]="isLoading" class="btn-primary" [style.background]="'white'" [style.color]="colors.primary">
                 <mat-icon svgIcon="heroicons_outline:bookmark"></mat-icon>
                 <span class="ml-2">Sauvegarder</span>
             </button>
@@ -56,121 +56,121 @@
     <!-- Main Content -->
     <div class="analyse-content">
         <!-- Panel 1: Available Fields -->
-        <div class="analyse-card">
-            <div class="analyse-card-header">
-                <div class="analyse-card-title">
-                    <mat-icon svgIcon="heroicons_outline:database" class="card-title-icon"></mat-icon>
-                    <span>Champs disponibles</span>
+    <div class="analyse-card">
+        <div class="analyse-card-header">
+            <div class="analyse-card-title">
+                <mat-icon svgIcon="heroicons_outline:database" class="card-title-icon" [style.color]="colors.primary"></mat-icon>
+                <span>Champs disponibles</span>
+            </div>
+            <mat-form-field class="analyse-search-field" appearance="outline">
+                <mat-icon matPrefix svgIcon="search"></mat-icon>
+                <input matInput [formControl]="searchFieldControl" placeholder="Rechercher un champ...">
+            </mat-form-field>
+        </div>
+
+        <div
+            class="analyse-card-body"
+            cdkDropList
+            id="availableDropList"
+            [cdkDropListData]="availableFields"
+            [cdkDropListConnectedTo]="['selectedDropList']"
+            (cdkDropListDropped)="dropAvailable($event)">
+            @if (getFilteredAvailable().length === 0 && searchFieldControl.value) {
+                <div class="analyse-empty-state">
+                    <mat-icon svgIcon="heroicons_outline:exclamation-circle"></mat-icon>
+                    <span>Aucun champ trouvé</span>
                 </div>
-                <mat-form-field class="analyse-search-field" appearance="outline">
-                    <mat-icon matPrefix svgIcon="search"></mat-icon>
-                    <input matInput [formControl]="searchFieldControl" placeholder="Rechercher un champ...">
+            }
+            @for (f of getFilteredAvailable(); track f.key) {
+                <div class="analyse-field-chip" cdkDrag>
+                    <div class="analyse-field-chip-content">
+                        <div class="analyse-field-chip-text">
+                            <div class="analyse-field-chip-label">{{ f.label }}</div>
+                            <div class="analyse-field-chip-key">{{ f.key }}</div>
+                        </div>
+                        <mat-icon class="analyse-field-chip-handle" svgIcon="heroicons_outline:arrows-up-down"></mat-icon>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Panel 2: Selected Fields -->
+    <div class="analyse-card">
+        <div class="analyse-card-header">
+            <div class="analyse-card-title">
+                <mat-icon svgIcon="heroicons_outline:check-circle" class="card-title-icon" [style.color]="colors.primary"></mat-icon>
+                <span>Champs sélectionnés</span>
+            </div>
+            <div class="analyse-card-count">{{ selectedFields.length }} champ(s)</div>
+        </div>
+
+        <div
+            class="analyse-card-body"
+            cdkDropList
+            id="selectedDropList"
+            [cdkDropListData]="selectedFields"
+            [cdkDropListConnectedTo]="['availableDropList']"
+            (cdkDropListDropped)="dropSelected($event)">
+            @if (selectedFields.length === 0) {
+                <div class="analyse-empty-state">
+                    <mat-icon svgIcon="heroicons_outline:arrow-down-circle"></mat-icon>
+                    <span>Glissez-déposez des champs ici</span>
+                </div>
+            }
+            @for (f of selectedFields; track f.key) {
+                <div class="analyse-field-chip analyse-field-chip-selected" cdkDrag [style.border-color]="colors.primary" [style.background]="colors.accent + '20'">
+                    <div class="analyse-field-chip-content">
+                        <div class="analyse-field-chip-text">
+                            <div class="analyse-field-chip-label">{{ f.label }}</div>
+                            <div class="analyse-field-chip-key">{{ f.key }}</div>
+                        </div>
+                        <button mat-icon-button type="button" (click)="removeSelected(f.key)" class="analyse-field-chip-remove">
+                            <mat-icon svgIcon="heroicons_outline:x-mark"></mat-icon>
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Panel 3: Date & Run -->
+    <div class="analyse-card analyse-card-date">
+        <div class="analyse-card-header">
+            <div class="analyse-card-title">
+                <mat-icon svgIcon="heroicons_outline:calendar" class="card-title-icon" [style.color]="colors.primary"></mat-icon>
+                <span>Période & configuration</span>
+            </div>
+        </div>
+
+        <div class="analyse-card-body analyse-card-body-date">
+            <div class="analyse-date-grid">
+                <mat-form-field class="analyse-form-field" appearance="outline">
+                    <mat-label>Date de début</mat-label>
+                    <input matInput [matDatepicker]="pickerFrom" [formControl]="form.get('dateFrom')">
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerFrom></mat-datepicker>
+                </mat-form-field>
+
+                <mat-form-field class="analyse-form-field" appearance="outline">
+                    <mat-label>Date de fin</mat-label>
+                    <input matInput [matDatepicker]="pickerTo" [formControl]="form.get('dateTo')">
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerTo"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerTo></mat-datepicker>
                 </mat-form-field>
             </div>
 
-            <div
-                class="analyse-card-body"
-                cdkDropList
-                id="availableDropList"
-                [cdkDropListData]="availableFields"
-                [cdkDropListConnectedTo]="['selectedDropList']"
-                (cdkDropListDropped)="dropAvailable($event)">
-                @if (getFilteredAvailable().length === 0 && searchFieldControl.value) {
-                    <div class="analyse-empty-state">
-                        <mat-icon svgIcon="heroicons_outline:exclamation-circle"></mat-icon>
-                        <span>Aucun champ trouvé</span>
-                    </div>
-                }
-                @for (f of getFilteredAvailable(); track f.key) {
-                    <div class="analyse-field-chip" cdkDrag>
-                        <div class="analyse-field-chip-content">
-                            <div class="analyse-field-chip-text">
-                                <div class="analyse-field-chip-label">{{ f.label }}</div>
-                                <div class="analyse-field-chip-key">{{ f.key }}</div>
-                            </div>
-                            <mat-icon class="analyse-field-chip-handle" svgIcon="heroicons_outline:arrows-up-down"></mat-icon>
-                        </div>
-                    </div>
-                }
+            <div class="analyse-info-box">
+                <mat-icon svgIcon="heroicons_outline:information-circle" class="info-icon"></mat-icon>
+                <span>Totaux automatiques calculés sur les colonnes numériques.</span>
             </div>
+
+            <button mat-raised-button type="button" (click)="run()" [disabled]="isLoading" class="btn-run" [style.background]="colors.gradient">
+                <mat-icon svgIcon="heroicons_outline:play"></mat-icon>
+                <span class="ml-2">Lancer l'analyse</span>
+            </button>
         </div>
-
-        <!-- Panel 2: Selected Fields -->
-        <div class="analyse-card">
-            <div class="analyse-card-header">
-                <div class="analyse-card-title">
-                    <mat-icon svgIcon="heroicons_outline:check-circle" class="card-title-icon"></mat-icon>
-                    <span>Champs sélectionnés</span>
-                </div>
-                <div class="analyse-card-count">{{ selectedFields.length }} champ(s)</div>
-            </div>
-
-            <div
-                class="analyse-card-body"
-                cdkDropList
-                id="selectedDropList"
-                [cdkDropListData]="selectedFields"
-                [cdkDropListConnectedTo]="['availableDropList']"
-                (cdkDropListDropped)="dropSelected($event)">
-                @if (selectedFields.length === 0) {
-                    <div class="analyse-empty-state">
-                        <mat-icon svgIcon="heroicons_outline:arrow-down-circle"></mat-icon>
-                        <span>Glissez-déposez des champs ici</span>
-                    </div>
-                }
-                @for (f of selectedFields; track f.key) {
-                    <div class="analyse-field-chip analyse-field-chip-selected" cdkDrag>
-                        <div class="analyse-field-chip-content">
-                            <div class="analyse-field-chip-text">
-                                <div class="analyse-field-chip-label">{{ f.label }}</div>
-                                <div class="analyse-field-chip-key">{{ f.key }}</div>
-                            </div>
-                            <button mat-icon-button type="button" (click)="removeSelected(f.key)" class="analyse-field-chip-remove">
-                                <mat-icon svgIcon="heroicons_outline:x-mark"></mat-icon>
-                            </button>
-                        </div>
-                    </div>
-                }
-            </div>
-        </div>
-
-        <!-- Panel 3: Date & Run -->
-        <div class="analyse-card analyse-card-date">
-            <div class="analyse-card-header">
-                <div class="analyse-card-title">
-                    <mat-icon svgIcon="heroicons_outline:calendar" class="card-title-icon"></mat-icon>
-                    <span>Période & configuration</span>
-                </div>
-            </div>
-
-            <div class="analyse-card-body analyse-card-body-date">
-                <div class="analyse-date-grid">
-                    <mat-form-field class="analyse-form-field" appearance="outline">
-                        <mat-label>Date de début</mat-label>
-                        <input matInput [matDatepicker]="pickerFrom" [formControl]="form.get('dateFrom')">
-                        <mat-datepicker-toggle matIconSuffix [for]="pickerFrom"></mat-datepicker-toggle>
-                        <mat-datepicker #pickerFrom></mat-datepicker>
-                    </mat-form-field>
-
-                    <mat-form-field class="analyse-form-field" appearance="outline">
-                        <mat-label>Date de fin</mat-label>
-                        <input matInput [matDatepicker]="pickerTo" [formControl]="form.get('dateTo')">
-                        <mat-datepicker-toggle matIconSuffix [for]="pickerTo"></mat-datepicker-toggle>
-                        <mat-datepicker #pickerTo></mat-datepicker>
-                    </mat-form-field>
-                </div>
-
-                <div class="analyse-info-box">
-                    <mat-icon svgIcon="heroicons_outline:information-circle" class="info-icon"></mat-icon>
-                    <span>Totaux automatiques calculés sur les colonnes numériques.</span>
-                </div>
-
-                <button mat-raised-button color="primary" type="button" (click)="run()" [disabled]="isLoading" class="btn-run">
-                    <mat-icon svgIcon="heroicons_outline:play"></mat-icon>
-                    <span class="ml-2">Lancer l'analyse</span>
-                </button>
-            </div>
-        </div>
+    </div>
     </div>
 
     <!-- Results Section -->
