@@ -103,6 +103,11 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
         this.map.on('click', (event: L.LeafletMouseEvent) => {
             const { lat, lng } = event.latlng;
 
+            // Only allow clicks within Tunisia
+            if (!TUNISIA_BOUNDS.contains([lat, lng])) {
+                return;
+            }
+
             if (this.marker) {
                 // Move existing marker
                 this.marker.setLatLng(event.latlng);
@@ -247,6 +252,17 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     private setupMarkerDragHandler(marker: Marker): void {
+        // Prevent dragging outside Tunisia
+        marker.on('drag', (event) => {
+            const position = event.target.getLatLng();
+            if (!TUNISIA_BOUNDS.contains(position)) {
+                // Constrain to Tunisia bounds
+                const lat = Math.max(TUNISIA_BOUNDS.getSouth(), Math.min(TUNISIA_BOUNDS.getNorth(), position.lat));
+                const lng = Math.max(TUNISIA_BOUNDS.getWest(), Math.min(TUNISIA_BOUNDS.getEast(), position.lng));
+                event.target.setLatLng([lat, lng]);
+            }
+        });
+
         marker.on('dragend', (event) => {
             const position = event.target.getLatLng();
             this.locationChange.emit({
