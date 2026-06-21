@@ -36,7 +36,7 @@ dotnet restore
 
 ---
 
-## Full Platform Startup (Backend + Frontend + 8 AI Services)
+## Full Platform Startup (Backend + Frontend + ETA Prediction Service)
 
 ### Option 1: Docker Compose (recommended)
 
@@ -50,7 +50,7 @@ This starts:
 - SQL Server
 - Backend API on `http://localhost:6064`
 - Frontend on `http://localhost:4200`
-- 8 AI services on ports `8001` to `8008`
+- ETA Prediction service on port `8001`
 
 Stop everything:
 
@@ -73,7 +73,7 @@ chmod +x start-all.sh
 start-all.bat
 ```
 
-The script starts backend, frontend, and all AI microservices in one run.
+The script starts backend, frontend, and the ETA prediction microservice in one run.
 
 ---
 
