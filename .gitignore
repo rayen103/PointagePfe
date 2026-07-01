@@ -12,3 +12,11 @@ __pycache__/
 # IDE
 .idea/
 .vscode/
+
+# .NET Framework Build Artifacts
+**/obj/
+**/bin/
+**/*.user
+**/*.suo
+*.cache
+*.log
