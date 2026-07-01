@@ -760,25 +760,19 @@ Docker Compose gère :
 
 ### Option B — Démarrage en développement (sans Docker)
 
-#### ✨ Option B1 — Un seul script pour tout démarrer (Recommandé !)
-
-Juste exécutez UNE commande et tout démarre automatiquement :
+#### ✨ Option B1 — ML Service automatique + Backend/Frontend manuels
+Démarrez vous-même backend et frontend, puis utilisez **UN SEUL CLIC** pour lancer le ML service :
 
 **Pour Windows :**
 ```bash
-start-all.bat
+start-ml.bat
 ```
 
 **Pour Linux ou macOS :**
 ```bash
-chmod +x start-all.sh  # Une seule fois : rendre le script exécutable
-./start-all.sh
+chmod +x start-ml.sh  # Une seule fois : rendre exécutable
+./start-ml.sh
 ```
-
-Ces scripts lancent :
-1. Le backend .NET
-2. Le frontend Angular
-3. Le service ML ETA Prediction (si le répertoire existe)
 
 ---
 
