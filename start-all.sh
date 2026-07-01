@@ -1,40 +1,61 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/bash
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+echo "========================================"
+echo "Starting PFE Project - All Services"
+echo "========================================"
 
-echo "Starting all ML services + backend + frontend..."
-echo "Press Ctrl+C to stop everything."
-
+# Function to kill background processes on exit
 cleanup() {
-  echo
-  echo "Stopping all services..."
-  kill 0
-}
-trap cleanup INT TERM EXIT
-
-start_service() {
-  local dir="$1"
-  local port="$2"
-  echo "[$dir] installing requirements..."
-  (cd "$ROOT_DIR/ml-services/$dir" && python -m pip install -r requirements.txt >/dev/null)
-  echo "[$dir] starting on http://localhost:$port ..."
-  (cd "$ROOT_DIR/ml-services/$dir" && python -m uvicorn api:app --host 0.0.0.0 --port "$port") &
+    echo ""
+    echo "Stopping all services..."
+    kill $BACKEND_PID 2>/dev/null
+    kill $FRONTEND_PID 2>/dev/null
+    kill $ML_PID 2>/dev/null
+    wait 2>/dev/null
+    echo "All services stopped!"
+    exit 0
 }
 
-start_service "eta_prediction" 8001
-start_service "anomaly_detection" 8002
-start_service "demand_forecasting" 8003
-start_service "passenger_counting_cv" 8004
-start_service "driver_behavior_scoring" 8005
-start_service "predictive_maintenance" 8006
-start_service "rl_dispatcher" 8007
-start_service "traffic_stgcn" 8008
+# Trap SIGINT (Ctrl+C) to trigger cleanup
+trap cleanup SIGINT
 
-echo "[backend] restoring and starting on http://localhost:6064 ..."
-(cd "$ROOT_DIR/backend" && dotnet restore && dotnet run --project src/CollectManagement.ms/CollectManagement.WebAPI/CollectManagement.WebAPI.csproj) &
+echo ""
+echo "[1/3] Starting Backend..."
+cd backend
+dotnet run --project src/CollectManagement.ms/CollectManagement.WebAPI/CollectManagement.WebAPI.csproj &
+BACKEND_PID=$!
+cd ..
+echo "Backend started with PID: $BACKEND_PID"
 
-echo "[frontend] installing dependencies and starting on http://localhost:4200 ..."
-(cd "$ROOT_DIR/frontend" && npm install && npm start) &
+echo ""
+echo "[2/3] Starting Frontend..."
+cd frontend
+npm start &
+FRONTEND_PID=$!
+cd ..
+echo "Frontend started with PID: $FRONTEND_PID"
 
+echo ""
+echo "[3/3] Starting ETA Prediction ML Service (if exists)..."
+if [ -d "ml-services/eta_prediction" ]; then
+    cd ml-services/eta_prediction
+    python3 -m uvicorn main:app --host 0.0.0.0 --port 8001 --reload &
+    ML_PID=$!
+    cd ../..
+    echo "ETA Prediction Service started with PID: $ML_PID"
+else
+    echo "Warning: ml-services/eta_prediction directory not found!"
+fi
+
+echo ""
+echo "========================================"
+echo "All services are starting!"
+echo "- Backend: http://localhost:6064"
+echo "- Frontend: http://localhost:4200"
+echo "- ETA Prediction: http://localhost:8001"
+echo ""
+echo "Press Ctrl+C to stop all services"
+echo "========================================"
+
+# Wait for all background processes
 wait

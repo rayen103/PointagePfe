@@ -1,27 +1,29 @@
 @echo off
-setlocal enabledelayedexpansion
+echo ========================================
+echo Starting PFE Project - All Services
+echo ========================================
 
-set ROOT_DIR=%~dp0
+echo.
+echo [1/3] Starting Backend...
+start "Backend Service" cmd /k "cd /d %~dp0backend && dotnet run --project src/CollectManagement.ms/CollectManagement.WebAPI/CollectManagement.WebAPI.csproj"
 
-echo Starting all ML services + backend + frontend...
-echo Use Ctrl+C in each window to stop services.
+echo.
+echo [2/3] Starting Frontend...
+start "Frontend Service" cmd /k "cd /d %~dp0frontend && npm start"
 
-call :start_ml eta_prediction 8001
-call :start_ml anomaly_detection 8002
-call :start_ml demand_forecasting 8003
-call :start_ml passenger_counting_cv 8004
-call :start_ml driver_behavior_scoring 8005
-call :start_ml predictive_maintenance 8006
-call :start_ml rl_dispatcher 8007
-call :start_ml traffic_stgcn 8008
+echo.
+echo [3/3] Starting ETA Prediction ML Service (if exists)...
+if exist "%~dp0ml-services\eta_prediction" (
+    start "ETA Prediction Service" cmd /k "cd /d %~dp0ml-services\eta_prediction && python -m uvicorn main:app --host 0.0.0.0 --port 8001 --reload"
+) else (
+    echo Warning: ml-services/eta_prediction directory not found!
+)
 
-start "Backend" cmd /k "cd /d ""%ROOT_DIR%backend"" && dotnet restore && dotnet run --project src/CollectManagement.ms/CollectManagement.WebAPI/CollectManagement.WebAPI.csproj"
-start "Frontend" cmd /k "cd /d ""%ROOT_DIR%frontend"" && npm install && npm start"
-
-goto :eof
-
-:start_ml
-set SERVICE_DIR=%1
-set SERVICE_PORT=%2
-start "ML %SERVICE_DIR%" cmd /k "cd /d ""%ROOT_DIR%ml-services\%SERVICE_DIR%"" && python -m pip install -r requirements.txt && python -m uvicorn api:app --host 0.0.0.0 --port %SERVICE_PORT%"
-goto :eof
+echo.
+echo ========================================
+echo All services are starting!
+echo - Backend: http://localhost:6064
+echo - Frontend: http://localhost:4200
+echo - ETA Prediction: http://localhost:8001
+echo ========================================
+pause
