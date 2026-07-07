@@ -35,8 +35,6 @@ public class Circuit : AuditableEntity
     
     public Societe? Societe { get; private set; }
 
-    public ICollection<CircuitPointCollecte>? CircuitPointsCollecte { get; private set; }
-
     private Circuit(
         CircuitId circuitId,
         string codeCircuit,

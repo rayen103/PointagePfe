@@ -150,4 +150,58 @@ app.UseAuthentication()
 
 app.MapCarter();
 
+// Auto-start ML ETA Prediction Service on backend startup
+if (app.Environment.IsDevelopment())
+{
+    try
+    {
+        // Get project root path (relative from WebAPI to ml-services)
+        var solutionRoot = Path.GetFullPath(Path.Combine(app.Environment.ContentRootPath, "..", "..", ".."));
+        var mlServicePath = Path.Combine(solutionRoot, "ml-services", "eta_prediction");
+
+        if (Directory.Exists(mlServicePath))
+        {
+            Console.WriteLine("🚀 Starting ML ETA Prediction Service automatically...");
+
+            var processStartInfo = new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = OperatingSystem.IsWindows() ? "python" : "python3",
+                Arguments = "-m uvicorn main:app --host 0.0.0.0 --port 8001 --reload",
+                WorkingDirectory = mlServicePath,
+                UseShellExecute = true,
+                CreateNoWindow = false,
+                WindowStyle = OperatingSystem.IsWindows() 
+                    ? System.Diagnostics.ProcessWindowStyle.Normal 
+                    : System.Diagnostics.ProcessWindowStyle.Normal
+            };
+
+            var mlProcess = System.Diagnostics.Process.Start(processStartInfo);
+            
+            if (mlProcess != null)
+            {
+                Console.WriteLine($"✅ ML Service started (PID: {mlProcess.Id}) at http://localhost:8001");
+                
+                // Keep track of the ML process so we can clean it up if needed
+                AppDomain.CurrentDomain.ProcessExit += (s, e) => 
+                {
+                    if (!mlProcess.HasExited)
+                    {
+                        Console.WriteLine("🛑 Stopping ML ETA Prediction Service...");
+                        mlProcess.Kill();
+                        mlProcess.WaitForExit();
+                    }
+                };
+            }
+        }
+        else
+        {
+            Console.WriteLine("⚠️ ML service directory not found at: " + mlServicePath);
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ Failed to auto-start ML service: {ex.Message}");
+    }
+}
+
 app.Run();

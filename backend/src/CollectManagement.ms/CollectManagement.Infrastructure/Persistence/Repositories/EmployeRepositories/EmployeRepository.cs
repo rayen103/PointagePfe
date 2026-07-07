@@ -58,7 +58,6 @@ public class EmployeRepository : RepositoryBase<Employe>, IEmployeRepository
                 c.RFID,
                 c.Nom,
                 c.Prenom,
-                c.TypeEmploye,
                 c.CodeCircuit,
                 c.CodePointCollecte,
                 c.CodeBus,

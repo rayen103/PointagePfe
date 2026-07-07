@@ -8,6 +8,7 @@ export interface Chauffeur {
     externe: boolean;
     isActive: boolean;
     societeId: string;
+    busId?: string;
 }
 
 export interface PagedChauffeur {

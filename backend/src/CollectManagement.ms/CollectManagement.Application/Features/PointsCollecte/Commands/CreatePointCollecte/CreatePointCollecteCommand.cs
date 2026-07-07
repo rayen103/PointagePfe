@@ -8,5 +8,6 @@ public record CreatePointCollecteCommand(
     string? CodeGouvernorat,
     string? CodeRegion,
     bool IsActive,
-    Ulid SocieteId
+    Ulid SocieteId,
+    Ulid? CircuitId
 ) : IRequest<CreatePointCollecteResponse>;

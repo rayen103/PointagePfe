@@ -56,7 +56,8 @@ export class PointCollecteService {
             codeGouvernorat: "",
             codeRegion: "",
             isActive: true,
-            societeId: ""
+            societeId: "",
+            circuitId: null
         }
         this._pointCollecte.next(newPointCollecte);
 

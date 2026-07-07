@@ -8,6 +8,7 @@ export interface PointCollecte {
     codeRegion?: string;
     isActive: boolean;
     societeId: string;
+    circuitId?: string;
 }
 
 export interface PagedPointCollecte {

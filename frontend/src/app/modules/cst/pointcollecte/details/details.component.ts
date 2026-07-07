@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { TranslocoModule } from '@ngneat/transloco';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatOptionModule, MatRippleModule } from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -22,15 +23,18 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { fuseAnimations } from '../../../../../@fuse/animations';
 import { PointCollecte } from '../../../../core/point-collecte/point-collecte.model';
-import { catchError, EMPTY, of, Subject, takeUntil } from 'rxjs';
+import { catchError, debounceTime, EMPTY, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { PointCollecteService } from '../../../../core/point-collecte/point-collecte.service';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UserService } from '../../../../core/user/user.service';
-import { MapLocation, MapViewerComponent } from '../../../../shared/components/map-viewer/map-viewer.component';
+import { MapPickerComponent } from '../../../../shared/components/map-picker/map-picker.component';
 import { GouvernoratService } from '../../../../core/gouvernorat/gouvernorat.service';
 import { RegionService } from '../../../../core/region/region.service';
 import { Gouvernorat } from '../../../../core/gouvernorat/gouvernorat.model';
 import { Region } from '../../../../core/region/region.model';
+import { Circuit } from '../../../../core/circuit/circuit.model';
+import { CircuitService } from '../../../../core/circuit/circuit.service';
+import { MapGeocodingService, GeocodingResult } from '../../../../core/common/map-geocoding.service';
 
 @Component({
   selector: 'app-details',
@@ -52,7 +56,8 @@ import { Region } from '../../../../core/region/region.model';
         MatSlideToggleModule,
         TranslocoModule,
         RouterLink,
-        MapViewerComponent,
+        MapPickerComponent,
+        MatAutocompleteModule,
     ],
   templateUrl: './details.component.html',
   styleUrl: './details.component.scss',
@@ -67,9 +72,12 @@ export class DetailsComponent implements OnInit, OnDestroy {
     pointCollecte: PointCollecte;
     flashMessage: 'success' | 'error' | null = null;
     isLoading: boolean = false;
+    isAutocompleteLoading = false;
+    locationOutOfTunisia = false;
     gouvernorats: Gouvernorat[] = [];
     regions: Region[] = [];
-    mapLocations: MapLocation[] = [];
+    circuits: Circuit[] = [];
+    autocompleteResults: GeocodingResult[] = [];
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     constructor(
@@ -77,10 +85,12 @@ export class DetailsComponent implements OnInit, OnDestroy {
         private _router: Router,
         private formBuilder: FormBuilder,
         private _pointCollecteService: PointCollecteService,
+        private _circuitService: CircuitService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _userService: UserService,
         private _gouvernoratService: GouvernoratService,
         private _regionService: RegionService,
+        private _mapGeocodingService: MapGeocodingService,
     ) { }
 
     ngOnInit(): void {
@@ -95,9 +105,10 @@ export class DetailsComponent implements OnInit, OnDestroy {
             codeRegion: [''],
             isActive: [true],
             societeId: ['', Validators.required],
+            circuitId: [null],
         });
 
-        // Load Gouvernorats and Regions
+        // Load Gouvernorats and Regions and Circuits
         this._gouvernoratService.GetGouvernorats().subscribe((res) => {
             this.gouvernorats = res.gouvernorats;
             this._changeDetectorRef.markForCheck();
@@ -108,20 +119,59 @@ export class DetailsComponent implements OnInit, OnDestroy {
             this._changeDetectorRef.markForCheck();
         });
 
-        // Update map locations when lat/lng change
+        this._circuitService.GetCircuit().subscribe((res) => {
+            this.circuits = res.circuits;
+            this._changeDetectorRef.markForCheck();
+        });
+
+        // Autocomplete for libellePointCollecte
+        this.pointCollecteForm.get('libellePointCollecte').valueChanges
+            .pipe(
+                takeUntil(this._unsubscribeAll),
+                debounceTime(300),
+                switchMap((value) => {
+                    if (!value || value.length < 2) {
+                        this.autocompleteResults = [];
+                        this._changeDetectorRef.markForCheck();
+                        return of([]);
+                    }
+                    this.isAutocompleteLoading = true;
+                    this._changeDetectorRef.markForCheck();
+                    return this._mapGeocodingService.searchAddressesAutocomplete(value);
+                })
+            )
+            .subscribe((results) => {
+                this.autocompleteResults = results;
+                this.isAutocompleteLoading = false;
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Validate location is in Tunisia
         this.pointCollecteForm.valueChanges
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((val) => {
                 if (val.latitude != null && val.longitude != null) {
-                    this.mapLocations = [{
-                        id: val.pointCollecteId || 'preview',
-                        name: val.libellePointCollecte || val.codePointCollecte || 'Point',
-                        latitude: Number(val.latitude),
-                        longitude: Number(val.longitude),
-                        pointType: 'base'
-                    }];
-                    this._changeDetectorRef.markForCheck();
+                    this.locationOutOfTunisia = !this._mapGeocodingService.isWithinTunisia(val.latitude, val.longitude);
+                    if (this.locationOutOfTunisia) {
+                        this.pointCollecteForm.get('latitude').setErrors({ outOfTunisia: true });
+                        this.pointCollecteForm.get('longitude').setErrors({ outOfTunisia: true });
+                    } else {
+                        // Clear errors if they exist
+                        const latErrors = this.pointCollecteForm.get('latitude').errors;
+                        const lngErrors = this.pointCollecteForm.get('longitude').errors;
+                        if (latErrors?.['outOfTunisia']) {
+                            const { outOfTunisia, ...rest } = latErrors;
+                            this.pointCollecteForm.get('latitude').setErrors(Object.keys(rest).length > 0 ? rest : null);
+                        }
+                        if (lngErrors?.['outOfTunisia']) {
+                            const { outOfTunisia, ...rest } = lngErrors;
+                            this.pointCollecteForm.get('longitude').setErrors(Object.keys(rest).length > 0 ? rest : null);
+                        }
+                    }
+                } else {
+                    this.locationOutOfTunisia = false;
                 }
+                this._changeDetectorRef.markForCheck();
             });
 
         // Get current user's societeId
@@ -150,30 +200,25 @@ export class DetailsComponent implements OnInit, OnDestroy {
                     this.pointCollecteForm.patchValue(pointCollecteWithoutSocieteId);
                 }
 
-                if (pointCollecte.latitude != null && pointCollecte.longitude != null) {
-                    this.mapLocations = [{
-                        id: pointCollecte.pointCollecteId,
-                        name: pointCollecte.libellePointCollecte || pointCollecte.codePointCollecte,
-                        latitude: Number(pointCollecte.latitude),
-                        longitude: Number(pointCollecte.longitude),
-                        pointType: 'base'
-                    }];
-                }
-
                 this._changeDetectorRef.markForCheck();
             });
 
     }
 
-    onMapClick(event: any): void {
-        const lat = event.latlng.lat;
-        const lng = event.latlng.lng;
-        
+    selectAutocompleteResult(result: GeocodingResult): void {
         this.pointCollecteForm.patchValue({
-            latitude: Number(lat.toFixed(6)),
-            longitude: Number(lng.toFixed(6))
+            libellePointCollecte: result.displayName,
+            latitude: Number(result.latitude.toFixed(6)),
+            longitude: Number(result.longitude.toFixed(6))
         });
+        this.autocompleteResults = [];
+    }
 
+    onLocationChange(location: { latitude: number; longitude: number }): void {
+        this.pointCollecteForm.patchValue({
+            latitude: Number(location.latitude.toFixed(6)),
+            longitude: Number(location.longitude.toFixed(6))
+        });
         this._changeDetectorRef.markForCheck();
     }
 

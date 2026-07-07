@@ -1,3 +1,5 @@
+using CollectManagement.Domain.Circuits;
+using CollectManagement.Domain.Circuits.ValueObjects;
 using CollectManagement.Domain.Common;
 using CollectManagement.Domain.PointsCollecte.ValueObjects;
 using CollectManagement.Domain.Societes;
@@ -26,6 +28,10 @@ public class PointCollecte : AuditableEntity
     public SocieteId SocieteId { get; private set; }
     
     public Societe? Societe { get; private set; }
+    
+    public CircuitId? CircuitId { get; private set; }
+    
+    public Circuit? Circuit { get; private set; }
 
     private PointCollecte(
         PointCollecteId pointCollecteId,
@@ -36,7 +42,8 @@ public class PointCollecte : AuditableEntity
         string? codeGouvernorat,
         string? codeRegion,
         bool isActive,
-        SocieteId societeId)
+        SocieteId societeId,
+        CircuitId? circuitId = null)
     {
         PointCollecteId = pointCollecteId;
         CodePointCollecte = codePointCollecte;
@@ -47,6 +54,7 @@ public class PointCollecte : AuditableEntity
         CodeRegion = codeRegion;
         IsActive = isActive;
         SocieteId = societeId;
+        CircuitId = circuitId;
     }
 
     public static PointCollecte Create(
@@ -58,7 +66,8 @@ public class PointCollecte : AuditableEntity
         string? codeGouvernorat,
         string? codeRegion,
         bool isActive,
-        SocieteId societeId)
+        SocieteId societeId,
+        CircuitId? circuitId = null)
     {
         return new PointCollecte(
             pointCollecteId,
@@ -69,7 +78,8 @@ public class PointCollecte : AuditableEntity
             codeGouvernorat,
             codeRegion,
             isActive,
-            societeId);
+            societeId,
+            circuitId);
     }
 
     public void Update(
@@ -79,7 +89,8 @@ public class PointCollecte : AuditableEntity
         decimal? longitude,
         string? codeGouvernorat,
         string? codeRegion,
-        bool isActive)
+        bool isActive,
+        CircuitId? circuitId = null)
     {
         CodePointCollecte = codePointCollecte;
         LibellePointCollecte = libellePointCollecte;
@@ -88,6 +99,7 @@ public class PointCollecte : AuditableEntity
         CodeGouvernorat = codeGouvernorat;
         CodeRegion = codeRegion;
         IsActive = isActive;
+        CircuitId = circuitId;
     }
     
     public static PointCollecte QueryCreate(
@@ -99,7 +111,8 @@ public class PointCollecte : AuditableEntity
         string? codeGouvernorat,
         string? codeRegion,
         bool isActive,
-        SocieteId societeId)
+        SocieteId societeId,
+        CircuitId? circuitId = null)
     {
         return new PointCollecte(
             pointCollecteId,
@@ -110,7 +123,8 @@ public class PointCollecte : AuditableEntity
             codeGouvernorat,
             codeRegion,
             isActive,
-            societeId);
+            societeId,
+            circuitId);
     }
 
 #pragma warning disable CS8618

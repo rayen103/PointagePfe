@@ -1,10 +1,13 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, TemplateRef, ViewChild, ViewEncapsulation } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewEncapsulation } from '@angular/core';
+import { CommonModule, DecimalPipe } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSelectModule } from '@angular/material/select';
 import { Router, RouterLink } from '@angular/router';
 import {
     ApexAxisChartSeries,
@@ -20,10 +23,13 @@ import {
     ApexXAxis,
     NgApexchartsModule,
 } from 'ng-apexcharts';
-import { BehaviorSubject, catchError, delay, finalize, map, Observable, of, shareReplay, startWith, Subject, switchMap, tap, take } from 'rxjs';
-import { DashboardAxisChart, DashboardData, DashboardPieChart, DashboardQuickAction, DashboardAiFeature } from './dashboard.models';
+import { BehaviorSubject, catchError, finalize, map, Observable, of, shareReplay, startWith, Subject, switchMap, tap } from 'rxjs';
+import { DashboardAxisChart, DashboardData, DashboardPieChart, DashboardQuickAction } from './dashboard.models';
 import { DashboardService } from './dashboard.service';
-import { QuickChatComponent } from 'app/layout/common/quick-chat/quick-chat.component';
+import { AnalyseApiService } from '../analyse/shared/analyse-api.service';
+import { AvailableBusEtaPrediction, BusEtaPredictionResponse } from '../analyse/shared/analyse.model';
+import { BusService } from '../../../core/bus/bus.service';
+import { Bus, PagedBus } from '../../../core/bus/bus.model';
 
 type AxisChartOptions = {
     series: ApexAxisChartSeries;
@@ -71,10 +77,13 @@ interface DashboardViewModel {
         MatButtonModule,
         MatIconModule,
         MatProgressBarModule,
-        MatProgressSpinnerModule,
-        MatDialogModule,
+        MatCardModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        ReactiveFormsModule,
+        DecimalPipe,
         NgApexchartsModule,
-        QuickChatComponent,
     ],
     templateUrl: './accueil.component.html',
     styleUrl: './accueil.component.scss',
@@ -82,7 +91,6 @@ interface DashboardViewModel {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccueilComponent {
-    @ViewChild('geminiChatDialog') geminiChatDialog: TemplateRef<any>;
 
     private readonly CHART_COLORS = {
         bar: ['#6366f1'],
@@ -141,11 +149,21 @@ export class AccueilComponent {
 
     private readonly _refresh$ = new Subject<void>();
 
+    // ETA Prediction properties
+    etaForm: FormGroup;
+    etaResult: BusEtaPredictionResponse | null = null;
+    availableEtaResults: AvailableBusEtaPrediction[] = [];
+    isEtaLoading = false;
+    isAvailableEtaLoading = false;
+    buses$: Observable<Bus[]>;
+
     constructor(
         private _dashboardService: DashboardService,
         private _router: Router,
         private _changeDetectorRef: ChangeDetectorRef,
-        private _matDialog: MatDialog
+        private fb: FormBuilder,
+        private analyseApiService: AnalyseApiService,
+        private busService: BusService,
     ) {
         this.viewModel$ = this._refresh$.pipe(
             startWith(void 0),
@@ -159,94 +177,93 @@ export class AccueilComponent {
             ),
             shareReplay({ bufferSize: 1, refCount: true })
         );
+
+        // Initialize ETA form
+        this.etaForm = this.fb.group({
+            selectedBus: [null],
+            Latitude: [null],
+            Longitude: [null],
+            CodeCircuit: [null],
+            ModelBus: [null],
+            Capacite: [null],
+            CurrentOccupancy: [null],
+            LastPositionAt: [null],
+        });
+
+        this.buses$ = this.busService.GetBuses().pipe(map((paged: PagedBus) => paged.buses));
+        
+        // Load available ETA predictions on init
+        this.predictAvailableBusesEta();
     }
 
     refresh(): void {
         this._refresh$.next();
+        this.predictAvailableBusesEta();
     }
 
-    getRiskBadgeClass(riskLevel: string | undefined): string {
-        switch (riskLevel) {
-            case 'low':
-                return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-            case 'medium':
-                return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-            case 'high':
-                return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-            default:
-                return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
-        }
-    }
-
-    getRiskLabel(riskLevel: string | undefined): string {
-        switch (riskLevel) {
-            case 'low':
-                return 'Faible';
-            case 'medium':
-                return 'Moyen';
-            case 'high':
-                return 'Élevé';
-            default:
-                return 'Inconnu';
-        }
-    }
-
-    /**
-     * Execute AI Feature
-     * @param feature
-     */
-    executeAiFeature(feature: DashboardAiFeature): void {
-        if (!feature.enabled || feature.isWorking) {
-            return;
-        }
-
-        // Special case for Gemini Assistant
-        if (feature.id === 'gemini-assistant') {
-            // Select the Gemini chat first
-            this._dashboardService
-                .getGeminiChatId()
-                .pipe(
-                    take(1),
-                    switchMap((chatId) => 
-                        this._dashboardService.selectGeminiChat(chatId).pipe(
-                            take(1),
-                            map(() => chatId)
-                        )
-                    )
-                )
-                .subscribe({
-                    next: () => {
-                        // Open as a popup
-                        this._matDialog.open(this.geminiChatDialog, {
-                            width: '500px',
-                            height: '700px',
-                            panelClass: 'gemini-chat-dialog',
-                            autoFocus: false
-                        });
-
-                        this._changeDetectorRef.markForCheck();
-                    },
-                    error: (err) => {
-                        console.error('Error opening Gemini chat:', err);
-                    }
-                });
-            return;
-        }
-
-        // Simulate working
-        feature.isWorking = true;
-        this._changeDetectorRef.markForCheck();
-
-        // Simulate AI processing delay
-        of(null)
-            .pipe(delay(2000))
-            .subscribe(() => {
-                feature.isWorking = false;
-                this._changeDetectorRef.markForCheck();
-
-                // Navigate to the feature link after "processing"
-                this._router.navigate([feature.link]);
+    onBusSelect(bus: Bus | null): void {
+        if (!bus) {
+            this.etaForm.patchValue({
+                Latitude: null,
+                Longitude: null,
+                CodeCircuit: null,
+                ModelBus: null,
+                Capacite: null,
+                CurrentOccupancy: null,
+                LastPositionAt: null,
             });
+            return;
+        }
+
+        this.etaForm.patchValue({
+            Latitude: bus.latitude,
+            Longitude: bus.longitude,
+            CodeCircuit: bus.codeCircuit,
+            ModelBus: bus.modelBus,
+            Capacite: bus.capacite,
+            CurrentOccupancy: bus.currentOccupancy,
+            LastPositionAt: bus.lastPositionAt,
+        });
+    }
+
+    predictEta(): void {
+        this.isEtaLoading = true;
+        const rawValues = this.etaForm.getRawValue();
+        this.analyseApiService.predictBusEta({
+            Latitude: rawValues.Latitude,
+            Longitude: rawValues.Longitude,
+            CodeCircuit: rawValues.CodeCircuit,
+            ModelBus: rawValues.ModelBus,
+            Capacite: rawValues.Capacite,
+            CurrentOccupancy: rawValues.CurrentOccupancy,
+            LastPositionAt: rawValues.LastPositionAt,
+        }).subscribe({
+            next: (result) => {
+                this.etaResult = result;
+                this.isEtaLoading = false;
+                this._changeDetectorRef.markForCheck();
+            },
+            error: () => {
+                this.isEtaLoading = false;
+                this._changeDetectorRef.markForCheck();
+            },
+        });
+    }
+
+    predictAvailableBusesEta(): void {
+        this.isAvailableEtaLoading = true;
+        this.analyseApiService.predictAvailableBusEta().subscribe({
+            next: (result) => {
+                this.availableEtaResults = result?.predictions ?? [];
+                this.isAvailableEtaLoading = false;
+                this._changeDetectorRef.markForCheck();
+            },
+            error: () => {
+                this.availableEtaResults = [];
+                this.isAvailableEtaLoading = false;
+                this._changeDetectorRef.markForCheck();
+            },
+        });
     }
 
     private _buildViewModel(data: DashboardData): DashboardViewModel {
@@ -370,28 +387,7 @@ export class AccueilComponent {
     private _buildFallbackData(): DashboardData {
         return {
             kpis: [],
-            aiFeatures: [
-                {
-                    id: 'absence-risk',
-                    title: "IA - Risque d'absence",
-                    description: "Scoring automatique du risque d'absence des employés",
-                    icon: 'mat_outline:psychology',
-                    link: '/fichier/employe',
-                    status: 'Indisponible',
-                    detail: "Le scoring d'absence est temporairement indisponible.",
-                    enabled: false,
-                },
-                {
-                    id: 'duration-prediction',
-                    title: 'IA - Durée prévisionnelle des OT',
-                    description: 'Estimation automatique de la durée des ordres de travail',
-                    icon: 'mat_outline:auto_graph',
-                    link: '/fichier/ordretravail',
-                    status: 'Indisponible',
-                    detail: 'Les prédictions de durée sont temporairement indisponibles.',
-                    enabled: false,
-                },
-            ],
+            aiFeatures: [],
             charts: {
                 bar: { labels: [], series: [] },
                 line: { labels: [], series: [] },
@@ -405,6 +401,7 @@ export class AccueilComponent {
             errorMessage: 'Impossible de charger les données du tableau de bord. Veuillez réessayer.',
             buses: [],
             employes: [],
+            chauffeurs: [],
             circuits: [],
             utilisateurs: [],
             chantiers: [],

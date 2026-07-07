@@ -11,9 +11,8 @@
     justify-content: space-between;
     gap: 1.5rem;
     padding: 1.5rem;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     border-radius: 1rem;
-    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
 
     .analyse-header-left {
         .analyse-title {
@@ -67,15 +66,13 @@
         }
 
         .btn-primary {
-            background: #ffffff;
-            color: #6366f1;
             font-weight: 600;
             border-radius: 0.75rem;
             padding: 0.75rem 1.5rem;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             transition: all 0.2s;
 
-            &:hover {
+            &:hover:not(:disabled) {
                 transform: translateY(-2px);
                 box-shadow: 0 6px 20px rgba(0,0,0,0.15);
             }
@@ -94,7 +91,7 @@
             padding: 0.75rem 1.5rem;
             font-weight: 600;
 
-            &:hover {
+            &:hover:not(:disabled) {
                 background: #fef2f2;
             }
         }
@@ -128,6 +125,11 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     display: flex;
     flex-direction: column;
+    transition: all 0.3s;
+
+    &:hover {
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
 
     @media (prefers-color-scheme: dark) {
         background: #1f2937;
@@ -244,13 +246,12 @@
             border-radius: 0.75rem;
             font-weight: 700;
             transition: all 0.2s;
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
             color: #ffffff;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 
             &:hover:not(:disabled) {
                 transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+                box-shadow: 0 6px 20px rgba(0,0,0,0.2);
             }
 
             &:disabled {
@@ -384,6 +385,11 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     display: flex;
     flex-direction: column;
+    transition: all 0.3s;
+
+    &:hover {
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
 
     @media (prefers-color-scheme: dark) {
         background: #1f2937;

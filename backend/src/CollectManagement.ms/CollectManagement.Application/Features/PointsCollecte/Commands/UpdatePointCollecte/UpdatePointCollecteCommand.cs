@@ -8,5 +8,6 @@ public record UpdatePointCollecteCommand(
     decimal? Longitude,
     string? CodeGouvernorat,
     string? CodeRegion,
-    bool IsActive
+    bool IsActive,
+    Ulid? CircuitId
 ) : IRequest<UpdatePointCollecteResponse>;

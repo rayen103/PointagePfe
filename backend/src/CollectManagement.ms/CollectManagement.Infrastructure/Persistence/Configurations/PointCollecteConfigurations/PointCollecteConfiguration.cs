@@ -1,3 +1,4 @@
+using CollectManagement.Domain.Circuits.ValueObjects;
 using CollectManagement.Domain.PointsCollecte;
 using CollectManagement.Domain.PointsCollecte.ValueObjects;
 using CollectManagement.Domain.Societes.ValueObjects;
@@ -43,9 +44,19 @@ public class PointCollecteConfiguration : IEntityTypeConfiguration<PointCollecte
                 c => c.Value.ToGuid(),
                 value => new SocieteId(new Ulid(value)));
 
+        builder.Property(p => p.CircuitId)
+            .HasConversion(
+                c => c == null ? null : (Guid?)c.Value.ToGuid(),
+                value => value.HasValue ? new CircuitId(new Ulid(value.Value)) : null);
+
         builder.HasOne(c => c.Societe)
             .WithMany()
             .HasForeignKey(c => c.SocieteId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(c => c.Circuit)
+            .WithMany()
+            .HasForeignKey(c => c.CircuitId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

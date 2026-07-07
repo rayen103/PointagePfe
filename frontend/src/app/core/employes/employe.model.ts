@@ -1,12 +1,9 @@
-export type TypeEmploye = 'EmployeSimple' | 'Chauffeur';
-
 export interface Employe {
     employeId: string;
     matricule: string;
     rfid?: string;
     nom: string;
     prenom: string;
-    typeEmploye: TypeEmploye;
     codeCircuit?: string;
     codePointCollecte?: string;
     codeBus?: string;
@@ -17,6 +14,7 @@ export interface Employe {
     latitude?: number;
     longitude?: number;
     societeId: string;
+    isActive: boolean;
     absenceRiskScore?: number;
     absenceRiskLevel?: 'low' | 'medium' | 'high';
     absencePredictionConfidence?: number;

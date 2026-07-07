@@ -59,7 +59,8 @@ public class PointCollecteRepository : RepositoryBase<PointCollecte>, IPointColl
                 c.CodeGouvernorat,
                 c.CodeRegion,
                 c.IsActive,
-                c.SocieteId
+                c.SocieteId,
+                c.CircuitId
             ))
             .ToListAsync(cancellationToken: cancellationToken)
             .ConfigureAwait(false);
@@ -82,7 +83,8 @@ public class PointCollecteRepository : RepositoryBase<PointCollecte>, IPointColl
                 c.CodeGouvernorat,
                 c.CodeRegion,
                 c.IsActive,
-                c.SocieteId
+                c.SocieteId,
+                c.CircuitId
             ))
             .FirstOrDefaultAsync(cancellationToken)
             .ConfigureAwait(false);
@@ -101,7 +103,8 @@ public class PointCollecteRepository : RepositoryBase<PointCollecte>, IPointColl
                     .SetProperty(p => p.Longitude, pointCollecte.Longitude)
                     .SetProperty(p => p.CodeGouvernorat, pointCollecte.CodeGouvernorat)
                     .SetProperty(p => p.CodeRegion, pointCollecte.CodeRegion)
-                    .SetProperty(p => p.IsActive, pointCollecte.IsActive),
+                    .SetProperty(p => p.IsActive, pointCollecte.IsActive)
+                    .SetProperty(p => p.CircuitId, pointCollecte.CircuitId),
                 cancellationToken)
             .ConfigureAwait(false);
     }

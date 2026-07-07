@@ -4,6 +4,7 @@ import { BusService } from 'app/core/bus/bus.service';
 import { QuickChatService } from 'app/layout/common/quick-chat/quick-chat.service';
 import { CircuitService } from 'app/core/circuit/circuit.service';
 import { EmployeService } from 'app/core/employes/employe.service';
+import { ChauffeurService } from 'app/core/chauffeur/chauffeur.service';
 import { OrdreTravailService } from 'app/core/ordre-travail/ordre-travail.service';
 import { RattachementService } from 'app/core/rattachement/rattachement.service';
 import { UtilisateurService } from 'app/core/utilisateurs/utilisateur.service';
@@ -13,6 +14,7 @@ import { PointCollecteService } from 'app/core/point-collecte/point-collecte.ser
 import { Bus, PagedBus } from 'app/core/bus/bus.model';
 import { Circuit, PagedCircuit } from 'app/core/circuit/circuit.model';
 import { Employe, PagedEmploye } from 'app/core/employes/employe.model';
+import { Chauffeur, PagedChauffeur } from 'app/core/chauffeur/chauffeur.model';
 import { OrdreTravail, PagedOrdreTravail } from 'app/core/ordre-travail/ordre-travail.model';
 import { PagedRattachement } from 'app/core/rattachement/rattachement.model';
 import { PagedUtilisateur } from 'app/core/utilisateurs/utilisateur.model';
@@ -44,6 +46,7 @@ export class DashboardService {
     constructor(
         private _utilisateurService: UtilisateurService,
         private _employeService: EmployeService,
+        private _chauffeurService: ChauffeurService,
         private _busService: BusService,
         private _circuitService: CircuitService,
         private _ordreTravailService: OrdreTravailService,
@@ -58,6 +61,7 @@ export class DashboardService {
         return forkJoin({
             utilisateurs: this._utilisateurService.GetUtilisateur(1, this.DASHBOARD_FETCH_LIMIT),
             employes: this._employeService.GetEmploye(1, this.DASHBOARD_FETCH_LIMIT),
+            chauffeurs: this._chauffeurService.GetChauffeurs(1, this.DASHBOARD_FETCH_LIMIT),
             buses: this._busService.GetBuses(1, this.DASHBOARD_FETCH_LIMIT),
             circuits: this._circuitService.GetCircuit(1, this.DASHBOARD_FETCH_LIMIT),
             ordresTravail: this._ordreTravailService.GetOrdresTravail(1, this.DASHBOARD_FETCH_LIMIT),
@@ -101,6 +105,7 @@ export class DashboardService {
     private _buildDashboardData(payload: {
         utilisateurs: PagedUtilisateur;
         employes: PagedEmploye;
+        chauffeurs: PagedChauffeur;
         buses: PagedBus;
         circuits: PagedCircuit;
         ordresTravail: PagedOrdreTravail;
@@ -111,6 +116,7 @@ export class DashboardService {
     }): DashboardData {
         const utilisateurs = payload.utilisateurs?.utilisateurs ?? [];
         const employes = payload.employes?.employes ?? [];
+        const chauffeurs = payload.chauffeurs?.chauffeurs ?? [];
         const buses = payload.buses?.buses ?? [];
         const circuits = payload.circuits?.circuits ?? [];
         const ordresTravail = payload.ordresTravail?.ordresTravail ?? [];
@@ -125,7 +131,7 @@ export class DashboardService {
         const totalCircuits = this._resolveTotal(payload.circuits?.totalCount, circuits);
         const totalOrdresTravail = this._resolveTotal(payload.ordresTravail?.totalCount, ordresTravail);
         const totalRattachements = this._resolveTotal(payload.rattachements?.totalCount, rattachements);
-        const aiFeatures = this._buildAiFeatures(employes, totalEmployees, ordresTravail, totalOrdresTravail, buses, circuits);
+        const aiFeatures = this._buildAiFeatures(employes, chauffeurs, totalEmployees, ordresTravail, totalOrdresTravail, buses, circuits);
 
         const activeBuses = buses.filter((bus) => bus.isActive).length;
         const inactiveBuses = buses.length - activeBuses;
@@ -315,6 +321,7 @@ export class DashboardService {
             lastUpdated: new Date(),
             buses,
             employes,
+            chauffeurs,
             circuits,
             utilisateurs,
             chantiers,
@@ -330,23 +337,15 @@ export class DashboardService {
             return { labels: [], series: [] };
         }
 
-        const counts = employes.reduce<Record<string, number>>((acc, employe) => {
-            const key = employe.typeEmploye ?? 'Autres';
-            acc[key] = (acc[key] ?? 0) + 1;
-            return acc;
-        }, {});
-
-        const labels = Object.keys(counts);
-        const series = labels.map((label) => counts[label]);
-
         return {
-            labels,
-            series,
+            labels: ['Employés'],
+            series: [employes.length],
         };
     }
 
     private _buildAiFeatures(
         employes: Employe[],
+        chauffeurs: Chauffeur[],
         totalEmployees: number,
         ordresTravail: OrdreTravail[],
         totalOrdresTravail: number,
@@ -439,10 +438,10 @@ export class DashboardService {
                 title: 'Scoring Conducteur',
                 description: 'Évaluation du comportement de conduite',
                 icon: 'mat_outline:speed',
-                link: '/fichier/employe',
-                status: employes.filter(e => e.typeEmploye === 'Chauffeur').length > 0 ? 'Évalué' : 'Indisponible',
+                link: '/fichier/chauffeur',
+                status: chauffeurs.length > 0 ? 'Évalué' : 'Indisponible',
                 detail: 'Analyse des accélérations et freinages brusques.',
-                enabled: employes.filter(e => e.typeEmploye === 'Chauffeur').length > 0,
+                enabled: chauffeurs.length > 0,
             },
             {
                 id: 'demand-forecasting',
@@ -618,6 +617,7 @@ export class DashboardService {
             errorMessage,
             buses: [],
             employes: [],
+            chauffeurs: [],
             circuits: [],
             utilisateurs: [],
             chantiers: [],

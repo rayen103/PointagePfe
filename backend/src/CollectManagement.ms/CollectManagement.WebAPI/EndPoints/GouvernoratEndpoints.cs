@@ -44,6 +44,11 @@ public class GouvernoratEndpoints : ICarterModule
                 (x.LibelleGouvernorat != null && x.LibelleGouvernorat.Contains(search, StringComparison.OrdinalIgnoreCase)));
         }
 
+        // Deduplicate by CodeGouvernorat
+        query = query
+            .GroupBy(x => x.CodeGouvernorat)
+            .Select(g => g.First());
+
         var prop = TypeDescriptor.GetProperties(typeof(Gouvernorat)).Find(sort ?? "CodeGouvernorat", true);
         query = prop is not null && order == "desc"
             ? query.OrderByDescending(x => prop.GetValue(x))

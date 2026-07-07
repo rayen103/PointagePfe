@@ -64,7 +64,7 @@ export class EmployeService {
                     return this._apiservice.Post2<AbsenceRiskBatchPredictionResponse>("prediction/absence-risk/batch", {
                         items: employes.map((employe) => ({
                             employeId: employe.employeId,
-                            typeEmploye: employe.typeEmploye,
+                            typeEmploye: null,
                             codeShift: employe.codeShift ?? null,
                             codeRattachement: employe.codeCircuit ?? null,
                             numeroChantier: null
@@ -105,7 +105,6 @@ export class EmployeService {
             rfid: null,
             nom: null,
             prenom: null,
-            typeEmploye: 'EmployeSimple',
             codeCircuit: null,
             codePointCollecte: null,
             codeBus: null,
@@ -116,6 +115,7 @@ export class EmployeService {
             latitude: null,
             longitude: null,
             societeId: '',
+            isActive: true,
         };
         this._employes.next([newEmploye, ...this._employes.value]);
         return of(newEmploye);

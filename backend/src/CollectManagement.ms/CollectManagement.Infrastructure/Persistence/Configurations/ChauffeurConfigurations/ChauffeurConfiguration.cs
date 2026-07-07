@@ -1,3 +1,4 @@
+using CollectManagement.Domain.Bus.ValueObjects;
 using CollectManagement.Domain.Chauffeurs;
 using CollectManagement.Domain.Chauffeurs.ValueObjects;
 using CollectManagement.Domain.Societes.ValueObjects;
@@ -44,9 +45,19 @@ public class ChauffeurConfiguration : IEntityTypeConfiguration<Chauffeur>
                 c => c.Value.ToGuid(),
                 value => new SocieteId(new Ulid(value)));
 
+        builder.Property(p => p.BusId)
+            .HasConversion(
+                c => c == null ? null : (Guid?)c.Value.ToGuid(),
+                value => value.HasValue ? new BusId(new Ulid(value.Value)) : null);
+
         builder.HasOne(c => c.Societe)
             .WithMany()
             .HasForeignKey(c => c.SocieteId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(c => c.Bus)
+            .WithMany()
+            .HasForeignKey(c => c.BusId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

@@ -1,0 +1,245 @@
+<div class="p-6 flex flex-col h-full" *transloco="let t">
+    <!-- Title -->
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold">{{ data.employe?.employeId === 'new' || !data.employe ? t('Ajouter un employé') : t('Modifier un employé') }}</h2>
+        <button mat-icon-button (click)="close()">
+            <mat-icon svgIcon="mat_outline:close"></mat-icon>
+        </button>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="form" (ngSubmit)="save()" class="flex-1 flex flex-col overflow-hidden">
+        <div class="flex-1 overflow-y-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Matricule -->
+            <mat-form-field class="w-full fuse-mat-dense">
+                <mat-label>{{ t('ID-Number') }}</mat-label>
+                <input matInput formControlName="matricule" />
+                @if (form.get('matricule')?.hasError('required')) {
+                    <mat-error>{{ t('ID-Number') }} is required.</mat-error>
+                }
+                @if (form.get('matricule')?.hasError('maxLength')) {
+                    <mat-error>{{ t('ID-Number') }} must be at most 50 characters.</mat-error>
+                }
+            </mat-form-field>
+
+            <!-- RFID -->
+            <mat-form-field class="w-full fuse-mat-dense">
+                <mat-label>{{ t('RFID') }}</mat-label>
+                <input matInput formControlName="rfid" />
+                @if (form.get('rfid')?.hasError('maxLength')) {
+                    <mat-error>{{ t('RFID') }} must be at most 50 characters.</mat-error>
+                }
+            </mat-form-field>
+
+            <!-- Nom -->
+            <mat-form-field class="w-full fuse-mat-dense">
+                <mat-label>{{ t('Name') }}</mat-label>
+                <input matInput formControlName="nom" />
+                @if (form.get('nom')?.hasError('required')) {
+                    <mat-error>{{ t('Name') }} is required.</mat-error>
+                }
+                @if (form.get('nom')?.hasError('maxLength')) {
+                    <mat-error>{{ t('Name') }} must be at most 100 characters.</mat-error>
+                }
+            </mat-form-field>
+
+            <!-- Prénom -->
+            <mat-form-field class="w-full fuse-mat-dense">
+                <mat-label>{{ t('First-Name') }}</mat-label>
+                <input matInput formControlName="prenom" />
+                @if (form.get('prenom')?.hasError('required')) {
+                    <mat-error>{{ t('First-Name') }} is required.</mat-error>
+                }
+                @if (form.get('prenom')?.hasError('maxLength')) {
+                    <mat-error>{{ t('First-Name') }} must be at most 100 characters.</mat-error>
+                }
+            </mat-form-field>
+
+            <!-- Circuit -->
+            <mat-form-field class="w-full fuse-mat-dense">
+                <mat-label>{{ t('Circuit') }}</mat-label>
+                <mat-select formControlName="codeCircuit">
+                    <mat-option value="">--</mat-option>
+                    @for (circuit of getFilteredCircuits(); track circuit.circuitId) {
+                        <mat-option [value]="circuit.codeCircuit">
+                            {{ circuit.codeCircuit }}
+                            @if (circuit.libelleCircuit) {
+                                - {{ circuit.libelleCircuit }}
+                            }
+                        </mat-option>
+                    }
+                    @if (form.get('codeCircuit')?.value && !hasExistingCircuitOption(form.get('codeCircuit')?.value)) {
+                        <mat-option disabled>— Current Value —</mat-option>
+                        <mat-option [value]="form.get('codeCircuit')?.value">
+                            {{ form.get('codeCircuit')?.value }}
+                        </mat-option>
+                    }
+                </mat-select>
+                @if (form.get('codeCircuit')?.hasError('required')) {
+                    <mat-error>{{ t('Circuit') }} is required.</mat-error>
+                }
+                @if (form.get('codeCircuit')?.hasError('maxLength')) {
+                    <mat-error>{{ t('Circuit') }} must be at most 50 characters.</mat-error>
+                }
+            </mat-form-field>
+
+            <!-- Point Collecte -->
+            <mat-form-field class="w-full fuse-mat-dense">
+                <mat-label>{{ t('Collection-Point') }}</mat-label>
+                <mat-select formControlName="codePointCollecte">
+                    <mat-option value="">--</mat-option>
+                    @for (point of getFilteredPointsCollecte(); track point.pointCollecteId) {
+                        <mat-option [value]="point.codePointCollecte">
+                            {{ point.codePointCollecte }}
+                            @if (point.libellePointCollecte) {
+                                - {{ point.libellePointCollecte }}
+                            }
+                        </mat-option>
+                    }
+                    @if (form.get('codePointCollecte')?.value && !hasExistingPointOption(form.get('codePointCollecte')?.value)) {
+                        <mat-option disabled>— Current Value —</mat-option>
+                        <mat-option [value]="form.get('codePointCollecte')?.value">
+                            {{ form.get('codePointCollecte')?.value }}
+                        </mat-option>
+                    }
+                </mat-select>
+                @if (form.get('codePointCollecte')?.hasError('required')) {
+                    <mat-error>{{ t('Collection-Point') }} is required.</mat-error>
+                }
+                @if (form.get('codePointCollecte')?.hasError('maxLength')) {
+                    <mat-error>{{ t('Collection-Point') }} must be at most 50 characters.</mat-error>
+                }
+            </mat-form-field>
+
+            <!-- Bus -->
+            <mat-form-field class="w-full fuse-mat-dense">
+                <mat-label>{{ t('Bus') }}</mat-label>
+                <mat-select formControlName="codeBus">
+                    <mat-option value="">--</mat-option>
+                    @for (bus of getFilteredBuses(); track bus.busId) {
+                        <mat-option [value]="bus.numeroIMM">
+                            {{ bus.numeroIMM }}
+                            @if (bus.modelBus) {
+                                - {{ bus.modelBus }}
+                            }
+                        </mat-option>
+                    }
+                    @if (form.get('codeBus')?.value && !hasExistingBusOption(form.get('codeBus')?.value)) {
+                        <mat-option disabled>— Current Value —</mat-option>
+                        <mat-option [value]="form.get('codeBus')?.value">
+                            {{ form.get('codeBus')?.value }}
+                        </mat-option>
+                    }
+                </mat-select>
+                @if (form.get('codeBus')?.hasError('maxLength')) {
+                    <mat-error>{{ t('Bus') }} must be at most 50 characters.</mat-error>
+                }
+            </mat-form-field>
+
+            <!-- Shift -->
+            <mat-form-field class="w-full fuse-mat-dense">
+                <mat-label>{{ t('Shift') }}</mat-label>
+                <mat-select formControlName="codeShift">
+                    <mat-option value="">--</mat-option>
+                    @for (shift of getFilteredShifts(); track shift.shiftId) {
+                        <mat-option [value]="shift.codeShift">
+                            {{ shift.codeShift }}
+                            @if (shift.libelleShift) {
+                                - {{ shift.libelleShift }}
+                            }
+                        </mat-option>
+                    }
+                    @if (form.get('codeShift')?.value && !hasExistingShiftOption(form.get('codeShift')?.value)) {
+                        <mat-option disabled>— Current Value —</mat-option>
+                        <mat-option [value]="form.get('codeShift')?.value">
+                            {{ form.get('codeShift')?.value }}
+                        </mat-option>
+                    }
+                </mat-select>
+                @if (form.get('codeShift')?.hasError('maxLength')) {
+                    <mat-error>{{ t('Shift') }} must be at most 50 characters.</mat-error>
+                }
+            </mat-form-field>
+
+            <!-- Adresse -->
+            <mat-form-field class="w-full fuse-mat-dense">
+                <mat-label>{{ t('Address') }}</mat-label>
+                <input matInput formControlName="adresse" />
+                @if (form.get('adresse')?.hasError('maxLength')) {
+                    <mat-error>{{ t('Address') }} must be at most 255 characters.</mat-error>
+                }
+            </mat-form-field>
+
+            <!-- Gouvernorat -->
+            <mat-form-field class="w-full fuse-mat-dense">
+                <mat-label>{{ t('Governorate') }}</mat-label>
+                <mat-select formControlName="codeGouvernorat">
+                    <mat-option value="">--</mat-option>
+                    @for (gouv of gouvernorats; track gouv.gouvernoratId) {
+                        <mat-option [value]="gouv.codeGouvernorat">
+                            {{ gouv.libelleGouvernorat }}
+                        </mat-option>
+                    }
+                    @if (form.get('codeGouvernorat')?.value && !hasExistingGouvOption(form.get('codeGouvernorat')?.value)) {
+                        <mat-option disabled>— Current Value —</mat-option>
+                        <mat-option [value]="form.get('codeGouvernorat')?.value">
+                            {{ form.get('codeGouvernorat')?.value }}
+                        </mat-option>
+                    }
+                </mat-select>
+                @if (form.get('codeGouvernorat')?.hasError('maxLength')) {
+                    <mat-error>{{ t('Governorate') }} must be at most 50 characters.</mat-error>
+                }
+            </mat-form-field>
+
+            <!-- Région -->
+            <mat-form-field class="w-full fuse-mat-dense">
+                <mat-label>{{ t('Region') }}</mat-label>
+                <mat-select formControlName="codeRegion">
+                    <mat-option value="">--</mat-option>
+                    @for (reg of regions; track reg.regionId) {
+                        <mat-option [value]="reg.codeRegion">
+                            {{ reg.libelleRegion }}
+                        </mat-option>
+                    }
+                    @if (form.get('codeRegion')?.value && !hasExistingRegionOption(form.get('codeRegion')?.value)) {
+                        <mat-option disabled>— Current Value —</mat-option>
+                        <mat-option [value]="form.get('codeRegion')?.value">
+                            {{ form.get('codeRegion')?.value }}
+                        </mat-option>
+                    }
+                </mat-select>
+                @if (form.get('codeRegion')?.hasError('maxLength')) {
+                    <mat-error>{{ t('Region') }} must be at most 50 characters.</mat-error>
+                }
+            </mat-form-field>
+
+            <!-- Société -->
+            <mat-form-field class="w-full fuse-mat-dense">
+                <mat-label>{{ t('Company') }}</mat-label>
+                <input type="text" matInput formControlName="societeId" [matAutocomplete]="autoSociete" />
+                <mat-autocomplete #autoSociete="matAutocomplete" [displayWith]="displaySociete">
+                    @for (soc of filteredSocietes$ | async; track soc.societeId) {
+                        <mat-option [value]="soc.societeId">{{ soc.nom }}</mat-option>
+                    }
+                </mat-autocomplete>
+                @if (form.get('societeId')?.hasError('required')) {
+                    <mat-error>{{ t('Company') }} is required.</mat-error>
+                }
+            </mat-form-field>
+
+            <!-- Is Active -->
+            <div class="flex items-center">
+                <mat-slide-toggle formControlName="isActive" color="primary">{{ t('Active') }}</mat-slide-toggle>
+            </div>
+        </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex justify-end gap-4 mt-6 pt-4 border-t">
+            <button type="button" mat-stroked-button (click)="close()">{{ t('Annuler') }}</button>
+            <button type="submit" mat-flat-button color="primary" [disabled]="saveClicked && form.valid">{{ t('Enregistrer') }}</button>
+        </div>
+    </form>
+</div>

@@ -1,3 +1,5 @@
+import { CircuitPointCollecte } from "./circuit-point-collecte.model";
+
 export interface Circuit {
     circuitId: string;
     codeCircuit: string;

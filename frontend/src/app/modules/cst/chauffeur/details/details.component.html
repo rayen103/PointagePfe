@@ -97,6 +97,20 @@
                         </mat-slide-toggle>
                     </div>
 
+                    <!-- Bus -->
+                    <mat-form-field class="fuse-mat-dense">
+                        <mat-label>{{ t('Bus') }}</mat-label>
+                        <mat-select formControlName="busId">
+                            <mat-option value="">--</mat-option>
+                            @for (bus of buses; track bus.busId) {
+                                <mat-option [value]="bus.busId">
+                                    {{ bus.numeroImm }}
+                                    @if (bus.modelBus) { - {{ bus.modelBus }} }
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+
                     <!-- Status -->
                     <div class="flex items-center mt-4">
                         <mat-slide-toggle

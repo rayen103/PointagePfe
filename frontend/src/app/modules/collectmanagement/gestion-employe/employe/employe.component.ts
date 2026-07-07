@@ -46,6 +46,8 @@ import { GouvernoratService } from '../../../../core/gouvernorat/gouvernorat.ser
 import { RegionService } from '../../../../core/region/region.service';
 import { Gouvernorat } from '../../../../core/gouvernorat/gouvernorat.model';
 import { Region } from '../../../../core/region/region.model';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { EmployeDialogComponent } from './employe-dialog.component';
 
 @Component({
     selector: 'app-employe',
@@ -67,6 +69,7 @@ import { Region } from '../../../../core/region/region.model';
         MatAutocompleteTrigger,
         NgForOf,
         TranslocoDirective,
+        MatDialogModule,
     ],
     templateUrl: './employe.component.html',
     styleUrl: './employe.component.scss',
@@ -114,7 +117,7 @@ export class EmployeComponent implements OnInit, OnDestroy {
         private _pointCollecteService: PointCollecteService,
         private _gouvernoratService: GouvernoratService,
         private _regionService: RegionService,
-
+        private _dialog: MatDialog,
     ) {
     }
 
@@ -273,29 +276,47 @@ export class EmployeComponent implements OnInit, OnDestroy {
 
     }
 
-    CreateEmploye() {
+    CreateEmploye(){
 
-        if (!this.hasActionPermission(FuseNavigationAction.Add)) {
+        if (!this.hasActionPermission(FuseNavigationAction.Add)){
             return;
         }
 
-        this._employeService.CreateNewEmploye().subscribe((newEmploye) => {
-            this.selectedEmploye = newEmploye;
-            this.isViewMode = false; // Edit mode for new employee
-            this.selectedEmployeForm.patchValue(newEmploye);
-            this.selectedEmployeForm.enable(); // Enable form for new employee
-            this._changeDetectorRef.markForCheck();
+        const dialogRef = this._dialog.open(EmployeDialogComponent, {
+            width: '800px',
+            maxHeight: '80vh',
+            data: {
+                employe: null,
+                societes: this.societe,
+                circuits: this.circuits,
+                buses: this.buses,
+                shifts: this.shifts,
+                pointsCollecte: this.pointsCollecte,
+                gouvernorats: this.gouvernorats,
+                regions: this.regions
+            }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                this._employeService.AddEmploye(result)
+                    .subscribe(() => {
+                        this.SortChange();
+                    });
+            }
         });
     }
 
     /**
-     * Toggle Employe details (view mode - read-only)
+     * Toggle Employe details
      *
      * @param employeId
      */
-    toggleDetails(employeId: string): void {
+    toggleDetails(employeId: string): void
+    {
         // If the employe is already selected...
-        if (this.selectedEmploye && this.selectedEmploye.employeId === employeId) {
+        if ( this.selectedEmploye && this.selectedEmploye.employeId === employeId )
+        {
             // Close the details
             this.closeDetails();
             return;
@@ -304,49 +325,40 @@ export class EmployeComponent implements OnInit, OnDestroy {
         // Get the employe by id
         this._employeService.GetEmployeById(employeId)
             .subscribe((employe) => {
+                const dialogRef = this._dialog.open(EmployeDialogComponent, {
+                width: '800px',
+                maxHeight: '80vh',
+                data: {
+                    employe: employe,
+                    societes: this.societe,
+                    circuits: this.circuits,
+                    buses: this.buses,
+                    shifts: this.shifts,
+                    pointsCollecte: this.pointsCollecte,
+                    gouvernorats: this.gouvernorats,
+                    regions: this.regions
+                }
+            });
 
-                // Set the selected employe
-                this.selectedEmploye = employe;
-                this.isViewMode = true; // View mode
-
-                // Fill the form (for when switching to edit mode)
-                this.selectedEmployeForm.patchValue(employe);
-
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
+                dialogRef.afterClosed().subscribe(result => {
+                    if (result) {
+                        this._employeService.UpdateEmploye(result)
+                            .subscribe(() => {
+                                this.SortChange();
+                            });
+                    }
+                });
             });
     }
 
     /**
-     * Edit Employe - opens details in edit mode
+     * Edit Employe - opens dialog
      *
      * @param employeId
      */
-    editEmploye(employeId: string): void {
-        // If the employe is already selected in edit mode...
-        if (this.selectedEmploye && this.selectedEmploye.employeId === employeId && !this.isViewMode) {
-            // Close the details
-            this.closeDetails();
-            return;
-        }
-
-        // Get the employe by id
-        this._employeService.GetEmployeById(employeId)
-            .subscribe((employe) => {
-
-                // Set the selected employe
-                this.selectedEmploye = employe;
-                this.isViewMode = false; // Edit mode
-
-                // Fill the form
-                this.selectedEmployeForm.patchValue(employe);
-                
-                // Enable all form controls in edit mode
-                this.selectedEmployeForm.enable();
-
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
+    editEmploye(employeId: string): void
+    {
+        this.toggleDetails(employeId);
     }
 
     /**

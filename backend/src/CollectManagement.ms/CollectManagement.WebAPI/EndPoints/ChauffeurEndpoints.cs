@@ -4,6 +4,7 @@ using Carter;
 using CollectManagement.Application.Common;
 using CollectManagement.Application.Interfaces.Repositories.Chauffeurs;
 using CollectManagement.Application.Shared;
+using CollectManagement.Domain.Bus.ValueObjects;
 using CollectManagement.Domain.Chauffeurs;
 using CollectManagement.Domain.Chauffeurs.ValueObjects;
 using CollectManagement.Domain.Societes.ValueObjects;
@@ -64,7 +65,8 @@ public class ChauffeurEndpoints : ICarterModule
                 x.RFIDChauffeur,
                 x.Externe,
                 x.IsActive,
-                x.SocieteId.Value))
+                x.SocieteId.Value,
+                x.BusId?.Value))
             .ToList();
 
         return Results.Ok(new ApiResponse<object>(new { chauffeurs = data, totalCount }));
@@ -76,6 +78,7 @@ public class ChauffeurEndpoints : ICarterModule
         IUnitOfWork unitOfWork,
         CancellationToken cancellationToken)
     {
+        BusId? busId = request.BusId.HasValue ? new BusId(request.BusId.Value) : null;
         var chauffeur = Chauffeur.Create(
             new ChauffeurId(Ulid.NewUlid()),
             request.CodeChauffeur,
@@ -85,7 +88,8 @@ public class ChauffeurEndpoints : ICarterModule
             request.RFIDChauffeur,
             request.Externe,
             request.IsActive,
-            new SocieteId(request.SocieteId));
+            new SocieteId(request.SocieteId),
+            busId);
 
         await repository.AddAsync(chauffeur, cancellationToken).ConfigureAwait(false);
         await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -99,7 +103,8 @@ public class ChauffeurEndpoints : ICarterModule
             chauffeur.RFIDChauffeur,
             chauffeur.Externe,
             chauffeur.IsActive,
-            chauffeur.SocieteId.Value)));
+            chauffeur.SocieteId.Value,
+            chauffeur.BusId?.Value)));
     }
 
     private static async Task<IResult> Update(
@@ -114,6 +119,8 @@ public class ChauffeurEndpoints : ICarterModule
         if (chauffeur is null)
             return Results.NotFound(new ApiResponse<string>("Chauffeur not found", false, StatusCodes.Status404NotFound));
 
+        BusId? busId = request.BusId.HasValue ? new BusId(request.BusId.Value) : null;
+        
         chauffeur.Update(
             request.CodeChauffeur,
             request.Nom,
@@ -121,7 +128,8 @@ public class ChauffeurEndpoints : ICarterModule
             request.CIN,
             request.RFIDChauffeur,
             request.Externe,
-            request.IsActive);
+            request.IsActive,
+            busId);
 
         repository.Update(chauffeur);
         await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -162,7 +170,8 @@ public class ChauffeurEndpoints : ICarterModule
             chauffeur.RFIDChauffeur,
             chauffeur.Externe,
             chauffeur.IsActive,
-            chauffeur.SocieteId.Value)));
+            chauffeur.SocieteId.Value,
+            chauffeur.BusId?.Value)));
     }
 
     private record ChauffeurDto(
@@ -174,7 +183,8 @@ public class ChauffeurEndpoints : ICarterModule
         string? RFIDChauffeur,
         bool Externe,
         bool IsActive,
-        Ulid SocieteId);
+        Ulid SocieteId,
+        Ulid? BusId);
 
     public record UpsertChauffeurRequest(
         string CodeChauffeur,
@@ -184,7 +194,8 @@ public class ChauffeurEndpoints : ICarterModule
         string? RFIDChauffeur,
         bool Externe,
         Ulid SocieteId,
-        bool IsActive = true);
+        bool IsActive = true,
+        Ulid? BusId = null);
 
     public record UpdateChauffeurRequest(
         Ulid ChauffeurId,
@@ -194,5 +205,6 @@ public class ChauffeurEndpoints : ICarterModule
         string? CIN,
         string? RFIDChauffeur,
         bool Externe,
-        bool IsActive);
+        bool IsActive,
+        Ulid? BusId = null);
 }

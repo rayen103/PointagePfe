@@ -1,5 +1,4 @@
 using CollectManagement.Domain.Employes;
-using CollectManagement.Domain.Employes.Enums;
 using CollectManagement.Domain.Employes.ValueObjects;
 using CollectManagement.Domain.Societes.ValueObjects;
 
@@ -37,12 +36,6 @@ public class EmployeConfiguration : IEntityTypeConfiguration<Employe>
         builder.HasIndex(p => p.RFID)
             .IsUnique()
             .HasFilter("[RFID] IS NOT NULL");
-
-        builder.Property(p => p.TypeEmploye)
-            .HasConversion(v => v.ToString(), v => Enum.Parse<TypeEmploye>(v))
-            .HasMaxLength(20)
-            .IsRequired()
-            .HasDefaultValue(TypeEmploye.EmployeSimple);
 
         builder.Property(p => p.CodeCircuit)
             .HasMaxLength(50);

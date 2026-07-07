@@ -1,4 +1,5 @@
 using CollectManagement.Application.Interfaces.Repositories.PointsCollecte;
+using CollectManagement.Domain.Circuits.ValueObjects;
 using CollectManagement.Domain.PointsCollecte;
 using CollectManagement.Domain.PointsCollecte.ValueObjects;
 using CollectManagement.Domain.Societes.ValueObjects;
@@ -23,6 +24,7 @@ public class CreatePointCollecteCommandHandler
     {
         var pointCollecteId = new PointCollecteId(Ulid.NewUlid());
         var societeId = new SocieteId(request.SocieteId);
+        var circuitId = request.CircuitId != null ? new CircuitId(request.CircuitId.Value) : null;
 
         var pointCollecte = PointCollecte.Create(
             pointCollecteId,
@@ -33,7 +35,8 @@ public class CreatePointCollecteCommandHandler
             request.CodeGouvernorat,
             request.CodeRegion,
             request.IsActive,
-            societeId
+            societeId,
+            circuitId
         );
 
         await _pointCollecteRepository

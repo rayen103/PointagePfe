@@ -56,7 +56,8 @@ export class ChauffeurService {
             rfidChauffeur: '',
             externe: false,
             isActive: true,
-            societeId: ''
+            societeId: '',
+            busId: null
         };
         this._chauffeur.next(newChauffeur);
 

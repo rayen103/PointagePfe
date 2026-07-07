@@ -53,7 +53,12 @@ export class CircuitService {
             libelleCircuit: "",
             description: "",
             isActive: true,
-            societeId: ""
+            societeId: "",
+            codePCDepart: "",
+            codePCArrivee: "",
+            distanceKm: null,
+            dureeMinutes: null,
+            couleur: "#2196F3"
         }
         this._circuit.next(newCircuit);
 

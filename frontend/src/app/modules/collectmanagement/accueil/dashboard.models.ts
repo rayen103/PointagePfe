@@ -77,6 +77,7 @@ export interface DashboardData {
     errorMessage?: string;
     buses: any[];
     employes: any[];
+    chauffeurs: any[];
     circuits: any[];
     utilisateurs: any[];
     chantiers: any[];
