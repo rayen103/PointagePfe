@@ -1,17 +1,22 @@
-<div class="rounded-lg bg-card border border-slate-200 dark:border-slate-700 overflow-hidden h-full">
-    <div class="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700">
-        <div class="font-semibold">Carte</div>
-        <mat-slide-toggle [checked]="showAll" (change)="toggleShowAll.emit($event.checked)">
+<div class="rounded-2xl bg-card border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden h-full flex flex-col">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-800/40">
+        <div class="flex items-center gap-2.5">
+            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_outline:map'"></mat-icon>
+            <div class="font-semibold">Carte</div>
+        </div>
+        <mat-slide-toggle [color]="'primary'" [checked]="showAll" (change)="toggleShowAll.emit($event.checked)">
             Tous
         </mat-slide-toggle>
     </div>
 
-    <div class="p-2">
+    <div class="p-2 flex-auto">
         @if ((locations?.length ?? 0) === 0) {
-            <div class="p-4 text-sm text-hint">Aucune position à afficher.</div>
+            <div class="flex flex-col items-center justify-center gap-2 p-10 text-sm text-hint">
+                <mat-icon class="icon-size-10 opacity-40" [svgIcon]="'heroicons_outline:map'"></mat-icon>
+                <span>Aucune position à afficher.</span>
+            </div>
         } @else {
             <app-map-viewer [locations]="locations" [height]="'520px'" [zoom]="7"></app-map-viewer>
         }
     </div>
 </div>
-

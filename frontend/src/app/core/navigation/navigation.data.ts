@@ -145,7 +145,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
         id: 'monitoring',
         title: 'Monitoring',
         type: 'group',
-        icon: 'mat_outline:monitoring',
+        icon: 'mat_outline:my_location',
         children: [
             {
                 id: 'monitoring.bus-tracking',
@@ -317,7 +317,7 @@ export const horizontalNavigation: FuseNavigationItem[] = [
         id   : 'monitoring',
         title: 'Monitoring',
         type : 'group',
-        icon : 'mat_outline:monitoring',
+        icon : 'mat_outline:my_location',
         children: []
     },
     {

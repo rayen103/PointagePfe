@@ -56,6 +56,30 @@ type PieChartOptions = {
     stroke?: ApexStroke;
 };
 
+interface InsightCard {
+    id: string;
+    title: string;
+    value: number;
+    icon: string;
+    color: string;
+    progress: number;
+    changeValue: number | null;
+    changeLabel: string | null;
+    isPositive: boolean;
+}
+
+interface OrderRow {
+    id: string;
+    title: string;
+    detail: string;
+    state: string;
+    stateIcon: string;
+    status: 'approved' | 'pending' | 'rejected' | 'system';
+    statusLabel: string;
+    date?: Date;
+    link?: string;
+}
+
 interface DashboardViewModel {
     data: DashboardData;
     barChartOptions: AxisChartOptions;
@@ -66,6 +90,16 @@ interface DashboardViewModel {
     hasLineData: boolean;
     hasPieData: boolean;
     hasDoughnutData: boolean;
+    insights: InsightCard[];
+    orders: OrderRow[];
+    donut: DonutVm;
+}
+
+interface DonutVm {
+    percent: number;
+    dash: number;
+    circ: number;
+    segments: { label: string; value: number; color: string }[];
 }
 
 @Component({
@@ -286,7 +320,79 @@ export class AccueilComponent {
             hasLineData: this._hasAxisData(data.charts.line),
             hasPieData: this._hasPieData(data.charts.pie),
             hasDoughnutData: this._hasPieData(data.charts.doughnut),
+            insights: this._buildInsights(data),
+            orders: this._buildOrders(data),
+            donut: this._buildDonut(data),
         };
+    }
+
+    private _buildDonut(data: DashboardData): DonutVm {
+        const series = data.charts.doughnut?.series ?? [];
+        const labels = data.charts.doughnut?.labels ?? [];
+        const palette = ['#42abe0', '#d12b28', '#f2b33d', '#0e8a5f'];
+        const total = series.reduce((a, b) => a + b, 0);
+        const percent = total > 0 ? Math.round((series[0] / total) * 100) : 0;
+        const r = 38;
+        const circ = +(2 * Math.PI * r).toFixed(2);
+        return {
+            percent,
+            circ,
+            dash: +((percent / 100) * circ).toFixed(2),
+            segments: labels.map((label, i) => ({
+                label,
+                value: series[i] ?? 0,
+                color: palette[i % palette.length],
+            })),
+        };
+    }
+
+    private _buildInsights(data: DashboardData): InsightCard[] {
+        const maxValue = Math.max(...data.kpis.map((k) => k.value), 1);
+        return data.kpis.map((kpi) => ({
+            id: kpi.id,
+            title: kpi.title,
+            value: kpi.value,
+            icon: kpi.icon,
+            color: kpi.color,
+            progress: Math.min(100, Math.round((kpi.value / maxValue) * 100)),
+            changeValue: kpi.change?.value ?? null,
+            changeLabel: kpi.change?.label ?? null,
+            isPositive: kpi.change?.isPositive ?? true,
+        }));
+    }
+
+    private _buildOrders(data: DashboardData): OrderRow[] {
+        const created: OrderRow[] = data.recentCreated.map((item) => ({
+            id: item.id,
+            title: item.title,
+            detail: item.description ?? '—',
+            state: 'Création',
+            stateIcon: 'heroicons_outline:plus-circle',
+            status: 'approved',
+            statusLabel: 'Nouveau',
+            date: item.date,
+        }));
+        const updated: OrderRow[] = data.recentUpdated.map((item) => ({
+            id: item.id,
+            title: item.title,
+            detail: item.description ?? '—',
+            state: 'Mise à jour',
+            stateIcon: 'heroicons_outline:pencil-square',
+            status: 'pending',
+            statusLabel: 'Mis à jour',
+            date: item.date,
+        }));
+        const system: OrderRow[] = data.systemActivity.map((item) => ({
+            id: item.id,
+            title: item.title,
+            detail: item.description ?? '—',
+            state: 'Système',
+            stateIcon: 'heroicons_outline:cog-6-tooth',
+            status: 'system',
+            statusLabel: 'Système',
+            date: item.date,
+        }));
+        return [...created, ...updated, ...system].slice(0, 6);
     }
 
     private _hasAxisData(chart: DashboardAxisChart): boolean {
@@ -306,7 +412,7 @@ export class AccueilComponent {
             series: chart.series,
             chart: {
                 type,
-                height: 280,
+                height: '100%',
                 toolbar: { show: false },
                 sparkline: { enabled: false },
             },
@@ -367,7 +473,7 @@ export class AccueilComponent {
             series: chart.series,
             chart: {
                 type,
-                height: 280,
+                height: '100%',
                 toolbar: { show: false },
             },
             labels: chart.labels,

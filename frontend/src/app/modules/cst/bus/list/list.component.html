@@ -1,201 +1,135 @@
-<div class="absolute inset-0 min-w-0 px-4 sm:px-6 md:px-8 overflow-x-hidden overflow-y-auto flex flex-col flex-auto bg-default" *transloco="let t">
+<div class="cst-list" *transloco="let t">
 
-    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-4 sm:py-8 px-4 sm:px-6 md:px-8" *transloco="let t">
-        <!-- Title -->
-        <div class="text-2xl sm:text-4xl font-extrabold tracking-tight">{{ t('Buses') }}</div>
-        <!-- Actions -->
-        <div class="button-container flex flex-col sm:flex-row items-end sm:items-center w-full sm:w-auto mt-4 sm:mt-0 sm:ml-4">
-            <!-- Search -->
-            <mat-form-field
-                class="fuse-mat-dense w-full sm:min-w-64"
-                [subscriptSizing]="'dynamic'">
-                <mat-icon
-                    class="icon-size-5"
-                    matPrefix
-                    [svgIcon]="'search'"></mat-icon>
-                <input
-                    matInput
-                    [formControl]="searchInputControl"
-                    [autocomplete]="'off'"
-                    [placeholder]="t('Search')"
-                    *transloco="let t">
-            </mat-form-field>
-            <!-- Add button -->
-            @if(hasActionPermission(FuseNavigationAction.Add)){
-            <button
-                class="btn-add mt-2 sm:mt-0 sm:ml-4 w-full sm:w-auto"
-                mat-flat-button
-                [color]="'primary'"
-                routerLink="ajouter">
-                <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-                <span class="ml-2 mr-1">{{ t('Add') }}</span>
-            </button>
-            }
+    <!-- Secondary sidebar -->
+    <aside class="cst-side">
+        <div class="cst-side__label">Flotte &amp; réseau</div>
+        <a class="cst-side__item is-active">
+            Bus
+            <span class="cst-side__count is-active">{{ busesLength ?? '—' }}</span>
+        </a>
+        <a class="cst-side__item" routerLink="/fichier/chauffeur">Chauffeurs</a>
+        <a class="cst-side__item" routerLink="/fichier/modem">Modems</a>
+        <a class="cst-side__item" routerLink="/fichier/circuit">Circuits</a>
+        <a class="cst-side__item" routerLink="/fichier/pointcollecte">Points de collecte</a>
+        <a class="cst-side__item" routerLink="/fichier/region">Régions</a>
+
+        <div class="cst-side__label" style="margin-top:18px">Organisation</div>
+        <a class="cst-side__item" routerLink="/fichier/gouvernorat">Gouvernorats</a>
+        <a class="cst-side__item" routerLink="/fichier/shift">Shifts</a>
+        <a class="cst-side__item" routerLink="/fichier/equipe">Équipes</a>
+        <a class="cst-side__item" routerLink="/fichier/ordretravail">Ordres de travail</a>
+        <a class="cst-side__item" routerLink="/fichier/rattachement">Rattachements</a>
+        <a class="cst-side__item" routerLink="/fichier/societe">Sociétés</a>
+    </aside>
+
+    <!-- Content -->
+    <div class="cst-main">
+        <div class="cst-crumb"><span>Gestion</span><span>/</span><b>Bus</b></div>
+
+        <div class="cst-head">
+            <div>
+                <div class="cst-head__title">{{ t('Buses') }}</div>
+                <div class="cst-head__sub">{{ busesLength ?? 0 }} véhicules</div>
+            </div>
+            <div class="cst-head__actions">
+                <button class="cst-btn cst-btn--ghost" type="button" (click)="SortChange()">
+                    <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:arrow-down-tray'"></mat-icon>
+                    {{ t('Export') || 'Exporter' }}
+                </button>
+                @if (hasActionPermission(FuseNavigationAction.Add)) {
+                    <button class="cst-btn cst-btn--primary" routerLink="ajouter">
+                        <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                        {{ t('Add') }}
+                    </button>
+                }
+            </div>
         </div>
-    </div>
 
-    <!-- Main -->
-    <div class="flex flex-auto">
+        <div class="cst-panel">
+            <!-- Filter bar -->
+            <div class="cst-filters">
+                <div class="cst-search">
+                    <mat-icon [svgIcon]="'heroicons_outline:magnifying-glass'"></mat-icon>
+                    <input [formControl]="searchInputControl" [placeholder]="t('Search')" [autocomplete]="'off'" />
+                </div>
+                <div class="cst-sort">
+                    <button type="button" [class.is-on]="sortActive === 'numeroIMM'"
+                            (click)="setSort('numeroIMM', sortActive === 'numeroIMM' && sortDirection === 'asc' ? 'desc' : 'asc')">
+                        {{ t('NumeroIMM') }}
+                        <span class="cst-sort__dir">{{ sortActive === 'numeroIMM' ? (sortDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
+                    </button>
+                    <button type="button" [class.is-on]="sortActive === 'modelBus'"
+                            (click)="setSort('modelBus', sortActive === 'modelBus' && sortDirection === 'asc' ? 'desc' : 'asc')">
+                        {{ t('Model') }}
+                        <span class="cst-sort__dir">{{ sortActive === 'modelBus' ? (sortDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
+                    </button>
+                </div>
+                <div class="cst-filters__count">{{ busesLength ?? 0 }} résultats</div>
+            </div>
 
-        <!-- Bus list -->
-        <div class="relative flex flex-col flex-auto sm:mb-18 overflow-hidden px-4 sm:px-8 pt-4 sm:pt-8 rounded-lg bg-card">
-            @if(bus$ | async; as buses){
-                @if(buses.length > 0){
-                    <div class="grid gap-4 pb-20">
-                        <fieldset class="flex flex-wrap items-center gap-2 mb-6">
-                            <legend class="text-sm text-hint">{{ t('Sort') }}</legend>
-                            <button
-                                mat-stroked-button
-                                type="button"
-                                [attr.aria-label]="t('Sort-by-numero-imm-ascending')"
-                                [disabled]="sortActive === 'numeroIMM' && sortDirection === 'asc'"
-                                [ngClass]="{'bg-primary text-white': sortActive === 'numeroIMM' && sortDirection === 'asc'}"
-                                (click)="setSort('numeroIMM','asc')">
-                                {{ t('NumeroIMM') }} ↑
-                            </button>
-                            <button
-                                mat-stroked-button
-                                type="button"
-                                [attr.aria-label]="t('Sort-by-numero-imm-descending')"
-                                [disabled]="sortActive === 'numeroIMM' && sortDirection === 'desc'"
-                                [ngClass]="{'bg-primary text-white': sortActive === 'numeroIMM' && sortDirection === 'desc'}"
-                                (click)="setSort('numeroIMM','desc')">
-                                {{ t('NumeroIMM') }} ↓
-                            </button>
-                            <button
-                                mat-stroked-button
-                                type="button"
-                                [attr.aria-label]="t('Sort-by-model-ascending')"
-                                [disabled]="sortActive === 'modelBus' && sortDirection === 'asc'"
-                                [ngClass]="{'bg-primary text-white': sortActive === 'modelBus' && sortDirection === 'asc'}"
-                                (click)="setSort('modelBus','asc')">
-                                {{ t('Model') }} ↑
-                            </button>
-                            <button
-                                mat-stroked-button
-                                type="button"
-                                [attr.aria-label]="t('Sort-by-model-descending')"
-                                [disabled]="sortActive === 'modelBus' && sortDirection === 'desc'"
-                                [ngClass]="{'bg-primary text-white': sortActive === 'modelBus' && sortDirection === 'desc'}"
-                                (click)="setSort('modelBus','desc')">
-                                {{ t('Model') }} ↓
-                            </button>
-                        </fieldset>
+            @if (isLoading) { <mat-progress-bar mode="indeterminate"></mat-progress-bar> }
 
-                        <!-- Cards Grid -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
-                            @for(bus of buses; track bus.busId || $index){
-                                <div class="entity-card bg-card p-6 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
-                                     (click)="toggleDetails(bus.busId)">
-                                    <div class="flex items-start justify-between mb-4">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
-                                                <mat-icon class="text-white text-2xl" svgIcon="mat_outline:directions_bus"></mat-icon>
-                                            </div>
-                                            <div>
-                                                <div class="font-bold text-lg">{{bus.numeroIMM || '-'}}</div>
-                                                <div class="text-sm text-gray-500 dark:text-gray-400">{{bus.modelBus || 'Modèle inconnu'}}</div>
-                                            </div>
-                                        </div>
-                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
-                                                  [ngClass]="bus.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'">
-                                            {{bus.isActive ? t('Active') : t('Inactive')}}
-                                        </span>
-                                    </div>
-                                    <div class="grid grid-cols-2 gap-4 text-sm">
-                                        <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                            <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
-                                                <mat-icon class="icon-size-4" svgIcon="mat_outline:local_offer"></mat-icon>
-                                                Capacité
-                                            </div>
-                                            <div class="font-semibold">{{bus.capacite ?? '-'}}</div>
-                                        </div>
-                                        <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                            <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
-                                                <mat-icon class="icon-size-4" svgIcon="mat_outline:route"></mat-icon>
-                                                Circuit
-                                            </div>
-                                            <div class="font-semibold">{{bus.codeCircuit || '-'}}</div>
-                                        </div>
-                                        <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                            <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
-                                                <mat-icon class="icon-size-4" svgIcon="mat_outline:smartphone"></mat-icon>
-                                                App Sagem
-                                            </div>
-                                            <span class="font-semibold" [ngClass]="bus.appSagem ? 'text-green-600' : 'text-orange-600'">
-                                                {{bus.appSagem ? t('Yes') : t('No')}}
-                                            </span>
-                                        </div>
-                                        <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                            <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
-                                                <mat-icon class="icon-size-4" svgIcon="mat_outline:tag"></mat-icon>
-                                                IMEI
-                                            </div>
-                                            <div class="font-semibold">{{bus.imei || '-'}}</div>
-                                        </div>
-                                    </div>
-                                    <!-- Action Buttons -->
-                                    <div class="flex items-center justify-end gap-2 mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
-                                        <button
-                                            mat-icon-button
-                                            [routerLink]="bus.busId"
-                                            class="!w-8 !h-8"
-                                            (click)="$event.stopPropagation()">
-                                            <mat-icon
-                                                class="text-gray-500"
-                                                [svgIcon]="'edit_road'">
-                                            </mat-icon>
+            <!-- Table -->
+            <div class="cst-tbl" style="--cols: 150px 1.3fr 90px 130px 1.3fr 120px 120px 96px; --colmin: 980px">
+                <div class="cst-tbl__head">
+                    <div>{{ t('NumeroIMM') }}</div>
+                    <div>{{ t('Model') }}</div>
+                    <div>{{ t('Capacity') }}</div>
+                    <div>IMEI</div>
+                    <div>{{ t('Circuit') }}</div>
+                    <div>{{ t('Chauffeur') }}</div>
+                    <div>{{ t('Status') || 'Statut' }}</div>
+                    <div class="cst-tbl__end">Actions</div>
+                </div>
+
+                @if (bus$ | async; as buses) {
+                    @if (buses.length > 0) {
+                        @for (bus of buses; track trackByFn($index, bus)) {
+                            <div class="cst-tbl__row">
+                                <div class="cst-strong cst-num">{{ bus.numeroIMM || '—' }}</div>
+                                <div>{{ bus.modelBus || '—' }}</div>
+                                <div class="cst-num cst-mut">{{ bus.capacite ?? '—' }}</div>
+                                <div class="cst-num cst-mut">{{ bus.imei || '—' }}</div>
+                                <div>{{ bus.codeCircuit || '—' }}</div>
+                                <div class="cst-mut">{{ bus.codeChauffeur || '—' }}</div>
+                                <div>
+                                    <span class="cst-pill" [ngClass]="bus.isActive ? 'cst-pill--ok' : 'cst-pill--off'">
+                                        {{ bus.isActive ? (t('Active') || 'ACTIF') : (t('Inactive') || 'INACTIF') }}
+                                    </span>
+                                </div>
+                                <div class="cst-tbl__act">
+                                    <button class="cst-round" type="button" [routerLink]="bus.busId" [attr.aria-label]="t('Edit')">
+                                        <mat-icon [svgIcon]="'heroicons_outline:pencil-square'"></mat-icon>
+                                    </button>
+                                    @if (hasActionPermission(FuseNavigationAction.Delete)) {
+                                        <button class="cst-round cst-round--danger" type="button" (click)="deleteSelectedBus(bus)" [attr.aria-label]="t('Delete')">
+                                            <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
                                         </button>
-                                        @if(hasActionPermission(FuseNavigationAction.Delete)){
-                                        <button
-                                            mat-icon-button
-                                            [color]="'warn'"
-                                            (click)="deleteSelectedBus(bus); $event.stopPropagation()"
-                                            class="!w-8 !h-8">
-                                            <mat-icon
-                                                [svgIcon]="'heroicons_outline:trash'">
-                                            </mat-icon>
-                                        </button>
-                                        }
-                                    </div>
-
-                                    @if(selectedBus?.busId === bus.busId){
-                                        <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                                                <div>
-                                                    <span class="font-semibold">{{ t('NumeroIMM') }}:</span>
-                                                    <span class="ml-2">{{bus.numeroIMM}}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="font-semibold">{{ t('Model') }}:</span>
-                                                    <span class="ml-2">{{bus.modelBus || '-'}}</span>
-                                                </div>
-                                            </div>
-                                        </div>
                                     }
                                 </div>
-                            }
+                            </div>
+                        }
+                    } @else {
+                        <div class="cst-tbl__empty">
+                            <div class="cst-tbl__empty-ic"><mat-icon [svgIcon]="'mat_outline:directions_bus'"></mat-icon></div>
+                            <div class="cst-tbl__empty-t">{{ t('No-buses-found') }}</div>
+                            <div class="cst-tbl__empty-s">Ajustez vos filtres ou créez un nouveau bus.</div>
                         </div>
-
-                        <!-- Paginator -->
-                        <mat-paginator
-                            class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
-                            [ngClass]="{'pointer-events-none': isLoading}"
-                            [length]="busesLength"
-                            [pageIndex]="0"
-                            [pageSize]="10"
-                            [pageSizeOptions]="[5, 10, 25, 100]"
-                            [showFirstLastButtons]="true"
-                            (page)="SortChange()">
-                        </mat-paginator>
-                    </div>
-                }@else{
-                    <div class="col-span-full text-center py-16 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
-                        <mat-icon class="icon-size-16 mb-3" svgIcon="mat_outline:directions_bus"></mat-icon>
-                        <div class="font-semibold text-2xl">{{ t('No-buses-found') }}</div>
-                    </div>
+                    }
                 }
-            }
+            </div>
+
+            <!-- Pagination -->
+            <mat-paginator
+                class="cst-pager"
+                [ngClass]="{'pointer-events-none': isLoading}"
+                [length]="busesLength"
+                [pageIndex]="0"
+                [pageSize]="10"
+                [pageSizeOptions]="[5, 10, 25, 100]"
+                [showFirstLastButtons]="true"
+                (page)="SortChange()">
+            </mat-paginator>
         </div>
     </div>
 </div>

@@ -5,3 +5,535 @@
 dx-license{
     display: none !important;
 }
+
+/* ----------------------------------------------------------------------------------------------------- */
+/*  @ CST CRUD list layout (Design Canvas 1d) — global so every gestion module reuses it                  */
+/*  @ Per-module table columns are set via `style="--cols: …; --colmin: …px"` on `.cst-tbl`.              */
+/* ----------------------------------------------------------------------------------------------------- */
+.cst-list {
+    width: 100%; flex: 1 1 auto; min-width: 0; min-height: 100%;
+    display: grid; grid-template-columns: 236px 1fr;
+    background: var(--cst-bg); font-family: var(--cst-font); color: var(--cst-text);
+}
+.cst-side {
+    background: #fff; border-right: 1px solid var(--cst-border); padding: 20px 12px;
+    display: flex; flex-direction: column; gap: 2px;
+}
+.cst-side__label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: var(--cst-text-hint); text-transform: uppercase; padding: 0 12px 10px; }
+.cst-side__item {
+    display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-radius: 9px;
+    font-size: 13px; font-weight: 500; color: var(--cst-text-2); cursor: pointer; text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease;
+    &:hover { background: var(--cst-surface-2); }
+    &.is-active { background: var(--cst-danger-bg); color: var(--cst-red); font-weight: 700; }
+}
+.cst-side__count { font-size: 11px; font-weight: 700; color: var(--cst-text-hint); background: var(--cst-pill-bg); border-radius: 999px; padding: 1px 8px; font-variant-numeric: tabular-nums; &.is-active { color: var(--cst-red); background: #fff; } }
+.cst-main { padding: 26px 30px; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.cst-crumb { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--cst-text-hint); a { color: var(--cst-text-hint); font-weight: 500; } b { color: var(--cst-navy); font-weight: 600; } }
+.cst-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.cst-head__title { font-family: var(--cst-font-head); font-size: 22px; font-weight: 700; color: var(--cst-navy); }
+.cst-head__sub { font-size: 13px; color: var(--cst-text-muted); margin-top: 3px; }
+.cst-head__actions { display: flex; gap: 10px; }
+.cst-panel { background: #fff; border: 1px solid var(--cst-border); border-radius: 16px; box-shadow: 0 1px 2px rgba(18, 18, 66, 0.05); overflow: hidden; display: flex; flex-direction: column; }
+.cst-filters { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--cst-border-soft); flex-wrap: wrap; }
+.cst-search {
+    display: flex; align-items: center; gap: 8px; width: 280px; max-width: 100%;
+    background: var(--cst-surface-2); border: 1px solid var(--cst-border-line); border-radius: 10px; padding: 9px 12px;
+    mat-icon { width: 14px; height: 14px; font-size: 14px; color: var(--cst-text-hint); }
+    input { flex: 1; border: none; background: transparent; outline: none; font-family: inherit; font-size: 13px; color: var(--cst-text); &::placeholder { color: var(--cst-text-hint); } }
+    &:focus-within { border-color: var(--cst-blue); }
+}
+.cst-sort { display: flex; gap: 7px; }
+.cst-sort button {
+    display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--cst-border-2); border-radius: 10px;
+    padding: 9px 12px; font-family: inherit; font-size: 13px; font-weight: 600; color: var(--cst-text-2); background: #fff; cursor: pointer;
+    &:hover { border-color: var(--cst-blue); }
+    &.is-on { border-color: var(--cst-blue); color: var(--cst-navy); background: var(--cst-blue-soft); }
+    .cst-sort__dir { color: var(--cst-text-hint); font-weight: 700; }
+}
+.cst-filters__count { margin-left: auto; font-size: 12px; color: var(--cst-text-hint); }
+.cst-tbl { display: flex; flex-direction: column; overflow-x: auto; }
+.cst-tbl__head, .cst-tbl__row { display: grid; grid-template-columns: var(--cols, repeat(6, 1fr)); align-items: center; min-width: var(--colmin, 900px); }
+.cst-tbl__head { padding: 10px 20px; background: var(--cst-surface-2); border-bottom: 1px solid var(--cst-border-line); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: var(--cst-text-hint); text-transform: uppercase; }
+.cst-tbl__end { text-align: right; }
+.cst-tbl__row { padding: 13px 20px; border-bottom: 1px solid var(--cst-border-soft); font-size: 13px; color: var(--cst-navy); transition: background 0.15s ease; &:hover { background: #fbfdff; } }
+.cst-strong { font-weight: 700; }
+.cst-num { font-variant-numeric: tabular-nums; }
+.cst-mut { color: var(--cst-text-2); }
+.cst-tbl__act { display: flex; gap: 6px; justify-content: flex-end; }
+.cst-tbl__empty { grid-column: 1 / -1; min-width: 0; padding: 44px 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.cst-tbl__empty-ic { width: 44px; height: 44px; border-radius: 12px; background: var(--cst-blue-soft); color: var(--cst-blue); display: flex; align-items: center; justify-content: center; mat-icon { color: var(--cst-blue) !important; } }
+.cst-tbl__empty-t { font-size: 14px; font-weight: 700; color: var(--cst-navy); }
+.cst-tbl__empty-s { font-size: 12px; color: var(--cst-text-hint); }
+.cst-pager { background: transparent; font-family: var(--cst-font); .mat-mdc-paginator-container { min-height: 56px; padding: 8px 16px; } }
+@media (max-width: 900px) { .cst-list { grid-template-columns: 1fr; } .cst-side { display: none; } }
+
+/* ----------------------------------------------------------------------------------------------------- */
+/*  @ CST detail / form layout (Design Canvas 1e)                                                          */
+/* ----------------------------------------------------------------------------------------------------- */
+.cst-form-page { width: 100%; flex: 1 1 auto; min-width: 0; min-height: 100%; background: var(--cst-bg); font-family: var(--cst-font); color: var(--cst-text); display: flex; justify-content: center; padding: 26px 20px 40px; }
+.cst-form-wrap { width: 920px; max-width: 100%; display: flex; flex-direction: column; gap: 18px; }
+.cst-form-topline { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.cst-form-id { display: flex; align-items: center; gap: 14px; }
+.cst-form-id__ic { width: 46px; height: 46px; border-radius: 13px; background: var(--cst-blue-soft); color: var(--cst-blue); display: flex; align-items: center; justify-content: center; mat-icon { color: var(--cst-blue) !important; } }
+.cst-form-id__title { display: flex; align-items: center; gap: 10px; font-family: var(--cst-font-head); font-size: 22px; font-weight: 700; color: var(--cst-navy); }
+.cst-form-id__meta { font-size: 13px; color: var(--cst-text-muted); margin-top: 2px; }
+.cst-form-card { background: #fff; border: 1px solid var(--cst-border); border-radius: 16px; box-shadow: 0 1px 2px rgba(18, 18, 66, 0.05); padding: 26px 30px; display: flex; flex-direction: column; gap: 24px; }
+.cst-form-sec__title { font-size: 14px; font-weight: 700; color: var(--cst-navy); margin-bottom: 4px; }
+.cst-form-sec__sub { font-size: 12px; color: var(--cst-text-hint); margin-bottom: 16px; }
+.cst-form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+@media (max-width: 800px) { .cst-form-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .cst-form-grid { grid-template-columns: 1fr; } }
+.cst-divider { height: 1px; background: var(--cst-border-soft); }
+.cst-form-statusrow { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.cst-banner { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid var(--cst-border); border-radius: 16px; box-shadow: 0 1px 2px rgba(18, 18, 66, 0.05); padding: 16px 20px; font-size: 13px; color: var(--cst-text-2); }
+.cst-banner__ic { width: 36px; height: 36px; flex: none; border-radius: 10px; background: var(--cst-blue-soft); color: var(--cst-blue); display: flex; align-items: center; justify-content: center; mat-icon { color: var(--cst-blue) !important; } }
+.cst-form-flash { border-radius: 12px; padding: 12px 16px; font-size: 13px; font-weight: 600; &.is-ok { color: var(--cst-ok); background: var(--cst-ok-bg); } &.is-err { color: var(--cst-danger); background: var(--cst-danger-bg); } }
+
+/* Toggle switch (Design Canvas) */
+.cst-toggle { position: relative; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; font-weight: 700; }
+.cst-toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+.cst-toggle__track { width: 46px; height: 26px; border-radius: 999px; background: var(--cst-text-disabled); position: relative; transition: background 0.2s ease; }
+.cst-toggle__track::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(18, 18, 66, 0.25); transition: transform 0.2s ease; }
+.cst-toggle input:checked + .cst-toggle__track { background: var(--cst-ok); }
+.cst-toggle input:checked + .cst-toggle__track::after { transform: translateX(20px); }
+.cst-toggle__on { color: var(--cst-ok); } .cst-toggle__off { color: var(--cst-text-muted); }
+
+/* Input error state */
+.cst-input.is-err, .cst-select.is-err select { border-color: var(--cst-danger); background: #fff7f7; box-shadow: 0 0 0 3px rgba(209, 43, 40, 0.10); }
+
+/* ----------------------------------------------------------------------------------------------------- */
+/*  @ CST shared component primitives (Design Canvas 1g) — global so every screen can use them            */
+/* ----------------------------------------------------------------------------------------------------- */
+.cst-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 40px; padding: 0 18px; border-radius: 10px;
+    font-family: var(--cst-font); font-size: 13px; font-weight: 600; cursor: pointer;
+    border: 1px solid transparent; white-space: nowrap;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+    .cst-btn__i { width: 16px; height: 16px; font-size: 16px; }
+    &--primary { background: var(--cst-red); color: #fff; font-weight: 700; border: none; box-shadow: 0 4px 12px rgba(209, 43, 40, 0.25); &:hover { background: var(--cst-red-hover); } }
+    &--ghost { background: #fff; color: var(--cst-text-2); border-color: var(--cst-border-2); &:hover { border-color: var(--cst-blue); color: var(--cst-navy); } }
+    &:disabled { opacity: 0.55; cursor: default; }
+}
+
+.cst-pill {
+    display: inline-flex; align-items: center; font-size: 11px; font-weight: 700;
+    padding: 4px 10px; border-radius: 999px; white-space: nowrap; letter-spacing: 0.01em;
+    &--ok, &--approved { color: var(--cst-ok); background: var(--cst-ok-bg); }
+    &--warn, &--pending { color: var(--cst-warn); background: var(--cst-warn-bg); }
+    &--info { color: var(--cst-info); background: var(--cst-info-bg); }
+    &--danger, &--rejected { color: var(--cst-danger); background: var(--cst-danger-bg); }
+    &--off, &--system { color: var(--cst-off); background: var(--cst-off-bg); }
+}
+
+.cst-round {
+    width: 30px; height: 30px; border-radius: 999px; border: none; cursor: pointer;
+    background: var(--cst-pill-bg); color: var(--cst-text-2);
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: background 0.15s ease, color 0.15s ease;
+    mat-icon { width: 14px; height: 14px; font-size: 14px; }
+    &:hover { background: var(--cst-blue-soft); color: var(--cst-blue); }
+    &--danger:hover { background: var(--cst-danger-bg); color: var(--cst-danger); }
+    &--solid { background: var(--cst-red); color: #fff; &:hover { background: var(--cst-red-hover); color: #fff; } }
+}
+
+/* ----------------------------------------------------------------------------------------------------- */
+/*  @ CST brand palette — derived from the CST logo (blue + red)                                          */
+/* ----------------------------------------------------------------------------------------------------- */
+:root {
+    /* Brand */
+    --cst-red: #d12b28;
+    --cst-red-hover: #b92221;
+    --cst-red-deep: #661011;
+    --cst-red-soft: #fdecec;      /* danger / destructive bg */
+    --cst-blue: #42abe0;
+    --cst-blue-strong: #2e8bbd;
+    --cst-blue-soft: #eaf6fc;     /* info bg / blue chip bg */
+    --cst-navy: #121242;
+    --cst-blue-dark: #121242;     /* alias kept for existing rules */
+
+    /* Surfaces & background */
+    --cst-bg: #eaf3fb;            /* Fond app */
+    --cst-blue-bg: #eaf3fb;       /* alias kept for existing rules */
+    --cst-surface: #ffffff;
+    --cst-surface-2: #f7fafd;     /* table header / soft surface */
+    --cst-input-bg: #fbfdff;
+    --cst-pill-bg: #f1f6fb;       /* pill nav track / chips */
+
+    /* Borders */
+    --cst-border: #e3ecf6;
+    --cst-border-2: #d7e3ef;      /* input border */
+    --cst-border-soft: #f1f6fb;
+    --cst-border-line: #edf3f9;
+
+    /* Text */
+    --cst-text: #121242;
+    --cst-text-2: #3d4c66;
+    --cst-text-muted: #5a6b85;
+    --cst-text-hint: #8ca2bd;
+    --cst-text-disabled: #c9d8e8;
+
+    /* Status */
+    --cst-ok: #0e8a5f;       --cst-ok-bg: #e3f5ee;
+    --cst-warn: #9a6700;     --cst-warn-bg: #fff3d6;   --cst-warn-strong: #f2b33d;
+    --cst-info: #2e8bbd;     --cst-info-bg: #eaf6fc;
+    --cst-danger: #d12b28;   --cst-danger-bg: #fdecec;
+    --cst-off: #5a6b85;      --cst-off-bg: #edf1f6;
+
+    /* Type */
+    --cst-font: 'Public Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --cst-font-head: 'Sora', 'Public Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ----------------------------------------------------------------------------------------------------- */
+/*  @ CST pill top-navigation (modern horizontal layout) — reference-style centered pill bar             */
+/* ----------------------------------------------------------------------------------------------------- */
+fuse-horizontal-navigation {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding: 4px !important;
+    border-radius: 9999px !important;
+    background: var(--cst-pill-bg) !important;
+    font-family: var(--cst-font);
+
+    .fuse-horizontal-navigation-wrapper { gap: 4px; }
+
+    .fuse-horizontal-navigation-item {
+        height: 38px !important;
+        min-height: 38px !important;
+        padding: 0 20px !important;
+        border-radius: 9999px !important;
+        gap: 8px;
+        color: var(--cst-text-2) !important;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+
+        &:hover {
+            background: #e3eef8 !important;
+            color: var(--cst-navy) !important;
+        }
+    }
+
+    .fuse-horizontal-navigation-item-icon { color: inherit !important; }
+    .fuse-horizontal-navigation-item-title { color: inherit !important; font-weight: inherit; }
+
+    .fuse-horizontal-navigation-item-active,
+    .fuse-horizontal-navigation-item-active:hover {
+        background: var(--cst-red) !important;
+        color: #fff !important;
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(209, 43, 40, 0.30);
+
+        .fuse-horizontal-navigation-item-icon,
+        .fuse-horizontal-navigation-item-title { color: #fff !important; }
+    }
+}
+
+/* ----------------------------------------------------------------------------------------------------- */
+/*  @ CST top-bar: logo lockup + circular action icons (Design Canvas)                                    */
+/* ----------------------------------------------------------------------------------------------------- */
+modern-layout {
+    .cst-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0 12px;
+        min-width: 210px;
+    }
+    .cst-logo__mark { height: 30px; width: auto; }
+    .cst-logo__text { line-height: 1.1; }
+    .cst-logo__name { font-family: var(--cst-font-head); font-weight: 800; font-size: 16px; color: var(--cst-navy); }
+    .cst-logo__sub { font-size: 9px; letter-spacing: 0.06em; color: var(--cst-text-hint); font-weight: 600; }
+
+    .cst-actions {
+        gap: 10px;
+        padding-left: 8px;
+        min-width: 210px;
+        justify-content: flex-end;
+        font-family: var(--cst-font);
+    }
+
+    /* Custom circular icon buttons (bell, theme) */
+    .cst-ic {
+        position: relative; width: 36px; height: 36px; border-radius: 9999px; border: none; cursor: pointer;
+        background: var(--cst-pill-bg); color: var(--cst-text-2);
+        display: flex; align-items: center; justify-content: center; transition: background 0.15s ease;
+        &:hover { background: #e3eef8; }
+        mat-icon { color: var(--cst-text-2) !important; width: 16px; height: 16px; font-size: 16px; }
+    }
+    .cst-ic__dot { position: absolute; top: 7px; right: 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--cst-red); border: 2px solid var(--cst-pill-bg); }
+
+    /* Fuse component triggers → same circular pill */
+    .cst-actions search .mat-mdc-icon-button,
+    .cst-actions languages button,
+    .cst-fs button,
+    .cst-user button {
+        width: 36px !important; height: 36px !important; min-height: 36px !important; padding: 0 !important;
+        border-radius: 9999px !important; background: var(--cst-pill-bg) !important;
+        &:hover { background: #e3eef8 !important; }
+    }
+    .cst-user button { background: var(--cst-navy) !important; color: #fff !important; }
+    .cst-user button:hover { background: #1c1c5a !important; }
+}
+
+/* ----------------------------------------------------------------------------------------------------- */
+/*  @ CST buttons — Material flat/raised primary adopt the CST red; everything rounds to 10px             */
+/* ----------------------------------------------------------------------------------------------------- */
+.mat-mdc-unelevated-button.mat-primary,
+.mat-mdc-raised-button.mat-primary {
+    --mdc-filled-button-container-color: var(--cst-red);
+    --mdc-filled-button-label-text-color: #ffffff;
+    --mdc-protected-button-container-color: var(--cst-red);
+    --mdc-protected-button-label-text-color: #ffffff;
+    background-color: var(--cst-red) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 12px rgba(209, 43, 40, 0.25) !important;
+    &:hover { background-color: var(--cst-red-hover) !important; }
+}
+.mat-mdc-button-base {
+    border-radius: 10px !important;
+    letter-spacing: normal !important;
+}
+.mat-mdc-outlined-button:not(.mat-mdc-icon-button),
+.mat-mdc-stroked-button {
+    --mdc-outlined-button-outline-color: var(--cst-border-2);
+    border-radius: 10px !important;
+}
+
+/* ----------------------------------------------------------------------------------------------------- */
+/*  @ CST form-control primitives (Design Canvas 1g) — reused by auth + detail/form screens              */
+/* ----------------------------------------------------------------------------------------------------- */
+.cst-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--cst-text-2);
+    }
+}
+.cst-field__err {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--cst-danger);
+}
+
+.cst-input {
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid var(--cst-border-2);
+    border-radius: 10px;
+    background: var(--cst-input-bg);
+    font-family: var(--cst-font);
+    font-size: 14px;
+    color: var(--cst-text);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+
+    &::placeholder { color: var(--cst-text-hint); }
+    &:focus {
+        border-color: var(--cst-blue);
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(66, 171, 224, 0.15);
+    }
+}
+.cst-input--group {
+    display: flex;
+    align-items: center;
+    padding-right: 8px;
+
+    input {
+        flex: 1;
+        height: 100%;
+        border: none;
+        background: transparent;
+        outline: none;
+        font-family: inherit;
+        font-size: 14px;
+        color: var(--cst-text);
+        &::placeholder { color: var(--cst-text-hint); }
+    }
+    &:focus-within {
+        border-color: var(--cst-blue);
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(66, 171, 224, 0.15);
+    }
+}
+.cst-input__eye {
+    display: flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; border: none; background: transparent; cursor: pointer;
+    svg { width: 16px; height: 16px; }
+}
+
+.cst-select {
+    position: relative;
+
+    select {
+        width: 100%;
+        height: 44px;
+        padding: 0 38px 0 14px;
+        border: 1px solid var(--cst-border-2);
+        border-radius: 10px;
+        background: var(--cst-input-bg);
+        font-family: var(--cst-font);
+        font-size: 14px;
+        color: var(--cst-text);
+        outline: none;
+        appearance: none;
+        -webkit-appearance: none;
+        cursor: pointer;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+
+        &:focus {
+            border-color: var(--cst-blue);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(66, 171, 224, 0.15);
+        }
+    }
+    svg {
+        position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+        width: 14px; height: 14px; pointer-events: none;
+    }
+}
+
+.cst-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--cst-text-2);
+    cursor: pointer;
+
+    input { position: absolute; opacity: 0; width: 0; height: 0; }
+    .cst-check__box {
+        width: 16px; height: 16px; border-radius: 4px;
+        border: 1.5px solid var(--cst-text-disabled); background: #fff;
+        display: inline-flex; align-items: center; justify-content: center;
+        transition: background 0.15s ease, border-color 0.15s ease;
+        svg { width: 10px; height: 10px; opacity: 0; transition: opacity 0.15s ease; }
+    }
+    input:checked + .cst-check__box {
+        background: var(--cst-red);
+        border-color: var(--cst-red);
+        svg { opacity: 1; }
+    }
+}
+
+/* ----------------------------------------------------------------------------------------------------- */
+/*  @ CST auth screens (Design Canvas 1a) — centered card on soft-blue background                        */
+/* ----------------------------------------------------------------------------------------------------- */
+.cst-auth {
+    position: relative;
+    min-height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+    background: var(--cst-bg);
+    font-family: var(--cst-font);
+    overflow: hidden;
+
+    &__bg { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    &__glow { position: absolute; border-radius: 50%; }
+    &__glow--1 { top: -180px; right: -120px; width: 560px; height: 560px; background: radial-gradient(circle at 40% 40%, rgba(66, 171, 224, 0.18), transparent 70%); }
+    &__glow--2 { bottom: -220px; left: -140px; width: 640px; height: 640px; background: radial-gradient(circle at 60% 60%, rgba(18, 18, 66, 0.08), transparent 70%); }
+    &__paths { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.5; }
+
+    &__card {
+        position: relative;
+        width: 440px;
+        max-width: 100%;
+        background: #fff;
+        border: 1px solid var(--cst-border);
+        border-radius: 20px;
+        box-shadow: 0 2px 4px rgba(18, 18, 66, 0.05), 0 24px 64px rgba(18, 18, 66, 0.12);
+        padding: 40px 44px 36px;
+    }
+
+    &__brand { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-bottom: 28px; text-align: center; img { height: 44px; } }
+    &__welcome { font-family: var(--cst-font-head); font-size: 20px; font-weight: 700; color: var(--cst-navy); }
+    &__sub { font-size: 13px; color: var(--cst-text-muted); margin-top: -6px; }
+
+    &__alert {
+        margin-bottom: 16px; border-radius: 10px; padding: 11px 14px; font-size: 13px; font-weight: 500;
+        color: var(--cst-danger); background: var(--cst-danger-bg); border: 1px solid #f6c1bf;
+    }
+
+    &__form { display: flex; flex-direction: column; gap: 14px; }
+
+    &__row { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; }
+    &__link { font-size: 13px; font-weight: 600; color: var(--cst-red); &:hover { color: var(--cst-red-deep); text-decoration: underline; } }
+
+    &__submit {
+        position: relative;
+        height: 46px; margin-top: 8px; border: none; border-radius: 10px;
+        background: linear-gradient(180deg, #d12b28, #b92221);
+        color: #fff; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 4px 12px rgba(209, 43, 40, 0.30);
+        transition: background 0.18s ease;
+        &:hover:not(:disabled) { background: linear-gradient(180deg, #b92221, #9c1b1a); }
+        &:disabled { opacity: 0.85; cursor: default; }
+        mat-progress-spinner circle { stroke: #fff !important; }
+    }
+
+    &__locked { margin-top: 6px; text-align: center; font-size: 13px; color: var(--cst-danger); }
+    &__foot { text-align: center; font-size: 13px; color: var(--cst-text-muted); margin-top: 4px; }
+    &__copy { position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; font-size: 12px; color: var(--cst-text-hint); }
+}
+
+/* ----------------------------------------------------------------------------------------------------- */
+/*  @ Shared CRUD entity card — ensures a consistent accent bar + elevation across every list module,     */
+/*  @ including the ones that never defined it in their own component stylesheet.                          */
+/* ----------------------------------------------------------------------------------------------------- */
+.entity-card {
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 20px -14px rgba(15, 23, 42, 0.25) !important;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease !important;
+
+    /* Gradient accent bar — authoritative so every list module matches */
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #6366f1, #8b5cf6, #a855f7) !important;
+        z-index: 1;
+    }
+
+    /* Soft radial sheen in the top-right corner */
+    &::after {
+        content: '';
+        position: absolute;
+        top: -40px;
+        right: -40px;
+        width: 130px;
+        height: 130px;
+        border-radius: 9999px;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.10), transparent 70%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+    }
+
+    &:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 24px 45px -22px rgba(79, 70, 229, 0.45) !important;
+        border-color: rgba(99, 102, 241, 0.45) !important;
+
+        &::after {
+            opacity: 1;
+        }
+    }
+}
