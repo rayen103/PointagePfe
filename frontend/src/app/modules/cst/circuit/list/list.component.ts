@@ -246,6 +246,8 @@ export class ListComponent implements OnInit, OnDestroy {
             return;
         }
 
+        console.log('[Circuit List] Toggle details for circuit:', circuitId);
+
         this.circuit$.pipe(
             map((circuits) => {
                 const index = circuits.findIndex(item => item.circuitId === circuitId);
@@ -255,15 +257,21 @@ export class ListComponent implements OnInit, OnDestroy {
                 this.selectedCircuit = circuit;
                 this.isViewMode = true;
                 
+                console.log('[Circuit List] Selected circuit:', circuit);
+                
                 if (circuit?.circuitId) {
                     return this._circuitPointCollecteService.getByCircuit(circuit.circuitId).pipe(
-                        map(points => ({ circuit, points }))
+                        map(points => {
+                            console.log('[Circuit List] Received points from API:', points);
+                            return { circuit, points };
+                        })
                     );
                 }
                 return of({ circuit, points: [] });
             })
         )
             .subscribe(({ circuit, points }) => {
+                console.log('[Circuit List] Setting points:', points.length, 'points');
                 this.selectedCircuitPoints = points;
                 
                 // Build map locations for the selected circuit
@@ -304,6 +312,7 @@ export class ListComponent implements OnInit, OnDestroy {
                     }
                 });
 
+                console.log('[Circuit List] Map locations:', locations.length, 'locations');
                 this.mapLocations = locations;
                 this._changeDetectorRef.markForCheck();
             });

@@ -1,18 +1,31 @@
 @if (!child) {
-    <div
-        [ngClass]="{
-            'fuse-horizontal-navigation-menu-active': trigger.menuOpen,
-            'fuse-horizontal-navigation-menu-active-forced': item.active,
-        }"
-        [matMenuTriggerFor]="matMenu"
-        (onMenuOpen)="triggerChangeDetection()"
-        (onMenuClose)="triggerChangeDetection()"
-        #trigger="matMenuTrigger"
-    >
-        <ng-container
-            *ngTemplateOutlet="itemTemplate; context: { $implicit: item }"
-        ></ng-container>
-    </div>
+    @if (item.link) {
+        <!-- Group with a link → navigate (no dropdown); children are shown as a sidebar in the page -->
+        <a
+            class="cst-nav-grouplink"
+            [routerLink]="item.link"
+            routerLinkActive="fuse-horizontal-navigation-item-active"
+        >
+            <ng-container
+                *ngTemplateOutlet="itemTemplate; context: { $implicit: item }"
+            ></ng-container>
+        </a>
+    } @else {
+        <div
+            [ngClass]="{
+                'fuse-horizontal-navigation-menu-active': trigger.menuOpen,
+                'fuse-horizontal-navigation-menu-active-forced': item.active,
+            }"
+            [matMenuTriggerFor]="matMenu"
+            (onMenuOpen)="triggerChangeDetection()"
+            (onMenuClose)="triggerChangeDetection()"
+            #trigger="matMenuTrigger"
+        >
+            <ng-container
+                *ngTemplateOutlet="itemTemplate; context: { $implicit: item }"
+            ></ng-container>
+        </div>
+    }
 }
 
 <mat-menu

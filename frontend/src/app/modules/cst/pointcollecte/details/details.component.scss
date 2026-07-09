@@ -1,1 +1,775 @@
-// Details component styles
+// ============================================================================
+// Compact No-Scroll Design - Point de Collecte Details Component
+// Senior Designer: Space-Optimized Layout
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// COMPACT FORM FIELDS
+// ----------------------------------------------------------------------------
+
+app-details {
+    
+    // Floating back button enhancement
+    .mat-mdc-icon-button.rounded-full {
+        &:hover {
+            transform: scale(1.1) translateY(-2px);
+            
+            mat-icon {
+                transform: translateX(-2px);
+            }
+        }
+
+        &:active {
+            transform: scale(0.95);
+        }
+    }
+
+    // Floating title badge animation
+    .absolute.top-4.left-1\/2 {
+        animation: float-in 0.5s ease-out;
+    }
+
+    @keyframes float-in {
+        from {
+            opacity: 0;
+            transform: translate(-50%, -20px);
+        }
+        to {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+    }
+    
+    // Compact form field styling
+    .compact-field {
+        .mat-mdc-text-field-wrapper {
+            .mat-mdc-form-field-flex {
+                min-height: 48px !important; // Reduced from 56px
+                
+                .mat-mdc-form-field-infix {
+                    padding-top: 12px !important; // Reduced padding
+                    padding-bottom: 12px !important;
+                    min-height: 48px !important;
+                }
+            }
+        }
+
+        .mat-mdc-form-field-subscript-wrapper {
+            margin-top: 0.25rem !important; // Tighter spacing
+        }
+
+        // Compact label
+        .mat-mdc-floating-label {
+            font-size: 0.875rem !important; // 14px
+        }
+
+        // Compact input text
+        input,
+        .mat-mdc-select {
+            font-size: 0.875rem !important; // 14px
+        }
+    }
+
+    // Compact section headers
+    h3 {
+        letter-spacing: 0.05em;
+        line-height: 1;
+    }
+
+    // Remove overflow scrolling
+    .flex-1.lg\:w-\[45\%\] {
+        overflow: hidden !important; // No scroll
+    }
+
+    // Ensure content fits
+    .min-h-0 {
+        min-height: 0;
+    }
+
+// ----------------------------------------------------------------------------
+// ANIMATIONS
+// ----------------------------------------------------------------------------
+
+@keyframes slide-down {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -30px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+@keyframes bounce-in {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-5px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+@keyframes pulse-subtle {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
+    }
+}
+
+.animate-slide-down {
+    animation: slide-down 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-bounce-in {
+    animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-shake {
+    animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.animate-pulse-subtle {
+    animation: pulse-subtle 3s infinite;
+}
+
+// ----------------------------------------------------------------------------
+// COMPONENT STYLES
+// ----------------------------------------------------------------------------
+
+    // Form Field Enhancements
+    .mat-mdc-form-field {
+        &.mat-form-field-appearance-outline {
+            .mat-mdc-text-field-wrapper {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                
+                .mat-mdc-form-field-flex {
+                    background-color: rgba(255, 255, 255, 0.8);
+                    backdrop-filter: blur(8px);
+                    transition: all 0.3s ease;
+                    
+                    @media (prefers-color-scheme: dark) {
+                        background-color: rgba(31, 41, 55, 0.8);
+                    }
+                }
+            }
+
+            // Focus state with glow
+            &.mat-focused .mat-mdc-text-field-wrapper {
+                .mat-mdc-form-field-flex {
+                    background-color: rgba(255, 255, 255, 1);
+                    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1),
+                                0 4px 12px rgba(0, 0, 0, 0.08);
+                    
+                    @media (prefers-color-scheme: dark) {
+                        background-color: rgba(31, 41, 55, 1);
+                        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2),
+                                    0 4px 12px rgba(0, 0, 0, 0.3);
+                    }
+                }
+            }
+
+            // Hover state
+            &:not(.mat-focused):hover .mat-mdc-text-field-wrapper {
+                .mat-mdc-form-field-flex {
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                    transform: translateY(-1px);
+                }
+            }
+        }
+    }
+
+    // Enhanced button styles
+    button {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-weight: 600;
+
+        &:not(:disabled) {
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12),
+                           0 4px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            &:active {
+                transform: translateY(0);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            }
+        }
+
+        &.mat-mdc-unelevated-button {
+            position: relative;
+            overflow: hidden;
+
+            &::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 0;
+                height: 0;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.3);
+                transform: translate(-50%, -50%);
+                transition: width 0.6s ease, height 0.6s ease;
+            }
+
+            &:not(:disabled):hover::before {
+                width: 300px;
+                height: 300px;
+            }
+        }
+    }
+
+    // Slide toggle enhancements
+    .mat-mdc-slide-toggle {
+        transition: all 0.3s ease;
+
+        .mdc-switch {
+            transition: all 0.3s ease;
+        }
+    }
+
+    // Autocomplete enhancements
+    .mat-mdc-option {
+        transition: all 0.2s ease;
+        
+        &:hover {
+            transform: translateX(4px);
+            background-color: rgba(59, 130, 246, 0.08);
+        }
+    }
+
+    // Card hover effects
+    .rounded-lg,
+    .rounded-xl {
+        transition: all 0.3s ease;
+    }
+
+    // Gradient backgrounds
+    .bg-gradient-to-r,
+    .bg-gradient-to-br {
+        background-size: 200% 200%;
+    }
+
+    // Map header backdrop effect
+    .backdrop-blur-md {
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+
+    .backdrop-blur-xl {
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+
+    // Icon animations
+    mat-icon {
+        transition: all 0.3s ease;
+    }
+
+    // Progress indicator animations
+    .w-6.h-6.rounded-full {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        
+        &.scale-110 {
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+        }
+    }
+
+    // Responsive adjustments
+    @media (max-width: 1023px) {
+        .lg\:flex-row {
+            flex-direction: column;
+        }
+
+        .lg\:w-\[45\%\],
+        .lg\:w-\[55\%\] {
+            width: 100%;
+            min-height: 500px;
+        }
+
+        .shadow-xl {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        // Allow scroll on mobile
+        .flex-1.lg\:w-\[45\%\] {
+            overflow-y: auto !important;
+        }
+    }
+
+    // Reduced motion support
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+
+    // Print styles
+    @media print {
+        .absolute.top-24,
+        button {
+            display: none;
+        }
+    }
+}
+
+// Dark mode specific enhancements
+@media (prefers-color-scheme: dark) {
+    app-details {
+        .backdrop-blur-md,
+        .backdrop-blur-xl {
+            background-color: rgba(17, 24, 39, 0.95) !important;
+        }
+
+        .shadow-xl {
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        .shadow-lg {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .shadow-md {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+    }
+}
+
+// Focus visible for accessibility
+*:focus-visible {
+    outline: 2px solid rgb(59, 130, 246);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+// Selection styling
+::selection {
+    background-color: rgba(59, 130, 246, 0.3);
+    color: inherit;
+}
+
+@keyframes slide-down {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -30px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+@keyframes bounce-in {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-5px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+@keyframes pulse-subtle {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
+    }
+}
+
+@keyframes gradient-shift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.animate-slide-down {
+    animation: slide-down 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-bounce-in {
+    animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-shake {
+    animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.animate-pulse-subtle {
+    animation: pulse-subtle 3s infinite;
+}
+
+// ----------------------------------------------------------------------------
+// COMPONENT STYLES
+// ----------------------------------------------------------------------------
+
+app-details {
+    
+    // Form Field Enhancements
+    .mat-mdc-form-field {
+        &.mat-form-field-appearance-outline {
+            .mat-mdc-text-field-wrapper {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                
+                .mat-mdc-form-field-flex {
+                    background-color: rgba(255, 255, 255, 0.8);
+                    backdrop-filter: blur(8px);
+                    transition: all 0.3s ease;
+                    
+                    @media (prefers-color-scheme: dark) {
+                        background-color: rgba(31, 41, 55, 0.8);
+                    }
+                }
+            }
+
+            // Focus state with glow
+            &.mat-focused .mat-mdc-text-field-wrapper {
+                .mat-mdc-form-field-flex {
+                    background-color: rgba(255, 255, 255, 1);
+                    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1),
+                                0 4px 12px rgba(0, 0, 0, 0.08);
+                    
+                    @media (prefers-color-scheme: dark) {
+                        background-color: rgba(31, 41, 55, 1);
+                        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2),
+                                    0 4px 12px rgba(0, 0, 0, 0.3);
+                    }
+                }
+            }
+
+            // Hover state
+            &:not(.mat-focused):hover .mat-mdc-text-field-wrapper {
+                .mat-mdc-form-field-flex {
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                    transform: translateY(-1px);
+                }
+            }
+        }
+    }
+
+    // Group hover effects for form fields
+    .group {
+        &:hover .mat-mdc-form-field {
+            .mat-mdc-text-field-wrapper {
+                transform: translateY(-2px);
+            }
+        }
+    }
+
+    // Enhanced scrollbar
+    .overflow-y-auto {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(59, 130, 246, 0.3) transparent;
+
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: linear-gradient(
+                180deg,
+                rgba(59, 130, 246, 0.3) 0%,
+                rgba(99, 102, 241, 0.3) 100%
+            );
+            border-radius: 3px;
+            transition: all 0.3s ease;
+
+            &:hover {
+                background: linear-gradient(
+                    180deg,
+                    rgba(59, 130, 246, 0.6) 0%,
+                    rgba(99, 102, 241, 0.6) 100%
+                );
+            }
+        }
+    }
+
+    // Section headers with enhanced styling
+    h3 {
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+    }
+
+    // Progress indicator animations
+    .w-8.h-8.rounded-full {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        
+        &:not(.bg-gray-300):not(.bg-gray-600) {
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+        }
+    }
+
+    // Enhanced button styles
+    button {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-weight: 600;
+        letter-spacing: 0.025em;
+
+        &:not(:disabled) {
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12),
+                           0 4px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            &:active {
+                transform: translateY(0);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            }
+        }
+
+        &.mat-mdc-unelevated-button {
+            position: relative;
+            overflow: hidden;
+
+            &::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 0;
+                height: 0;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.3);
+                transform: translate(-50%, -50%);
+                transition: width 0.6s ease, height 0.6s ease;
+            }
+
+            &:not(:disabled):hover::before {
+                width: 300px;
+                height: 300px;
+            }
+        }
+    }
+
+    // Slide toggle enhancements
+    .mat-mdc-slide-toggle {
+        transition: all 0.3s ease;
+
+        &:hover {
+            transform: translateX(4px);
+        }
+
+        .mdc-switch {
+            transition: all 0.3s ease;
+            
+            &:hover {
+                box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.1);
+            }
+        }
+    }
+
+    // Autocomplete enhancements
+    .modern-autocomplete {
+        .mat-mdc-option {
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            margin: 4px 8px;
+            
+            &:hover {
+                transform: translateX(4px);
+                box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+            }
+        }
+    }
+
+    // Card hover effects
+    .p-4.rounded-xl,
+    .p-6.rounded-xl {
+        transition: all 0.3s ease;
+        
+        &:not(.animate-shake) {
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            }
+        }
+    }
+
+    // Gradient backgrounds with animation
+    .bg-gradient-to-r,
+    .bg-gradient-to-br {
+        background-size: 200% 200%;
+        
+        &:hover {
+            animation: gradient-shift 3s ease infinite;
+        }
+    }
+
+    // Map header backdrop effect
+    .backdrop-blur-md {
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+
+    .backdrop-blur-xl {
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+    }
+
+    // Icon animations
+    mat-icon {
+        transition: all 0.3s ease;
+    }
+
+    .group:hover mat-icon {
+        transform: scale(1.1);
+    }
+
+    // Flash message enhancements
+    .absolute.top-24 {
+        .rounded-xl {
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+    }
+
+    // Responsive adjustments
+    @media (max-width: 1023px) {
+        .lg\:flex-row {
+            flex-direction: column;
+        }
+
+        .lg\:w-\[45\%\],
+        .lg\:w-\[55\%\] {
+            width: 100%;
+            min-height: 500px;
+        }
+
+        .border-r {
+            border-right: none;
+        }
+
+        .shadow-xl {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+    }
+
+    // High contrast mode support
+    @media (prefers-contrast: high) {
+        .mat-mdc-form-field {
+            &.mat-focused .mat-mdc-text-field-wrapper {
+                .mat-mdc-form-field-flex {
+                    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+                }
+            }
+        }
+
+        button:not(:disabled):hover {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+        }
+    }
+
+    // Reduced motion support
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+
+    // Print styles
+    @media print {
+        .absolute.top-24,
+        button {
+            display: none;
+        }
+
+        .overflow-y-auto {
+            overflow: visible !important;
+        }
+    }
+}
+
+// Dark mode specific enhancements
+@media (prefers-color-scheme: dark) {
+    app-details {
+        .backdrop-blur-md,
+        .backdrop-blur-xl {
+            background-color: rgba(17, 24, 39, 0.95) !important;
+        }
+
+        .shadow-xl {
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        .shadow-lg {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .shadow-2xl {
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7);
+        }
+    }
+}
+
+// Focus visible for accessibility
+*:focus-visible {
+    outline: 2px solid rgb(59, 130, 246);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+// Selection styling
+::selection {
+    background-color: rgba(59, 130, 246, 0.3);
+    color: inherit;
+}

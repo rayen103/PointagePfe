@@ -4,6 +4,7 @@ import { AuthGuard } from 'app/core/auth/guards/auth.guard';
 import { NoAuthGuard } from 'app/core/auth/guards/noAuth.guard';
 import { LayoutComponent } from 'app/layout/layout.component';
 import { navigationGuard } from './core/navigation/guards/navigation.guard';
+import { GestionShellComponent } from './modules/cst/gestion-shell/gestion-shell.component';
 
 // @formatter:off
 /* eslint-disable max-len */
@@ -123,8 +124,8 @@ export const appRoutes: Route[] = [
             {path: 'chantier', pathMatch: 'full', redirectTo: 'fichier/chantier'},
             {path: 'rattachement-employe', pathMatch: 'full', redirectTo: 'fichier/rattachement-employe'},
             {path: 'rattachement-article', pathMatch: 'full', redirectTo: 'fichier/rattachement-article'},
-            //Fichier
-            {path:'fichier', children:[
+            //Fichier — wrapped in the Gestion shell so children show as a left sidebar (not a dropdown)
+            {path:'fichier', component: GestionShellComponent, children:[
                     {path:'utilisateur',
                         data:{navigationId: 'fichier.utilisateur'},
                         loadChildren:() => import('app/modules/collectmanagement/gestion-utilisateur/utilisateur/utilisateur.routes')},

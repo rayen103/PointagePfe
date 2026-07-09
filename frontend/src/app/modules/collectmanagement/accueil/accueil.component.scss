@@ -102,9 +102,9 @@
 .cst-ins__bar { height: 6px; border-radius: 999px; background: var(--cst-bg); overflow: hidden; span { display: block; height: 100%; border-radius: 999px; background: var(--cst-blue); transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1); } }
 
 /* ---------- Table ---------- */
-$cols: 110px 1.4fr 1.6fr 100px 110px 52px;
+$cols: 90px 1.2fr 1fr 1.2fr 80px 100px 40px;
 .cst-table { display: flex; flex-direction: column; overflow-x: auto; }
-.cst-table__head, .cst-table__row { display: grid; grid-template-columns: $cols; align-items: center; min-width: 640px; }
+.cst-table__head, .cst-table__row { display: grid; grid-template-columns: $cols; align-items: center; min-width: 720px; }
 .cst-table__head {
     padding: 10px 24px; background: var(--cst-surface-2);
     border-top: 1px solid var(--cst-border-line); border-bottom: 1px solid var(--cst-border-line);

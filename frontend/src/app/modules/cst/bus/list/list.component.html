@@ -1,30 +1,5 @@
-<div class="cst-list" *transloco="let t">
-
-    <!-- Secondary sidebar -->
-    <aside class="cst-side">
-        <div class="cst-side__label">Flotte &amp; réseau</div>
-        <a class="cst-side__item is-active">
-            Bus
-            <span class="cst-side__count is-active">{{ busesLength ?? '—' }}</span>
-        </a>
-        <a class="cst-side__item" routerLink="/fichier/chauffeur">Chauffeurs</a>
-        <a class="cst-side__item" routerLink="/fichier/modem">Modems</a>
-        <a class="cst-side__item" routerLink="/fichier/circuit">Circuits</a>
-        <a class="cst-side__item" routerLink="/fichier/pointcollecte">Points de collecte</a>
-        <a class="cst-side__item" routerLink="/fichier/region">Régions</a>
-
-        <div class="cst-side__label" style="margin-top:18px">Organisation</div>
-        <a class="cst-side__item" routerLink="/fichier/gouvernorat">Gouvernorats</a>
-        <a class="cst-side__item" routerLink="/fichier/shift">Shifts</a>
-        <a class="cst-side__item" routerLink="/fichier/equipe">Équipes</a>
-        <a class="cst-side__item" routerLink="/fichier/ordretravail">Ordres de travail</a>
-        <a class="cst-side__item" routerLink="/fichier/rattachement">Rattachements</a>
-        <a class="cst-side__item" routerLink="/fichier/societe">Sociétés</a>
-    </aside>
-
-    <!-- Content -->
-    <div class="cst-main">
-        <div class="cst-crumb"><span>Gestion</span><span>/</span><b>Bus</b></div>
+<div class="cst-main" *transloco="let t">
+        <div class="cst-crumb"><a routerLink="/fichier/bus">Gestion</a><span>/</span><b>Bus</b></div>
 
         <div class="cst-head">
             <div>
@@ -70,8 +45,9 @@
             @if (isLoading) { <mat-progress-bar mode="indeterminate"></mat-progress-bar> }
 
             <!-- Table -->
-            <div class="cst-tbl" style="--cols: 150px 1.3fr 90px 130px 1.3fr 120px 120px 96px; --colmin: 980px">
+            <div class="cst-tbl" style="--cols: 44px 150px 1.3fr 90px 130px 1.3fr 120px 120px 96px; --colmin: 1020px">
                 <div class="cst-tbl__head">
+                    <div><span class="w-4 h-4 rounded border border-gray-300 dark:border-gray-650 bg-white dark:bg-gray-800 inline-block transition-colors"></span></div>
                     <div>{{ t('NumeroIMM') }}</div>
                     <div>{{ t('Model') }}</div>
                     <div>{{ t('Capacity') }}</div>
@@ -86,6 +62,7 @@
                     @if (buses.length > 0) {
                         @for (bus of buses; track trackByFn($index, bus)) {
                             <div class="cst-tbl__row">
+                                <div><span class="w-4 h-4 rounded border border-gray-300 dark:border-gray-650 bg-white dark:bg-gray-800 inline-flex items-center justify-center transition-colors"></span></div>
                                 <div class="cst-strong cst-num">{{ bus.numeroIMM || '—' }}</div>
                                 <div>{{ bus.modelBus || '—' }}</div>
                                 <div class="cst-num cst-mut">{{ bus.capacite ?? '—' }}</div>
@@ -131,5 +108,4 @@
                 (page)="SortChange()">
             </mat-paginator>
         </div>
-    </div>
 </div>

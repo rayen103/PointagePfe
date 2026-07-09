@@ -1,211 +1,111 @@
-<div class="absolute inset-0 min-w-0 px-4 sm:px-6 md:px-8 overflow-x-hidden overflow-y-auto flex flex-col flex-auto bg-default" *transloco="let t">
+<div class="cst-main" *transloco="let t">
+    <div class="cst-crumb"><a routerLink="/fichier/bus">Gestion</a><span>/</span><b>Points de collecte</b></div>
 
-    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-4 sm:py-8 px-4 sm:px-6 md:px-8" *transloco="let t">
-        <!-- Title -->
-        <div class="text-2xl sm:text-4xl font-extrabold tracking-tight">{{ t('Points-Collecte') }}</div>
-        <!-- Actions -->
-        <div class="button-container flex flex-col sm:flex-row items-end sm:items-center w-full sm:w-auto mt-4 sm:mt-0 sm:ml-4">
-            <!-- Search -->
-            <mat-form-field
-                class="fuse-mat-dense w-full sm:min-w-64"
-                [subscriptSizing]="'dynamic'">
-                <mat-icon
-                    class="icon-size-5"
-                    matPrefix
-                    [svgIcon]="'search'"></mat-icon>
-                <input
-                    matInput
-                    [formControl]="searchInputControl"
-                    [autocomplete]="'off'"
-                    [placeholder]="t('Search')"
-                    *transloco="let t">
-            </mat-form-field>
-            <!-- Add button -->
-            @if(hasActionPermission(FuseNavigationAction.Add)){
-            <button
-                class="btn-add mt-2 sm:mt-0 sm:ml-4 w-full sm:w-auto"
-                mat-flat-button
-                [color]="'primary'"
-                routerLink="ajouter">
-                <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-                <span class="ml-2 mr-1">{{ t('Add') }}</span>
-            </button>
+    <div class="cst-head">
+        <div>
+            <div class="cst-head__title">Points de collecte</div>
+            <div class="cst-head__sub">
+                {{ pointsCollecteLength ?? 0 }} points
+                @if (selectedCount > 0) { · <b style="color:var(--cst-blue-strong)">{{ selectedCount }} sélectionné(s)</b> }
+            </div>
+        </div>
+        <div class="cst-head__actions">
+            @if (selectedCount > 0) {
+                <button class="cst-btn cst-btn--ghost" type="button" (click)="clearSelection()">
+                    <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:x-mark'"></mat-icon> Effacer
+                </button>
+            }
+            @if (hasActionPermission(FuseNavigationAction.Add)) {
+                <button class="cst-btn cst-btn--primary" routerLink="ajouter">
+                    <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:plus'"></mat-icon> {{ t('Add') }}
+                </button>
             }
         </div>
     </div>
 
-    <!-- Main -->
-    <div class="flex flex-auto">
+    <div class="pc-split">
+        <!-- ===== List panel ===== -->
+        <div class="cst-panel pc-list">
+            <div class="pc-list__bar">
+                <div class="cst-search">
+                    <mat-icon [svgIcon]="'heroicons_outline:magnifying-glass'"></mat-icon>
+                    <input [formControl]="searchInputControl" [placeholder]="t('Search')" autocomplete="off" />
+                </div>
+            </div>
 
-        <!-- Point Collecte list -->
-        <div class="relative flex flex-col flex-auto sm:mb-18 overflow-hidden px-4 sm:px-8 pt-4 sm:pt-8 rounded-lg bg-card">
-            @if(pointCollecte$ | async; as pointsCollecte){
-                @if(pointsCollecte.length > 0){
-                    <div class="grid gap-4 pb-20">
-                        <fieldset class="flex flex-wrap items-center gap-2">
-                            <legend class="text-sm text-hint">{{ t('Sort') }}</legend>
-                            <button
-                                mat-stroked-button
-                                type="button"
-                                [attr.aria-label]="t('Sort-by-code-ascending')"
-                                [disabled]="sortActive === 'codePointCollecte' && sortDirection === 'asc'"
-                                [ngClass]="{'bg-primary text-white': sortActive === 'codePointCollecte' && sortDirection === 'asc'}"
-                                (click)="setSort('codePointCollecte','asc')">
-                                {{ t('Code') }} ↑
-                            </button>
-                            <button
-                                mat-stroked-button
-                                type="button"
-                                [attr.aria-label]="t('Sort-by-code-descending')"
-                                [disabled]="sortActive === 'codePointCollecte' && sortDirection === 'desc'"
-                                [ngClass]="{'bg-primary text-white': sortActive === 'codePointCollecte' && sortDirection === 'desc'}"
-                                (click)="setSort('codePointCollecte','desc')">
-                                {{ t('Code') }} ↓
-                            </button>
-                            <button
-                                mat-stroked-button
-                                type="button"
-                                [attr.aria-label]="t('Sort-by-label-ascending')"
-                                [disabled]="sortActive === 'libellePointCollecte' && sortDirection === 'asc'"
-                                [ngClass]="{'bg-primary text-white': sortActive === 'libellePointCollecte' && sortDirection === 'asc'}"
-                                (click)="setSort('libellePointCollecte','asc')">
-                                {{ t('Label') }} ↑
-                            </button>
-                            <button
-                                mat-stroked-button
-                                type="button"
-                                [attr.aria-label]="t('Sort-by-label-descending')"
-                                [disabled]="sortActive === 'libellePointCollecte' && sortDirection === 'desc'"
-                                [ngClass]="{'bg-primary text-white': sortActive === 'libellePointCollecte' && sortDirection === 'desc'}"
-                                (click)="setSort('libellePointCollecte','desc')">
-                                {{ t('Label') }} ↓
-                            </button>
-                        </fieldset>
+            @if (isLoading) { <mat-progress-bar mode="indeterminate"></mat-progress-bar> }
 
-                        <!-- Cards Grid -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
-                        @for(pointCollecte of pointsCollecte; track pointCollecte.pointCollecteId || $index){
-                            <div class="entity-card bg-card p-6 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
-                                 (click)="toggleDetails(pointCollecte.pointCollecteId)">
-                                <div class="flex items-start justify-between gap-4 mb-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-lg">
-                                            <mat-icon class="text-white text-2xl" svgIcon="mat_outline:location_on"></mat-icon>
-                                        </div>
-                                        <div>
-                                            <div class="font-bold text-lg">{{pointCollecte.codePointCollecte || '-'}}</div>
-                                            <div class="text-sm text-gray-500 dark:text-gray-400">{{pointCollecte.libellePointCollecte || '-'}}</div>
-                                        </div>
-                                    </div>
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
-                                              [ngClass]="pointCollecte.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'">
-                                        {{pointCollecte.isActive ? t('Active') : t('Inactive')}}
-                                    </span>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4 text-sm mb-4">
-                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
-                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:map"></mat-icon>
-                                            Gouvernorat
-                                        </div>
-                                        <div class="font-semibold">{{pointCollecte.codeGouvernorat || '-'}}</div>
-                                    </div>
-                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
-                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:map"></mat-icon>
-                                            Région
-                                        </div>
-                                        <div class="font-semibold">{{pointCollecte.codeRegion || '-'}}</div>
-                                    </div>
-                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg col-span-2">
-                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
-                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:gps_fixed"></mat-icon>
-                                            Coordonnées
-                                        </div>
-                                        <div class="font-semibold text-sm">{{pointCollecte.latitude && pointCollecte.longitude ? (pointCollecte.latitude + ', ' + pointCollecte.longitude) : '-'}}</div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-700">
-                                    <button
-                                        mat-icon-button
-                                        [routerLink]="pointCollecte.pointCollecteId"
-                                        class="!w-8 !h-8"
-                                        (click)="$event.stopPropagation()">
-                                        <mat-icon
-                                            class="text-gray-500"
-                                            [svgIcon]="'edit_road'">
-                                        </mat-icon>
-                                    </button>
-                                    @if(hasActionPermission(FuseNavigationAction.Delete)){
-                                    <button
-                                        mat-icon-button
-                                        [color]="'warn'"
-                                        (click)="deleteSelectedPointCollecte(pointCollecte); $event.stopPropagation()"
-                                        class="!w-8 !h-8">
-                                        <mat-icon
-                                            [svgIcon]="'heroicons_outline:trash'">
-                                        </mat-icon>
-                                    </button>
-                                    }
-                                </div>
-                                @if(selectedPointCollecte?.pointCollecteId === pointCollecte.pointCollecteId){
-                                    <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                                            <div>
-                                                <span class="font-semibold">{{ t('Code') }}:</span>
-                                                <span class="ml-2">{{pointCollecte.codePointCollecte}}</span>
-                                            </div>
-                                            <div>
-                                                <span class="font-semibold">{{ t('Label') }}:</span>
-                                                <span class="ml-2">{{pointCollecte.libellePointCollecte}}</span>
-                                            </div>
-                                            <div>
-                                                <span class="font-semibold">{{ t('Gouvernorat') }}:</span>
-                                                <span class="ml-2">{{pointCollecte.codeGouvernorat || '-'}}</span>
-                                            </div>
-                                            <div>
-                                                <span class="font-semibold">{{ t('Region') }}:</span>
-                                                <span class="ml-2">{{pointCollecte.codeRegion || '-'}}</span>
-                                            </div>
-                                            <div>
-                                                <span class="font-semibold">{{ t('Latitude') }}:</span>
-                                                <span class="ml-2">{{pointCollecte.latitude || '-'}}</span>
-                                            </div>
-                                            <div>
-                                                <span class="font-semibold">{{ t('Longitude') }}:</span>
-                                                <span class="ml-2">{{pointCollecte.longitude || '-'}}</span>
-                                            </div>
-                                        </div>
+            @if (pointCollecte$ | async; as points) {
+                <div class="pc-list__tools">
+                    <button type="button" class="pc-link" (click)="selectAll(points)">
+                        <mat-icon class="icon-size-4" [svgIcon]="'heroicons_outline:check-circle'"></mat-icon> Tout sélectionner
+                    </button>
+                    <span class="pc-list__count">{{ points.length }} affichés</span>
+                </div>
 
-                                        @if(mapLocations.length > 0){
-                                            <div class="mt-6 h-80 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700">
-                                                <app-map-viewer [locations]="mapLocations" [height]="'100%'" [zoom]="13"></app-map-viewer>
-                                            </div>
+                <div class="pc-list__scroll">
+                    @if (points.length > 0) {
+                        @for (point of points; track trackByFn($index, point)) {
+                            <div class="pc-item" [class.is-selected]="isSelected(point.pointCollecteId)" (click)="toggleSelect(point)">
+                                <span class="pc-check" [class.on]="isSelected(point.pointCollecteId)">
+                                    <svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M2 6.5l2.6 2.6L10 3.5"></path></svg>
+                                </span>
+                                <div class="pc-item__main">
+                                    <div class="pc-item__top">
+                                        <span class="pc-item__code">{{ point.codePointCollecte || '—' }}</span>
+                                        @if (hasCoordinates(point)) {
+                                            <mat-icon class="icon-size-3.5 pc-item__pin" [svgIcon]="'heroicons_solid:map-pin'"></mat-icon>
+                                        } @else {
+                                            <span class="pc-item__nogeo">sans position</span>
                                         }
                                     </div>
-                                }
+                                    <div class="pc-item__lib">{{ point.libellePointCollecte || '—' }}</div>
+                                    <div class="pc-item__meta">{{ point.codeRegion || '—' }}<span> · </span>{{ point.codeGouvernorat || '—' }}</div>
+                                </div>
+                                <div class="pc-item__side">
+                                    <span class="cst-pill" [ngClass]="point.isActive ? 'cst-pill--ok' : 'cst-pill--off'">{{ point.isActive ? (t('Active') || 'ACTIF') : (t('Inactive') || 'INACTIF') }}</span>
+                                    <div class="pc-item__act">
+                                        <button class="cst-round" type="button" [routerLink]="point.pointCollecteId" (click)="$event.stopPropagation()"><mat-icon [svgIcon]="'heroicons_outline:pencil-square'"></mat-icon></button>
+                                        @if (hasActionPermission(FuseNavigationAction.Delete)) {
+                                            <button class="cst-round cst-round--danger" type="button" (click)="deleteSelectedPointCollecte(point); $event.stopPropagation()"><mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon></button>
+                                        }
+                                    </div>
+                                </div>
                             </div>
                         }
+                    } @else {
+                        <div class="cst-tbl__empty">
+                            <div class="cst-tbl__empty-ic"><mat-icon [svgIcon]="'mat_outline:location_on'"></mat-icon></div>
+                            <div class="cst-tbl__empty-t">{{ t('No-pointsCollecte-found') || 'Aucun point de collecte' }}</div>
+                            <div class="cst-tbl__empty-s">Ajustez vos filtres ou créez un nouveau point.</div>
                         </div>
-                        <!-- Paginator -->
-                        <mat-paginator
-                            class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
-                            [ngClass]="{'pointer-events-none': isLoading}"
-                            [length]="pointsCollecteLength"
-                            [pageIndex]="0"
-                            [pageSize]="10"
-                            [pageSizeOptions]="[5, 10, 25, 100]"
-                            [showFirstLastButtons]="true"
-                            (page)="SortChange()">
-                        </mat-paginator>
-                    </div>
-                }@else{
-                    <div class="col-span-full text-center py-16 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
-                        <mat-icon class="icon-size-16 mb-3" svgIcon="mat_outline:location_on"></mat-icon>
-                        <div class="font-semibold text-2xl">{{ t('No-points-collecte-found') }}</div>
+                    }
+                </div>
+
+                <mat-paginator class="cst-pager" [ngClass]="{'pointer-events-none': isLoading}" [length]="pointsCollecteLength" [pageIndex]="0" [pageSize]="10" [pageSizeOptions]="[10, 25, 50, 100]" [showFirstLastButtons]="true" (page)="SortChange()"></mat-paginator>
+            }
+        </div>
+
+        <!-- ===== Map panel ===== -->
+        <div class="cst-panel pc-map">
+            <div class="pc-map__head">
+                <div class="cst-card__title" style="display:flex;align-items:center;gap:8px">
+                    <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_outline:map'"></mat-icon>
+                    Carte
+                </div>
+                <span class="pc-map__badge">{{ selectedCount }} point(s)</span>
+            </div>
+            <div class="pc-map__body">
+                @if (mapLocations.length > 0) {
+                    <app-map-viewer [locations]="mapLocations" [height]="'100%'" [zoom]="8" class="w-full h-full block"></app-map-viewer>
+                } @else {
+                    <div class="pc-map__empty">
+                        <div class="cst-tbl__empty-ic"><mat-icon [svgIcon]="'heroicons_outline:map-pin'"></mat-icon></div>
+                        <div class="cst-tbl__empty-t">Aucun point sur la carte</div>
+                        <div class="cst-tbl__empty-s">Sélectionnez un ou plusieurs points de collecte dans la liste pour les afficher ici.</div>
                     </div>
                 }
-            }
+            </div>
         </div>
     </div>
 </div>

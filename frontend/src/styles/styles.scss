@@ -28,7 +28,7 @@ dx-license{
     &.is-active { background: var(--cst-danger-bg); color: var(--cst-red); font-weight: 700; }
 }
 .cst-side__count { font-size: 11px; font-weight: 700; color: var(--cst-text-hint); background: var(--cst-pill-bg); border-radius: 999px; padding: 1px 8px; font-variant-numeric: tabular-nums; &.is-active { color: var(--cst-red); background: #fff; } }
-.cst-main { padding: 26px 30px; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.cst-main { padding: 26px 30px; display: flex; flex-direction: column; gap: 18px; width: 100%; flex: 1 1 auto; min-width: 0; }
 .cst-crumb { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--cst-text-hint); a { color: var(--cst-text-hint); font-weight: 500; } b { color: var(--cst-navy); font-weight: 600; } }
 .cst-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .cst-head__title { font-family: var(--cst-font-head); font-size: 22px; font-weight: 700; color: var(--cst-navy); }
@@ -199,11 +199,17 @@ fuse-horizontal-navigation {
 
     .fuse-horizontal-navigation-wrapper { gap: 4px; }
 
+    .cst-nav-grouplink,
+    .fuse-horizontal-navigation-item-wrapper,
     .fuse-horizontal-navigation-item {
         height: 38px !important;
         min-height: 38px !important;
-        padding: 0 20px !important;
         border-radius: 9999px !important;
+        overflow: hidden !important;
+    }
+
+    .fuse-horizontal-navigation-item {
+        padding: 0 20px !important;
         gap: 8px;
         color: var(--cst-text-2) !important;
         font-size: 14px;
@@ -220,7 +226,9 @@ fuse-horizontal-navigation {
     .fuse-horizontal-navigation-item-title { color: inherit !important; font-weight: inherit; }
 
     .fuse-horizontal-navigation-item-active,
-    .fuse-horizontal-navigation-item-active:hover {
+    .fuse-horizontal-navigation-item-active:hover,
+    .cst-nav-grouplink.fuse-horizontal-navigation-item-active .fuse-horizontal-navigation-item,
+    .cst-nav-grouplink.fuse-horizontal-navigation-item-active .fuse-horizontal-navigation-item:hover {
         background: var(--cst-red) !important;
         color: #fff !important;
         font-weight: 700;
@@ -229,6 +237,9 @@ fuse-horizontal-navigation {
         .fuse-horizontal-navigation-item-icon,
         .fuse-horizontal-navigation-item-title { color: #fff !important; }
     }
+
+    /* Group rendered as a navigating link (no dropdown) */
+    .cst-nav-grouplink { text-decoration: none; cursor: pointer; display: block; }
 }
 
 /* ----------------------------------------------------------------------------------------------------- */

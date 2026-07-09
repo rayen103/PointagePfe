@@ -65,6 +65,9 @@ export class ListComponent implements OnInit, OnDestroy {
     sortDirection: 'asc' | 'desc' = 'asc';
     mapLocations: MapLocation[] = [];
 
+    /** Multi-selection of points shown on the map (keyed by pointCollecteId). */
+    selectedPoints = new Map<string, PointCollecte>();
+
     constructor(
         private _pointCollecteService: PointCollecteService,
         private _changeDetectorRef: ChangeDetectorRef,
@@ -228,6 +231,69 @@ export class ListComponent implements OnInit, OnDestroy {
                     });
             }
         });
+    }
+
+    // -----------------------------------------------------------------------------------------------------
+    // @ Multi-selection + map
+    // -----------------------------------------------------------------------------------------------------
+
+    /** Whether the given point is currently selected (shown on the map). */
+    isSelected(pointCollecteId: string): boolean {
+        return this.selectedPoints.has(pointCollecteId);
+    }
+
+    /** Whether the point has usable coordinates. */
+    hasCoordinates(point: PointCollecte): boolean {
+        return point?.latitude != null && point?.longitude != null;
+    }
+
+    /** Toggle a point in/out of the selection and refresh the map. */
+    toggleSelect(point: PointCollecte): void {
+        if (!point?.pointCollecteId) {
+            return;
+        }
+        if (this.selectedPoints.has(point.pointCollecteId)) {
+            this.selectedPoints.delete(point.pointCollecteId);
+        } else {
+            this.selectedPoints.set(point.pointCollecteId, point);
+        }
+        this.rebuildMap();
+    }
+
+    /** Select every visible point that has coordinates. */
+    selectAll(points: PointCollecte[]): void {
+        (points ?? []).forEach((p) => {
+            if (p?.pointCollecteId && this.hasCoordinates(p)) {
+                this.selectedPoints.set(p.pointCollecteId, p);
+            }
+        });
+        this.rebuildMap();
+    }
+
+    /** Clear the whole selection. */
+    clearSelection(): void {
+        this.selectedPoints.clear();
+        this.rebuildMap();
+    }
+
+    get selectedCount(): number {
+        return this.selectedPoints.size;
+    }
+
+    /** Rebuild the map markers from the current selection (only points with coordinates). */
+    private rebuildMap(): void {
+        this.mapLocations = Array.from(this.selectedPoints.values())
+            .filter((p) => this.hasCoordinates(p))
+            .map((p) => ({
+                id: p.pointCollecteId,
+                name: p.libellePointCollecte || p.codePointCollecte || '—',
+                latitude: Number(p.latitude),
+                longitude: Number(p.longitude),
+                pointType: 'base' as const,
+                isActive: p.isActive,
+                description: [p.codeRegion, p.codeGouvernorat].filter(Boolean).join(' · '),
+            }));
+        this._changeDetectorRef.markForCheck();
     }
 
     /**

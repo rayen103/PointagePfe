@@ -14,6 +14,7 @@ import {
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenu, MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FuseHorizontalNavigationBasicItemComponent } from '@fuse/components/navigation/horizontal/components/basic/basic.component';
 import { FuseHorizontalNavigationDividerItemComponent } from '@fuse/components/navigation/horizontal/components/divider/divider.component';
 import { FuseHorizontalNavigationComponent } from '@fuse/components/navigation/horizontal/horizontal.component';
@@ -35,6 +36,8 @@ import { Subject, takeUntil } from 'rxjs';
         FuseHorizontalNavigationDividerItemComponent,
         MatTooltipModule,
         MatIconModule,
+        RouterLink,
+        RouterLinkActive,
     ],
 })
 export class FuseHorizontalNavigationBranchItemComponent

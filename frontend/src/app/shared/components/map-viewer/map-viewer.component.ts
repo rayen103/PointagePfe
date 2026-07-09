@@ -85,6 +85,13 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
 
         // Add markers for locations
         this.updateMarkers();
+
+        // Trigger size recalculation after a delay to ensure parent dimensions are bound
+        setTimeout(() => {
+            if (this.map) {
+                this.map.invalidateSize();
+            }
+        }, 200);
     }
 
     private updateMarkers(): void {

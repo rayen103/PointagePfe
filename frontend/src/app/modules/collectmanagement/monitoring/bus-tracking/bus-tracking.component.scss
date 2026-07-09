@@ -1,6 +1,26 @@
-.bus-tracking-grid {
-    @screen lg {
-        height: calc(100vh - 220px);
-    }
+:host {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
+.cst-supervision-page {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    background: var(--cst-bg);
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.cst-supervision-grid {
+    flex: 1 1 auto;
+    min-height: 0;
+}

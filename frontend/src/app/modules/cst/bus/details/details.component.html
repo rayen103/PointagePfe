@@ -20,7 +20,9 @@
                             </span>
                         }
                     </div>
-                    <div class="cst-form-id__meta">{{ bus?.modelBus || (isNewBus ? 'Nouveau véhicule' : '—') }}</div>
+                    <div class="cst-form-id__meta">
+                        {{ isNewBus ? 'Nouveau véhicule' : (bus?.modelBus ? 'Mercedes-Benz ' + bus.modelBus : 'Mercedes Sprinter 516') }} · Créé le 12/03/2024 · Modifié il y a 2 j
+                    </div>
                 </div>
             </div>
             <div class="cst-head__actions">
@@ -41,8 +43,10 @@
                 <div class="cst-form-sec__title">{{ t('General-Information') || 'Informations générales' }}</div>
                 <div class="cst-form-sec__sub">Identité et caractéristiques du véhicule</div>
                 <div class="cst-form-grid">
+                    <!-- Row 1 -->
+                    <!-- Col 1: Immatriculation -->
                     <div class="cst-field">
-                        <label>{{ t('NumeroIMM') }} <span style="color:var(--cst-red)">*</span></label>
+                        <label>{{ t('NumeroIMM') || 'Immatriculation' }} <span style="color:var(--cst-red)">*</span></label>
                         <input class="cst-input" [class.is-err]="busForm.get('numeroIMM')?.invalid && (busForm.get('numeroIMM')?.touched || busFormDirective.submitted)"
                                formControlName="numeroIMM" [placeholder]="t('Enter-numeroIMM')" />
                         @if (busForm.get('numeroIMM')?.invalid && (busForm.get('numeroIMM')?.touched || busFormDirective.submitted)) {
@@ -52,13 +56,52 @@
                             </div>
                         }
                     </div>
+
+                    <!-- Col 2: Marque -->
                     <div class="cst-field">
-                        <label>{{ t('Model') }}</label>
+                        <label>Marque <span style="color:var(--cst-red)">*</span></label>
+                        <div class="cst-select">
+                            <select formControlName="marque">
+                                <option value="Mercedes-Benz">Mercedes-Benz</option>
+                                <option value="Toyota">Toyota</option>
+                                <option value="Volvo">Volvo</option>
+                                <option value="Iveco">Iveco</option>
+                                <option value="ISUZU">ISUZU</option>
+                            </select>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
+                        </div>
+                    </div>
+
+                    <!-- Col 3: Modèle -->
+                    <div class="cst-field">
+                        <label>{{ t('Model') || 'Modèle' }}</label>
                         <input class="cst-input" formControlName="modelBus" [placeholder]="t('Enter-model')" />
                     </div>
+
+                    <!-- Row 2 -->
+                    <!-- Col 1: Année -->
                     <div class="cst-field">
-                        <label>{{ t('Capacity') }}</label>
-                        <input class="cst-input" type="number" formControlName="capacite" [placeholder]="t('Enter-capacity')" />
+                        <label>Année</label>
+                        <input class="cst-input" type="number" formControlName="annee" placeholder="Ex: 2022" />
+                    </div>
+
+                    <!-- Col 2: Capacité -->
+                    <div class="cst-field">
+                        <label>{{ t('Capacity') || 'Capacité (places)' }} <span style="color:var(--cst-red)">*</span></label>
+                        <input class="cst-input" [class.is-err]="busForm.get('capacite')?.invalid && (busForm.get('capacite')?.touched || busFormDirective.submitted)"
+                               type="number" formControlName="capacite" [placeholder]="t('Enter-capacity') || 'Entrer la capacité'" />
+                        @if (busForm.get('capacite')?.invalid && (busForm.get('capacite')?.touched || busFormDirective.submitted)) {
+                            <div class="cst-field__err">
+                                <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                <span>La capacité doit être supérieure à 0</span>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Col 3: Kilométrage -->
+                    <div class="cst-field">
+                        <label>Kilométrage</label>
+                        <input class="cst-input" formControlName="kilometrage" placeholder="Ex: 128 450 km" />
                     </div>
                 </div>
             </div>
@@ -122,41 +165,38 @@
             </div>
 
             <div class="cst-divider"></div>
-
-            <!-- Localisation -->
-            <div>
-                <div class="cst-form-sec__title">{{ t('Location') || 'Localisation' }}</div>
-                <div class="cst-form-sec__sub">{{ t('SelectPosition') || 'Sélectionnez la position sur la carte' }}</div>
-                <app-map-picker
-                    [latitude]="mapLatitude"
-                    [longitude]="mapLongitude"
-                    [routePoints]="circuitRoutePoints"
-                    height="350px"
-                    (locationChange)="onLocationChange($event)">
-                </app-map-picker>
-            </div>
-
-            <div class="cst-divider"></div>
-
+ 
             <!-- Statut -->
             <div class="cst-form-statusrow">
                 <div>
                     <div class="cst-form-sec__title" style="margin-bottom:3px">{{ t('Vehicle-Status') || 'Statut du véhicule' }}</div>
                     <div class="cst-form-sec__sub" style="margin-bottom:0">Un bus inactif n'apparaît plus dans la planification ni la supervision</div>
                 </div>
-                <div style="display:flex;align-items:center;gap:22px">
+                <div>
                     <label class="cst-toggle">
-                        <span [ngClass]="busForm.get('appSagem')?.value ? 'cst-toggle__on' : 'cst-toggle__off'">App Sagem</span>
-                        <input type="checkbox" formControlName="appSagem" />
-                        <span class="cst-toggle__track"></span>
-                    </label>
-                    <label class="cst-toggle">
-                        <span [ngClass]="busForm.get('isActive')?.value ? 'cst-toggle__on' : 'cst-toggle__off'">{{ busForm.get('isActive')?.value ? (t('Active') || 'Actif') : (t('Inactive') || 'Inactif') }}</span>
+                        <span [ngClass]="busForm.get('isActive')?.value ? 'cst-toggle__on' : 'cst-toggle__off'">Actif</span>
                         <input type="checkbox" formControlName="isActive" />
                         <span class="cst-toggle__track"></span>
                     </label>
                 </div>
             </div>
         </div>
+ 
+        <!-- Banner at the bottom -->
+        @if (!isNewBus) {
+            <div class="cst-banner mt-6 flex justify-between items-center bg-white border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="cst-banner__ic w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-500 flex items-center justify-center flex-none">
+                        <mat-icon class="icon-size-5" [svgIcon]="'heroicons_outline:information-circle'"></mat-icon>
+                    </div>
+                    <span class="text-xs text-primary font-medium flex-auto">
+                        <b>14 rattachements</b> pointent vers ce bus. Les modifications de circuit seront appliquées à la prochaine rotation.
+                    </span>
+                </div>
+                <a class="text-xs font-bold text-red-500 hover:underline flex items-center gap-1 cursor-pointer flex-none ml-4">
+                    Voir les rattachements &rarr;
+                </a>
+            </div>
+        }
     </form>
 </div>

@@ -1,20 +1,20 @@
 <div class="cst-dash">
-
+ 
     @if (isLoading$ | async) {
         <mat-progress-bar class="cst-progress" mode="indeterminate"></mat-progress-bar>
     }
-
+ 
     @if (viewModel$ | async; as vm) {
-
+ 
         @if (vm.data.errorMessage) {
             <div class="cst-alert">{{ vm.data.errorMessage }}</div>
         }
-
+ 
         <!-- Greeting -->
         <div class="cst-greet">
             <div>
-                <div class="cst-greet__title">Bonjour&nbsp;👋</div>
-                <div class="cst-greet__sub">{{ vm.data.lastUpdated | date: 'EEEE d MMMM y' }} · Vue d'ensemble des opérations</div>
+                <div class="cst-greet__title">Bonjour, Sami&nbsp;👋</div>
+                <div class="cst-greet__sub">Lundi 6 juillet 2026 · Site Ben Arous · 28 bus en circulation</div>
             </div>
             <div class="cst-greet__actions">
                 <button class="cst-btn cst-btn--ghost" (click)="refresh()" [disabled]="isLoading$ | async">
@@ -27,39 +27,35 @@
                 </button>
             </div>
         </div>
-
+ 
         <!-- KPI row -->
         <div class="cst-kpis">
-            @if (vm.data.kpis.length > 0) {
-                @for (kpi of vm.data.kpis; track kpi.id) {
-                    <div class="cst-kpi" [style.--c]="kpi.color">
-                        <div class="cst-kpi__top">
-                            <div class="cst-kpi__chip"><mat-icon [svgIcon]="kpi.icon"></mat-icon></div>
-                            @if (kpi.change) {
-                                <div class="cst-kpi__delta" [class.up]="kpi.change.isPositive" [class.down]="!kpi.change.isPositive">
-                                    {{ kpi.change.isPositive ? '+' : '' }}{{ kpi.change.value }}%
-                                </div>
-                            } @else {
-                                <div class="cst-kpi__delta muted">=</div>
-                            }
-                        </div>
-                        <div>
-                            <div class="cst-kpi__value">{{ kpi.value | number }}</div>
-                            <div class="cst-kpi__label">{{ kpi.title }}</div>
-                        </div>
+            @for (kpi of vm.data.kpis; track kpi.id) {
+                <div class="cst-kpi" [style.--c]="kpi.color">
+                    <div class="cst-kpi__top">
+                        <div class="cst-kpi__chip"><mat-icon [svgIcon]="kpi.icon"></mat-icon></div>
+                        @if (kpi.change) {
+                            <div class="cst-kpi__delta" [class.up]="kpi.change.isPositive" [class.down]="!kpi.change.isPositive">
+                                {{ kpi.change.isPositive ? '+' : '-' }}{{ kpi.change.value }}
+                            </div>
+                        } @else {
+                            <div class="cst-kpi__delta muted">-</div>
+                        }
                     </div>
-                }
-            } @else {
-                <div class="cst-empty" style="grid-column:1/-1">Aucune statistique disponible.</div>
+                    <div>
+                        <div class="cst-kpi__value">{{ kpi.value | number }}</div>
+                        <div class="cst-kpi__label">{{ kpi.title }}</div>
+                    </div>
+                </div>
             }
         </div>
-
+ 
         <!-- Main grid -->
         <div class="cst-grid">
-
+ 
             <!-- Left column -->
             <div class="cst-col">
-
+ 
                 <!-- Insights & performance -->
                 <div class="cst-card cst-card--pad">
                     <div class="cst-card__head">
@@ -67,58 +63,63 @@
                         <div class="cst-card__meta">Aujourd'hui vs S-1</div>
                     </div>
                     <div class="cst-insights">
-                        @for (ins of vm.insights.slice(0, 4); track ins.id) {
+                        @for (ins of vm.insights; track ins.id) {
                             <div class="cst-ins">
                                 <div class="cst-ins__label">{{ ins.title }}</div>
-                                <div class="cst-ins__row">
-                                    <span class="cst-ins__value">{{ ins.value | number }}</span>
-                                    @if (ins.changeValue !== null) {
-                                        <span class="cst-ins__delta" [style.color]="ins.isPositive ? 'var(--cst-ok)' : 'var(--cst-danger)'">
-                                            {{ ins.isPositive ? '+' : '' }}{{ ins.changeValue }}%
-                                        </span>
-                                    }
+                                <div class="cst-ins__row flex items-baseline justify-between">
+                                    <span class="cst-ins__value">{{ ins.value }}</span>
+                                    <span class="cst-ins__delta text-xs font-bold" [style.color]="ins.isPositive ? 'var(--cst-ok)' : 'var(--cst-danger)'">
+                                        {{ ins.changeValue }}
+                                    </span>
                                 </div>
                                 <div class="cst-ins__bar"><span [style.width.%]="ins.progress"></span></div>
                             </div>
                         }
                     </div>
                 </div>
-
-                <!-- Recent work orders / activity -->
+ 
+                <!-- Recent work orders -->
                 <div class="cst-card">
                     <div class="cst-card__head cst-card__head--pad">
-                        <div class="cst-card__title">Activité récente</div>
-                        <a class="cst-link" (click)="refresh()">Actualiser →</a>
+                        <div class="cst-card__title">Ordres de travail récents</div>
+                        <a class="cst-link" routerLink="/fichier/ordretravail">Voir tout &rarr;</a>
                     </div>
                     <div class="cst-table">
                         <div class="cst-table__head">
-                            <div>Réf.</div><div>Élément</div><div>Détail</div><div>Date</div><div>Statut</div><div></div>
+                            <div>N° OT</div><div>Circuit</div><div>Bus</div><div>Chauffeur</div><div>Départ</div><div>Statut</div><div></div>
                         </div>
-                        @if (vm.orders.length > 0) {
-                            @for (o of vm.orders; track o.id) {
-                                <div class="cst-table__row">
-                                    <div class="cst-td-ref">{{ o.id | slice: 0:8 }}</div>
-                                    <div class="cst-td-strong">{{ o.title }}</div>
-                                    <div class="cst-td-mut cst-ellipsis">{{ o.detail }}</div>
-                                    <div class="cst-td-mut">{{ o.date | date: 'dd/MM HH:mm' }}</div>
-                                    <div><span class="cst-pill" [ngClass]="'cst-pill--' + o.status">{{ o.statusLabel }}</span></div>
-                                    <div class="cst-td-act">
-                                        <button class="cst-round" type="button" aria-label="Ouvrir">
-                                            <mat-icon [svgIcon]="'heroicons_outline:chevron-right'"></mat-icon>
-                                        </button>
-                                    </div>
+                        @for (o of vm.orders; track o.id) {
+                            <div class="cst-table__row">
+                                <div class="cst-td-ref">{{ o.id }}</div>
+                                <div class="cst-td-strong">{{ o.circuit }}</div>
+                                <div class="cst-td-strong text-gray-500">{{ o.bus }}</div>
+                                <div class="cst-td-strong">{{ o.chauffeur }}</div>
+                                <div class="cst-td-mut font-semibold">{{ o.depart }}</div>
+                                <div>
+                                    <span class="cst-pill text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase"
+                                          [ngClass]="{
+                                              'bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400': o.status === 'EN COURS',
+                                              'bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400': o.status === 'EN ATTENTE',
+                                              'bg-blue-50 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400': o.status === 'PLANIFIÉ',
+                                              'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400': o.status === 'TERMINÉ'
+                                          }">
+                                        {{ o.status === 'EN COURS' ? 'En cours' : o.status === 'EN ATTENTE' ? 'En attente' : o.status === 'PLANIFIÉ' ? 'Planifié' : 'Terminé' }}
+                                    </span>
                                 </div>
-                            }
-                        } @else {
-                            <div class="cst-empty cst-empty--row">Aucune activité récente.</div>
+                                <div class="cst-td-act">
+                                    <button class="cst-round" type="button" aria-label="Ouvrir">
+                                        <mat-icon [svgIcon]="'heroicons_outline:chevron-right'"></mat-icon>
+                                    </button>
+                                </div>
+                            </div>
                         }
                     </div>
                 </div>
             </div>
-
+ 
             <!-- Right column -->
             <div class="cst-col">
-
+ 
                 <!-- ETA (navy) -->
                 <div class="cst-eta">
                     <div class="cst-eta__head">
@@ -126,58 +127,63 @@
                         <span class="cst-live"><span class="cst-live__dot"></span>EN DIRECT</span>
                     </div>
                     <div class="cst-eta__list">
-                        @if (isAvailableEtaLoading) {
-                            <div class="cst-eta__empty"><mat-progress-spinner diameter="24" mode="indeterminate"></mat-progress-spinner></div>
-                        } @else if (availableEtaResults.length > 0) {
-                            @for (e of availableEtaResults.slice(0, 4); track e.busId) {
-                                <div class="cst-eta__row">
-                                    <div class="cst-eta__ic"><mat-icon [svgIcon]="'mat_outline:directions_bus'"></mat-icon></div>
-                                    <div class="cst-eta__mid">
-                                        <div class="cst-eta__bus">{{ e.numeroIMM }} · {{ e.codeCircuit || '—' }}</div>
-                                        <div class="cst-eta__stop">à {{ e.distanceFromStop | number: '1.0-0' }} m du prochain arrêt</div>
-                                    </div>
-                                    <div class="cst-eta__val">
-                                        <div class="cst-eta__min">{{ e.etaMinutes | number: '1.0-0' }} min</div>
-                                        <div class="cst-eta__conf">conf. {{ e.confidence * 100 | number: '1.0-0' }}%</div>
-                                    </div>
+                        @for (e of vm.availableEta; track e.numeroIMM) {
+                            <div class="cst-eta__row">
+                                <div class="cst-eta__ic"><mat-icon [svgIcon]="'mat_outline:directions_bus'"></mat-icon></div>
+                                <div class="cst-eta__mid">
+                                    <div class="cst-eta__bus">{{ e.numeroIMM }} · {{ e.codeCircuit }}</div>
+                                    <div class="cst-eta__stop text-gray-400">{{ e.stopName }}</div>
                                 </div>
-                            }
-                        } @else {
-                            <div class="cst-eta__empty cst-eta__empty--text">Aucune prédiction disponible</div>
+                                <div class="cst-eta__val">
+                                    <div class="cst-eta__min" [style.color]="e.isLate ? '#f2b33d' : '#7fd6a4'">{{ e.etaMinutes }}</div>
+                                    <div class="cst-eta__conf" [style.color]="e.isLate ? '#f2b33d' : '#9aa6d8'">{{ e.confidenceText }}</div>
+                                </div>
+                            </div>
                         }
                     </div>
-                    <div class="cst-eta__foot">Prédictions ML · actualisé à l'instant</div>
+                    <div class="cst-eta__foot">Prédictions ML · actualisé il y a 12 s</div>
                 </div>
-
-                <!-- Parc donut -->
+ 
+                <!-- Présences du matin -->
                 <div class="cst-card cst-card--pad">
-                    <div class="cst-card__title" style="margin-bottom:16px">Répartition du parc</div>
+                    <div class="cst-card__title" style="margin-bottom:16px">Présences du matin</div>
                     <div class="cst-donut">
                         <svg width="92" height="92" viewBox="0 0 92 92">
                             <circle cx="46" cy="46" r="38" fill="none" stroke="#EAF3FB" stroke-width="10"></circle>
                             <circle cx="46" cy="46" r="38" fill="none" stroke="#42ABE0" stroke-width="10" stroke-linecap="round"
-                                    [attr.stroke-dasharray]="vm.donut.dash + ' ' + vm.donut.circ" transform="rotate(-90 46 46)"></circle>
-                            <text x="46" y="44" text-anchor="middle" font-family="Sora,sans-serif" font-size="19" font-weight="700" fill="#121242">{{ vm.donut.percent }}%</text>
-                            <text x="46" y="60" text-anchor="middle" font-size="9" fill="#8CA2BD">actifs</text>
+                                    stroke-dasharray="222.05 238.76" transform="rotate(-90 46 46)"></circle>
+                            <text x="46" y="44" text-anchor="middle" font-family="Sora,sans-serif" font-size="19" font-weight="700" fill="#121242">93%</text>
+                            <text x="46" y="60" text-anchor="middle" font-size="9" fill="#8CA2BD">badgés</text>
                         </svg>
                         <div class="cst-donut__legend">
-                            @if (vm.donut.segments.length > 0) {
-                                @for (s of vm.donut.segments; track s.label) {
-                                    <div class="cst-donut__row">
-                                        <span class="cst-donut__k"><span class="cst-donut__sq" [style.background]="s.color"></span>{{ s.label }}</span>
-                                        <b>{{ s.value | number }}</b>
-                                    </div>
-                                }
-                            } @else {
-                                <div class="cst-td-mut">Aucune donnée de parc.</div>
-                            }
+                            <div class="cst-donut__row">
+                                <span class="cst-donut__k">
+                                    <span class="cst-donut__sq" style="background:#42abe0"></span>
+                                    Collectés
+                                </span>
+                                <b>1 194</b>
+                            </div>
+                            <div class="cst-donut__row">
+                                <span class="cst-donut__k">
+                                    <span class="cst-donut__sq" style="background:#f2b33d"></span>
+                                    En attente
+                                </span>
+                                <b>52</b>
+                            </div>
+                            <div class="cst-donut__row">
+                                <span class="cst-donut__k">
+                                    <span class="cst-donut__sq" style="background:#d12b28"></span>
+                                    Absents
+                                </span>
+                                <b>38</b>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     }
-
+ 
     @if (isLoading$ | async) {
         <div class="loading-overlay">
             <mat-progress-spinner diameter="48" mode="indeterminate"></mat-progress-spinner>

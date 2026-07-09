@@ -8,6 +8,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
         title: 'Fichier',
         type : 'group',
         icon : 'mat_outline:assignment',
+        link : '/fichier/bus',
         children: [
 
             {
@@ -307,10 +308,18 @@ export const futuristicNavigation: FuseNavigationItem[] = [
 export const horizontalNavigation: FuseNavigationItem[] = [
 
     {
+        id   : 'accueil',
+        title: 'Accueil',
+        type : 'basic',
+        icon : 'mat_outline:home',
+        link : '/Accueil/page'
+    },
+    {
         id   : 'fichier',
         title: 'Fichier',
         type : 'group',
         icon : 'mat_outline:assignment',
+        link : '/fichier/bus',
         children: []
     },
     {
@@ -318,11 +327,12 @@ export const horizontalNavigation: FuseNavigationItem[] = [
         title: 'Monitoring',
         type : 'group',
         icon : 'mat_outline:my_location',
+        link : '/monitoring/bus-tracking',
         children: []
     },
     {
         id   : 'analyse',
-        title: 'Anaalyse',
+        title: 'Analyse',
         type : 'group',
         icon : 'mat_outline:analytics',
         children: []

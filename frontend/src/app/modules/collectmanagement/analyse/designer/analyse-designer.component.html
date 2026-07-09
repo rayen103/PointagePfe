@@ -1,21 +1,27 @@
-<div class="analyse-container">
+<div class="analyse-container" cdkDropListGroup>
     <!-- Header -->
-    <div class="analyse-header" [style.background]="colors.gradient">
-        <div class="analyse-header-left">
-            <div class="analyse-title">
-                <mat-icon svgIcon="heroicons_outline:chart-bar" class="title-icon"></mat-icon>
-                <span>{{ title }}</span>
+    <div class="cst-head bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm mb-4">
+        <div>
+            <div class="flex items-center gap-2">
+                <span class="cst-head__title">{{ title }}</span>
+                @if (response) {
+                    <span class="cst-pill cst-pill--ok">Calculé</span>
+                } @else {
+                    <span class="cst-pill cst-pill--warn">Brouillon</span>
+                }
             </div>
+            <div class="cst-head__sub">BI Report Concepteur · Configuration personnalisée</div>
         </div>
 
-        <div class="analyse-header-actions">
-            <mat-form-field class="analyse-form-field" appearance="outline">
+        <div class="flex flex-wrap items-center gap-3">
+            <!-- Layout Selector -->
+            <mat-form-field class="fuse-mat-dense w-48" [subscriptSizing]="'dynamic'">
                 <mat-label>Layout</mat-label>
                 <mat-select
                     [value]="selectedLayoutId"
                     (selectionChange)="selectLayout($event.value)"
-                    placeholder="Choisir un layout...">
-                    <mat-option [value]="null">—</mat-option>
+                    placeholder="Choisir...">
+                    <mat-option [value]="null">— Nouveau —</mat-option>
                     @for (l of layouts; track l.reportLayoutId) {
                         <mat-option [value]="l.reportLayoutId">
                             {{ l.name }} @if (l.isDefault) { (défaut) }
@@ -24,198 +30,219 @@
                 </mat-select>
             </mat-form-field>
 
-            <mat-form-field class="analyse-form-field analyse-form-field-wide" appearance="outline">
+            <!-- Layout Name -->
+            <mat-form-field class="fuse-mat-dense w-48" [subscriptSizing]="'dynamic'">
                 <mat-label>Nom du layout</mat-label>
-                <input matInput [formControl]="form.get('layoutName')" placeholder="Ex: Suivi mensuel">
+                <input matInput [formControl]="form.get('layoutName')" placeholder="Nom du layout">
             </mat-form-field>
 
-            <div class="analyse-toggle-container">
-                <mat-slide-toggle [formControl]="form.get('isDefault')" color="primary">
-                    <span class="toggle-label">Layout par défaut</span>
-                </mat-slide-toggle>
-            </div>
+            <!-- Is Default Switch -->
+            <label class="cst-toggle">
+                <span>Défaut</span>
+                <input type="checkbox" [formControl]="form.get('isDefault')" />
+                <span class="cst-toggle__track"></span>
+            </label>
 
-            <button mat-raised-button type="button" (click)="saveLayout()" [disabled]="isLoading" class="btn-primary" [style.background]="'white'" [style.color]="colors.primary">
-                <mat-icon svgIcon="heroicons_outline:bookmark"></mat-icon>
-                <span class="ml-2">Sauvegarder</span>
+            <!-- Actions -->
+            <button class="cst-btn cst-btn--primary" type="button" (click)="saveLayout()" [disabled]="isLoading">
+                <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:bookmark'"></mat-icon>
+                Sauvegarder
             </button>
 
-            <button mat-stroked-button color="warn" type="button" (click)="deleteLayout()" [disabled]="isLoading || !selectedLayoutId" class="btn-danger">
-                <mat-icon svgIcon="heroicons_outline:trash"></mat-icon>
-                <span class="ml-2">Supprimer</span>
-            </button>
+            @if (selectedLayoutId) {
+                <button class="cst-btn cst-btn--ghost text-red-500 border-red-200 hover:bg-red-50" type="button" (click)="deleteLayout()" [disabled]="isLoading">
+                    <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                    Supprimer
+                </button>
+            }
         </div>
     </div>
 
     @if (isLoading) {
-        <div class="loading-bar-container">
-            <mat-progress-bar mode="indeterminate" color="primary"></mat-progress-bar>
-        </div>
+        <mat-progress-bar mode="indeterminate" class="rounded-full mb-4"></mat-progress-bar>
     }
 
-    <!-- Main Content -->
-    <div class="analyse-content">
-        <!-- Panel 1: Available Fields -->
-    <div class="analyse-card">
-        <div class="analyse-card-header">
-            <div class="analyse-card-title">
-                <mat-icon svgIcon="heroicons_outline:database" class="card-title-icon" [style.color]="colors.primary"></mat-icon>
-                <span>Champs disponibles</span>
-            </div>
-            <mat-form-field class="analyse-search-field" appearance="outline">
-                <mat-icon matPrefix svgIcon="search"></mat-icon>
-                <input matInput [formControl]="searchFieldControl" placeholder="Rechercher un champ...">
-            </mat-form-field>
-        </div>
-
-        <div
-            class="analyse-card-body"
-            cdkDropList
-            id="availableDropList"
-            [cdkDropListData]="availableFields"
-            [cdkDropListConnectedTo]="['selectedDropList']"
-            (cdkDropListDropped)="dropAvailable($event)">
-            @if (getFilteredAvailable().length === 0 && searchFieldControl.value) {
-                <div class="analyse-empty-state">
-                    <mat-icon svgIcon="heroicons_outline:exclamation-circle"></mat-icon>
-                    <span>Aucun champ trouvé</span>
-                </div>
-            }
-            @for (f of getFilteredAvailable(); track f.key) {
-                <div class="analyse-field-chip" cdkDrag>
-                    <div class="analyse-field-chip-content">
-                        <div class="analyse-field-chip-text">
-                            <div class="analyse-field-chip-label">{{ f.label }}</div>
-                            <div class="analyse-field-chip-key">{{ f.key }}</div>
-                        </div>
-                        <mat-icon class="analyse-field-chip-handle" svgIcon="heroicons_outline:arrows-up-down"></mat-icon>
+    <!-- Main Workspace Grid -->
+    <div class="grid grid-cols-1 xl:grid-cols-[280px_1fr] gap-6 items-start">
+        
+        <!-- Left Sidebar: Fields & Dates -->
+        <div class="flex flex-col gap-5">
+            <!-- Available Fields Card -->
+            <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm overflow-hidden flex flex-col h-[520px]">
+                <div class="p-4 border-b border-gray-100 dark:border-gray-800 flex flex-col gap-3">
+                    <div class="text-sm font-bold text-primary">Champs disponibles</div>
+                    <div class="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <mat-icon class="icon-size-4 text-secondary" [svgIcon]="'heroicons_outline:magnifying-glass'"></mat-icon>
+                        <input
+                            [formControl]="searchFieldControl"
+                            class="w-full bg-transparent border-none outline-none text-xs text-primary placeholder-secondary"
+                            placeholder="Filtrer les champs…" />
                     </div>
                 </div>
-            }
-        </div>
-    </div>
 
-    <!-- Panel 2: Selected Fields -->
-    <div class="analyse-card">
-        <div class="analyse-card-header">
-            <div class="analyse-card-title">
-                <mat-icon svgIcon="heroicons_outline:check-circle" class="card-title-icon" [style.color]="colors.primary"></mat-icon>
-                <span>Champs sélectionnés</span>
-            </div>
-            <div class="analyse-card-count">{{ selectedFields.length }} champ(s)</div>
-        </div>
-
-        <div
-            class="analyse-card-body"
-            cdkDropList
-            id="selectedDropList"
-            [cdkDropListData]="selectedFields"
-            [cdkDropListConnectedTo]="['availableDropList']"
-            (cdkDropListDropped)="dropSelected($event)">
-            @if (selectedFields.length === 0) {
-                <div class="analyse-empty-state">
-                    <mat-icon svgIcon="heroicons_outline:arrow-down-circle"></mat-icon>
-                    <span>Glissez-déposez des champs ici</span>
-                </div>
-            }
-            @for (f of selectedFields; track f.key) {
-                <div class="analyse-field-chip analyse-field-chip-selected" cdkDrag [style.border-color]="colors.primary" [style.background]="colors.accent + '20'">
-                    <div class="analyse-field-chip-content">
-                        <div class="analyse-field-chip-text">
-                            <div class="analyse-field-chip-label">{{ f.label }}</div>
-                            <div class="analyse-field-chip-key">{{ f.key }}</div>
-                        </div>
-                        <button mat-icon-button type="button" (click)="removeSelected(f.key)" class="analyse-field-chip-remove">
-                            <mat-icon svgIcon="heroicons_outline:x-mark"></mat-icon>
-                        </button>
-                    </div>
-                </div>
-            }
-        </div>
-    </div>
-
-    <!-- Panel 3: Date & Run -->
-    <div class="analyse-card analyse-card-date">
-        <div class="analyse-card-header">
-            <div class="analyse-card-title">
-                <mat-icon svgIcon="heroicons_outline:calendar" class="card-title-icon" [style.color]="colors.primary"></mat-icon>
-                <span>Période & configuration</span>
-            </div>
-        </div>
-
-        <div class="analyse-card-body analyse-card-body-date">
-            <div class="analyse-date-grid">
-                <mat-form-field class="analyse-form-field" appearance="outline">
-                    <mat-label>Date de début</mat-label>
-                    <input matInput [matDatepicker]="pickerFrom" [formControl]="form.get('dateFrom')">
-                    <mat-datepicker-toggle matIconSuffix [for]="pickerFrom"></mat-datepicker-toggle>
-                    <mat-datepicker #pickerFrom></mat-datepicker>
-                </mat-form-field>
-
-                <mat-form-field class="analyse-form-field" appearance="outline">
-                    <mat-label>Date de fin</mat-label>
-                    <input matInput [matDatepicker]="pickerTo" [formControl]="form.get('dateTo')">
-                    <mat-datepicker-toggle matIconSuffix [for]="pickerTo"></mat-datepicker-toggle>
-                    <mat-datepicker #pickerTo></mat-datepicker>
-                </mat-form-field>
-            </div>
-
-            <div class="analyse-info-box">
-                <mat-icon svgIcon="heroicons_outline:information-circle" class="info-icon"></mat-icon>
-                <span>Totaux automatiques calculés sur les colonnes numériques.</span>
-            </div>
-
-            <button mat-raised-button type="button" (click)="run()" [disabled]="isLoading" class="btn-run" [style.background]="colors.gradient">
-                <mat-icon svgIcon="heroicons_outline:play"></mat-icon>
-                <span class="ml-2">Lancer l'analyse</span>
-            </button>
-        </div>
-    </div>
-    </div>
-
-    <!-- Results Section -->
-    <div class="analyse-results">
-        <div class="analyse-results-header">
-            <div class="analyse-card-title">
-                <mat-icon svgIcon="heroicons_outline:table-cells" class="card-title-icon"></mat-icon>
-                <span>Résultats de l'analyse</span>
-            </div>
-            @if (response) {
-                <div class="analyse-card-count">{{ rows?.length ?? 0 }} ligne(s)</div>
-            }
-        </div>
-
-        @if (!response) {
-            <div class="analyse-empty-state analyse-empty-state-large">
-                <mat-icon svgIcon="heroicons_outline:rocket-launch"></mat-icon>
-                <span>Lancez une analyse pour consulter les résultats</span>
-            </div>
-        } @else {
-            <div class="analyse-table-container">
-                <table mat-table [dataSource]="rows" class="analyse-table">
-                    @for (c of response.columns; track c.key) {
-                        <ng-container [matColumnDef]="c.key">
-                            <th mat-header-cell *matHeaderCellDef class="analyse-table-header">
-                                {{ c.label }}
-                            </th>
-                            <td mat-cell *matCellDef="let row" class="analyse-table-cell">
-                                {{ row[c.key] ?? '—' }}
-                            </td>
-                            <td mat-footer-cell *matFooterCellDef class="analyse-table-footer">
-                                @if (c.isNumeric) {
-                                    {{ totals?.[c.key] ?? 0 }}
-                                } @else {
-                                    —
-                                }
-                            </td>
-                        </ng-container>
+                <!-- Drag List of Available Fields -->
+                <div
+                    id="availableList"
+                    [cdkDropListData]="availableFields"
+                    (cdkDropListDropped)="onDrop($event)"
+                    cdkDropList
+                    class="flex-auto overflow-y-auto p-3 space-y-2 min-h-40 bg-gray-50/50 dark:bg-gray-950/20">
+                    @if (getFilteredAvailable().length === 0) {
+                        <div class="text-xs text-hint text-center py-8">Aucun champ disponible.</div>
                     }
-
-                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-                    <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
-                </table>
+                    @for (f of getFilteredAvailable(); track f.key) {
+                        <div
+                            cdkDrag
+                            class="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg cursor-grab hover:border-blue-400 dark:hover:border-blue-500 shadow-sm transition-all text-xs font-semibold text-primary">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="#C9D8E8" class="flex-none"><circle cx="8" cy="6" r="2"></circle><circle cx="16" cy="6" r="2"></circle><circle cx="8" cy="12" r="2"></circle><circle cx="16" cy="12" r="2"></circle><circle cx="8" cy="18" r="2"></circle><circle cx="16" cy="18" r="2"></circle></svg>
+                            <span class="truncate flex-auto">{{ f.label }}</span>
+                            <span class="text-[10px] text-hint uppercase bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">
+                                {{ f.isNumeric ? 'Σ' : 'Abc' }}
+                            </span>
+                        </div>
+                    }
+                </div>
             </div>
-        }
+
+            <!-- Date range Configuration -->
+            <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm flex flex-col gap-4">
+                <div class="text-sm font-bold text-primary">Période &amp; Configuration</div>
+                <div class="grid grid-cols-1 gap-3">
+                    <mat-form-field class="fuse-mat-dense w-full" appearance="outline" [subscriptSizing]="'dynamic'">
+                        <mat-label>Date de début</mat-label>
+                        <input matInput [matDatepicker]="pickerFrom" [formControl]="form.get('dateFrom')">
+                        <mat-datepicker-toggle matIconSuffix [for]="pickerFrom"></mat-datepicker-toggle>
+                        <mat-datepicker #pickerFrom></mat-datepicker>
+                    </mat-form-field>
+
+                    <mat-form-field class="fuse-mat-dense w-full" appearance="outline" [subscriptSizing]="'dynamic'">
+                        <mat-label>Date de fin</mat-label>
+                        <input matInput [matDatepicker]="pickerTo" [formControl]="form.get('dateTo')">
+                        <mat-datepicker-toggle matIconSuffix [for]="pickerTo"></mat-datepicker-toggle>
+                        <mat-datepicker #pickerTo></mat-datepicker>
+                    </mat-form-field>
+                </div>
+
+                <button class="cst-btn cst-btn--primary w-full justify-center" type="button" (click)="run()" [disabled]="isLoading">
+                    <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:play'"></mat-icon>
+                    Lancer l'analyse
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Builder Pane: Drop Zones & Table Results -->
+        <div class="flex flex-col gap-6 min-w-0">
+            <!-- Dropzones Card -->
+            <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                <!-- Zone Lignes -->
+                <div class="bg-gray-50/50 dark:bg-gray-950/20 border border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-3 flex flex-col gap-2 min-h-28">
+                    <div class="text-[11px] font-bold tracking-wider text-secondary uppercase">Lignes</div>
+                    <div
+                        id="lignesList"
+                        [cdkDropListData]="lignesFields"
+                        (cdkDropListDropped)="onDrop($event)"
+                        cdkDropList
+                        class="flex-auto flex flex-wrap gap-1.5 items-start content-start min-h-16">
+                        @for (f of lignesFields; track f.key) {
+                            <span class="inline-flex items-center gap-1.5 text-xs font-bold pl-3 pr-2 py-1.5 bg-[#121242] text-white rounded-full shadow-sm max-w-full">
+                                <span class="truncate">{{ f.label }}</span>
+                                <button type="button" (click)="removeSelected(f.key, 'lignes')" class="text-white/60 hover:text-white outline-none flex items-center justify-center">
+                                    <mat-icon class="icon-size-3.5" [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
+                                </button>
+                            </span>
+                        }
+                    </div>
+                </div>
+
+                <!-- Zone Colonnes -->
+                <div class="bg-gray-50/50 dark:bg-gray-950/20 border border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-3 flex flex-col gap-2 min-h-28">
+                    <div class="text-[11px] font-bold tracking-wider text-secondary uppercase">Colonnes</div>
+                    <div
+                        id="colonnesList"
+                        [cdkDropListData]="colonnesFields"
+                        (cdkDropListDropped)="onDrop($event)"
+                        cdkDropList
+                        class="flex-auto flex flex-wrap gap-1.5 items-start content-start min-h-16">
+                        @for (f of colonnesFields; track f.key) {
+                            <span class="inline-flex items-center gap-1.5 text-xs font-bold pl-3 pr-2 py-1.5 bg-[#121242] text-white rounded-full shadow-sm max-w-full">
+                                <span class="truncate">{{ f.label }}</span>
+                                <button type="button" (click)="removeSelected(f.key, 'colonnes')" class="text-white/60 hover:text-white outline-none flex items-center justify-center">
+                                    <mat-icon class="icon-size-3.5" [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
+                                </button>
+                            </span>
+                        }
+                    </div>
+                </div>
+
+                <!-- Zone Valeurs -->
+                <div class="bg-blue-50/30 dark:bg-blue-950/5 border border-dashed border-blue-300 dark:border-blue-900 rounded-xl p-3 flex flex-col gap-2 min-h-28 relative">
+                    <div class="text-[11px] font-bold tracking-wider text-blue-500 uppercase">Valeurs</div>
+                    <div
+                        id="valeursList"
+                        [cdkDropListData]="valeursFields"
+                        (cdkDropListDropped)="onDrop($event)"
+                        cdkDropList
+                        class="flex-auto flex flex-wrap gap-1.5 items-start content-start min-h-16 pb-4">
+                        @for (f of valeursFields; track f.key) {
+                            <span class="inline-flex items-center gap-1.5 text-xs font-bold pl-3 pr-2 py-1.5 bg-blue-500 text-white rounded-full shadow-sm max-w-full">
+                                <span class="truncate">Σ {{ f.label }}</span>
+                                <button type="button" (click)="removeSelected(f.key, 'valeurs')" class="text-white/60 hover:text-white outline-none flex items-center justify-center">
+                                    <mat-icon class="icon-size-3.5" [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
+                                </button>
+                            </span>
+                        }
+                    </div>
+                    <div class="absolute bottom-2.5 right-3 text-[10px] font-bold text-blue-400">Déposer ici</div>
+                </div>
+            </div>
+
+            <!-- Table Results Card -->
+            <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+                <div class="p-4.5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-950/20">
+                    <div class="text-sm font-bold text-primary">Résultat de l'analyse</div>
+                    @if (response) {
+                        <div class="text-xs font-bold text-secondary bg-gray-100 dark:bg-gray-800 px-2.5 py-1 rounded-full">{{ rows?.length ?? 0 }} ligne(s)</div>
+                    }
+                </div>
+
+                <div class="overflow-x-auto min-h-48 flex flex-col justify-center">
+                    @if (!response) {
+                        <div class="flex flex-col items-center justify-center gap-2 p-10 text-sm text-hint">
+                            <mat-icon class="icon-size-10 opacity-30" [svgIcon]="'heroicons_outline:rocket-launch'"></mat-icon>
+                            <span>Lancez une analyse pour consulter les résultats</span>
+                        </div>
+                    } @else {
+                        <table mat-table [dataSource]="rows" class="w-full">
+                            @for (c of response.columns; track c.key) {
+                                <ng-container [matColumnDef]="c.key">
+                                    <!-- Header -->
+                                    <th mat-header-cell *matHeaderCellDef class="px-5 py-3 text-[11px] font-bold tracking-wider text-secondary uppercase bg-gray-50/80 dark:bg-gray-850 border-b border-gray-200 dark:border-gray-800" [ngClass]="c.isNumeric ? 'text-right' : 'text-left'">
+                                        {{ c.label }}
+                                    </th>
+                                    <!-- Cells -->
+                                    <td mat-cell *matCellDef="let row" class="px-5 py-3 text-[13px] text-primary border-b border-gray-100 dark:border-gray-850" [ngClass]="c.isNumeric ? 'text-right tabular-nums' : 'text-left font-semibold'">
+                                        {{ row[c.key] ?? '—' }}
+                                    </td>
+                                    <!-- Footer cell matching mockup dark layout -->
+                                    <td mat-footer-cell *matFooterCellDef class="px-5 py-3 text-[13px] font-bold text-white border-t-0" [ngClass]="c.isNumeric ? 'text-right' : 'text-left'">
+                                        @if (c.isNumeric) {
+                                            {{ totals?.[c.key] ?? 0 }}
+                                        } @else {
+                                            —
+                                        }
+                                    </td>
+                                </ng-container>
+                            }
+
+                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns" class="hover:bg-gray-50/50 dark:hover:bg-gray-800/40"></tr>
+                            <!-- Dark general total row -->
+                            <tr mat-footer-row *matFooterRowDef="displayedColumns" class="bg-[#121242] border-t border-gray-800 text-white"></tr>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
     </div>
 </div>

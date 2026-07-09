@@ -19,9 +19,9 @@ export class CircuitPointCollecteService {
         return this._apiService.Get<CircuitPointCollecteList>(`circuit-point-collecte/${circuitId}/list`)
             .pipe(
                 tap((r) => {
-                    this._circuitPoints.next(r.data?.circuitPointsCollecte ?? []);
+                    this._circuitPoints.next(r.data?.items ?? []);
                 }),
-                map(r => r.data?.circuitPointsCollecte ?? [])
+                map(r => r.data?.items ?? [])
             );
     }
 

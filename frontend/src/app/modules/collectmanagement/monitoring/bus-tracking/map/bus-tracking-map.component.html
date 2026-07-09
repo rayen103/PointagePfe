@@ -1,22 +1,33 @@
-<div class="rounded-2xl bg-card border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden h-full flex flex-col">
-    <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-800/40">
-        <div class="flex items-center gap-2.5">
-            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_outline:map'"></mat-icon>
-            <div class="font-semibold">Carte</div>
-        </div>
-        <mat-slide-toggle [color]="'primary'" [checked]="showAll" (change)="toggleShowAll.emit($event.checked)">
-            Tous
-        </mat-slide-toggle>
+<div class="w-full h-full relative bg-gray-50 dark:bg-gray-950 overflow-hidden">
+    <!-- Floating Map Controls (Top Left) -->
+    <div class="absolute top-4 left-4 z-[999] flex gap-2">
+        <button class="px-4 py-1.5 rounded-full text-xs font-bold shadow-sm transition-all bg-[#121242] text-white flex items-center gap-1.5" type="button">
+            <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+            Temps réel
+        </button>
+        <button class="px-4 py-1.5 rounded-full text-xs font-bold shadow-sm transition-all bg-white hover:bg-gray-50 text-secondary border border-gray-200 dark:bg-gray-900 dark:border-gray-750 dark:text-gray-300" type="button">
+            Circuits
+        </button>
+        <button class="px-4 py-1.5 rounded-full text-xs font-bold shadow-sm transition-all bg-white hover:bg-gray-50 text-secondary border border-gray-200 dark:bg-gray-900 dark:border-gray-750 dark:text-gray-300" type="button">
+            Points de collecte
+        </button>
     </div>
 
-    <div class="p-2 flex-auto">
+    <!-- Floating Toggle for Show All (Tous) (Top Right) -->
+    <div class="absolute top-4 right-4 z-[999] bg-white dark:bg-gray-900 px-3 py-1.5 rounded-full shadow-sm border border-gray-200 dark:border-gray-750 flex items-center gap-2">
+        <span class="text-[11px] font-bold text-secondary">Tous</span>
+        <mat-slide-toggle [color]="'primary'" [checked]="showAll" (change)="toggleShowAll.emit($event.checked)" class="scale-90"></mat-slide-toggle>
+    </div>
+
+    <!-- Map Viewport -->
+    <div class="w-full h-full relative min-h-0">
         @if ((locations?.length ?? 0) === 0) {
-            <div class="flex flex-col items-center justify-center gap-2 p-10 text-sm text-hint">
-                <mat-icon class="icon-size-10 opacity-40" [svgIcon]="'heroicons_outline:map'"></mat-icon>
+            <div class="flex flex-col items-center justify-center gap-2 p-10 text-sm text-hint absolute inset-0 bg-white/70 dark:bg-gray-900/70">
+                <mat-icon class="icon-size-10 opacity-30" [svgIcon]="'heroicons_outline:map'"></mat-icon>
                 <span>Aucune position à afficher.</span>
             </div>
         } @else {
-            <app-map-viewer [locations]="locations" [height]="'520px'" [zoom]="7"></app-map-viewer>
+            <app-map-viewer [locations]="locations" [height]="'100%'" [zoom]="7" class="w-full h-full block"></app-map-viewer>
         }
     </div>
 </div>
