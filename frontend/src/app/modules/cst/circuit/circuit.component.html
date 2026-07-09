@@ -1,1 +1,7 @@
 <router-outlet></router-outlet>
+
+@if (hasActionPermission(FuseNavigationAction.Add)) {
+    <button class="circuit-add-fab" routerLink="ajouter" aria-label="Add">
+        <span class="circuit-add-fab__icon" aria-hidden="true">+</span>
+    </button>
+}

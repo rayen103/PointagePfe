@@ -14,6 +14,7 @@ export interface Circuit {
     distanceKm?: number;
     dureeMinutes?: number;
     couleur?: string;
+    pointCollecteIds?: string[];
 }
 
 export interface PagedCircuit {

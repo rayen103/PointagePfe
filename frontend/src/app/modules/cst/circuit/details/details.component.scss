@@ -1,1 +1,122 @@
-// Details component styles
+/* =====================================================================
+   Circuit form — two columns: [info + points] | [map]  (CST design)
+   ===================================================================== */
+:host { display: block; width: 100%; min-height: 100%; }
+
+.cc-form { display: flex; flex-direction: column; gap: 16px; width: 100%; }
+
+/* ---------- Fit the whole form to the viewport (no page scroll) ---------- */
+@media (min-width: 1101px) {
+    .cst-form-page.cc-fit {
+        height: calc(100dvh - var(--cc-offset, 92px));
+        min-height: 0;
+        overflow: hidden;
+        align-items: stretch;
+        padding-top: 18px;
+        padding-bottom: 14px;
+    }
+    .cc-fit .cc-form { height: 100%; min-height: 0; gap: 12px; }
+    .cc-fit .cc-split { flex: 1 1 auto; min-height: 0; height: auto; align-items: stretch; grid-template-rows: minmax(0, 1fr); }
+    .cc-fit .cc-left { min-height: 0; gap: 12px; overflow: hidden; }
+    .cc-fit .cc-map { position: static; height: 100%; min-height: 0; }
+    /* info card keeps its natural height; the points card takes the rest and scrolls internally */
+    .cc-fit .cc-left > .cst-form-card:first-child { flex: 0 0 auto; }
+    .cc-fit .cc-points { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+    .cc-fit .cc-points__list { max-height: none; flex: 1 1 0; min-height: 0; overflow-y: auto; }
+
+    /* Compact the info card so it leaves room for the map + list */
+    .cc-fit .cc-left .cst-form-card { padding: 14px 16px; gap: 0; }
+    .cc-fit .cst-form-sec__title { font-size: 13px; }
+    .cc-fit .cst-form-sec__sub { margin-bottom: 10px; font-size: 11px; }
+    .cc-fit .cst-form-grid { gap: 10px 14px; }
+    .cc-fit .cst-field { gap: 4px; }
+    .cc-fit .cst-field label { font-size: 11.5px; }
+    .cc-fit .cst-input,
+    .cc-fit .cst-select select { height: 38px; }
+    .cc-fit .cc-color { height: 38px; }
+    .cc-fit .cst-toggle { height: 38px !important; }
+    .cc-fit .cc-textarea { min-height: 52px; }
+
+    /* Points card: tight chrome so the list gets real height */
+    .cc-fit .cc-points { padding: 14px 16px; }
+    .cc-fit .cc-points__head { margin-bottom: 10px; }
+    .cc-fit .cc-points .cst-search { margin-bottom: 10px !important; }
+}
+
+/* ---------- Two-column split ---------- */
+.cc-split {
+    display: grid;
+    grid-template-columns: minmax(0, 520px) minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+}
+@media (max-width: 1100px) {
+    .cc-split { grid-template-columns: 1fr; }
+    .cc-map { position: static !important; height: 460px !important; }
+}
+
+.cc-left { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.cc-right { min-width: 0; }
+
+/* ---------- Map (right, sticky, fills height) ---------- */
+.cc-map {
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 12px;
+    height: calc(100dvh - 210px);
+    min-height: 480px;
+}
+.cc-map__head {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+    padding: 16px 18px; border-bottom: 1px solid var(--cst-border-soft); background: var(--cst-surface-2);
+}
+.cc-map__hint { font-size: 12px; color: var(--cst-text-hint); }
+.cc-map__body { flex: 1 1 auto; min-height: 0; position: relative; }
+.cc-map__body app-map-picker { display: block; width: 100%; height: 100%; }
+
+/* ---------- Textarea + color + toggle helpers ---------- */
+.cc-textarea { height: auto !important; min-height: 84px; padding: 10px 14px !important; line-height: 1.4; resize: vertical; font-family: var(--cst-font); }
+.cc-color {
+    display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 12px;
+    border: 1px solid var(--cst-border-2); border-radius: 10px; background: var(--cst-input-bg);
+    input[type="color"] { width: 30px; height: 30px; padding: 0; border: none; background: none; cursor: pointer; }
+    .cc-color__val { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--cst-text-2); }
+}
+
+/* ---------- Points de collecte (container 2) ---------- */
+.cc-points__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.cc-points__badge {
+    font-size: 11px; font-weight: 700; color: var(--cst-blue-strong);
+    background: var(--cst-blue-soft); border-radius: 999px; padding: 4px 11px; white-space: nowrap;
+}
+.cc-points__list {
+    max-height: 320px; overflow-y: auto;
+    border: 1px solid var(--cst-border); border-radius: 12px;
+}
+
+/* ---------- Selection list item (shared visual with point-collecte) ---------- */
+.pc-item {
+    display: flex; align-items: center; gap: 12px; padding: 11px 14px;
+    border-bottom: 1px solid var(--cst-border-soft); border-left: 3px solid transparent;
+    cursor: pointer; transition: background 0.15s ease, border-color 0.15s ease;
+    &:last-child { border-bottom: none; }
+    &:hover { background: #fbfdff; }
+    &.is-selected { background: var(--cst-blue-soft); border-left-color: var(--cst-blue); }
+}
+.pc-check {
+    width: 20px; height: 20px; flex: none; border-radius: 6px;
+    border: 1.5px solid var(--cst-text-disabled); background: #fff;
+    display: inline-flex; align-items: center; justify-content: center; transition: background 0.15s ease, border-color 0.15s ease;
+    svg { width: 12px; height: 12px; opacity: 0; transition: opacity 0.15s ease; }
+    &.on { background: var(--cst-blue); border-color: var(--cst-blue); svg { opacity: 1; } }
+}
+.pc-item__main { flex: 1 1 auto; min-width: 0; }
+.pc-item__top { display: flex; align-items: center; gap: 7px; }
+.pc-item__code { font-size: 13.5px; font-weight: 700; color: var(--cst-navy); font-variant-numeric: tabular-nums; }
+.pc-item__pin { width: 14px !important; height: 14px !important; font-size: 14px !important; color: var(--cst-blue) !important; }
+.pc-item__nogeo { font-size: 10px; font-weight: 700; color: var(--cst-warn); background: var(--cst-warn-bg); border-radius: 999px; padding: 1px 7px; }
+.pc-item__lib { font-size: 12.5px; color: var(--cst-text-2); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-item__meta { font-size: 11px; color: var(--cst-text-hint); margin-top: 2px; }

@@ -1,5 +1,5 @@
 <div class="fixed inset-0 z-40 flex flex-col bg-gray-50 dark:bg-gray-900" *transloco="let t">
-    
+
     <!-- Header Bar -->
     <div class="flex-none bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 shadow-sm">
         <div class="flex items-center justify-between">
@@ -29,38 +29,38 @@
 
     <!-- 3-Panel Layout -->
     <div class="flex-1 flex overflow-hidden">
-        
+
         <!-- LEFT PANEL: Circuits List (30%) -->
         <div class="w-[30%] flex flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
-            
+
             <!-- Search & Filters -->
             <div class="flex-none p-4 space-y-3 border-b border-gray-200 dark:border-gray-700">
                 <!-- Search -->
                 <div class="relative">
                     <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 icon-size-5 text-gray-400" [svgIcon]="'heroicons_outline:magnifying-glass'"></mat-icon>
-                    <input 
-                        [formControl]="searchInputControl" 
-                        [placeholder]="t('Search') + '...'" 
+                    <input
+                        [formControl]="searchInputControl"
+                        [placeholder]="t('Search') + '...'"
                         class="w-full pl-10 pr-4 py-2 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                         autocomplete="off" />
                 </div>
 
                 <!-- Sort Buttons -->
                 <div class="flex gap-2">
-                    <button 
-                        type="button" 
+                    <button
+                        type="button"
                         [ngClass]="{
                             'bg-blue-100': sortActive === 'codeCircuit',
                             'dark:bg-blue-900/30': sortActive === 'codeCircuit',
                             'text-blue-700': sortActive === 'codeCircuit',
                             'dark:text-blue-300': sortActive === 'codeCircuit'
                         }"
-                        class="flex-1 px-3 py-1.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all" 
+                        class="flex-1 px-3 py-1.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
                         (click)="setSort('codeCircuit', sortActive === 'codeCircuit' && sortDirection === 'asc' ? 'desc' : 'asc')">
                         {{ t('Code') }}
                         <span class="ml-1">{{ sortActive === 'codeCircuit' ? (sortDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
                     </button>
-                    <button 
+                    <button
                         type="button"
                         [ngClass]="{
                             'bg-blue-100': sortActive === 'libelleCircuit',
@@ -68,7 +68,7 @@
                             'text-blue-700': sortActive === 'libelleCircuit',
                             'dark:text-blue-300': sortActive === 'libelleCircuit'
                         }"
-                        class="flex-1 px-3 py-1.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all" 
+                        class="flex-1 px-3 py-1.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
                         (click)="setSort('libelleCircuit', sortActive === 'libelleCircuit' && sortDirection === 'asc' ? 'desc' : 'asc')">
                         {{ t('Libelle') || 'Libellé' }}
                         <span class="ml-1">{{ sortActive === 'libelleCircuit' ? (sortDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
@@ -86,8 +86,8 @@
                 @if (circuit$ | async; as circuits) {
                     @if (circuits.length > 0) {
                         @for (circuit of circuits; track circuit.circuitId || $index) {
-                            <div 
-                                class="p-4 border-b border-gray-100 dark:border-gray-700 cursor-pointer transition-all hover:bg-gray-50 dark:hover:bg-gray-700/50" 
+                            <div
+                                class="p-4 border-b border-gray-100 dark:border-gray-700 cursor-pointer transition-all hover:bg-gray-50 dark:hover:bg-gray-700/50"
                                 [ngClass]="{
                                     'bg-blue-50': selectedCircuit?.circuitId === circuit.circuitId,
                                     'dark:bg-blue-900/20': selectedCircuit?.circuitId === circuit.circuitId,
@@ -95,15 +95,15 @@
                                     'border-l-blue-500': selectedCircuit?.circuitId === circuit.circuitId
                                 }"
                                 (click)="toggleDetails(circuit.circuitId)">
-                                
+
                                 <div class="flex items-start justify-between mb-2">
                                     <div class="flex-1 min-w-0">
                                         <div class="flex items-center space-x-2">
                                             <span class="px-2 py-0.5 text-xs font-bold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 rounded">
                                                 {{ circuit.codeCircuit || '—' }}
                                             </span>
-                                            <span 
-                                                class="px-2 py-0.5 text-xs font-medium rounded" 
+                                            <span
+                                                class="px-2 py-0.5 text-xs font-medium rounded"
                                                 [ngClass]="circuit.isActive ? 'text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/30' : 'text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700'">
                                                 {{ circuit.isActive ? (t('Active') || 'ACTIF') : (t('Inactive') || 'INACTIF') }}
                                             </span>
@@ -113,17 +113,17 @@
                                         </h3>
                                     </div>
                                     <div class="flex items-center space-x-1 ml-2">
-                                        <button 
-                                            class="p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded transition-all" 
-                                            type="button" 
-                                            [routerLink]="circuit.circuitId" 
+                                        <button
+                                            class="p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded transition-all"
+                                            type="button"
+                                            [routerLink]="circuit.circuitId"
                                             (click)="$event.stopPropagation()">
                                             <mat-icon class="icon-size-4" [svgIcon]="'heroicons_outline:pencil-square'"></mat-icon>
                                         </button>
                                         @if (hasActionPermission(FuseNavigationAction.Delete)) {
-                                            <button 
-                                                class="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-all" 
-                                                type="button" 
+                                            <button
+                                                class="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-all"
+                                                type="button"
                                                 (click)="deleteSelectedCircuit(circuit); $event.stopPropagation()">
                                                 <mat-icon class="icon-size-4" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
                                             </button>
@@ -161,13 +161,13 @@
 
             <!-- Pagination -->
             <div class="flex-none border-t border-gray-200 dark:border-gray-700">
-                <mat-paginator 
-                    [ngClass]="{'pointer-events-none': isLoading}" 
-                    [length]="circuitsLength" 
-                    [pageIndex]="0" 
-                    [pageSize]="10" 
-                    [pageSizeOptions]="[5, 10, 25, 100]" 
-                    [showFirstLastButtons]="true" 
+                <mat-paginator
+                    [ngClass]="{'pointer-events-none': isLoading}"
+                    [length]="circuitsLength"
+                    [pageIndex]="0"
+                    [pageSize]="10"
+                    [pageSizeOptions]="[5, 10, 25, 100]"
+                    [showFirstLastButtons]="true"
                     (page)="SortChange()">
                 </mat-paginator>
             </div>
@@ -175,15 +175,15 @@
 
         <!-- MIDDLE PANEL: Collection Points (30%) -->
         <div class="w-[30%] flex flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
-            
+
             <!-- DEBUG INFO (TEMPORARY) -->
-            <div class="p-2 bg-yellow-100 dark:bg-yellow-900 text-xs">
-                <strong>Debug Info:</strong><br>
-                Selected Circuit: {{ selectedCircuit ? selectedCircuit.codeCircuit : 'None' }}<br>
-                Points Array Length: {{ selectedCircuitPoints.length }}<br>
-                Points Data: {{ selectedCircuitPoints | json }}
-            </div>
-            
+<!--            <div class="p-2 bg-yellow-100 dark:bg-yellow-900 text-xs">-->
+<!--                <strong>Debug Info:</strong><br>-->
+<!--                Selected Circuit: {{ selectedCircuit ? selectedCircuit.codeCircuit : 'None' }}<br>-->
+<!--                Points Array Length: {{ selectedCircuitPoints.length }}<br>-->
+<!--                Points Data: {{ selectedCircuitPoints | json }}-->
+<!--            </div>-->
+
             @if (selectedCircuit) {
                 <!-- Header -->
                 <div class="flex-none p-4 border-b border-gray-200 dark:border-gray-700">
@@ -206,7 +206,7 @@
                                     <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-sm font-bold rounded-lg shadow-sm">
                                         {{ point.ordre }}
                                     </div>
-                                    
+
                                     <!-- Point Info -->
                                     <div class="flex-1 min-w-0">
                                         <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">
@@ -260,7 +260,7 @@
 
         <!-- RIGHT PANEL: Map (40%) -->
         <div class="flex-1 flex flex-col bg-gray-100 dark:bg-gray-950 relative">
-            
+
             <!-- Map Header -->
             <div class="flex-none bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 px-6 py-4 shadow-sm">
                 <div class="flex items-center justify-between">
@@ -297,10 +297,10 @@
             <!-- Map Container -->
             <div class="flex-1 relative">
                 @if (mapLocations.length > 0) {
-                    <app-map-viewer 
-                        [locations]="mapLocations" 
-                        [height]="'100%'" 
-                        [zoom]="13" 
+                    <app-map-viewer
+                        [locations]="mapLocations"
+                        [height]="'100%'"
+                        [zoom]="13"
                         [showRoute]="selectedCircuit !== null">
                     </app-map-viewer>
                 } @else {

@@ -1,239 +1,204 @@
-<div class="absolute inset-0 flex flex-col min-w-0 overflow-hidden" *transloco="let t">
+<div class="cst-form-page cc-fit" *transloco="let t">
+    <form class="cc-form" [formGroup]="circuitForm" #circuitFormDirective="ngForm">
 
-    <!-- Header -->
-    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
-        <!-- Title -->
-        <div class="text-4xl font-extrabold tracking-tight">
-            {{isNewCircuit ? t('Add-Circuit') : t('Edit-Circuit')}}
+        <!-- Breadcrumb -->
+        <div class="cst-crumb">
+            <a routerLink="/fichier/circuit">Gestion</a><span>/</span><a routerLink="/fichier/circuit">Circuits</a><span>/</span>
+            <b>{{ isNewCircuit ? (t('Add-Circuit') || 'Nouveau circuit') : (circuit?.codeCircuit || t('Edit-Circuit')) }}</b>
         </div>
-        <!-- Actions -->
-        <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4 gap-3">
-            <!-- Delete button (only for existing circuits) -->
-            @if(!isNewCircuit) {
-                <button
-                    mat-flat-button
-                    color="warn"
-                    (click)="deleteCircuit()">
-                    <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
-                    <span class="ml-2">{{ t('Delete') }}</span>
-                </button>
-            }
-            <!-- Back button -->
-            <button
-                mat-flat-button
-                (click)="onBackdropClicked()">
-                <mat-icon [svgIcon]="'heroicons_outline:arrow-left'"></mat-icon>
-                <span class="ml-2">{{ t('Back') }}</span>
-            </button>
-        </div>
-    </div>
 
-    <!-- Main -->
-    <div class="flex flex-auto overflow-y-auto">
-        <div class="flex flex-col flex-auto p-6 md:p-8">
-
-            <!-- Flash message -->
-            @if(flashMessage){
-                <div class="mb-6" *transloco="let t">
-                    @if(flashMessage === 'success'){
-                        <div class="p-4 bg-green-100 dark:bg-green-800 rounded text-green-800 dark:text-green-100">
-                            {{t('Success-message')}}
-                        </div>
-                    }
-                    @if(flashMessage === 'error'){
-                        <div class="p-4 bg-red-100 dark:bg-red-800 rounded text-red-800 dark:text-red-100">
-                            {{t('Error-message')}}
-                        </div>
-                    }
+        <!-- Header line -->
+        <div class="cst-form-topline">
+            <div class="cst-form-id">
+                <div class="cst-form-id__ic"><mat-icon [svgIcon]="'mat_outline:alt_route'"></mat-icon></div>
+                <div>
+                    <div class="cst-form-id__title">
+                        <span>{{ isNewCircuit ? (t('Add-Circuit') || 'Nouveau circuit') : (circuit?.codeCircuit || t('Edit-Circuit')) }}</span>
+                        @if (!isNewCircuit) {
+                            <span class="cst-pill" [ngClass]="circuit?.isActive ? 'cst-pill--ok' : 'cst-pill--off'">
+                                {{ circuit?.isActive ? (t('Active') || 'ACTIF') : (t('Inactive') || 'INACTIF') }}
+                            </span>
+                        }
+                    </div>
+                    <div class="cst-form-id__meta">{{ circuit?.libelleCircuit || (isNewCircuit ? 'Définissez le tracé et les points de collecte' : '—') }}</div>
                 </div>
-            }
+            </div>
+            <div class="cst-head__actions">
+                @if (!isNewCircuit) {
+                    <button class="cst-btn cst-btn--ghost" type="button" (click)="deleteCircuit()" style="color:var(--cst-danger);border-color:#f6c1bf">
+                        <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:trash'"></mat-icon> {{ t('Delete') || 'Supprimer' }}
+                    </button>
+                }
+                <button class="cst-btn cst-btn--ghost" type="button" (click)="onBackdropClicked()">{{ t('Cancel') || 'Annuler' }}</button>
+                <button class="cst-btn cst-btn--primary" type="button" (click)="saveCircuit()">{{ t('Save') || 'Enregistrer' }}</button>
+            </div>
+        </div>
 
-            <!-- Form -->
-            <form
-                class="flex flex-col"
-                [formGroup]="circuitForm"
-                #circuitFormDirective="ngForm">
+        @if (flashMessage) {
+            <div class="cst-form-flash" [class.is-ok]="flashMessage === 'success'" [class.is-err]="flashMessage === 'error'">
+                {{ flashMessage === 'success' ? (t('Success-message') || 'Enregistré avec succès') : (t('Error-message') || 'Veuillez corriger les erreurs du formulaire') }}
+            </div>
+        }
 
-                <mat-card class="p-6">
-                    <mat-card-content>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <!-- ================= Two-column split ================= -->
+        <div class="cc-split">
 
-                            <!-- Code Circuit -->
-                            <mat-form-field class="w-full">
-                                <mat-label>{{ t('Circuit-Code') }}</mat-label>
-                                <mat-icon
-                                    class="icon-size-5"
-                                    matPrefix
-                                    [svgIcon]="'heroicons_solid:identification'"></mat-icon>
-                                <input
-                                    matInput
-                                    formControlName="codeCircuit"
-                                    [placeholder]="t('Enter-circuit-code')">
-                                @if(circuitForm.get('codeCircuit').hasError('required')){
-                                    <mat-error>{{ t('Code-required') }}</mat-error>
-                                }
-                            </mat-form-field>
+            <!-- ===== LEFT COLUMN ===== -->
+            <div class="cc-left">
 
-                            <!-- Libelle Circuit -->
-                            <mat-form-field class="w-full">
-                                <mat-label>{{ t('Circuit-Label') }}</mat-label>
-                                <mat-icon
-                                    class="icon-size-5"
-                                    matPrefix
-                                    [svgIcon]="'heroicons_solid:tag'"></mat-icon>
-                                <input
-                                    matInput
-                                    formControlName="libelleCircuit"
-                                    [placeholder]="t('Enter-circuit-label')">
-                            </mat-form-field>
+                <!-- Container 1: Informations du circuit -->
+                <div class="cst-form-card">
+                    <div class="cst-form-sec__title">{{ t('Circuit-Information') || 'Informations du circuit' }}</div>
+                    <div class="cst-form-sec__sub">Identité, extrémités et paramètres du trajet</div>
 
-                            <!-- Description -->
-                            <mat-form-field class="w-full sm:col-span-2">
-                                <mat-label>{{ t('Description') }}</mat-label>
-                                <mat-icon
-                                    class="icon-size-5"
-                                    matPrefix
-                                    [svgIcon]="'heroicons_solid:document-text'"></mat-icon>
-                                <textarea
-                                    matInput
-                                    formControlName="description"
-                                    [placeholder]="t('Enter-description')"
-                                    rows="4"></textarea>
-                            </mat-form-field>
-
-
-
-                            <!-- Code PC Départ -->
-                            <mat-form-field class="w-full">
-                                <mat-label>{{ t('Code-PC-Depart') }}</mat-label>
-                                <mat-icon
-                                    class="icon-size-5"
-                                    matPrefix
-                                    [svgIcon]="'heroicons_solid:play'"></mat-icon>
-                                <mat-select formControlName="codePCDepart" [placeholder]="t('Select-start-point')">
-                                    @for (point of allPoints; track point.pointCollecteId) {
-                                        <mat-option [value]="point.codePointCollecte">{{ point.libellePointCollecte || point.codePointCollecte }}</mat-option>
-                                    }
-                                </mat-select>
-                                @if(circuitForm.get('codePCDepart')?.hasError('required')){
-                                    <mat-error>{{ t('Code-PC-Depart') }} is required</mat-error>
-                                }
-                            </mat-form-field>
-
-                            <!-- Code PC Arrivée -->
-                            <mat-form-field class="w-full">
-                                <mat-label>{{ t('Code-PC-Arrivee') }}</mat-label>
-                                <mat-icon
-                                    class="icon-size-5"
-                                    matPrefix
-                                    [svgIcon]="'heroicons_solid:stop'"></mat-icon>
-                                <mat-select formControlName="codePCArrivee" [placeholder]="t('Select-end-point')">
-                                    @for (point of allPoints; track point.pointCollecteId) {
-                                        <mat-option [value]="point.codePointCollecte">{{ point.libellePointCollecte || point.codePointCollecte }}</mat-option>
-                                    }
-                                </mat-select>
-                                @if(circuitForm.get('codePCArrivee')?.hasError('required')){
-                                    <mat-error>{{ t('Code-PC-Arrivee') }} is required</mat-error>
-                                }
-                            </mat-form-field>
-
-                            <div class="w-full sm:col-span-2 flex justify-between items-center">
-                                <div class="flex items-center gap-4">
-                                    <mat-label class="font-semibold">{{ t('Couleur') }}</mat-label>
-                                    <div class="flex items-center gap-2 border rounded p-1">
-                                        <input
-                                            type="color"
-                                            formControlName="couleur"
-                                            class="w-10 h-10 p-0 border-0 cursor-pointer">
-                                        <span class="text-sm font-mono">{{ circuitForm.get('couleur').value }}</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Distance (km) -->
-                            <mat-form-field class="w-full">
-                                <mat-label>{{ t('Distance-Km') }}</mat-label>
-                                <mat-icon
-                                    class="icon-size-5"
-                                    matPrefix
-                                    [svgIcon]="'heroicons_solid:arrow-right'"></mat-icon>
-                                <input
-                                    matInput
-                                    type="number"
-                                    formControlName="distanceKm"
-                                    [placeholder]="t('Enter-distance-km')">
-                            </mat-form-field>
-
-                            <!-- Durée (minutes) -->
-                            <mat-form-field class="w-full">
-                                <mat-label>{{ t('Duree-Minutes') }}</mat-label>
-                                <mat-icon
-                                    class="icon-size-5"
-                                    matPrefix
-                                    [svgIcon]="'heroicons_solid:clock'"></mat-icon>
-                                <input
-                                    matInput
-                                    type="number"
-                                    formControlName="dureeMinutes"
-                                    [placeholder]="t('Enter-duree-minutes')">
-                            </mat-form-field>
-
-                            <!-- Societe ID (hidden, populated from user context) -->
-                            <input type="hidden" formControlName="societeId">
-
-                            <!-- Is Active -->
-                            <div class="flex items-center">
-                                <mat-slide-toggle
-                                    formControlName="isActive"
-                                    [color]="'primary'">
-                                    {{ t('Active') }}
-                                </mat-slide-toggle>
-                            </div>
-
+                    <div class="cst-form-grid" style="grid-template-columns:1fr 1fr">
+                        <div class="cst-field">
+                            <label>{{ t('Circuit-Code') || 'Code circuit' }} <span style="color:var(--cst-red)">*</span></label>
+                            <input class="cst-input" formControlName="codeCircuit"
+                                   [class.is-err]="circuitForm.get('codeCircuit')?.invalid && (circuitForm.get('codeCircuit')?.touched || circuitFormDirective.submitted)"
+                                   [placeholder]="t('Enter-circuit-code') || 'Ex: AR-NORD'" />
+                            @if (circuitForm.get('codeCircuit')?.invalid && (circuitForm.get('codeCircuit')?.touched || circuitFormDirective.submitted)) {
+                                <div class="cst-field__err"><mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon> {{ t('Code-required') || 'Le code est requis' }}</div>
+                            }
                         </div>
-                    </mat-card-content>
-                </mat-card>
 
-                <!-- Map Picker -->
-                <mat-card class="p-6 mt-6">
-                    <mat-card-header>
-                        <mat-card-title>{{ t('Circuit-Location') }}</mat-card-title>
-                    </mat-card-header>
-                    <mat-card-content>
-                        <p class="text-secondary mb-4">{{ t('Click-on-map-to-set-location') }}</p>
+                        <div class="cst-field">
+                            <label>{{ t('Circuit-Label') || 'Libellé' }}</label>
+                            <input class="cst-input" formControlName="libelleCircuit" [placeholder]="t('Enter-circuit-label') || 'Ex: Ariana Nord'" />
+                        </div>
+
+                        <div class="cst-field" style="grid-column:1/-1">
+                            <label>{{ t('Description') || 'Description' }}</label>
+                            <textarea class="cst-input cc-textarea" formControlName="description" rows="2" [placeholder]="t('Enter-description') || 'Description du circuit…'"></textarea>
+                        </div>
+
+                        <div class="cst-field">
+                            <label>{{ t('Code-PC-Depart') || 'Point de départ' }} <span style="color:var(--cst-red)">*</span></label>
+                            <div class="cst-select" [class.is-err]="circuitForm.get('codePCDepart')?.invalid && (circuitForm.get('codePCDepart')?.touched || circuitFormDirective.submitted)">
+                                <select formControlName="codePCDepart">
+                                    <option value="">{{ t('Select-start-point') || 'Sélectionner…' }}</option>
+                                    @for (point of allPoints; track point.pointCollecteId) {
+                                        <option [value]="point.codePointCollecte">{{ point.libellePointCollecte || point.codePointCollecte }}</option>
+                                    }
+                                </select>
+                                <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
+                            </div>
+                        </div>
+
+                        <div class="cst-field">
+                            <label>{{ t('Code-PC-Arrivee') || "Point d'arrivée" }} <span style="color:var(--cst-red)">*</span></label>
+                            <div class="cst-select" [class.is-err]="circuitForm.get('codePCArrivee')?.invalid && (circuitForm.get('codePCArrivee')?.touched || circuitFormDirective.submitted)">
+                                <select formControlName="codePCArrivee">
+                                    <option value="">{{ t('Select-end-point') || 'Sélectionner…' }}</option>
+                                    @for (point of allPoints; track point.pointCollecteId) {
+                                        <option [value]="point.codePointCollecte">{{ point.libellePointCollecte || point.codePointCollecte }}</option>
+                                    }
+                                </select>
+                                <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
+                            </div>
+                        </div>
+
+                        <div class="cst-field">
+                            <label>{{ t('Distance-Km') || 'Distance (km)' }}</label>
+                            <input class="cst-input" type="number" formControlName="distanceKm" [placeholder]="t('Enter-distance-km') || 'Ex: 12'" />
+                        </div>
+
+                        <div class="cst-field">
+                            <label>{{ t('Duree-Minutes') || 'Durée (min)' }}</label>
+                            <input class="cst-input" type="number" formControlName="dureeMinutes" [placeholder]="t('Enter-duree-minutes') || 'Ex: 35'" />
+                        </div>
+
+                        <div class="cst-field">
+                            <label>{{ t('Couleur') || 'Couleur du tracé' }}</label>
+                            <div class="cc-color">
+                                <input type="color" formControlName="couleur" />
+                                <span class="cc-color__val">{{ circuitForm.get('couleur')?.value }}</span>
+                            </div>
+                        </div>
+
+                        <div class="cst-field">
+                            <label>{{ t('Status') || 'Statut' }}</label>
+                            <label class="cst-toggle" style="height:44px">
+                                <input type="checkbox" formControlName="isActive" />
+                                <span class="cst-toggle__track"></span>
+                                <span [ngClass]="circuitForm.get('isActive')?.value ? 'cst-toggle__on' : 'cst-toggle__off'">{{ circuitForm.get('isActive')?.value ? (t('Active') || 'Actif') : (t('Inactive') || 'Inactif') }}</span>
+                            </label>
+                        </div>
+
+                        <input type="hidden" formControlName="societeId" />
+                    </div>
+                </div>
+
+                <!-- Container 2: Points de collecte -->
+                <div class="cst-form-card cc-points">
+                    <div class="cc-points__head">
+                        <div>
+                            <div class="cst-form-sec__title" style="margin:0">{{ t('PointsCollecte') || 'Points de collecte' }}</div>
+                            <div class="cst-form-sec__sub" style="margin:2px 0 0">Rattachez les points desservis par ce circuit</div>
+                        </div>
+                        <span class="cc-points__badge">{{ selectedPointCount }} sélectionné(s)</span>
+                    </div>
+
+                    <div class="cst-search" style="margin-bottom:10px">
+                        <mat-icon [svgIcon]="'heroicons_outline:magnifying-glass'"></mat-icon>
+                        <input [formControl]="pointSearchControl" placeholder="Code, libellé, région…" autocomplete="off" />
+                    </div>
+
+                    <div class="cc-points__list">
+                        @if (filteredPoints.length > 0) {
+                            @for (point of filteredPoints; track point.pointCollecteId) {
+                                <div class="pc-item" [class.is-selected]="isPointSelected(point.pointCollecteId)" (click)="togglePointSelection(point.pointCollecteId)">
+                                    <span class="pc-check" [class.on]="isPointSelected(point.pointCollecteId)">
+                                        <svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M2 6.5l2.6 2.6L10 3.5"></path></svg>
+                                    </span>
+                                    <div class="pc-item__main">
+                                        <div class="pc-item__top">
+                                            <span class="pc-item__code">{{ point.codePointCollecte || '—' }}</span>
+                                            @if (point.latitude && point.longitude) {
+                                                <mat-icon class="pc-item__pin" [svgIcon]="'heroicons_solid:map-pin'"></mat-icon>
+                                            } @else {
+                                                <span class="pc-item__nogeo">sans position</span>
+                                            }
+                                        </div>
+                                        <div class="pc-item__lib">{{ point.libellePointCollecte || '—' }}</div>
+                                        <div class="pc-item__meta">{{ point.codeRegion || '—' }}<span> · </span>{{ point.codeGouvernorat || '—' }}</div>
+                                    </div>
+                                    <span class="cst-pill" [ngClass]="point.isActive ? 'cst-pill--ok' : 'cst-pill--off'">{{ point.isActive ? 'ACTIF' : 'INACTIF' }}</span>
+                                </div>
+                            }
+                        } @else {
+                            <div class="cst-tbl__empty">
+                                <div class="cst-tbl__empty-ic"><mat-icon [svgIcon]="'mat_outline:location_on'"></mat-icon></div>
+                                <div class="cst-tbl__empty-t">Aucun point de collecte</div>
+                                <div class="cst-tbl__empty-s">Ajustez la recherche ou créez des points de collecte.</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== RIGHT COLUMN: Map ===== -->
+            <div class="cc-right">
+                <div class="cst-form-card cc-map">
+                    <div class="cc-map__head">
+                        <div class="cst-form-sec__title" style="margin:0;display:flex;align-items:center;gap:8px">
+                            <mat-icon class="icon-size-5" style="color:var(--cst-blue)" [svgIcon]="'heroicons_outline:map'"></mat-icon>
+                            {{ t('Circuit-Location') || 'Tracé du circuit' }}
+                        </div>
+                        <span class="cc-map__hint">{{ t('Click-on-map-to-set-location') || 'Cliquez sur la carte pour définir la position' }}</span>
+                    </div>
+                    <div class="cc-map__body">
                         <app-map-picker
                             [latitude]="circuitForm.get('latitude')?.value"
                             [longitude]="circuitForm.get('longitude')?.value"
                             [routePoints]="circuitRoutePoints"
                             [color]="circuitForm.get('couleur')?.value"
-                            [height]="'400px'"
+                            [height]="'100%'"
                             (locationChange)="onLocationChange($event)">
                         </app-map-picker>
-                    </mat-card-content>
-                </mat-card>
-
-                <!-- Actions -->
-                <div class="flex items-center justify-end mt-6 gap-4">
-                    <button
-                        mat-button
-                        type="button"
-                        (click)="onBackdropClicked()">
-                        {{ t('Cancel') }}
-                    </button>
-                    <button
-                        mat-flat-button
-                        type="button"
-                        [color]="'primary'"
-                        [disabled]="circuitForm.invalid"
-                        (click)="saveCircuit()">
-                        <mat-icon [svgIcon]="'heroicons_outline:check'"></mat-icon>
-                        <span class="ml-2">{{ t('Save') }}</span>
-                    </button>
+                    </div>
                 </div>
-
-            </form>
-
+            </div>
         </div>
-    </div>
-
+    </form>
 </div>

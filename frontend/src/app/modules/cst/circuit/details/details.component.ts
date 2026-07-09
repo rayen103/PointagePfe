@@ -15,12 +15,13 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatSelectModule } from '@angular/material/select';
-import { FormBuilder, FormGroupDirective, ReactiveFormsModule, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroupDirective, ReactiveFormsModule, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { catchError, EMPTY, finalize, forkJoin, map, Observable, of, Subject, take, takeUntil } from 'rxjs';
 import { fuseAnimations } from '../../../../../@fuse/animations';
 import { Circuit } from '../../../../core/circuit/circuit.model';
@@ -54,6 +55,7 @@ import { FuseConfirmationService } from '../../../../../@fuse/services/confirmat
         TranslocoModule,
         RouterLink,
         MapPickerComponent,
+        MatCheckboxModule,
     ],
   templateUrl: './details.component.html',
   styleUrl: './details.component.scss',
@@ -73,6 +75,9 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
     departureAddressNotFound: boolean = false;
     arrivalAddressNotFound: boolean = false;
     allPoints: PointCollecte[] = [];
+    selectedPointIds: string[] = [];
+    pointSearchControl: UntypedFormControl = new UntypedFormControl('');
+    filteredPoints: PointCollecte[] = [];
     
     private departureAddressPoint: MapRoutePoint | null = null;
     private arrivalAddressPoint: MapRoutePoint | null = null;
@@ -89,6 +94,63 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         private _userService: UserService,
         private _fuseConfirmationService: FuseConfirmationService
     ) { }
+
+    togglePointSelection(pointId: string): void {
+        const idx = this.selectedPointIds.indexOf(pointId);
+        if (idx === -1) {
+            this.selectedPointIds = [...this.selectedPointIds, pointId];
+        } else {
+            this.selectedPointIds = this.selectedPointIds.filter(id => id !== pointId);
+        }
+        this._changeDetectorRef.markForCheck();
+    }
+
+    isPointSelected(pointId: string): boolean {
+        return this.selectedPointIds.includes(pointId);
+    }
+
+    /** Return points that should be selectable in the current mode:
+     *  - New circuit: only points with no circuit assigned.
+     *  - Edit circuit: points with no circuit assigned + points assigned to this circuit.
+     */
+    private getAssignablePoints(): PointCollecte[] {
+        const base = this.allPoints ?? [];
+        if (!this.circuit?.circuitId || this.isNewCircuit) {
+            return base.filter((p) => !p.circuitId);
+        }
+        return base.filter((p) => !p.circuitId || p.circuitId === this.circuit.circuitId);
+    }
+
+    /** Filter the collection points shown in the list by assignment mode + free-text term. */
+    applyPointFilter(term: string | null | undefined): void {
+        const assignable = this.getAssignablePoints();
+        const q = (term ?? '').toString().trim().toLowerCase();
+        this.filteredPoints = q
+            ? assignable.filter((p) =>
+                  [p.codePointCollecte, p.libellePointCollecte, p.codeRegion, p.codeGouvernorat]
+                      .filter(Boolean)
+                      .some((v) => v!.toString().toLowerCase().includes(q))
+              )
+            : assignable;
+        this._changeDetectorRef.markForCheck();
+    }
+
+    /** Refresh selectable points and current selection after data changes. */
+    private refreshPointSelection(): void {
+        if (!this.circuit?.circuitId || this.isNewCircuit) {
+            this.selectedPointIds = [];
+        } else {
+            this.selectedPointIds = this.allPoints
+                .filter((p) => p.circuitId === this.circuit.circuitId)
+                .map((p) => p.pointCollecteId);
+        }
+        this.applyPointFilter(this.pointSearchControl.value);
+        this.composeCircuitRoutePoints();
+    }
+
+    get selectedPointCount(): number {
+        return this.selectedPointIds.length;
+    }
 
     ngOnInit(): void {
 
@@ -110,9 +172,15 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
 
         // Load all collection points
         this._pointCollecteService.GetPointsCollecte().subscribe(res => {
-            this.allPoints = res.pointsCollecte;
+            this.allPoints = res.pointsCollecte ?? [];
+            this.refreshPointSelection();
             this._changeDetectorRef.markForCheck();
         });
+
+        // Filter the collection-point list as the user searches
+        this.pointSearchControl.valueChanges
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((term) => this.applyPointFilter(term));
 
         this.circuitForm.get('codePCDepart')?.addValidators([Validators.required]);
         this.circuitForm.get('codePCArrivee')?.addValidators([Validators.required]);
@@ -164,6 +232,7 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                 }
                 
                 console.log('Form societeId after patch:', this.circuitForm.get('societeId').value);
+                this.refreshPointSelection();
                 this.locateAddressesOnMap();
 
                 this._changeDetectorRef.markForCheck();
@@ -259,6 +328,7 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                 }
 
                 const circuit = this.circuitForm.getRawValue() as Circuit;
+                circuit.pointCollecteIds = this.selectedPointIds;
                 console.log('Saving circuit:', circuit);
 
                 if (!this.circuit?.circuitId) {
@@ -426,7 +496,16 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
             }
         }
 
-        this.circuitRoutePoints = routePoints;
+        const selectedWithLocation = this.selectedPointIds
+            .map((id) => this.allPoints.find((p) => p.pointCollecteId === id))
+            .filter((p): p is PointCollecte => !!p && p.latitude != null && p.longitude != null)
+            .map((p) => ({
+                latitude: Number(p.latitude),
+                longitude: Number(p.longitude),
+                label: `PC: ${p.codePointCollecte || p.libellePointCollecte || 'Point'}`,
+            }));
+
+        this.circuitRoutePoints = [...routePoints, ...selectedWithLocation];
     }
 
     ngOnDestroy(): void {
