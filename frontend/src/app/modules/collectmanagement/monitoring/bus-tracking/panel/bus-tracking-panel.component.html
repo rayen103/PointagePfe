@@ -11,11 +11,11 @@
                 <div>
                     <div class="text-[18px] font-bold text-primary tabular-nums">{{ bus.numeroIMM }}</div>
                     <div class="text-[12px] text-secondary mt-1">
-                        {{ bus.codeCircuit || 'Aucun circuit' }} · {{ bus.codeChauffeur || 'Aucun chauffeur' }}
+                        {{ circuitInfo?.circuitName || circuitInfo?.circuitCode || 'Aucun circuit' }}
                     </div>
                 </div>
                 <span class="cst-pill" [ngClass]="bus.isActive ? 'cst-pill--ok' : 'cst-pill--off'">
-                    {{ bus.isActive ? 'EN ROUTE' : 'ARRÊT' }}
+                    {{ getStatusLabel() }}
                 </span>
             </div>
         </div>
@@ -23,6 +23,62 @@
         <!-- Scrollable Details & Stats Area -->
         <div class="flex-auto overflow-y-auto flex flex-col">
             
+            <!-- Circuit Progress Section -->
+            @if (circuitInfo && circuitInfo.totalCollectionPoints > 0) {
+                <div class="p-5 border-b border-gray-100 dark:border-gray-850">
+                    <div class="text-[13px] font-bold text-primary mb-3">Progression du circuit</div>
+                    
+                    <div class="flex items-center justify-between text-[12px] mb-2">
+                        <span class="text-secondary">Collection</span>
+                        <span class="text-primary font-bold tabular-nums">
+                            {{ circuitInfo.completedPoints }}/{{ circuitInfo.totalCollectionPoints }}
+                        </span>
+                    </div>
+                    
+                    <div class="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden mb-3">
+                        <div
+                            class="h-full rounded-full bg-[#121242] dark:bg-blue-600 transition-all duration-500"
+                            [style.width.%]="circuitInfo.progressPercent ?? 0">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+                            <div class="text-[11px] text-secondary uppercase tracking-wide mb-1">Prochain point</div>
+                            <div class="text-[12px] font-bold text-primary truncate">
+                                {{ circuitInfo.nextDestinationName || '—' }}
+                            </div>
+                        </div>
+                        <div class="p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+                            <div class="text-[11px] text-secondary uppercase tracking-wide mb-1">Distance restante</div>
+                            <div class="text-[12px] font-bold text-primary tabular-nums">
+                                @if (circuitInfo.remainingDistanceKm != null) {
+                                    {{ circuitInfo.remainingDistanceKm }} km
+                                } @else {
+                                    —
+                                }
+                            </div>
+                        </div>
+                        <div class="p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+                            <div class="text-[11px] text-secondary uppercase tracking-wide mb-1">ETA</div>
+                            <div class="text-[12px] font-bold text-primary tabular-nums">
+                                @if (circuitInfo.remainingEtaMinutes != null) {
+                                    {{ circuitInfo.remainingEtaMinutes }} min
+                                } @else {
+                                    —
+                                }
+                            </div>
+                        </div>
+                        <div class="p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+                            <div class="text-[11px] text-secondary uppercase tracking-wide mb-1">Progression</div>
+                            <div class="text-[12px] font-bold text-primary tabular-nums">
+                                {{ circuitInfo.progressPercent ?? 0 }} %
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
             <!-- Passenger SVG Circle Progress Chart & Stats -->
             <div class="p-5 flex items-center gap-5 border-b border-gray-100 dark:border-gray-850">
                 <svg width="96" height="96" viewBox="0 0 96 96" class="flex-none">
@@ -52,7 +108,7 @@
                     </div>
                     <div class="flex justify-between">
                         <span class="text-secondary font-medium">Vitesse</span>
-                        <b class="text-primary font-bold tabular-nums">{{ bus.isActive ? '12 km/h' : '0 km/h' }}</b>
+                        <b class="text-primary font-bold tabular-nums">—</b>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-secondary font-medium">Position</span>
@@ -63,6 +119,10 @@
                                 —
                             }
                         </b>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-secondary font-medium">Heading</span>
+                        <b class="text-primary font-bold tabular-nums">—</b>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-secondary font-medium">Mise à jour</span>

@@ -46,7 +46,7 @@
                             <div class="cst-num cst-mut">{{ modem.numeroSim || '—' }}</div>
                             <div><span class="cst-pill" [ngClass]="modem.isActive ? 'cst-pill--ok' : 'cst-pill--off'">{{ modem.isActive ? (t('Active') || 'ACTIF') : (t('Inactive') || 'INACTIF') }}</span></div>
                             <div class="cst-tbl__act">
-                                <button class="cst-round" type="button" [routerLink]="modem.modemId"><mat-icon [svgIcon]="'heroicons_outline:pencil-square'"></mat-icon></button>
+                                <button class="cst-round" type="button" [routerLink]="['/fichier/modem', modem.modemId]"><mat-icon [svgIcon]="'heroicons_outline:pencil-square'"></mat-icon></button>
                                 @if (hasActionPermission(FuseNavigationAction.Delete)) {
                                     <button class="cst-round cst-round--danger" type="button" (click)="deleteSelectedModem(modem)"><mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon></button>
                                 }

@@ -22,6 +22,10 @@
             <app-bus-tracking-map
                 [locations]="getMapLocations()"
                 [showAll]="showAllOnMapControl.value === true"
+                [circuitPoints]="CircuitPoints"
+                [optimizedRoute]="OptimizedRouteForMap"
+                [selectedBusPosition]="SelectedBusPosition"
+                [routeLoading]="circuitLoading"
                 (toggleShowAll)="onToggleShowAllOnMap($event)">
             </app-bus-tracking-map>
         </div>
@@ -33,6 +37,17 @@
                 [events]="selectedEvents"
                 [eventsLoading]="selectedBusEventsLoading"
                 [canEmptyBus]="hasActionPermission(FuseNavigationAction.Edit)"
+                [circuitInfo]="circuitData ? {
+                    circuitId: circuitData.circuitId,
+                    circuitCode: circuitData.circuitCode,
+                    circuitName: circuitData.circuitName,
+                    completedPoints: completedCollectionPoints,
+                    totalCollectionPoints: circuitData.collectionPoints.length,
+                    progressPercent: routeProgressPercent,
+                    nextDestinationName: nextDestinationName,
+                    remainingDistanceKm: remainingDistanceKm,
+                    remainingEtaMinutes: remainingEtaMinutes
+                } : null"
                 (emptyBus)="emptySelectedBus()">
             </app-bus-tracking-panel>
         </div>

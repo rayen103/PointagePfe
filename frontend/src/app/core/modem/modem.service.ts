@@ -98,7 +98,7 @@ export class ModemService {
     }
 
     GetModemById(id: string): Observable<Modem> {
-        return this._apiservice.Get<Modem>(`modem/${id}`)
+        return this._apiservice.Get<Modem>(`modem/${id}/one`)
             .pipe(
                 tap((modem) => {
                     this._modem.next(modem.data);

@@ -14,6 +14,18 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BusRuntimeEvent } from 'app/core/bus/bus.model';
 import { BusTrackingAdapterService, BusTrackingItem } from '../bus-tracking.adapter.service';
 
+export interface CircuitPanelInfo {
+    circuitId: string;
+    circuitCode: string;
+    circuitName: string;
+    completedPoints: number;
+    totalCollectionPoints: number;
+    progressPercent: number | null;
+    nextDestinationName: string | null;
+    remainingDistanceKm: number | null;
+    remainingEtaMinutes: number | null;
+}
+
 @Component({
     selector: 'app-bus-tracking-panel',
     standalone: true,
@@ -34,6 +46,7 @@ export class BusTrackingPanelComponent {
     @Input() events: BusRuntimeEvent[] = [];
     @Input() eventsLoading: boolean = false;
     @Input() canEmptyBus: boolean = false;
+    @Input() circuitInfo: CircuitPanelInfo | null = null;
     @Output() readonly emptyBus = new EventEmitter<void>();
 
     constructor(private readonly _adapter: BusTrackingAdapterService) {}
@@ -67,5 +80,12 @@ export class BusTrackingPanelComponent {
         if (type.includes('ralentissement') || type.includes('incident') || type.includes('alerte')) return '#FFF6E3';
         return '#EDF1F6';
     }
-}
 
+    getStatusLabel(): string {
+        return this.bus?.isActive ? 'En route' : 'Arrêt';
+    }
+
+    getStatusColor(): string {
+        return this.bus?.isActive ? 'text-green-600' : 'text-gray-500';
+    }
+}
