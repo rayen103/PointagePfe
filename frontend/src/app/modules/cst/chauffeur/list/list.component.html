@@ -11,7 +11,7 @@
                 <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:arrow-down-tray'"></mat-icon> Exporter
             </button>
             @if (hasActionPermission(FuseNavigationAction.Add)) {
-                <button class="cst-btn cst-btn--primary" routerLink="ajouter">
+                <button class="cst-btn cst-btn--primary" routerLink="/fichier/chauffeur/ajouter">
                     <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:plus'"></mat-icon> {{ t('Add') }}
                 </button>
             }
@@ -47,7 +47,7 @@
                             <div class="cst-num cst-mut">{{ chauffeur.rfidChauffeur || '—' }}</div>
                             <div><span class="cst-pill" [ngClass]="chauffeur.isActive ? 'cst-pill--ok' : 'cst-pill--off'">{{ chauffeur.isActive ? (t('Active') || 'ACTIF') : (t('Inactive') || 'INACTIF') }}</span></div>
                             <div class="cst-tbl__act">
-                                <button class="cst-round" type="button" [routerLink]="chauffeur.chauffeurId"><mat-icon [svgIcon]="'heroicons_outline:pencil-square'"></mat-icon></button>
+                                <button class="cst-round" type="button" [routerLink]="['/fichier/chauffeur', chauffeur.chauffeurId]"><mat-icon [svgIcon]="'heroicons_outline:pencil-square'"></mat-icon></button>
                                 @if (hasActionPermission(FuseNavigationAction.Delete)) {
                                     <button class="cst-round cst-round--danger" type="button" (click)="deleteSelectedChauffeur(chauffeur)"><mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon></button>
                                 }

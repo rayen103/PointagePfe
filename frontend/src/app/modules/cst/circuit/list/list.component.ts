@@ -9,44 +9,53 @@ import {
 } from '@angular/core';
 import { TranslocoModule } from '@ngneat/transloco';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import { AsyncPipe, CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { fuseAnimations } from '../../../../../@fuse/animations';
-import { forkJoin, map, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
+import {
+    BehaviorSubject,
+    combineLatest,
+    debounceTime,
+    distinctUntilChanged,
+    map,
+    Observable,
+    of,
+    Subject,
+    switchMap,
+    take,
+    takeUntil,
+} from 'rxjs';
 import { Circuit } from '../../../../core/circuit/circuit.model';
 import { CircuitService } from '../../../../core/circuit/circuit.service';
 import { FuseConfirmationService } from '../../../../../@fuse/services/confirmation';
 import { RoleNavigation } from '../../../../core/role-utilisateur/role-utilisateur.model';
 import { FuseNavigationAction } from '../../../../../@fuse/components/navigation';
-import { MapViewerComponent, MapLocation, MapPointType } from '../../../../shared/components/map-viewer/map-viewer.component';
-import { MapGeocodingService } from '../../../../core/common/map-geocoding.service';
+import { MapPickerComponent, MapRoutePoint } from '../../../../shared/components/map-picker/map-picker.component';
+import { MapSkeletonComponent } from '../../../../shared/components/map-skeleton/map-skeleton.component';
 import { CircuitPointCollecteService } from '../../../../core/circuit/circuit-point-collecte.service';
 import { CircuitPointCollecte } from '../../../../core/circuit/circuit-point-collecte.model';
 
+type StatusFilter = 'all' | 'active' | 'inactive';
+
 @Component({
-  selector: 'app-list',
-  standalone: true,
+    selector: 'app-list',
+    standalone: true,
     imports: [
-        MatButtonModule,
-        MatFormFieldModule,
         MatIconModule,
-        MatInputModule,
         MatProgressBarModule,
         ReactiveFormsModule,
         CommonModule,
         MatPaginatorModule,
         TranslocoModule,
         RouterLink,
-        MapViewerComponent,
+        MapPickerComponent,
+        MapSkeletonComponent,
     ],
-  templateUrl: './list.component.html',
-  styleUrl: './list.component.scss',
+    templateUrl: './list.component.html',
+    styleUrl: './list.component.scss',
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
     animations: fuseAnimations,
@@ -55,43 +64,92 @@ export class ListComponent implements OnInit, OnDestroy {
     @ViewChild(MatPaginator) private _paginator: MatPaginator;
 
     circuit$: Observable<Circuit[]>;
+    filteredCircuits$: Observable<Circuit[]>;
 
-    flashMessage: 'success' | 'error' | null = null;
     isLoading: boolean = false;
     circuitsLength: number;
     searchInputControl: UntypedFormControl = new UntypedFormControl();
-    private _unsubscribeAll: Subject<any> = new Subject<any>();
     roleNavigation: RoleNavigation;
+
+    statusFilter: StatusFilter = 'all';
+    private readonly _statusFilter$ = new BehaviorSubject<StatusFilter>('all');
+
     selectedCircuit: Circuit | null = null;
     selectedCircuitPoints: CircuitPointCollecte[] = [];
-    isViewMode: boolean = false;
-    showMapView: boolean = false; // Toggle between list and map view
-    mapLocations: MapLocation[] = []; // Locations for map display
-    mapCircuitsWithLocations: number = 0;
+    isLoadingPoints: boolean = false;
+    /** Points count per circuit, learned as circuits get selected. */
+    pointsCountByCircuit = new Map<string, number>();
+
+    mapPoints: MapRoutePoint[] = [];
     sortActive: string = 'codeCircuit';
     sortDirection: 'asc' | 'desc' = 'asc';
+
+    /** Placeholder rows for the loading skeleton. */
+    readonly skeletonRows = Array.from({ length: 6 });
+
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     constructor(
         private _circuitService: CircuitService,
         private _circuitPointCollecteService: CircuitPointCollecteService,
-        private _mapGeocodingService: MapGeocodingService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseConfirmationService: FuseConfirmationService
     ) {}
 
-    SortChange() {
-        this.isLoading = true;
-        this.getCircuits()
-            .pipe(
-                map(() => {
-                    this.isLoading = false;
+    ngOnInit(): void {
+        this.circuit$ = this._circuitService.circuits$;
 
-                    // Mark for check
+        // Status filter applied client-side on the current page
+        this.filteredCircuits$ = combineLatest([this.circuit$, this._statusFilter$]).pipe(
+            map(([circuits, status]) => {
+                if (!circuits) {
+                    return [];
+                }
+                if (status === 'all') {
+                    return circuits;
+                }
+                return circuits.filter((c) => (status === 'active' ? c.isActive : !c.isActive));
+            })
+        );
+
+        this._circuitService.circuitsLength$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((length) => {
+                this.circuitsLength = length;
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Overview map: every circuit with coordinates, as a clustered poi dot
+        this.circuit$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((circuits) => {
+                if (!this.selectedCircuit) {
+                    this.mapPoints = this.buildOverviewPoints(circuits ?? []);
+                }
+                this._changeDetectorRef.markForCheck();
+            });
+
+        // Debounced server-side search
+        this.searchInputControl.valueChanges
+            .pipe(
+                debounceTime(350),
+                distinctUntilChanged(),
+                switchMap(() => {
+                    this.isLoading = true;
                     this._changeDetectorRef.markForCheck();
-                })
+                    return this.getCircuits();
+                }),
+                takeUntil(this._unsubscribeAll)
             )
-            .subscribe();
+            .subscribe(() => {
+                this.isLoading = false;
+                this._changeDetectorRef.markForCheck();
+            });
     }
+
+    // ------------------------------------------------------------------ //
+    //  Data loading / sorting / filtering
+    // ------------------------------------------------------------------ //
 
     getCircuits() {
         return this._circuitService.GetCircuit(
@@ -103,270 +161,174 @@ export class ListComponent implements OnInit, OnDestroy {
         );
     }
 
+    SortChange() {
+        this.isLoading = true;
+        this.getCircuits()
+            .pipe(
+                map(() => {
+                    this.isLoading = false;
+                    this._changeDetectorRef.markForCheck();
+                })
+            )
+            .subscribe();
+    }
+
     setSort(active: string, direction: 'asc' | 'desc'): void {
         this.sortActive = active;
         this.sortDirection = direction;
         this.SortChange();
     }
 
+    setStatusFilter(status: StatusFilter): void {
+        this.statusFilter = status;
+        this._statusFilter$.next(status);
+    }
+
     hasActionPermission(action: FuseNavigationAction): boolean {
         return !this.roleNavigation || this.roleNavigation?.actions?.includes(action);
     }
 
-    ngOnInit(): void {
-        this.circuit$ = this._circuitService.circuits$;
+    // ------------------------------------------------------------------ //
+    //  Selection → points + route on the map
+    // ------------------------------------------------------------------ //
 
-        this._circuitService.circuitsLength$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((length) => {
-                this.circuitsLength = length;
-
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
-        
-        // Subscribe to circuits to update map locations
-        this.circuit$
-            .pipe(
-                switchMap((circuits) => this.buildMapLocations(circuits)),
-                takeUntil(this._unsubscribeAll)
-            )
-            .subscribe((mapLocations) => {
-                this.mapLocations = mapLocations;
-                this.mapCircuitsWithLocations = new Set(
-                    mapLocations.map((location) => location.circuitId ?? location.id)
-                ).size;
-                this._changeDetectorRef.markForCheck();
-            });
-        
-        this.searchInputControl.valueChanges
-            .pipe(
-                switchMap((query) => {
-                    this.isLoading = true;
-                    return this.getCircuits();
-                }),
-                map(() => {
-                    this.isLoading = false;
-                })
-            )
-            .subscribe();
-    }
-
-    /**
-     * Update map locations from circuits
-     */
-    private buildMapLocations(circuits: Circuit[]): Observable<MapLocation[]> {
-        if (!circuits?.length) {
-            return of([]);
-        }
-
-        const perCircuitLocations$ = circuits.map((circuit) => {
-            const baseLocations: MapLocation[] = [];
-
-            if (circuit.latitude != null && circuit.longitude != null) {
-                baseLocations.push({
-                    id: `${circuit.circuitId}-base`,
-                    circuitId: circuit.circuitId,
-                    pointType: 'base',
-                    name: `${circuit.codeCircuit}${circuit.libelleCircuit ? ` - ${circuit.libelleCircuit}` : ''}`,
-                    latitude: circuit.latitude,
-                    longitude: circuit.longitude,
-                    isActive: circuit.isActive,
-                    description: circuit.description,
-                });
-            }
-
-            const departureAddress = (circuit.codePCDepart ?? '').trim();
-            const arrivalAddress = (circuit.codePCArrivee ?? '').trim();
-
-            const departure$ = departureAddress
-                ? this._mapGeocodingService.searchAddress(departureAddress)
-                : of(null);
-            const arrival$ = arrivalAddress
-                ? this._mapGeocodingService.searchAddress(arrivalAddress)
-                : of(null);
-
-            return forkJoin({
-                departure: departure$,
-                arrival: arrival$,
-            }).pipe(
-                map(({ departure, arrival }) => {
-                    if (departure) {
-                        baseLocations.push({
-                            id: `${circuit.circuitId}-depart`,
-                            circuitId: circuit.circuitId,
-                            pointType: 'departure',
-                            name: `${circuit.codeCircuit} - Departure`,
-                            latitude: departure.latitude,
-                            longitude: departure.longitude,
-                            isActive: circuit.isActive,
-                            description: departureAddress,
-                        });
-                    }
-
-                    if (arrival) {
-                        baseLocations.push({
-                            id: `${circuit.circuitId}-arrivee`,
-                            circuitId: circuit.circuitId,
-                            pointType: 'arrival',
-                            name: `${circuit.codeCircuit} - Arrival`,
-                            latitude: arrival.latitude,
-                            longitude: arrival.longitude,
-                            isActive: circuit.isActive,
-                            description: arrivalAddress,
-                        });
-                    }
-
-                    return baseLocations;
-                })
-            );
-        });
-
-        return forkJoin(perCircuitLocations$).pipe(
-            map((locationsPerCircuit) => locationsPerCircuit.flat())
-        );
-    }
-
-    /**
-     * Toggle between list and map view
-     */
-    toggleMapView(): void {
-        this.showMapView = !this.showMapView;
-        this._changeDetectorRef.markForCheck();
-    }
-
-    /**
-     * Toggle circuit details for viewing (read-only mode)
-     *
-     * @param circuitId
-     */
     toggleDetails(circuitId: string): void {
         if (this.selectedCircuit && this.selectedCircuit.circuitId === circuitId) {
             this.closeDetails();
             return;
         }
 
-        console.log('[Circuit List] Toggle details for circuit:', circuitId);
+        this.circuit$
+            .pipe(
+                map((circuits) => circuits.find((item) => item.circuitId === circuitId) ?? null),
+                switchMap((circuit) => {
+                    this.selectedCircuit = circuit;
+                    this.isLoadingPoints = !!circuit?.circuitId;
+                    this._changeDetectorRef.markForCheck();
 
-        this.circuit$.pipe(
-            map((circuits) => {
-                const index = circuits.findIndex(item => item.circuitId === circuitId);
-                return circuits[index];
-            }),
-            switchMap((circuit) => {
-                this.selectedCircuit = circuit;
-                this.isViewMode = true;
-                
-                console.log('[Circuit List] Selected circuit:', circuit);
-                
-                if (circuit?.circuitId) {
-                    return this._circuitPointCollecteService.getByCircuit(circuit.circuitId).pipe(
-                        map(points => {
-                            console.log('[Circuit List] Received points from API:', points);
-                            return { circuit, points };
-                        })
-                    );
-                }
-                return of({ circuit, points: [] });
-            })
-        )
-            .subscribe(({ circuit, points }) => {
-                console.log('[Circuit List] Setting points:', points.length, 'points');
-                this.selectedCircuitPoints = points;
-                
-                // Build map locations for the selected circuit
-                const locations: MapLocation[] = [];
-                const circuitColor = circuit.couleur || '#2563eb';
-
-                if (circuit.latitude != null && circuit.longitude != null) {
-                    locations.push({
-                        id: `${circuit.circuitId}-base`,
-                        circuitId: circuit.circuitId,
-                        pointType: 'base',
-                        name: `${circuit.codeCircuit}${circuit.libelleCircuit ? ` - ${circuit.libelleCircuit}` : ''}`,
-                        latitude: circuit.latitude,
-                        longitude: circuit.longitude,
-                        isActive: circuit.isActive,
-                        description: circuit.description,
-                        color: circuitColor
-                    });
-                }
-
-                // Add points to map locations
-                points.forEach((p, idx) => {
-                    if (p.latitude != null && p.longitude != null) {
-                        let pointType: MapPointType = 'base';
-                        if (idx === 0) pointType = 'departure';
-                        else if (idx === points.length - 1) pointType = 'arrival';
-
-                        locations.push({
-                            id: p.circuitPointCollecteId,
-                            circuitId: circuit.circuitId,
-                            pointType: pointType,
-                            name: p.libellePointCollecte || p.codePointCollecte,
-                            latitude: Number(p.latitude),
-                            longitude: Number(p.longitude),
-                            description: `Order: ${p.ordre}`,
-                            color: circuitColor
-                        });
+                    if (circuit?.circuitId) {
+                        return this._circuitPointCollecteService.getByCircuit(circuit.circuitId).pipe(
+                            map((points) => ({ circuit, points }))
+                        );
                     }
-                });
+                    return of({ circuit, points: [] as CircuitPointCollecte[] });
+                }),
+                takeUntil(this._unsubscribeAll)
+            )
+            .subscribe(({ circuit, points }) => {
+                if (!circuit || this.selectedCircuit?.circuitId !== circuit.circuitId) {
+                    return;
+                }
 
-                console.log('[Circuit List] Map locations:', locations.length, 'locations');
-                this.mapLocations = locations;
+                const orderedPoints = [...points].sort((a, b) => (a.ordre ?? 0) - (b.ordre ?? 0));
+                this.selectedCircuitPoints = orderedPoints;
+                this.isLoadingPoints = false;
+                this.pointsCountByCircuit.set(circuit.circuitId, orderedPoints.length);
+                this.mapPoints = this.buildSelectedRoutePoints(circuit, orderedPoints);
                 this._changeDetectorRef.markForCheck();
             });
     }
 
-    /**
-     * Edit circuit - opens details in edit mode
-     *
-     * @param circuitId
-     */
-    editCircuit(circuitId: string): void {
-        if (this.selectedCircuit && this.selectedCircuit.circuitId === circuitId) {
-            this.closeDetails();
-            return;
-        }
-
-        this.circuit$.pipe(
-            map((circuits) => {
-                const index = circuits.findIndex(item => item.circuitId === circuitId);
-                return circuits[index];
-            })
-        )
-            .subscribe((circuit) => {
-                this.selectedCircuit = circuit;
-                this.isViewMode = false;
-
-                this._changeDetectorRef.markForCheck();
-            });
-    }
-
-    /**
-     * Close the details
-     */
     closeDetails(): void {
         this.selectedCircuit = null;
         this.selectedCircuitPoints = [];
-        this.isViewMode = false;
-        this.mapLocations = [];
+        this.isLoadingPoints = false;
+
+        this.circuit$
+            .pipe(take(1), map((circuits) => this.buildOverviewPoints(circuits ?? [])))
+            .subscribe((points) => {
+                this.mapPoints = points;
+                this._changeDetectorRef.markForCheck();
+            });
     }
 
-    /**
-     * Delete the selected circuit
-     */
+    onMapPointClick(circuitId: string): void {
+        if (circuitId && circuitId !== this.selectedCircuit?.circuitId) {
+            this.toggleDetails(circuitId);
+        }
+    }
+
+    private buildOverviewPoints(circuits: Circuit[]): MapRoutePoint[] {
+        return circuits
+            .filter((c) => c.latitude != null && c.longitude != null)
+            .map((c) => ({
+                id: c.circuitId,
+                kind: 'poi' as const,
+                latitude: Number(c.latitude),
+                longitude: Number(c.longitude),
+                label: `${c.codeCircuit}${c.libelleCircuit ? ' — ' + c.libelleCircuit : ''}`,
+                color: c.couleur || '#2563eb',
+            }));
+    }
+
+    private buildSelectedRoutePoints(circuit: Circuit, points: CircuitPointCollecte[]): MapRoutePoint[] {
+        const located = points.filter((p) => p.latitude != null && p.longitude != null);
+
+        // No `id` here: clicking a route waypoint should not re-trigger a circuit selection
+        return located.map((p, index) => ({
+            latitude: Number(p.latitude),
+            longitude: Number(p.longitude),
+            label: p.libellePointCollecte || p.codePointCollecte,
+            kind: index === 0 ? 'departure' as const
+                : index === located.length - 1 ? 'arrival' as const
+                : 'stop' as const,
+            order: index,
+        }));
+    }
+
+    // ------------------------------------------------------------------ //
+    //  Quick actions
+    // ------------------------------------------------------------------ //
+
+    duplicateCircuit(circuit: Circuit): void {
+        if (!this.hasActionPermission(FuseNavigationAction.Add)) {
+            return;
+        }
+
+        const confirmation = this._fuseConfirmationService.open({
+            title: 'Dupliquer le circuit',
+            message: `Créer une copie de « ${circuit.codeCircuit} » ? Les points de collecte ne sont pas copiés (un point n'appartient qu'à un seul circuit).`,
+            icon: { name: 'heroicons_outline:document-duplicate', color: 'info' },
+            actions: { confirm: { label: 'Dupliquer', color: 'primary' } },
+        });
+
+        confirmation.afterClosed().subscribe((result) => {
+            if (result !== 'confirmed') {
+                return;
+            }
+
+            const copy: Circuit = {
+                ...circuit,
+                circuitId: null,
+                codeCircuit: `${circuit.codeCircuit}-COPIE`,
+                libelleCircuit: circuit.libelleCircuit ? `${circuit.libelleCircuit} (copie)` : '',
+                pointCollecteIds: [],
+            };
+
+            this._circuitService.AddCircuit(copy).subscribe({
+                next: () => this._changeDetectorRef.markForCheck(),
+                error: () => {
+                    this._fuseConfirmationService.open({
+                        title: 'Duplication impossible',
+                        message: 'La copie n\'a pas pu être créée (le code existe peut-être déjà).',
+                        icon: { name: 'heroicons_outline:exclamation-triangle', color: 'warn' },
+                        actions: { confirm: { label: 'OK' }, cancel: { show: false } },
+                    });
+                },
+            });
+        });
+    }
+
     deleteSelectedCircuit(circuit: Circuit): void {
         if (!this.hasActionPermission(FuseNavigationAction.Delete)) {
             return;
         }
         const confirmation = this._fuseConfirmationService.open({
-            title: 'Delete Circuit',
-            message:
-                'Are you sure you want to remove this circuit? This action cannot be undone!',
+            title: 'Supprimer le circuit',
+            message: 'Voulez-vous vraiment supprimer ce circuit ? Cette action est irréversible.',
             actions: {
                 confirm: {
-                    label: 'Delete',
+                    label: 'Supprimer',
                 },
             },
         });
@@ -376,25 +338,47 @@ export class ListComponent implements OnInit, OnDestroy {
                 this._circuitService
                     .DeleteCircuit({ circuitId: circuit.circuitId })
                     .subscribe(() => {
+                        if (this.selectedCircuit?.circuitId === circuit.circuitId) {
+                            this.closeDetails();
+                        }
                         this._changeDetectorRef.markForCheck();
                     });
             }
         });
     }
 
-    /**
-     * Track by function for ngFor loops
-     *
-     * @param index
-     * @param item
-     */
-    trackByFn(index: number, item: any): any {
-        return item.id || index;
+    /** Export the currently displayed circuits as CSV. */
+    exportCircuits(circuits: Circuit[]): void {
+        const header = ['Code', 'Libellé', 'Description', 'Statut', 'Distance (km)', 'Durée (min)', 'Départ', 'Arrivée'];
+        const rows = circuits.map((c) => [
+            c.codeCircuit,
+            c.libelleCircuit ?? '',
+            (c.description ?? '').replace(/[\r\n;]+/g, ' '),
+            c.isActive ? 'Actif' : 'Inactif',
+            c.distanceKm ?? '',
+            c.dureeMinutes ?? '',
+            c.codePCDepart ?? '',
+            c.codePCArrivee ?? '',
+        ]);
+
+        const csv = [header, ...rows].map((r) => r.join(';')).join('\n');
+        const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `circuits-${new Date().toISOString().slice(0, 10)}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
     }
 
-    /**
-     * On destroy
-     */
+    pointsCountOf(circuit: Circuit): number | null {
+        return this.pointsCountByCircuit.get(circuit.circuitId) ?? null;
+    }
+
+    trackByCircuit(index: number, item: Circuit): string {
+        return item.circuitId ?? String(index);
+    }
+
     ngOnDestroy(): void {
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();

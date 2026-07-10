@@ -1,324 +1,256 @@
-<div class="fixed inset-0 z-40 flex flex-col bg-gray-50 dark:bg-gray-900" *transloco="let t">
+<div class="cst-main cl-page" *transloco="let t">
 
-    <!-- Header Bar -->
-    <div class="flex-none bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 shadow-sm">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-                <div class="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-md">
-                    <mat-icon class="icon-size-5 text-white" [svgIcon]="'mat_outline:alt_route'"></mat-icon>
-                </div>
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ t('Circuits') }}</h1>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ circuitsLength ?? 0 }} circuits disponibles</p>
-                </div>
-            </div>
-            <div class="flex items-center space-x-3">
-                <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all" type="button" (click)="SortChange()">
-                    <mat-icon class="icon-size-4 mr-1.5" [svgIcon]="'heroicons_outline:arrow-down-tray'"></mat-icon>
-                    Exporter
+    <!-- ============ Page header ============ -->
+    <div class="cst-crumb">
+        <a routerLink="/fichier/circuit">Gestion</a><span>/</span><b>{{ t('Circuits') || 'Circuits' }}</b>
+    </div>
+
+    <div class="cst-head">
+        <div>
+            <div class="cst-head__title">{{ t('Circuits') || 'Circuits' }}</div>
+            <div class="cst-head__sub">{{ circuitsLength ?? 0 }} circuits · tournées, points de collecte et zones géographiques</div>
+        </div>
+        <div class="cst-head__actions">
+            @if (filteredCircuits$ | async; as circuits) {
+                <button class="cst-btn cst-btn--ghost" type="button" (click)="exportCircuits(circuits)" [disabled]="!circuits.length">
+                    <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:arrow-down-tray'"></mat-icon>
+                    {{ t('Export') || 'Exporter' }}
                 </button>
-                @if (hasActionPermission(FuseNavigationAction.Add)) {
-                    <button class="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg hover:shadow-lg transition-all" routerLink="ajouter">
-                        <mat-icon class="icon-size-4 mr-1.5" [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-                        {{ t('Add') }}
-                    </button>
-                }
-            </div>
+            }
+            @if (hasActionPermission(FuseNavigationAction.Add)) {
+                <button class="cst-btn cst-btn--primary" routerLink="ajouter">
+                    <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                    {{ t('Add-Circuit') || 'Ajouter un circuit' }}
+                </button>
+            }
         </div>
     </div>
 
-    <!-- 3-Panel Layout -->
-    <div class="flex-1 flex overflow-hidden">
+    <!-- ============ Workspace: list | map ============ -->
+    <div class="cl-body">
 
-        <!-- LEFT PANEL: Circuits List (30%) -->
-        <div class="w-[30%] flex flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
-
-            <!-- Search & Filters -->
-            <div class="flex-none p-4 space-y-3 border-b border-gray-200 dark:border-gray-700">
-                <!-- Search -->
-                <div class="relative">
-                    <mat-icon class="absolute left-3 top-1/2 transform -translate-y-1/2 icon-size-5 text-gray-400" [svgIcon]="'heroicons_outline:magnifying-glass'"></mat-icon>
+        <!-- ----- Left: circuits ----- -->
+        <aside class="cst-panel cl-list">
+            <div class="cl-toolbar">
+                <div class="cst-search cl-search">
+                    <mat-icon [svgIcon]="'heroicons_outline:magnifying-glass'"></mat-icon>
                     <input
                         [formControl]="searchInputControl"
-                        [placeholder]="t('Search') + '...'"
-                        class="w-full pl-10 pr-4 py-2 text-sm bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        [placeholder]="(t('Search') || 'Rechercher') + ' un circuit…'"
                         autocomplete="off" />
                 </div>
 
-                <!-- Sort Buttons -->
-                <div class="flex gap-2">
-                    <button
-                        type="button"
-                        [ngClass]="{
-                            'bg-blue-100': sortActive === 'codeCircuit',
-                            'dark:bg-blue-900/30': sortActive === 'codeCircuit',
-                            'text-blue-700': sortActive === 'codeCircuit',
-                            'dark:text-blue-300': sortActive === 'codeCircuit'
-                        }"
-                        class="flex-1 px-3 py-1.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
-                        (click)="setSort('codeCircuit', sortActive === 'codeCircuit' && sortDirection === 'asc' ? 'desc' : 'asc')">
-                        {{ t('Code') }}
-                        <span class="ml-1">{{ sortActive === 'codeCircuit' ? (sortDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
-                    </button>
-                    <button
-                        type="button"
-                        [ngClass]="{
-                            'bg-blue-100': sortActive === 'libelleCircuit',
-                            'dark:bg-blue-900/30': sortActive === 'libelleCircuit',
-                            'text-blue-700': sortActive === 'libelleCircuit',
-                            'dark:text-blue-300': sortActive === 'libelleCircuit'
-                        }"
-                        class="flex-1 px-3 py-1.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
-                        (click)="setSort('libelleCircuit', sortActive === 'libelleCircuit' && sortDirection === 'asc' ? 'desc' : 'asc')">
-                        {{ t('Libelle') || 'Libellé' }}
-                        <span class="ml-1">{{ sortActive === 'libelleCircuit' ? (sortDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
-                    </button>
+                <div class="cl-toolbar__row">
+                    <div class="cl-chips" role="tablist" aria-label="Filtrer par statut">
+                        <button type="button" class="cl-chip" [class.is-on]="statusFilter === 'all'" (click)="setStatusFilter('all')">Tous</button>
+                        <button type="button" class="cl-chip cl-chip--ok" [class.is-on]="statusFilter === 'active'" (click)="setStatusFilter('active')">Actifs</button>
+                        <button type="button" class="cl-chip cl-chip--off" [class.is-on]="statusFilter === 'inactive'" (click)="setStatusFilter('inactive')">Inactifs</button>
+                    </div>
+
+                    <div class="cst-sort cl-sort">
+                        <button type="button" [class.is-on]="sortActive === 'codeCircuit'"
+                                (click)="setSort('codeCircuit', sortActive === 'codeCircuit' && sortDirection === 'asc' ? 'desc' : 'asc')">
+                            Code <span class="cst-sort__dir">{{ sortActive === 'codeCircuit' ? (sortDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
+                        </button>
+                        <button type="button" [class.is-on]="sortActive === 'libelleCircuit'"
+                                (click)="setSort('libelleCircuit', sortActive === 'libelleCircuit' && sortDirection === 'asc' ? 'desc' : 'asc')">
+                            Libellé <span class="cst-sort__dir">{{ sortActive === 'libelleCircuit' ? (sortDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Loading Bar -->
             @if (isLoading) {
-                <mat-progress-bar mode="indeterminate" class="h-1"></mat-progress-bar>
+                <mat-progress-bar mode="indeterminate" class="cl-progress"></mat-progress-bar>
             }
 
-            <!-- Circuits List -->
-            <div class="flex-1 overflow-y-auto">
-                @if (circuit$ | async; as circuits) {
-                    @if (circuits.length > 0) {
-                        @for (circuit of circuits; track circuit.circuitId || $index) {
-                            <div
-                                class="p-4 border-b border-gray-100 dark:border-gray-700 cursor-pointer transition-all hover:bg-gray-50 dark:hover:bg-gray-700/50"
-                                [ngClass]="{
-                                    'bg-blue-50': selectedCircuit?.circuitId === circuit.circuitId,
-                                    'dark:bg-blue-900/20': selectedCircuit?.circuitId === circuit.circuitId,
-                                    'border-l-4': selectedCircuit?.circuitId === circuit.circuitId,
-                                    'border-l-blue-500': selectedCircuit?.circuitId === circuit.circuitId
-                                }"
+            <!-- Cards -->
+            <div class="cl-cards">
+                @if (isLoading) {
+                    <!-- Loading skeletons -->
+                    @for (row of skeletonRows; track $index) {
+                        <div class="cl-skel">
+                            <span class="cl-skel__bar"></span>
+                            <div class="cl-skel__body">
+                                <span class="cl-skel__line" style="width: 42%"></span>
+                                <span class="cl-skel__line cl-skel__line--lg" style="width: 68%"></span>
+                                <span class="cl-skel__line" style="width: 55%"></span>
+                            </div>
+                        </div>
+                    }
+                } @else {
+                    @if (filteredCircuits$ | async; as circuits) {
+                        @if (circuits.length > 0) {
+                        @for (circuit of circuits; track trackByCircuit($index, circuit)) {
+                            <article
+                                class="cl-card"
+                                [class.is-selected]="selectedCircuit?.circuitId === circuit.circuitId"
                                 (click)="toggleDetails(circuit.circuitId)">
 
-                                <div class="flex items-start justify-between mb-2">
-                                    <div class="flex-1 min-w-0">
-                                        <div class="flex items-center space-x-2">
-                                            <span class="px-2 py-0.5 text-xs font-bold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30 rounded">
-                                                {{ circuit.codeCircuit || '—' }}
-                                            </span>
-                                            <span
-                                                class="px-2 py-0.5 text-xs font-medium rounded"
-                                                [ngClass]="circuit.isActive ? 'text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/30' : 'text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700'">
-                                                {{ circuit.isActive ? (t('Active') || 'ACTIF') : (t('Inactive') || 'INACTIF') }}
-                                            </span>
-                                        </div>
-                                        <h3 class="mt-1.5 text-sm font-semibold text-gray-900 dark:text-white truncate">
-                                            {{ circuit.libelleCircuit || 'Sans nom' }}
-                                        </h3>
-                                    </div>
-                                    <div class="flex items-center space-x-1 ml-2">
-                                        <button
-                                            class="p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded transition-all"
-                                            type="button"
-                                            [routerLink]="circuit.circuitId"
-                                            (click)="$event.stopPropagation()">
-                                            <mat-icon class="icon-size-4" [svgIcon]="'heroicons_outline:pencil-square'"></mat-icon>
-                                        </button>
-                                        @if (hasActionPermission(FuseNavigationAction.Delete)) {
-                                            <button
-                                                class="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-all"
-                                                type="button"
-                                                (click)="deleteSelectedCircuit(circuit); $event.stopPropagation()">
-                                                <mat-icon class="icon-size-4" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                                <span class="cl-card__bar" [style.background]="circuit.couleur || '#2563eb'"></span>
+
+                                <div class="cl-card__main">
+                                    <div class="cl-card__top">
+                                        <span class="cl-card__code">{{ circuit.codeCircuit || '—' }}</span>
+                                        <span class="cst-pill" [ngClass]="circuit.isActive ? 'cst-pill--ok' : 'cst-pill--off'">
+                                            {{ circuit.isActive ? 'ACTIF' : 'INACTIF' }}
+                                        </span>
+                                        <div class="cl-card__actions" (click)="$event.stopPropagation()">
+                                            <button class="cst-round" type="button" title="Voir sur la carte" (click)="toggleDetails(circuit.circuitId)">
+                                                <mat-icon [svgIcon]="'heroicons_outline:eye'"></mat-icon>
                                             </button>
+                                            @if (hasActionPermission(FuseNavigationAction.Update)) {
+                                                <button class="cst-round" type="button" title="Modifier" [routerLink]="circuit.circuitId">
+                                                    <mat-icon [svgIcon]="'heroicons_outline:pencil-square'"></mat-icon>
+                                                </button>
+                                            }
+                                            @if (hasActionPermission(FuseNavigationAction.Add)) {
+                                                <button class="cst-round" type="button" title="Dupliquer" (click)="duplicateCircuit(circuit)">
+                                                    <mat-icon [svgIcon]="'heroicons_outline:document-duplicate'"></mat-icon>
+                                                </button>
+                                            }
+                                            @if (hasActionPermission(FuseNavigationAction.Delete)) {
+                                                <button class="cst-round cst-round--danger" type="button" title="Supprimer" (click)="deleteSelectedCircuit(circuit)">
+                                                    <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <h3 class="cl-card__title">{{ circuit.libelleCircuit || 'Sans libellé' }}</h3>
+                                    @if (circuit.description) {
+                                        <p class="cl-card__desc">{{ circuit.description }}</p>
+                                    }
+
+                                    <div class="cl-card__meta">
+                                        <span class="cl-badge">
+                                            <mat-icon [svgIcon]="'heroicons_outline:map-pin'"></mat-icon>
+                                            {{ circuit.distanceKm != null ? (circuit.distanceKm | number: '1.0-1') + ' km' : '—' }}
+                                        </span>
+                                        <span class="cl-badge">
+                                            <mat-icon [svgIcon]="'heroicons_outline:clock'"></mat-icon>
+                                            {{ circuit.dureeMinutes != null ? circuit.dureeMinutes + ' min' : '—' }}
+                                        </span>
+                                        @if (pointsCountOf(circuit) !== null) {
+                                            <span class="cl-badge cl-badge--blue">
+                                                <mat-icon [svgIcon]="'heroicons_outline:flag'"></mat-icon>
+                                                {{ pointsCountOf(circuit) }} points
+                                            </span>
+                                        }
+                                        @if (circuit.codePCDepart) {
+                                            <span class="cl-badge cl-badge--route" [title]="circuit.codePCDepart + ' → ' + (circuit.codePCArrivee || '?')">
+                                                {{ circuit.codePCDepart }} → {{ circuit.codePCArrivee || '?' }}
+                                            </span>
                                         }
                                     </div>
-                                </div>
 
-                                <div class="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
-                                    <div class="flex items-center">
-                                        <mat-icon class="icon-size-3 mr-1" [svgIcon]="'heroicons_outline:map-pin'"></mat-icon>
-                                        <span>{{ circuit.distanceKm != null ? (circuit.distanceKm | number: '1.0-1') + ' km' : '—' }}</span>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <mat-icon class="icon-size-3 mr-1" [svgIcon]="'heroicons_outline:clock'"></mat-icon>
-                                        <span>{{ circuit.dureeMinutes != null ? circuit.dureeMinutes + ' min' : '—' }}</span>
-                                    </div>
+                                    <!-- Inline points when selected -->
+                                    @if (selectedCircuit?.circuitId === circuit.circuitId) {
+                                        <div class="cl-points" (click)="$event.stopPropagation()">
+                                            @if (isLoadingPoints) {
+                                                <div class="cl-points__loading">Chargement des points…</div>
+                                            } @else if (selectedCircuitPoints.length > 0) {
+                                                <div class="cl-points__title">Ordre de passage · {{ selectedCircuitPoints.length }} points</div>
+                                                @for (point of selectedCircuitPoints; track point.circuitPointCollecteId || $index) {
+                                                    <div class="cl-point">
+                                                        <span class="cl-point__no"
+                                                              [class.is-start]="$index === 0"
+                                                              [class.is-end]="$index === selectedCircuitPoints.length - 1">
+                                                            {{ $index === 0 ? 'D' : ($index === selectedCircuitPoints.length - 1 ? 'A' : $index) }}
+                                                        </span>
+                                                        <span class="cl-point__name">{{ point.libellePointCollecte || point.codePointCollecte }}</span>
+                                                        @if (point.latitude == null || point.longitude == null) {
+                                                            <span class="cl-point__nogeo">sans position</span>
+                                                        }
+                                                    </div>
+                                                }
+                                            } @else {
+                                                <div class="cl-points__loading">Aucun point de collecte rattaché à ce circuit.</div>
+                                            }
+                                        </div>
+                                    }
                                 </div>
-
-                                @if (circuit.description) {
-                                    <p class="mt-2 text-xs text-gray-600 dark:text-gray-400 line-clamp-2">{{ circuit.description }}</p>
-                                }
-                            </div>
+                            </article>
                         }
                     } @else {
-                        <div class="flex flex-col items-center justify-center h-full p-8 text-center">
-                            <div class="w-16 h-16 mb-4 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-                                <mat-icon class="icon-size-8 text-gray-400" [svgIcon]="'mat_outline:alt_route'"></mat-icon>
-                            </div>
-                            <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-1">{{ t('No-circuits-found') || 'Aucun circuit' }}</h3>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Ajustez vos filtres ou créez un nouveau circuit.</p>
-                        </div>
-                    }
-                }
-            </div>
-
-            <!-- Pagination -->
-            <div class="flex-none border-t border-gray-200 dark:border-gray-700">
-                <mat-paginator
-                    [ngClass]="{'pointer-events-none': isLoading}"
-                    [length]="circuitsLength"
-                    [pageIndex]="0"
-                    [pageSize]="10"
-                    [pageSizeOptions]="[5, 10, 25, 100]"
-                    [showFirstLastButtons]="true"
-                    (page)="SortChange()">
-                </mat-paginator>
-            </div>
-        </div>
-
-        <!-- MIDDLE PANEL: Collection Points (30%) -->
-        <div class="w-[30%] flex flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
-
-            <!-- DEBUG INFO (TEMPORARY) -->
-<!--            <div class="p-2 bg-yellow-100 dark:bg-yellow-900 text-xs">-->
-<!--                <strong>Debug Info:</strong><br>-->
-<!--                Selected Circuit: {{ selectedCircuit ? selectedCircuit.codeCircuit : 'None' }}<br>-->
-<!--                Points Array Length: {{ selectedCircuitPoints.length }}<br>-->
-<!--                Points Data: {{ selectedCircuitPoints | json }}-->
-<!--            </div>-->
-
-            @if (selectedCircuit) {
-                <!-- Header -->
-                <div class="flex-none p-4 border-b border-gray-200 dark:border-gray-700">
-                    <div class="flex items-center space-x-2 mb-2">
-                        <mat-icon class="icon-size-5 text-blue-600 dark:text-blue-400" [svgIcon]="'heroicons_solid:map-pin'"></mat-icon>
-                        <h2 class="text-lg font-bold text-gray-900 dark:text-white">Points de Collecte</h2>
-                    </div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                        {{ selectedCircuitPoints.length }} points sur ce circuit
-                    </p>
-                </div>
-
-                <!-- Points List -->
-                <div class="flex-1 overflow-y-auto">
-                    @if (selectedCircuitPoints.length > 0) {
-                        @for (point of selectedCircuitPoints; track point.circuitPointCollecteId || $index) {
-                            <div class="p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all">
-                                <div class="flex items-start space-x-3">
-                                    <!-- Order Number -->
-                                    <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-sm font-bold rounded-lg shadow-sm">
-                                        {{ point.ordre }}
-                                    </div>
-
-                                    <!-- Point Info -->
-                                    <div class="flex-1 min-w-0">
-                                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">
-                                            {{ point.libellePointCollecte || point.codePointCollecte }}
-                                        </h3>
-                                        @if (point.codePointCollecte) {
-                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                                Code: {{ point.codePointCollecte }}
-                                            </p>
-                                        }
-                                        @if (point.latitude && point.longitude) {
-                                            <div class="flex items-center mt-1 text-xs text-gray-600 dark:text-gray-400">
-                                                <mat-icon class="icon-size-3 mr-1" [svgIcon]="'heroicons_outline:map-pin'"></mat-icon>
-                                                <span class="font-mono">{{ point.latitude | number:'1.4-4' }}, {{ point.longitude | number:'1.4-4' }}</span>
-                                            </div>
-                                        }
-                                    </div>
-
-                                    <!-- Active Status -->
-                                    <div class="flex-shrink-0">
-                                        @if (point.isActive) {
-                                            <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                                        } @else {
-                                            <div class="w-2 h-2 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    } @else {
-                        <div class="flex flex-col items-center justify-center h-full p-8 text-center">
-                            <div class="w-16 h-16 mb-4 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-                                <mat-icon class="icon-size-8 text-gray-400" [svgIcon]="'heroicons_outline:map-pin'"></mat-icon>
-                            </div>
-                            <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-1">Aucun point</h3>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Ce circuit n'a pas encore de points de collecte.</p>
-                        </div>
-                    }
-                </div>
-            } @else {
-                <!-- Empty State -->
-                <div class="flex flex-col items-center justify-center h-full p-8 text-center">
-                    <div class="w-20 h-20 mb-4 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-                        <mat-icon class="icon-size-10 text-gray-400" [svgIcon]="'heroicons_outline:cursor-arrow-ripple'"></mat-icon>
-                    </div>
-                    <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-2">Sélectionnez un circuit</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 max-w-xs">Choisissez un circuit dans la liste pour voir ses points de collecte sur la carte.</p>
-                </div>
-            }
-        </div>
-
-        <!-- RIGHT PANEL: Map (40%) -->
-        <div class="flex-1 flex flex-col bg-gray-100 dark:bg-gray-950 relative">
-
-            <!-- Map Header -->
-            <div class="flex-none bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 px-6 py-4 shadow-sm">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <div class="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-md">
-                            <mat-icon class="icon-size-5 text-white" [svgIcon]="'heroicons_solid:map'"></mat-icon>
-                        </div>
-                        <div>
-                            <h2 class="text-lg font-bold text-gray-900 dark:text-white">
-                                {{ selectedCircuit ? 'Itinéraire du Circuit' : 'Carte des Circuits' }}
-                            </h2>
-                            @if (selectedCircuit) {
-                                <p class="text-sm text-gray-500 dark:text-gray-400">
-                                    {{ selectedCircuit.codeCircuit }} - {{ selectedCircuitPoints.length }} points
-                                </p>
-                            } @else {
-                                <p class="text-sm text-gray-500 dark:text-gray-400">
-                                    Vue d'ensemble de tous les circuits
-                                </p>
+                        <!-- Empty state -->
+                        <div class="cst-tbl__empty">
+                            <div class="cst-tbl__empty-ic"><mat-icon [svgIcon]="'mat_outline:alt_route'"></mat-icon></div>
+                            <div class="cst-tbl__empty-t">Aucun circuit trouvé</div>
+                            <div class="cst-tbl__empty-s">Ajustez la recherche ou les filtres, ou créez votre premier circuit.</div>
+                            @if (hasActionPermission(FuseNavigationAction.Add)) {
+                                <button class="cst-btn cst-btn--primary" routerLink="ajouter" style="margin-top: 6px">
+                                    <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                                    Ajouter un circuit
+                                </button>
                             }
                         </div>
-                    </div>
-
-                    @if (selectedCircuit) {
-                        <div class="flex items-center space-x-2">
-                            <div class="px-3 py-1.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs font-bold rounded-lg shadow-sm">
-                                {{ selectedCircuitPoints.length }} POINTS
-                            </div>
-                        </div>
+                        }
                     }
-                </div>
+                }
             </div>
 
-            <!-- Map Container -->
-            <div class="flex-1 relative">
-                @if (mapLocations.length > 0) {
-                    <app-map-viewer
-                        [locations]="mapLocations"
-                        [height]="'100%'"
-                        [zoom]="13"
-                        [showRoute]="selectedCircuit !== null">
-                    </app-map-viewer>
-                } @else {
-                    <div class="absolute inset-0 flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-                        <div class="text-center p-8">
-                            <div class="w-24 h-24 mx-auto mb-6 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-                                <mat-icon class="icon-size-12 text-gray-400" [svgIcon]="'heroicons_outline:map'"></mat-icon>
-                            </div>
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Aucune donnée de carte</h3>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 max-w-md">
-                                Sélectionnez un circuit avec des coordonnées GPS pour visualiser l'itinéraire sur la carte.
-                            </p>
+            <mat-paginator
+                class="cst-pager cl-pager"
+                [ngClass]="{ 'pointer-events-none': isLoading }"
+                [length]="circuitsLength"
+                [pageIndex]="0"
+                [pageSize]="10"
+                [pageSizeOptions]="[5, 10, 25, 100]"
+                [showFirstLastButtons]="true"
+                (page)="SortChange()">
+            </mat-paginator>
+        </aside>
+
+        <!-- ----- Right: map ----- -->
+        <section class="cst-panel cl-map">
+            <div class="cl-map__head">
+                <div class="cl-map__id">
+                    <div class="cl-map__ic">
+                        <mat-icon [svgIcon]="'heroicons_outline:map'"></mat-icon>
+                    </div>
+                    <div>
+                        <div class="cl-map__title">
+                            {{ selectedCircuit ? ('Itinéraire · ' + selectedCircuit.codeCircuit) : 'Carte des circuits' }}
                         </div>
+                        <div class="cl-map__sub">
+                            {{ selectedCircuit
+                                ? (selectedCircuitPoints.length + ' points de passage')
+                                : 'Cliquez sur un circuit ou un marqueur pour voir son itinéraire' }}
+                        </div>
+                    </div>
+                </div>
+
+                @if (selectedCircuit) {
+                    <div class="cl-map__badges">
+                        @if (selectedCircuit.distanceKm != null) {
+                            <span class="cl-badge">{{ selectedCircuit.distanceKm | number: '1.0-1' }} km</span>
+                        }
+                        @if (selectedCircuit.dureeMinutes != null) {
+                            <span class="cl-badge">{{ selectedCircuit.dureeMinutes }} min</span>
+                        }
+                        <button class="cst-round" type="button" title="Fermer l'itinéraire" (click)="closeDetails()">
+                            <mat-icon [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
+                        </button>
                     </div>
                 }
             </div>
-        </div>
 
+            <div class="cl-map__body">
+                <!-- The Leaflet map is lazy-loaded: the page renders instantly with a skeleton -->
+                @defer (on viewport; prefetch on idle) {
+                    <app-map-picker
+                        [routePoints]="mapPoints"
+                        [drawRoute]="!!selectedCircuit"
+                        [enableMainMarker]="false"
+                        [color]="selectedCircuit?.couleur || '#2563eb'"
+                        [height]="'100%'"
+                        (pointClick)="onMapPointClick($event)">
+                    </app-map-picker>
+                } @placeholder {
+                    <app-map-skeleton></app-map-skeleton>
+                }
+            </div>
+        </section>
     </div>
-
 </div>

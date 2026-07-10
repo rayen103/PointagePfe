@@ -86,6 +86,25 @@
     .cc-color__val { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--cst-text-2); }
 }
 
+/* ---------- Collapsible card header ---------- */
+.cc-card__head {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+    cursor: pointer; user-select: none;
+}
+.cc-card__head-end { display: flex; align-items: center; gap: 10px; }
+.cc-collapse {
+    flex: none; width: 30px; height: 30px; border-radius: 9px; border: 1px solid var(--cst-border-2);
+    background: #fff; color: var(--cst-text-2); cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    /* Rotation is bound inline on the icon (infoCollapsed/pointsCollapsed) so it
+       always wins the cascade; here we only animate it. */
+    mat-icon { transition: transform 0.2s ease; }
+    &:hover { border-color: var(--cst-blue); color: var(--cst-blue); background: var(--cst-blue-soft); }
+}
+/* When collapsed the info card should not keep flex-growing in the fit layout */
+.cc-fit .cc-points.is-collapsed { flex: 0 0 auto; }
+
 /* ---------- Points de collecte (container 2) ---------- */
 .cc-points__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
 .cc-points__badge {
@@ -120,3 +139,104 @@
 .pc-item__nogeo { font-size: 10px; font-weight: 700; color: var(--cst-warn); background: var(--cst-warn-bg); border-radius: 999px; padding: 1px 7px; }
 .pc-item__lib { font-size: 12.5px; color: var(--cst-text-2); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pc-item__meta { font-size: 11px; color: var(--cst-text-hint); margin-top: 2px; }
+.pc-item__outzone { font-size: 10px; font-weight: 700; color: var(--cst-warn); background: var(--cst-warn-bg); border: 1px dashed var(--cst-warn-strong, #F2B33D); border-radius: 999px; padding: 1px 7px; }
+
+/* ---------- Ordre de passage (drag & drop) ---------- */
+.cc-order { margin-top: 12px; }
+.cc-order__title {
+    display: flex; align-items: baseline; gap: 8px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--cst-text-hint); margin-bottom: 7px;
+}
+.cc-order__hint { font-size: 10.5px; font-weight: 500; text-transform: none; letter-spacing: 0; }
+.cc-order__list {
+    border: 1px solid var(--cst-border); border-radius: 12px; overflow-y: auto; max-height: 190px;
+    background: var(--cst-surface-2);
+}
+.cc-order__item {
+    display: flex; align-items: center; gap: 8px; padding: 7px 10px;
+    background: #fff; border-bottom: 1px solid var(--cst-border-soft);
+    font-size: 12.5px; color: var(--cst-text);
+    &:last-child { border-bottom: none; }
+}
+.cc-order__grip { width: 15px !important; height: 15px !important; font-size: 15px !important; color: var(--cst-text-disabled) !important; cursor: grab; flex: none; }
+.cc-order__no {
+    flex: none; width: 20px; height: 20px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 10.5px; font-weight: 800; color: #fff; background: var(--cst-blue);
+}
+.cc-order__name { flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; color: var(--cst-navy); }
+.cc-order__rm { width: 24px; height: 24px; mat-icon { width: 12px !important; height: 12px !important; font-size: 12px !important; } }
+
+/* CDK drag ghosts */
+.cdk-drag-preview.cc-order__item {
+    border: 1px solid var(--cst-blue); border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(18, 18, 66, 0.18);
+}
+.cdk-drag-placeholder { opacity: 0.35; }
+.cc-order__list.cdk-drop-list-dragging .cc-order__item:not(.cdk-drag-placeholder) { transition: transform 0.2s ease; }
+
+/* ---------- Map header: stats + optimize ---------- */
+.cc-stat {
+    font-size: 11px; font-weight: 700; color: var(--cst-text-2);
+    background: var(--cst-pill-bg); border-radius: 999px; padding: 3px 9px; white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    &--ok { color: var(--cst-ok); background: var(--cst-ok-bg); }
+    &--warn { color: var(--cst-warn); background: var(--cst-warn-bg); }
+}
+.cc-optimize { height: 36px; padding: 0 14px; font-size: 12.5px; }
+
+.cc-spin {
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.4); border-top-color: #fff;
+    animation: cc-spin 0.7s linear infinite;
+}
+@keyframes cc-spin { to { transform: rotate(360deg); } }
+
+/* ---------- Zone (polygon) toolbar ---------- */
+.cc-maptools {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    padding: 9px 18px; border-bottom: 1px solid var(--cst-border-soft); background: #fff;
+}
+.cc-maptools__label { font-size: 11px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--cst-text-hint); }
+.cc-maptools__drawing { font-size: 11.5px; color: var(--cst-blue-strong); font-weight: 600; }
+.cc-tool {
+    display: inline-flex; align-items: center; gap: 5px;
+    border: 1px solid var(--cst-border-2); background: #fff; color: var(--cst-text-2);
+    font: 600 11.5px/1 var(--cst-font); border-radius: 8px; padding: 6px 10px; cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+    mat-icon { width: 13px !important; height: 13px !important; font-size: 13px !important; }
+    &:hover { border-color: var(--cst-blue); color: var(--cst-navy); }
+    &.is-on { border-color: var(--cst-blue); background: var(--cst-blue-soft); color: var(--cst-blue-strong); }
+    &--danger:hover { border-color: var(--cst-danger); color: var(--cst-danger); }
+}
+.cc-restrict {
+    display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+    font-size: 11.5px; font-weight: 600; color: var(--cst-text-2);
+    input { accent-color: var(--cst-red); width: 14px; height: 14px; cursor: pointer; }
+}
+.cc-zonestats { display: flex; align-items: center; gap: 5px; margin-left: auto; }
+
+/* ---------- Optimization comparison ---------- */
+.cc-compare {
+    padding: 10px 18px; border-bottom: 1px solid var(--cst-border-soft);
+    background: var(--cst-blue-soft);
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    &.is-applied { background: var(--cst-ok-bg); }
+}
+.cc-compare__cols { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.cc-compare__k { font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--cst-text-hint); }
+.cc-compare__v { font-size: 13px; font-weight: 700; color: var(--cst-navy); font-variant-numeric: tabular-nums; margin-top: 1px; }
+.cc-compare__v--opt { display: flex; align-items: center; gap: 7px; }
+.cc-compare__arrow { color: var(--cst-text-hint) !important; width: 18px !important; height: 18px !important; font-size: 18px !important; }
+.cc-gain { font-size: 11px; font-weight: 800; color: var(--cst-ok); background: #fff; border-radius: 999px; padding: 2px 8px; }
+.cc-compare__note { flex-basis: 100%; font-size: 11px; color: var(--cst-warn); font-weight: 600; }
+.cc-compare__actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.cc-applied {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 700; color: var(--cst-ok);
+    mat-icon { width: 15px !important; height: 15px !important; font-size: 15px !important; color: var(--cst-ok) !important; }
+}
+
+/* Map body hosts either the skeleton or the map */
+.cc-map__body app-map-skeleton { display: block; width: 100%; height: 100%; }

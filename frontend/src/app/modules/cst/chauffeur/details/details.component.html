@@ -1,138 +1,153 @@
-<div class="flex flex-col flex-auto min-w-0" *transloco="let t">
+<div class="cst-form-page" *transloco="let t">
+    <form class="cst-form-wrap" [formGroup]="chauffeurForm" #chauffeurFormDirective="ngForm">
 
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
-        <div class="flex-1 min-w-0">
-            <!-- Breadcrumbs -->
-            <div class="flex flex-wrap items-center font-medium">
+        <!-- Breadcrumb -->
+        <div class="cst-crumb">
+            <a routerLink="/fichier/chauffeur">Gestion</a><span>/</span><a routerLink="/fichier/chauffeur">{{ t('Chauffeurs') || 'Chauffeurs' }}</a><span>/</span>
+            <b>{{ isNewChauffeur ? (t('Add-Chauffeur') || 'Nouveau chauffeur') : (chauffeur?.codeChauffeur || t('Edit-Chauffeur')) }}</b>
+        </div>
+
+        <!-- Header line -->
+        <div class="cst-form-topline">
+            <div class="cst-form-id">
+                <div class="cst-form-id__ic">
+                    <mat-icon [svgIcon]="'mat_outline:person'"></mat-icon>
+                </div>
                 <div>
-                    <a class="whitespace-nowrap text-primary-500" routerLink="..">{{ t('Chauffeurs') }}</a>
-                </div>
-                <div class="flex items-center ml-1 whitespace-nowrap">
-                    <mat-icon
-                        class="icon-size-5 text-secondary"
-                        [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-                    <span class="ml-1 text-secondary">{{ isNewChauffeur ? t('Add') : t('Edit') }}</span>
+                    <div class="cst-form-id__title">
+                        <span>{{ isNewChauffeur ? (t('New-Chauffeur') || 'Nouveau chauffeur') : (chauffeur?.nom || '') + ' ' + (chauffeur?.prenom || '') }}</span>
+                        @if (!isNewChauffeur) {
+                            <span class="cst-pill" [ngClass]="chauffeurForm.get('isActive')?.value ? 'cst-pill--ok' : 'cst-pill--off'">
+                                {{ chauffeurForm.get('isActive')?.value ? (t('Active') || 'ACTIF') : (t('Inactive') || 'INACTIF') }}
+                            </span>
+                        }
+                    </div>
+                    <div class="cst-form-id__meta">
+                        {{ isNewChauffeur ? 'Créer une fiche chauffeur' : ('Code: ' + (chauffeur?.codeChauffeur || '—')) }}
+                    </div>
                 </div>
             </div>
-            <!-- Title -->
-            <div class="mt-2">
-                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
-                    {{ isNewChauffeur ? t('New-Chauffeur') : chauffeur?.nom + ' ' + (chauffeur?.prenom || '') }}
-                </h2>
+            <div class="cst-head__actions">
+                <button class="cst-btn cst-btn--ghost" type="button" (click)="onBackdropClicked()">{{ t('Cancel') || 'Annuler' }}</button>
+                <button class="cst-btn cst-btn--primary" type="button" (click)="saveChauffeur()" [disabled]="isLoading">
+                    @if (isLoading) { <span class="cc-spin"></span> }
+                    {{ t('Save') || 'Enregistrer' }}
+                </button>
             </div>
         </div>
-        <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
-            <button
-                mat-flat-button
-                [color]="'primary'"
-                (click)="saveChauffeur()">
-                <mat-icon [svgIcon]="'heroicons_outline:check'"></mat-icon>
-                <span class="ml-2">{{ t('Save') }}</span>
-            </button>
-        </div>
-    </div>
 
-    <!-- Main -->
-    <div class="flex-auto p-6 sm:p-10">
-        <div class="max-w-3xl">
-            <form [formGroup]="chauffeurForm" #chauffeurFormDirective="ngForm">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-                    <!-- Code -->
-                    <mat-form-field class="fuse-mat-dense">
-                        <mat-label>{{ t('Code') }}</mat-label>
-                        <input matInput formControlName="codeChauffeur">
-                        <mat-icon
-                            matPrefix
-                            class="icon-size-5"
-                            [svgIcon]="'heroicons_solid:hashtag'"></mat-icon>
-                    </mat-form-field>
+        @if (flashMessage) {
+            <div class="cst-form-flash" [class.is-ok]="flashMessage === 'success'" [class.is-err]="flashMessage === 'error'">
+                {{ flashMessage === 'success' ? (t('Successfully-saved') || 'Enregistré avec succès') : (t('Something-went-wrong') || 'Veuillez corriger les erreurs du formulaire') }}
+            </div>
+        }
+
+        <div class="cst-form-card">
+            <!-- Section 1: Informations Générales -->
+            <div>
+                <div class="cst-form-sec__title">{{ t('General-Information') || 'Informations générales' }}</div>
+                <div class="cst-form-sec__sub">Identité et informations d'identification du chauffeur</div>
+                <div class="cst-form-grid">
+                    
+                    <!-- Code Chauffeur -->
+                    <div class="cst-field">
+                        <label>{{ t('Code') || 'Code' }} <span style="color:var(--cst-red)">*</span></label>
+                        <input class="cst-input" [class.is-err]="chauffeurForm.get('codeChauffeur')?.invalid && (chauffeurForm.get('codeChauffeur')?.touched || chauffeurFormDirective.submitted)"
+                               formControlName="codeChauffeur" [placeholder]="t('Enter-code') || 'Ex: CH-101'" />
+                        @if (chauffeurForm.get('codeChauffeur')?.invalid && (chauffeurForm.get('codeChauffeur')?.touched || chauffeurFormDirective.submitted)) {
+                            <div class="cst-field__err">
+                                <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                {{ t('Code-required') || 'Le code est requis' }}
+                            </div>
+                        }
+                    </div>
 
                     <!-- Nom -->
-                    <mat-form-field class="fuse-mat-dense">
-                        <mat-label>{{ t('Nom') }}</mat-label>
-                        <input matInput formControlName="nom">
-                        <mat-icon
-                            matPrefix
-                            class="icon-size-5"
-                            [svgIcon]="'heroicons_solid:user'"></mat-icon>
-                    </mat-form-field>
+                    <div class="cst-field">
+                        <label>{{ t('Nom') || 'Nom' }} <span style="color:var(--cst-red)">*</span></label>
+                        <input class="cst-input" [class.is-err]="chauffeurForm.get('nom')?.invalid && (chauffeurForm.get('nom')?.touched || chauffeurFormDirective.submitted)"
+                               formControlName="nom" [placeholder]="t('Enter-name') || 'Ex: Ben Ali'" />
+                        @if (chauffeurForm.get('nom')?.invalid && (chauffeurForm.get('nom')?.touched || chauffeurFormDirective.submitted)) {
+                            <div class="cst-field__err">
+                                <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                {{ t('Name-required') || 'Le nom est requis' }}
+                            </div>
+                        }
+                    </div>
 
-                    <!-- Prenom -->
-                    <mat-form-field class="fuse-mat-dense">
-                        <mat-label>{{ t('Prenom') }}</mat-label>
-                        <input matInput formControlName="prenom">
-                        <mat-icon
-                            matPrefix
-                            class="icon-size-5"
-                            [svgIcon]="'heroicons_solid:user'"></mat-icon>
-                    </mat-form-field>
+                    <!-- Prénom -->
+                    <div class="cst-field">
+                        <label>{{ t('Prenom') || 'Prénom' }}</label>
+                        <input class="cst-input" formControlName="prenom" [placeholder]="t('Enter-firstname') || 'Ex: Mohamed'" />
+                    </div>
 
                     <!-- CIN -->
-                    <mat-form-field class="fuse-mat-dense">
-                        <mat-label>{{ t('CIN') }}</mat-label>
-                        <input matInput formControlName="cin">
-                        <mat-icon
-                            matPrefix
-                            class="icon-size-5"
-                            [svgIcon]="'heroicons_solid:identification'"></mat-icon>
-                    </mat-form-field>
+                    <div class="cst-field">
+                        <label>{{ t('CIN') || 'CIN' }}</label>
+                        <input class="cst-input" formControlName="cin" [placeholder]="t('Enter-cin') || 'Ex: 08765432'" />
+                    </div>
 
                     <!-- RFID -->
-                    <mat-form-field class="fuse-mat-dense">
-                        <mat-label>{{ t('RFID') }}</mat-label>
-                        <input matInput formControlName="rfidChauffeur">
-                        <mat-icon
-                            matPrefix
-                            class="icon-size-5"
-                            [svgIcon]="'heroicons_solid:credit-card'"></mat-icon>
-                    </mat-form-field>
-
-                    <!-- Externe -->
-                    <div class="flex items-center mt-4">
-                        <mat-slide-toggle
-                            [color]="'primary'"
-                            formControlName="externe">
-                            {{ t('Externe') }}
-                        </mat-slide-toggle>
-                    </div>
-
-                    <!-- Bus -->
-                    <mat-form-field class="fuse-mat-dense">
-                        <mat-label>{{ t('Bus') }}</mat-label>
-                        <mat-select formControlName="busId">
-                            <mat-option value="">--</mat-option>
-                            @for (bus of buses; track bus.busId) {
-                                <mat-option [value]="bus.busId">
-                                    {{ bus.numeroImm }}
-                                    @if (bus.modelBus) { - {{ bus.modelBus }} }
-                                </mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
-
-                    <!-- Status -->
-                    <div class="flex items-center mt-4">
-                        <mat-slide-toggle
-                            [color]="'primary'"
-                            formControlName="isActive">
-                            {{ t('Active') }}
-                        </mat-slide-toggle>
+                    <div class="cst-field">
+                        <label>{{ t('RFID') || 'RFID' }}</label>
+                        <input class="cst-input" formControlName="rfidChauffeur" [placeholder]="t('Enter-rfid') || 'Ex: RFID-77321'" />
                     </div>
                 </div>
+            </div>
 
-                <!-- Flash message -->
-                @if (flashMessage) {
-                    <div
-                        class="mt-8 p-4 rounded-lg"
-                        [ngClass]="{
-                            'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100': flashMessage === 'success',
-                            'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100': flashMessage === 'error'
-                        }">
-                        {{ flashMessage === 'success' ? t('Successfully-saved') : t('Something-went-wrong') }}
+            <div class="cst-divider"></div>
+
+            <!-- Section 2: Affectation & Statut -->
+            <div>
+                <div class="cst-form-sec__title">{{ t('Assignment-Status') || 'Affectation & Statut' }}</div>
+                <div class="cst-form-sec__sub">Véhicule assigné et état de service du chauffeur</div>
+                <div class="cst-form-grid">
+                    
+                    <!-- Bus -->
+                    <div class="cst-field">
+                        <label>{{ t('Bus') || 'Bus attitré' }}</label>
+                        <div class="cst-select">
+                            <select formControlName="busId">
+                                <option [value]="''">--</option>
+                                @for (bus of buses; track bus.busId) {
+                                    <option [value]="bus.busId">
+                                        {{ bus.numeroIMM }}@if (bus.modelBus) { — {{ bus.modelBus }} }
+                                    </option>
+                                }
+                            </select>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
+                        </div>
                     </div>
-                }
-            </form>
+
+                    <!-- Externe Toggle -->
+                    <div class="cst-field flex justify-center" style="height: 100%; align-items: flex-start; padding-top: 24px;">
+                        <label class="cst-toggle">
+                            <span [ngClass]="chauffeurForm.get('externe')?.value ? 'cst-toggle__on' : 'cst-toggle__off'">{{ t('Externe') || 'Externe' }}</span>
+                            <input type="checkbox" formControlName="externe" />
+                            <span class="cst-toggle__track"></span>
+                        </label>
+                    </div>
+
+                    <input type="hidden" formControlName="societeId" />
+                </div>
+            </div>
+
+            <div class="cst-divider"></div>
+
+            <!-- Section 3: Statut de service -->
+            <div class="cst-form-statusrow">
+                <div>
+                    <div class="cst-form-sec__title" style="margin-bottom:3px">{{ t('Chauffeur-Status') || 'Statut du chauffeur' }}</div>
+                    <div class="cst-form-sec__sub" style="margin-bottom:0">Un chauffeur inactif ne pourra pas démarrer de rotation de pointage</div>
+                </div>
+                <div>
+                    <label class="cst-toggle">
+                        <span [ngClass]="chauffeurForm.get('isActive')?.value ? 'cst-toggle__on' : 'cst-toggle__off'">{{ chauffeurForm.get('isActive')?.value ? (t('Active') || 'Actif') : (t('Inactive') || 'Inactif') }}</span>
+                        <input type="checkbox" formControlName="isActive" />
+                        <span class="cst-toggle__track"></span>
+                    </label>
+                </div>
+            </div>
         </div>
-    </div>
+    </form>
 </div>

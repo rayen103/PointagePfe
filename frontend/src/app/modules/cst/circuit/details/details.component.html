@@ -20,7 +20,7 @@
                             </span>
                         }
                     </div>
-                    <div class="cst-form-id__meta">{{ circuit?.libelleCircuit || (isNewCircuit ? 'Définissez le tracé et les points de collecte' : '—') }}</div>
+                    <div class="cst-form-id__meta">{{ circuit?.libelleCircuit || (isNewCircuit ? 'Définissez le tracé, la zone et les points de collecte' : '—') }}</div>
                 </div>
             </div>
             <div class="cst-head__actions">
@@ -29,8 +29,14 @@
                         <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:trash'"></mat-icon> {{ t('Delete') || 'Supprimer' }}
                     </button>
                 }
+                <button class="cst-btn cst-btn--ghost" type="button" (click)="resetForm()">
+                    <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:arrow-path'"></mat-icon> {{ t('Reset') || 'Réinitialiser' }}
+                </button>
                 <button class="cst-btn cst-btn--ghost" type="button" (click)="onBackdropClicked()">{{ t('Cancel') || 'Annuler' }}</button>
-                <button class="cst-btn cst-btn--primary" type="button" (click)="saveCircuit()">{{ t('Save') || 'Enregistrer' }}</button>
+                <button class="cst-btn cst-btn--primary" type="button" (click)="saveCircuit()" [disabled]="isLoading">
+                    @if (isLoading) { <span class="cc-spin"></span> }
+                    {{ t('Save') || 'Enregistrer' }}
+                </button>
             </div>
         </div>
 
@@ -47,10 +53,21 @@
             <div class="cc-left">
 
                 <!-- Container 1: Informations du circuit -->
-                <div class="cst-form-card">
-                    <div class="cst-form-sec__title">{{ t('Circuit-Information') || 'Informations du circuit' }}</div>
-                    <div class="cst-form-sec__sub">Identité, extrémités et paramètres du trajet</div>
+                <div class="cst-form-card" [class.is-collapsed]="infoCollapsed">
+                    <div class="cc-card__head" (click)="toggleInfoCard()">
+                        <div>
+                            <div class="cst-form-sec__title" style="margin:0">{{ t('Circuit-Information') || 'Informations du circuit' }}</div>
+                            <div class="cst-form-sec__sub" style="margin:2px 0 0">Identité, extrémités et paramètres du trajet</div>
+                        </div>
+                        <button class="cc-collapse" type="button"
+                                [attr.aria-expanded]="!infoCollapsed"
+                                [attr.aria-label]="infoCollapsed ? 'Développer' : 'Réduire'"
+                                (click)="toggleInfoCard(); $event.stopPropagation()">
+                            <mat-icon class="icon-size-4" [style.transform]="infoCollapsed ? 'rotate(0deg)' : 'rotate(180deg)'" [svgIcon]="'heroicons_outline:chevron-down'"></mat-icon>
+                        </button>
+                    </div>
 
+                    @if (!infoCollapsed) {
                     <div class="cst-form-grid" style="grid-template-columns:1fr 1fr">
                         <div class="cst-field">
                             <label>{{ t('Circuit-Code') || 'Code circuit' }} <span style="color:var(--cst-red)">*</span></label>
@@ -83,6 +100,9 @@
                                 </select>
                                 <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
                             </div>
+                            @if (departureAddressNotFound) {
+                                <div class="cst-field__err"><mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon> Position introuvable pour ce point</div>
+                            }
                         </div>
 
                         <div class="cst-field">
@@ -96,6 +116,9 @@
                                 </select>
                                 <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
                             </div>
+                            @if (arrivalAddressNotFound) {
+                                <div class="cst-field__err"><mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon> Position introuvable pour ce point</div>
+                            }
                         </div>
 
                         <div class="cst-field">
@@ -127,18 +150,28 @@
 
                         <input type="hidden" formControlName="societeId" />
                     </div>
+                    }
                 </div>
 
                 <!-- Container 2: Points de collecte -->
-                <div class="cst-form-card cc-points">
-                    <div class="cc-points__head">
+                <div class="cst-form-card cc-points" [class.is-collapsed]="pointsCollapsed">
+                    <div class="cc-points__head cc-card__head" (click)="togglePointsCard()">
                         <div>
                             <div class="cst-form-sec__title" style="margin:0">{{ t('PointsCollecte') || 'Points de collecte' }}</div>
-                            <div class="cst-form-sec__sub" style="margin:2px 0 0">Rattachez les points desservis par ce circuit</div>
+                            <div class="cst-form-sec__sub" style="margin:2px 0 0">Sélectionnez, puis glissez-déposez pour ordonner la tournée</div>
                         </div>
-                        <span class="cc-points__badge">{{ selectedPointCount }} sélectionné(s)</span>
+                        <div class="cc-card__head-end">
+                            <span class="cc-points__badge">{{ selectedPointCount }} sélectionné(s)</span>
+                            <button class="cc-collapse" type="button"
+                                    [attr.aria-expanded]="!pointsCollapsed"
+                                    [attr.aria-label]="pointsCollapsed ? 'Développer' : 'Réduire'"
+                                    (click)="togglePointsCard(); $event.stopPropagation()">
+                                <mat-icon class="icon-size-4" [style.transform]="pointsCollapsed ? 'rotate(0deg)' : 'rotate(180deg)'" [svgIcon]="'heroicons_outline:chevron-down'"></mat-icon>
+                            </button>
+                        </div>
                     </div>
 
+                    @if (!pointsCollapsed) {
                     <div class="cst-search" style="margin-bottom:10px">
                         <mat-icon [svgIcon]="'heroicons_outline:magnifying-glass'"></mat-icon>
                         <input [formControl]="pointSearchControl" placeholder="Code, libellé, région…" autocomplete="off" />
@@ -159,6 +192,9 @@
                                             } @else {
                                                 <span class="pc-item__nogeo">sans position</span>
                                             }
+                                            @if (hasPolygon && isPointOutsideZone(point)) {
+                                                <span class="pc-item__outzone" title="Ce point est en dehors de la zone dessinée">hors zone</span>
+                                            }
                                         </div>
                                         <div class="pc-item__lib">{{ point.libellePointCollecte || '—' }}</div>
                                         <div class="pc-item__meta">{{ point.codeRegion || '—' }}<span> · </span>{{ point.codeGouvernorat || '—' }}</div>
@@ -174,6 +210,35 @@
                             </div>
                         }
                     </div>
+
+                    <!-- Ordre de passage (drag & drop) -->
+                    @if (orderedSelectedPoints.length > 0) {
+                        <div class="cc-order">
+                            <div class="cc-order__title">
+                                Ordre de passage
+                                <span class="cc-order__hint">glissez pour réordonner</span>
+                            </div>
+                            <div class="cc-order__list" cdkDropList (cdkDropListDropped)="dropSelectedPoint($event)">
+                                @for (point of orderedSelectedPoints; track point.pointCollecteId) {
+                                    <div class="cc-order__item" cdkDrag [cdkDragDisabled]="orderedSelectedPoints.length < 2">
+                                        <mat-icon class="cc-order__grip" cdkDragHandle [svgIcon]="'heroicons_outline:bars-3'"></mat-icon>
+                                        <span class="cc-order__no">{{ $index + 1 }}</span>
+                                        <span class="cc-order__name">{{ point.libellePointCollecte || point.codePointCollecte }}</span>
+                                        @if (point.latitude == null || point.longitude == null) {
+                                            <span class="pc-item__nogeo">sans position</span>
+                                        }
+                                        @if (hasPolygon && isPointOutsideZone(point)) {
+                                            <span class="pc-item__outzone">hors zone</span>
+                                        }
+                                        <button class="cst-round cc-order__rm" type="button" title="Retirer" (click)="removeSelectedPoint(point.pointCollecteId)">
+                                            <mat-icon [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    }
                 </div>
             </div>
 
@@ -184,18 +249,106 @@
                         <div class="cst-form-sec__title" style="margin:0;display:flex;align-items:center;gap:8px">
                             <mat-icon class="icon-size-5" style="color:var(--cst-blue)" [svgIcon]="'heroicons_outline:map'"></mat-icon>
                             {{ t('Circuit-Location') || 'Tracé du circuit' }}
+                            @if (manualEvaluation) {
+                                <span class="cc-stat">{{ manualEvaluation.totalDistanceKm | number:'1.0-1' }} km</span>
+                                <span class="cc-stat">≈ {{ manualEvaluation.estimatedDurationMinutes }} min</span>
+                            }
                         </div>
-                        <span class="cc-map__hint">{{ t('Click-on-map-to-set-location') || 'Cliquez sur la carte pour définir la position' }}</span>
+                        <button class="cst-btn cst-btn--primary cc-optimize" type="button"
+                                [disabled]="!canOptimize" (click)="optimizeRoute()"
+                                title="Calculer le meilleur ordre de passage (Dijkstra)">
+                            <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:sparkles'"></mat-icon>
+                            Optimiser le circuit
+                        </button>
                     </div>
+
+                    <!-- Zone tools -->
+                    <div class="cc-maptools">
+                        <span class="cc-maptools__label">Zone</span>
+                        @if (polygonMode === 'draw') {
+                            <span class="cc-maptools__drawing">Cliquez sur la carte pour ajouter des sommets · double-clic pour fermer</span>
+                            <button class="cc-tool is-on" type="button" (click)="finishPolygon()">
+                                <mat-icon [svgIcon]="'heroicons_outline:check'"></mat-icon> Terminer
+                            </button>
+                        } @else {
+                            <button class="cc-tool" type="button" (click)="startPolygonDraw()">
+                                <mat-icon [svgIcon]="'heroicons_outline:pencil'"></mat-icon> {{ hasPolygon ? 'Redessiner' : 'Dessiner une zone' }}
+                            </button>
+                            @if (hasPolygon) {
+                                <button class="cc-tool" type="button" [class.is-on]="polygonMode === 'edit'" (click)="editPolygon()">
+                                    <mat-icon [svgIcon]="'heroicons_outline:adjustments-horizontal'"></mat-icon> {{ polygonMode === 'edit' ? 'Terminer l\'édition' : 'Modifier' }}
+                                </button>
+                                <button class="cc-tool cc-tool--danger" type="button" (click)="clearPolygon()">
+                                    <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon> Effacer
+                                </button>
+                                <label class="cc-restrict" title="Pénalise les trajets sortant de la zone et exclut les points extérieurs de l'optimisation">
+                                    <input type="checkbox" [checked]="restrictToPolygon" (change)="toggleRestrictToPolygon()" />
+                                    Restreindre à la zone
+                                </label>
+                            }
+                        }
+
+                        @if (polygonStats) {
+                            <div class="cc-zonestats">
+                                <span class="cc-stat">{{ polygonStats.areaKm2 | number:'1.0-1' }} km²</span>
+                                <span class="cc-stat cc-stat--ok">{{ polygonStats.includedCount }} inclus</span>
+                                @if (polygonStats.excludedCount > 0) {
+                                    <span class="cc-stat cc-stat--warn">{{ polygonStats.excludedCount }} hors zone</span>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Optimization comparison -->
+                    @if (optimizedResult && manualEvaluation) {
+                        <div class="cc-compare" [class.is-applied]="optimizedApplied">
+                            <div class="cc-compare__cols">
+                                <div class="cc-compare__col">
+                                    <div class="cc-compare__k">Ordre manuel</div>
+                                    <div class="cc-compare__v">{{ manualEvaluation.totalDistanceKm | number:'1.0-1' }} km · {{ manualEvaluation.estimatedDurationMinutes }} min</div>
+                                </div>
+                                <mat-icon class="cc-compare__arrow" [svgIcon]="'heroicons_outline:arrow-long-right'"></mat-icon>
+                                <div class="cc-compare__col">
+                                    <div class="cc-compare__k">Ordre optimisé (Dijkstra)</div>
+                                    <div class="cc-compare__v cc-compare__v--opt">
+                                        {{ optimizedResult.totalDistanceKm | number:'1.0-1' }} km · {{ optimizedResult.estimatedDurationMinutes }} min
+                                        @if (optimizationGainPct !== null && optimizationGainPct > 0) {
+                                            <span class="cc-gain">−{{ optimizationGainPct }} %</span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            @if (optimizedResult.excludedWaypointIds.length > 0) {
+                                <div class="cc-compare__note">{{ optimizedResult.excludedWaypointIds.length }} point(s) hors zone exclu(s) de l'optimisation</div>
+                            }
+                            <div class="cc-compare__actions">
+                                @if (optimizedApplied) {
+                                    <span class="cc-applied"><mat-icon [svgIcon]="'heroicons_solid:check-circle'"></mat-icon> Ordre optimisé appliqué</span>
+                                } @else {
+                                    <button class="cst-btn cst-btn--primary" type="button" style="height:34px;padding:0 14px" (click)="applyOptimizedOrder()">Appliquer cet ordre</button>
+                                }
+                                <button class="cst-btn cst-btn--ghost" type="button" style="height:34px;padding:0 14px" (click)="dismissOptimization()">Fermer</button>
+                            </div>
+                        </div>
+                    }
+
                     <div class="cc-map__body">
-                        <app-map-picker
-                            [latitude]="circuitForm.get('latitude')?.value"
-                            [longitude]="circuitForm.get('longitude')?.value"
-                            [routePoints]="circuitRoutePoints"
-                            [color]="circuitForm.get('couleur')?.value"
-                            [height]="'100%'"
-                            (locationChange)="onLocationChange($event)">
-                        </app-map-picker>
+                        @defer (on viewport; prefetch on idle) {
+                            <app-map-picker
+                                [latitude]="circuitForm.get('latitude')?.value"
+                                [longitude]="circuitForm.get('longitude')?.value"
+                                [routePoints]="circuitRoutePoints"
+                                [color]="circuitForm.get('couleur')?.value"
+                                [polygon]="polygonPoints"
+                                [polygonMode]="polygonMode"
+                                [height]="'100%'"
+                                (locationChange)="onLocationChange($event)"
+                                (polygonChange)="onPolygonChange($event)"
+                                (polygonDrawFinished)="onPolygonDrawFinished($event)">
+                            </app-map-picker>
+                        } @placeholder {
+                            <app-map-skeleton></app-map-skeleton>
+                        }
                     </div>
                 </div>
             </div>
