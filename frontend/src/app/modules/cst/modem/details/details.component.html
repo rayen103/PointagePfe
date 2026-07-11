@@ -68,6 +68,17 @@
                         <label>{{ t('Numero-Sim') || 'N° SIM' }}</label>
                         <input class="cst-input" formControlName="numeroSim" [placeholder]="t('Enter-sim') || 'Ex: 216XXXXXXXX'" />
                     </div>
+
+                    <!-- Col 4: Bus -->
+                    <div class="cst-field">
+                        <label>{{ t('Bus') || 'Bus' }}</label>
+                        <mat-select class="cst-input" formControlName="busId">
+                            <mat-option value="">-- Aucun --</mat-option>
+                            @for (bus of buses; track bus.busId) {
+                                <mat-option [value]="bus.busId">{{ bus.numeroIMM }} ({{ bus.modelBus }})</mat-option>
+                            }
+                        </mat-select>
+                    </div>
                 </div>
             </div>
 

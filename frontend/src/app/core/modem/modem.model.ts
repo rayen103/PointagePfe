@@ -5,6 +5,7 @@ export interface Modem {
     numeroSim?: string;
     isActive: boolean;
     societeId: string;
+    busId?: string;
 }
 
 export interface PagedModem {
