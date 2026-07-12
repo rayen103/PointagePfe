@@ -1,7 +1,0 @@
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.VenteMobile.Metier\bin\Release\CST.LePoint.VenteMobile.Metier.dll
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.VenteMobile.Metier\bin\Release\CST.LePoint.VenteMobile.Metier.pdb
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.VenteMobile.Metier\bin\Release\CST.LePoint.Referentiel.dll
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.VenteMobile.Metier\bin\Release\CST.LePoint.Referentiel.pdb
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.VenteMobile.Metier\obj\Release\CST.LePoint.VenteMobile.Metier.csprojResolveAssemblyReference.cache
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.VenteMobile.Metier\obj\Release\CST.LePoint.VenteMobile.Metier.dll
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.VenteMobile.Metier\obj\Release\CST.LePoint.VenteMobile.Metier.pdb

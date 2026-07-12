@@ -1,9 +1,0 @@
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Vente.Achat\bin\Release\CST.LePoint.Vente.Achat.dll
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Vente.Achat\bin\Release\CST.LePoint.Vente.Achat.pdb
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Vente.Achat\bin\Release\CST.Stock.Metier.dll
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Vente.Achat\bin\Release\CST.LePoint.Referentiel.dll
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Vente.Achat\bin\Release\CST.Stock.Metier.pdb
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Vente.Achat\bin\Release\CST.LePoint.Referentiel.pdb
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Vente.Achat\obj\Release\CST.LePoint.Achat.Metier.csprojResolveAssemblyReference.cache
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Vente.Achat\obj\Release\CST.LePoint.Vente.Achat.dll
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Vente.Achat\obj\Release\CST.LePoint.Vente.Achat.pdb

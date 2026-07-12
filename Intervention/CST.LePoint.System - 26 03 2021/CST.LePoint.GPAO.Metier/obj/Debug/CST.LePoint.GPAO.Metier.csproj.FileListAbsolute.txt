@@ -1,5 +1,0 @@
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.GPAO.Metier\bin\Debug\CST.LePoint.GPAO.Metier.dll
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.GPAO.Metier\bin\Debug\CST.LePoint.GPAO.Metier.pdb
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.GPAO.Metier\obj\Debug\CST.LePoint.GPAO.Metier.csprojResolveAssemblyReference.cache
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.GPAO.Metier\obj\Debug\CST.LePoint.GPAO.Metier.dll
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.GPAO.Metier\obj\Debug\CST.LePoint.GPAO.Metier.pdb
