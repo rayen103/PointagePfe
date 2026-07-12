@@ -1,36 +1,373 @@
-<div class="flex h-full w-full flex-col items-center justify-center">
-    <div class="w-full max-w-3xl">
-        <div class="prose prose-sm mx-auto max-w-none">
-            <img class="w-20" src="images/logo/logo.svg" alt="Logo image" />
-            <h1>Landing Module</h1>
-            <p>
-                This can be the landing or the welcome page of your application.
-                If you have an SSR (Server Side Rendering) setup, or if you
-                don't need to have Search engine visibility and optimizations,
-                you can even use this page as your primary landing page.
-            </p>
-            <p>
-                This is a separate "module", it has its own directory and
-                routing setup and also it's completely separated from the actual
-                application. This is also a simple example of a multiple
-                applications setup that uses the same codebase. You can have
-                different entry points and essentially have different
-                applications within the same codebase.
-            </p>
+<div class="cst-landing">
+    <!-- Nav -->
+    <header class="cst-landing__nav">
+        <img class="cst-landing__logo" src="images/logo/logo-text.svg" alt="CST — Canadian System Technology" />
+        <nav class="cst-landing__nav-actions">
+            @if (isAuthenticated) {
+                <a class="cst-landing__btn cst-landing__btn--primary" [routerLink]="['/Accueil/page']">Accéder au tableau de bord</a>
+            } @else {
+                <a class="cst-landing__btn cst-landing__btn--ghost" [routerLink]="['/sign-in']">Se connecter</a>
+                <a class="cst-landing__btn cst-landing__btn--primary" [routerLink]="['/sign-up']">Créer un compte</a>
+            }
+        </nav>
+    </header>
+
+    <!-- Hero -->
+    <section class="cst-landing__hero">
+        <div class="cst-landing__hero-glow cst-landing__hero-glow--1"></div>
+        <div class="cst-landing__hero-glow cst-landing__hero-glow--2"></div>
+        <svg class="cst-landing__hero-paths" viewBox="0 0 1440 400" preserveAspectRatio="xMidYMax slice">
+            <path d="M-40 300 C 240 220, 420 380, 700 300 S 1180 200, 1480 280" fill="none" stroke="#C9DEF0" stroke-width="2" stroke-dasharray="1 10" stroke-linecap="round"></path>
+            <path d="M-40 360 C 260 300, 480 440, 760 360 S 1200 280, 1480 350" fill="none" stroke="#C9DEF0" stroke-width="2" stroke-dasharray="1 10" stroke-linecap="round"></path>
+        </svg>
+
+        <div class="cst-landing__hero-inner">
+            <div class="cst-landing__hero-copy">
+                <span class="cst-landing__badge">Plateforme SaaS · Pointage en bus &amp; dispatching</span>
+                <h1 class="cst-landing__title">
+                    Le pointage de vos employés,<br />
+                    directement à bord de vos bus
+                </h1>
+                <p class="cst-landing__lead">
+                    À chaque montée, l'employé badge dans le bus : votre entreprise sait en temps réel
+                    <strong>qui est présent, où et à quel moment</strong>. Ces données alimentent un
+                    dispatching intelligent qui place le bon bus sur le bon circuit — chaque jour.
+                </p>
+                <div class="cst-landing__cta">
+                    @if (!isAuthenticated) {
+                        <a class="cst-landing__btn cst-landing__btn--primary cst-landing__btn--lg" [routerLink]="['/sign-up']">
+                            Inscrire ma société
+                        </a>
+                        <a class="cst-landing__btn cst-landing__btn--ghost cst-landing__btn--lg" [routerLink]="['/sign-in']">
+                            J'ai déjà un compte
+                        </a>
+                    } @else {
+                        <a class="cst-landing__btn cst-landing__btn--primary cst-landing__btn--lg" [routerLink]="['/Accueil/page']">
+                            Ouvrir mon espace
+                        </a>
+                    }
+                </div>
+            </div>
+
+            <!-- Hero visual : carte temps réel + toast de pointage -->
+            <div class="cst-landing__hero-visual" aria-hidden="true">
+                <svg viewBox="0 0 560 430" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Aperçu du suivi temps réel">
+                    <!-- Card -->
+                    <rect x="14" y="18" width="532" height="360" rx="18" fill="#ffffff" stroke="#e3ecf6"/>
+                    <!-- Header -->
+                    <circle cx="42" cy="46" r="5" fill="#d12b28"/>
+                    <circle cx="60" cy="46" r="5" fill="#f0b429"/>
+                    <circle cx="78" cy="46" r="5" fill="#0e8a5f"/>
+                    <text x="104" y="51" font-family="Sora, Arial" font-size="13" font-weight="700" fill="#121242">Monitoring · Flotte en direct</text>
+                    <rect x="440" y="34" width="84" height="24" rx="12" fill="#e3f5ee"/>
+                    <circle cx="456" cy="46" r="4" fill="#0e8a5f"/>
+                    <text x="466" y="50" font-family="Public Sans, Arial" font-size="11" font-weight="700" fill="#0e8a5f">EN DIRECT</text>
+                    <!-- Map area -->
+                    <rect x="30" y="70" width="360" height="290" rx="12" fill="#eaf3fb"/>
+                    <g stroke="#d7e3ef" stroke-width="1">
+                        <line x1="30" y1="130" x2="390" y2="130"/><line x1="30" y1="190" x2="390" y2="190"/>
+                        <line x1="30" y1="250" x2="390" y2="250"/><line x1="30" y1="310" x2="390" y2="310"/>
+                        <line x1="100" y1="70" x2="100" y2="360"/><line x1="180" y1="70" x2="180" y2="360"/>
+                        <line x1="260" y1="70" x2="260" y2="360"/><line x1="340" y1="70" x2="340" y2="360"/>
+                    </g>
+                    <!-- Circuit -->
+                    <path d="M55 330 C 110 290, 120 210, 185 195 S 300 150, 355 100" fill="none" stroke="#d12b28" stroke-width="3" stroke-dasharray="7 7" stroke-linecap="round"/>
+                    <!-- Stops -->
+                    <g>
+                        <circle cx="55" cy="330" r="9" fill="#ffffff" stroke="#42abe0" stroke-width="3"/>
+                        <circle cx="185" cy="195" r="9" fill="#ffffff" stroke="#42abe0" stroke-width="3"/>
+                        <circle cx="355" cy="100" r="9" fill="#ffffff" stroke="#42abe0" stroke-width="3"/>
+                    </g>
+                    <!-- Bus marker -->
+                    <g transform="translate(122 246)">
+                        <circle r="17" fill="rgba(209,43,40,0.15)"/>
+                        <rect x="-12" y="-9" width="24" height="18" rx="5" fill="#121242"/>
+                        <rect x="6" y="-9" width="6" height="18" rx="3" fill="#d12b28"/>
+                        <rect x="-8" y="-5" width="10" height="4" rx="1.5" fill="#42abe0"/>
+                        <rect x="-8" y="1" width="10" height="4" rx="1.5" fill="#42abe0"/>
+                    </g>
+                    <!-- ETA chip on map -->
+                    <g transform="translate(196 132)">
+                        <rect width="150" height="30" rx="15" fill="#121242"/>
+                        <text x="14" y="19" font-family="Public Sans, Arial" font-size="11.5" font-weight="700" fill="#ffffff">Pt. Mégrine · ETA 6 min</text>
+                    </g>
+                    <!-- Right panel : occupation -->
+                    <g font-family="Public Sans, Arial">
+                        <text x="410" y="92" font-size="12" font-weight="700" fill="#121242">Occupation</text>
+                        <text x="410" y="118" font-size="11" fill="#5a6b85">142 TU 3805</text>
+                        <rect x="410" y="126" width="112" height="8" rx="4" fill="#f1f6fb"/>
+                        <rect x="410" y="126" width="86" height="8" rx="4" fill="#42abe0"/>
+                        <text x="410" y="158" font-size="11" fill="#5a6b85">128 TU 4521</text>
+                        <rect x="410" y="166" width="112" height="8" rx="4" fill="#f1f6fb"/>
+                        <rect x="410" y="166" width="52" height="8" rx="4" fill="#42abe0"/>
+                        <text x="410" y="198" font-size="11" fill="#5a6b85">156 TU 1120</text>
+                        <rect x="410" y="206" width="112" height="8" rx="4" fill="#f1f6fb"/>
+                        <rect x="410" y="206" width="100" height="8" rx="4" fill="#d12b28"/>
+                        <text x="410" y="240" font-size="12" font-weight="700" fill="#121242">Présences</text>
+                        <text x="410" y="266" font-size="22" font-family="Sora, Arial" font-weight="800" fill="#0e8a5f">93%</text>
+                        <text x="410" y="284" font-size="10.5" fill="#5a6b85">badgés ce matin</text>
+                        <text x="410" y="318" font-size="12" font-weight="700" fill="#121242">Bus actifs</text>
+                        <text x="410" y="344" font-size="22" font-family="Sora, Arial" font-weight="800" fill="#121242">28<tspan font-size="12" fill="#5a6b85">/36</tspan></text>
+                    </g>
+                    <!-- Floating toast : pointage validé -->
+                    <g transform="translate(52 386)">
+                        <rect width="272" height="38" rx="12" fill="#ffffff" stroke="#e3ecf6"/>
+                        <circle cx="22" cy="19" r="11" fill="#e3f5ee"/>
+                        <path d="M17 19.5l3.4 3.4L27 16" fill="none" stroke="#0e8a5f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                        <text x="42" y="16" font-family="Public Sans, Arial" font-size="11.5" font-weight="700" fill="#121242">Pointage validé — Ahmed B.</text>
+                        <text x="42" y="30" font-family="Public Sans, Arial" font-size="10.5" fill="#5a6b85">07:42 · Pt. Borj Louzir · Bus 142 TU 3805</text>
+                    </g>
+                </svg>
+            </div>
         </div>
-        <div>
-            <a
-                class="mt-8"
-                mat-flat-button
-                [color]="'primary'"
-                [routerLink]="'/dashboards/project'"
-            >
-                <span>Launch the App</span>
-                <mat-icon
-                    class="ml-2 icon-size-5"
-                    [svgIcon]="'heroicons_mini:arrow-long-right'"
-                ></mat-icon>
-            </a>
+    </section>
+
+    <!-- Pointage en bus, expliqué -->
+    <section class="cst-landing__split">
+        <div class="cst-landing__split-visual" aria-hidden="true">
+            <svg viewBox="0 0 520 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Le badge de l'employé est scanné à bord du bus">
+                <!-- Bus silhouette -->
+                <rect x="24" y="60" width="300" height="200" rx="24" fill="#121242"/>
+                <rect x="24" y="60" width="300" height="46" rx="23" fill="#1d1d5e"/>
+                <rect x="44" y="118" width="56" height="52" rx="8" fill="#42abe0" opacity="0.9"/>
+                <rect x="112" y="118" width="56" height="52" rx="8" fill="#42abe0" opacity="0.9"/>
+                <rect x="180" y="118" width="56" height="52" rx="8" fill="#42abe0" opacity="0.9"/>
+                <rect x="248" y="112" width="56" height="120" rx="8" fill="#eaf6fc"/>
+                <rect x="24" y="196" width="300" height="18" fill="#d12b28"/>
+                <circle cx="92" cy="272" r="26" fill="#121242"/><circle cx="92" cy="272" r="12" fill="#eaf3fb"/>
+                <circle cx="252" cy="272" r="26" fill="#121242"/><circle cx="252" cy="272" r="12" fill="#eaf3fb"/>
+                <!-- RFID reader by the door -->
+                <rect x="262" y="128" width="28" height="44" rx="6" fill="#121242" stroke="#42abe0" stroke-width="2"/>
+                <circle cx="276" cy="150" r="6" fill="#d12b28"/>
+                <!-- Badge card -->
+                <g transform="translate(330 96)">
+                    <rect width="158" height="104" rx="14" fill="#ffffff" stroke="#e3ecf6"/>
+                    <rect x="14" y="14" width="34" height="34" rx="8" fill="#eaf6fc"/>
+                    <circle cx="31" cy="26" r="6" fill="#42abe0"/>
+                    <path d="M20 44c2-7 8-10 11-10s9 3 11 10" fill="none" stroke="#42abe0" stroke-width="3" stroke-linecap="round"/>
+                    <rect x="58" y="18" width="82" height="8" rx="4" fill="#121242"/>
+                    <rect x="58" y="32" width="58" height="7" rx="3.5" fill="#c9d8e8"/>
+                    <rect x="14" y="62" width="126" height="7" rx="3.5" fill="#f1f6fb"/>
+                    <rect x="14" y="76" width="96" height="7" rx="3.5" fill="#f1f6fb"/>
+                    <rect x="14" y="88" width="60" height="7" rx="3.5" fill="#fdecec"/>
+                </g>
+                <!-- RFID waves between badge and reader -->
+                <g fill="none" stroke="#d12b28" stroke-width="2.4" stroke-linecap="round">
+                    <path d="M312 138 a 14 14 0 0 1 0 24"/>
+                    <path d="M320 130 a 24 24 0 0 1 0 40"/>
+                </g>
+                <!-- Counter chip -->
+                <g transform="translate(40 300)">
+                    <rect width="180" height="40" rx="20" fill="#ffffff" stroke="#e3ecf6"/>
+                    <circle cx="22" cy="20" r="10" fill="#eaf6fc"/>
+                    <path d="M18 20h8M22 16v8" stroke="#2e8bbd" stroke-width="2.2" stroke-linecap="round"/>
+                    <text x="42" y="25" font-family="Public Sans, Arial" font-size="13" font-weight="700" fill="#121242">32 employés à bord</text>
+                </g>
+                <!-- Attendance list -->
+                <g transform="translate(330 224)" font-family="Public Sans, Arial" font-size="11.5">
+                    <rect width="158" height="120" rx="14" fill="#ffffff" stroke="#e3ecf6"/>
+                    <text x="14" y="24" font-weight="700" font-size="12" fill="#121242">Présences · 07:45</text>
+                    <circle cx="22" cy="46" r="7" fill="#e3f5ee"/><path d="M19 46l2.2 2.2 4-4.4" stroke="#0e8a5f" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                    <text x="38" y="50" fill="#3d4c66">Ahmed B. · 07:42</text>
+                    <circle cx="22" cy="72" r="7" fill="#e3f5ee"/><path d="M19 72l2.2 2.2 4-4.4" stroke="#0e8a5f" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                    <text x="38" y="76" fill="#3d4c66">Sonia M. · 07:43</text>
+                    <circle cx="22" cy="98" r="7" fill="#fdecec"/><path d="M19.5 95.5l5 5M24.5 95.5l-5 5" stroke="#d12b28" stroke-width="1.8" stroke-linecap="round"/>
+                    <text x="38" y="102" fill="#3d4c66">Karim J. · absent</text>
+                </g>
+            </svg>
         </div>
-    </div>
+        <div class="cst-landing__split-copy">
+            <span class="cst-landing__eyebrow">Pointage en bus</span>
+            <h2 class="cst-landing__h2 cst-landing__h2--left">Chaque montée compte, sans aucune saisie manuelle</h2>
+            <p class="cst-landing__text">
+                Le pointage ne se fait plus à l'usine ni sur papier : il se fait <strong>dans le bus</strong>.
+                À la montée, l'employé présente son badge au lecteur embarqué. Le pointage est
+                <strong>horodaté, géolocalisé au point de collecte et rattaché au bus et au chauffeur</strong> —
+                votre entreprise dispose d'une information fiable, à la seconde.
+            </p>
+            <ul class="cst-landing__checklist">
+                <li>
+                    <strong>Présences en temps réel</strong>
+                    Qui est monté, à quel arrêt, à quelle heure : les présences, retards et absences
+                    remontent instantanément vers les RH — plus de feuilles de pointage à ressaisir.
+                </li>
+                <li>
+                    <strong>Occupation mesurée</strong>
+                    Le comptage à bord révèle le taux d'occupation réel de chaque bus sur chaque
+                    circuit, trajet par trajet.
+                </li>
+                <li>
+                    <strong>Historique &amp; rapports</strong>
+                    Chaque trajet est archivé : heures de passage, effectifs transportés, chauffeur
+                    affecté. Des rapports prêts à exporter pour la paie et les audits.
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Dispatching intelligent -->
+    <section class="cst-landing__split cst-landing__split--reverse">
+        <div class="cst-landing__split-visual" aria-hidden="true">
+            <svg viewBox="0 0 520 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Affectation des bus aux circuits">
+                <rect x="16" y="16" width="488" height="368" rx="18" fill="#ffffff" stroke="#e3ecf6"/>
+                <text x="36" y="48" font-family="Sora, Arial" font-size="13" font-weight="700" fill="#121242">Dispatching · affectation des circuits</text>
+                <!-- Circuits -->
+                <path d="M60 120 C 140 90, 220 150, 300 120 S 420 80, 470 110" fill="none" stroke="#d12b28" stroke-width="3" stroke-dasharray="7 7" stroke-linecap="round"/>
+                <path d="M60 210 C 150 190, 230 250, 320 220 S 430 190, 470 210" fill="none" stroke="#42abe0" stroke-width="3" stroke-dasharray="7 7" stroke-linecap="round"/>
+                <path d="M60 300 C 150 280, 240 330, 330 305 S 430 280, 470 300" fill="none" stroke="#121242" stroke-width="3" stroke-dasharray="7 7" stroke-linecap="round"/>
+                <!-- Stops -->
+                <g fill="#ffffff">
+                    <circle cx="60" cy="120" r="8" stroke="#d12b28" stroke-width="3"/><circle cx="300" cy="120" r="8" stroke="#d12b28" stroke-width="3"/><circle cx="470" cy="110" r="8" stroke="#d12b28" stroke-width="3"/>
+                    <circle cx="60" cy="210" r="8" stroke="#42abe0" stroke-width="3"/><circle cx="320" cy="220" r="8" stroke="#42abe0" stroke-width="3"/><circle cx="470" cy="210" r="8" stroke="#42abe0" stroke-width="3"/>
+                    <circle cx="60" cy="300" r="8" stroke="#121242" stroke-width="3"/><circle cx="330" cy="305" r="8" stroke="#121242" stroke-width="3"/><circle cx="470" cy="300" r="8" stroke="#121242" stroke-width="3"/>
+                </g>
+                <!-- Buses assigned -->
+                <g transform="translate(178 104)">
+                    <rect x="-14" y="-11" width="28" height="22" rx="6" fill="#121242"/><rect x="8" y="-11" width="7" height="22" rx="3.5" fill="#d12b28"/>
+                </g>
+                <g transform="translate(200 226)">
+                    <rect x="-14" y="-11" width="28" height="22" rx="6" fill="#121242"/><rect x="8" y="-11" width="7" height="22" rx="3.5" fill="#d12b28"/>
+                </g>
+                <!-- Assignment labels -->
+                <g font-family="Public Sans, Arial" font-size="11" font-weight="700">
+                    <rect x="330" y="86" width="120" height="24" rx="12" fill="#fdecec"/><text x="342" y="102" fill="#d12b28">Circuit A · saturé</text>
+                    <rect x="330" y="240" width="132" height="24" rx="12" fill="#eaf6fc"/><text x="342" y="256" fill="#2e8bbd">Circuit B · +1 bus ➜</text>
+                    <rect x="330" y="330" width="120" height="24" rx="12" fill="#f1f6fb"/><text x="342" y="346" fill="#121242">Circuit C · optimal</text>
+                </g>
+                <!-- ETA / ML footer -->
+                <g transform="translate(36 340)" font-family="Public Sans, Arial">
+                    <rect width="212" height="30" rx="15" fill="#121242"/>
+                    <circle cx="18" cy="15" r="5" fill="#42abe0"/>
+                    <text x="32" y="19" font-size="11" font-weight="700" fill="#ffffff">ETA prédits par le service ML</text>
+                </g>
+            </svg>
+        </div>
+        <div class="cst-landing__split-copy">
+            <span class="cst-landing__eyebrow">Dispatching intelligent</span>
+            <h2 class="cst-landing__h2 cst-landing__h2--left">Le bon bus, sur le bon circuit, au bon moment</h2>
+            <p class="cst-landing__text">
+                Les données de pointage et la télémétrie des bus alimentent directement le dispatching.
+                Vous n'affectez plus vos véhicules « au feeling » : vous les affectez selon la
+                <strong>demande réelle mesurée sur chaque circuit</strong>.
+            </p>
+            <ul class="cst-landing__checklist">
+                <li>
+                    <strong>Capacité ajustée à la demande</strong>
+                    L'occupation mesurée circuit par circuit révèle les bus sous-utilisés et les
+                    lignes saturées : redéployez la flotte là où elle est utile.
+                </li>
+                <li>
+                    <strong>Tournées optimisées</strong>
+                    L'ordre des points de collecte est optimisé automatiquement pour raccourcir les
+                    trajets, et les heures d'arrivée sont prédites par notre moteur de prévision.
+                </li>
+                <li>
+                    <strong>Réactivité terrain</strong>
+                    Panne, retard, chauffeur absent ? Réaffectez un bus à un autre circuit en
+                    quelques clics — le suivi temps réel confirme aussitôt la prise en charge.
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Chiffres / promesses produit -->
+    <section class="cst-landing__stats">
+        <div class="cst-landing__stat">
+            <span class="cst-landing__stat-value">Temps réel</span>
+            <span class="cst-landing__stat-label">positions, occupation et pointages à la seconde</span>
+        </div>
+        <div class="cst-landing__stat">
+            <span class="cst-landing__stat-value">0 papier</span>
+            <span class="cst-landing__stat-label">pointage 100 % digital, prêt pour la paie</span>
+        </div>
+        <div class="cst-landing__stat">
+            <span class="cst-landing__stat-value">24 gouvernorats</span>
+            <span class="cst-landing__stat-label">référentiel national prêt à l'emploi</span>
+        </div>
+        <div class="cst-landing__stat">
+            <span class="cst-landing__stat-value">Multi-sociétés</span>
+            <span class="cst-landing__stat-label">vos données restent strictement isolées</span>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="cst-landing__features">
+        <h2 class="cst-landing__h2">Tout ce qu'il faut pour piloter vos opérations</h2>
+        <div class="cst-landing__grid">
+            <article class="cst-landing__card">
+                <div class="cst-landing__card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                </div>
+                <h3>Suivi en temps réel</h3>
+                <p>Localisez chaque bus de votre flotte sur la carte, avec télémétrie embarquée : position, occupation, batterie.</p>
+            </article>
+            <article class="cst-landing__card">
+                <div class="cst-landing__card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2"></circle><circle cx="18" cy="5" r="2"></circle><path d="M12 19h4.5a3.5 3.5 0 000-7h-8a3.5 3.5 0 010-7H12"></path></svg>
+                </div>
+                <h3>Circuits &amp; points de collecte</h3>
+                <p>Dessinez vos circuits, ordonnez les points de collecte et optimisez les tournées de vos équipes.</p>
+            </article>
+            <article class="cst-landing__card">
+                <div class="cst-landing__card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"></path></svg>
+                </div>
+                <h3>Équipes &amp; pointage</h3>
+                <p>Gérez chauffeurs, employés, équipes et shifts. Le pointage terrain remonte automatiquement.</p>
+            </article>
+            <article class="cst-landing__card">
+                <div class="cst-landing__card-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M7 15l4-6 4 3 5-8"></path></svg>
+                </div>
+                <h3>Tableaux de bord &amp; analyses</h3>
+                <p>Des indicateurs clairs et des rapports BI pour piloter l'activité de votre société au quotidien.</p>
+            </article>
+        </div>
+    </section>
+
+    <!-- Isolation band -->
+    <section class="cst-landing__band">
+        <div class="cst-landing__band-inner">
+            <div>
+                <h2 class="cst-landing__h2 cst-landing__h2--light">Vos données restent les vôtres</h2>
+                <p>
+                    Chaque société dispose de son propre espace étanche : vos bus, employés,
+                    circuits et rapports ne sont jamais visibles par une autre société.
+                </p>
+            </div>
+            @if (!isAuthenticated) {
+                <a class="cst-landing__btn cst-landing__btn--white cst-landing__btn--lg" [routerLink]="['/sign-up']">
+                    Commencer maintenant
+                </a>
+            }
+        </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="cst-landing__steps">
+        <h2 class="cst-landing__h2">Démarrez en 3 étapes</h2>
+        <div class="cst-landing__grid cst-landing__grid--3">
+            <article class="cst-landing__card cst-landing__card--step">
+                <span class="cst-landing__step-num">1</span>
+                <h3>Inscrivez votre société</h3>
+                <p>Renseignez le nom de votre société, vos coordonnées et un mot de passe.</p>
+            </article>
+            <article class="cst-landing__card cst-landing__card--step">
+                <span class="cst-landing__step-num">2</span>
+                <h3>Vérifiez votre email</h3>
+                <p>Saisissez le code à 6 chiffres reçu par email pour activer votre compte.</p>
+            </article>
+            <article class="cst-landing__card cst-landing__card--step">
+                <span class="cst-landing__step-num">3</span>
+                <h3>Pilotez vos opérations</h3>
+                <p>Vous êtes connecté automatiquement : ajoutez vos bus, circuits et équipes.</p>
+            </article>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="cst-landing__footer">
+        <img class="cst-landing__logo cst-landing__logo--sm" src="images/logo/logo-text.svg" alt="CST" />
+        <span>© {{ currentYear }} Canadian System Technology · FR / EN</span>
+    </footer>
 </div>

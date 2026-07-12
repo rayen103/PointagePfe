@@ -1,0 +1,76 @@
+<div class="cst-auth">
+    <!-- Decorative background -->
+    <div class="cst-auth__bg">
+        <div class="cst-auth__glow cst-auth__glow--1"></div>
+        <div class="cst-auth__glow cst-auth__glow--2"></div>
+        <svg class="cst-auth__paths" viewBox="0 0 1440 860" preserveAspectRatio="xMidYMax slice">
+            <path d="M-40 640 C 240 560, 420 720, 700 640 S 1180 540, 1480 620" fill="none" stroke="#C9DEF0" stroke-width="2" stroke-dasharray="1 10" stroke-linecap="round"></path>
+            <path d="M-40 720 C 260 660, 480 800, 760 720 S 1200 640, 1480 710" fill="none" stroke="#C9DEF0" stroke-width="2" stroke-dasharray="1 10" stroke-linecap="round"></path>
+        </svg>
+    </div>
+
+    <!-- Card -->
+    <div class="cst-auth__card">
+        <div class="cst-auth__brand">
+            <img src="images/logo/logo-text.svg" alt="CST — Canadian System Technology" />
+            <div class="cst-auth__welcome">Vérifiez votre email</div>
+            <div class="cst-auth__sub">
+                Un code à 6 chiffres a été envoyé à<br />
+                <strong>{{ email }}</strong>
+            </div>
+        </div>
+
+        @if (showAlert) {
+            <div
+                class="cst-auth__alert"
+                [class.is-error]="alert.type === 'error'"
+                [class.is-success]="alert.type === 'success'"
+                [@shake]="alert.type === 'error'"
+            >
+                {{ alert.message }}
+            </div>
+        }
+
+        <div class="cst-auth__form">
+            <!-- Code digits -->
+            <div class="cst-code" (paste)="onPaste($event)">
+                @for (digit of digits; track $index) {
+                    <input
+                        #digitInput
+                        class="cst-code__digit"
+                        type="text"
+                        inputmode="numeric"
+                        maxlength="6"
+                        autocomplete="one-time-code"
+                        [value]="digits[$index]"
+                        (input)="onDigitInput($index, $event)"
+                        (keydown)="onDigitKeydown($index, $event)"
+                    />
+                }
+            </div>
+
+            <!-- Submit -->
+            <button type="button" class="cst-auth__submit" [disabled]="isLoading || code.length !== 6" (click)="verify()">
+                @if (isLoading) {
+                    <mat-progress-spinner [diameter]="22" [mode]="'indeterminate'"></mat-progress-spinner>
+                } @else {
+                    Vérifier et me connecter
+                }
+            </button>
+
+            <div class="cst-auth__foot">
+                Vous n'avez rien reçu ?
+                @if (resendCooldown > 0) {
+                    <span class="cst-auth__muted">Renvoyer le code ({{ resendCooldown }} s)</span>
+                } @else {
+                    <a class="cst-auth__link" href="javascript:void(0)" (click)="resend()">Renvoyer le code</a>
+                }
+            </div>
+            <div class="cst-auth__foot">
+                <a class="cst-auth__link" [routerLink]="['/sign-up']">Modifier mon inscription</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="cst-auth__copy">© 2026 Canadian System Technology · FR / EN</div>
+</div>

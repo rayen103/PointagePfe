@@ -1,6 +1,4 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -8,11 +6,13 @@ import { RouterLink } from '@angular/router';
     templateUrl: './home.component.html',
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatButtonModule, RouterLink, MatIconModule],
+    imports: [RouterLink],
 })
 export class LandingHomeComponent {
-    /**
-     * Constructor
-     */
-    constructor() {}
+    /** Un token présent = session probable : le CTA devient « Accéder au tableau de bord ». */
+    get isAuthenticated(): boolean {
+        return !!localStorage.getItem('accessToken');
+    }
+
+    readonly currentYear = new Date().getFullYear();
 }

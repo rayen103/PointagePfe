@@ -21,10 +21,6 @@ import { AuthService } from 'app/core/auth/auth.service';
 import { ApiResponse } from '../../../core/common/api-response';
 import { User } from '../../../core/user/user.types';
 import { HttpErrorResponse } from '@angular/common/http';
-import { SocieteService } from '../../../core/Societe/societe.service';
-import { Societe } from '../../../core/Societe/societe.model';
-import { ChantierService } from '../../../core/chantier/chantier.service';
-import { Chantier } from '../../../core/chantier/chantier.model';
 
 @Component({
     selector: 'auth-sign-in',
@@ -55,9 +51,6 @@ export class AuthSignInComponent implements OnInit {
     isLocked: boolean = false;
     remainingTime: number = 30; // 30 secondes
     private lockTimer: any;
-    societes: Societe[] = [];
-    chantiers: Chantier[] = [];
-    filteredChantiers: Chantier[] = [];
 
     alert: { type: FuseAlertType; message: string } = {
         type: 'success',
@@ -73,9 +66,7 @@ export class AuthSignInComponent implements OnInit {
         private _activatedRoute: ActivatedRoute,
         private _authService: AuthService,
         private _formBuilder: UntypedFormBuilder,
-        private _router: Router,
-        private _societeService: SocieteService,
-        private _chantierService: ChantierService
+        private _router: Router
     ) {}
 
     // -----------------------------------------------------------------------------------------------------
@@ -86,29 +77,14 @@ export class AuthSignInComponent implements OnInit {
      * On init
      */
     ngOnInit(): void {
-        // Create the form
+        // Create the form — the company is derived server-side from the unique email.
         this.signInForm = this._formBuilder.group({
             login: [
                 '',
                 [Validators.required],
             ],
             password: ['', Validators.required],
-            societeId: ['', Validators.required],
-            numeroChantier: ['', Validators.required],
             rememberMe: [''],
-        });
-
-        this._societeService.GetSociete().subscribe((response) => {
-            this.societes = response?.societes ?? [];
-        });
-
-        this._chantierService.GetChantiers().subscribe((response) => {
-            this.chantiers = response?.chantiers ?? [];
-        });
-
-        this.signInForm.get('societeId')?.valueChanges.subscribe((societeId: string) => {
-            this.filteredChantiers = this.chantiers.filter((chantier) => chantier.societeId === societeId);
-            this.signInForm.patchValue({ numeroChantier: '' }, { emitEvent: false });
         });
     }
 

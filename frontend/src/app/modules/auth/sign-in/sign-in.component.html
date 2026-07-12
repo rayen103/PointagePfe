@@ -24,42 +24,6 @@
         }
 
         <form class="cst-auth__form" [formGroup]="signInForm" #signInNgForm="ngForm">
-            <!-- Société -->
-            <div class="cst-field">
-                <label>Société</label>
-                <div class="cst-select">
-                    <select formControlName="societeId">
-                        <option value="" disabled>Sélectionner une société</option>
-                        @for (societe of societes; track societe.societeId) {
-                            <option [value]="societe.societeId">{{ societe.nom }}</option>
-                        }
-                    </select>
-                    <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
-                </div>
-                @if (signInForm.get('societeId')?.hasError('required') && signInNgForm.submitted) {
-                    <div class="cst-field__err">La société est requise</div>
-                }
-            </div>
-
-            <!-- Chantier -->
-            <div class="cst-field">
-                <label>Chantier</label>
-                <div class="cst-select">
-                    <select formControlName="numeroChantier">
-                        <option value="" disabled>Sélectionner un chantier</option>
-                        @for (chantier of filteredChantiers; track chantier.chantierId) {
-                            <option [value]="chantier.numeroChantier">
-                                {{ chantier.numeroChantier }}@if (chantier.libelleChantier) { — {{ chantier.libelleChantier }}}
-                            </option>
-                        }
-                    </select>
-                    <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
-                </div>
-                @if (signInForm.get('numeroChantier')?.hasError('required') && signInNgForm.submitted) {
-                    <div class="cst-field__err">Le chantier est requis</div>
-                }
-            </div>
-
             <!-- Email -->
             <div class="cst-field">
                 <label>Adresse email</label>
