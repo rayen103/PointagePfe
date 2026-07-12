@@ -20,3 +20,8 @@ __pycache__/
 **/*.suo
 *.cache
 *.log
+
+# Test and Coverage Results
+TestResults/
+coverage*/
+tests/
