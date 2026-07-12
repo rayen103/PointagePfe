@@ -669,8 +669,112 @@ modern-layout {
         margin: 0 0 32px;
     }
     &__h2--light { color: #fff; text-align: left; margin-bottom: 10px; }
+    &__h2--left { text-align: left; margin-bottom: 16px; }
 
-    &__features { padding: 24px 32px 72px; max-width: 1120px; margin: 0 auto; width: 100%; }
+    &__eyebrow {
+        display: inline-block;
+        margin-bottom: 12px;
+        padding: 5px 12px;
+        border-radius: 999px;
+        background: var(--cst-red-soft, #fdecec);
+        color: var(--cst-red);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+    &__text {
+        font-size: 15px;
+        line-height: 1.75;
+        color: var(--cst-text-muted);
+        margin: 0 0 22px;
+        strong { color: var(--cst-navy); font-weight: 700; }
+    }
+
+    /* Sections éditoriales : illustration + argumentaire */
+    &__split {
+        max-width: 1120px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 72px 32px 24px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 56px;
+        align-items: center;
+
+        &--reverse { direction: rtl; > * { direction: ltr; } }
+    }
+    &__split-visual {
+        svg {
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 18px 40px rgba(18, 18, 66, 0.10));
+        }
+    }
+    &__checklist {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+
+        li {
+            position: relative;
+            padding-left: 34px;
+            font-size: 13.5px;
+            line-height: 1.65;
+            color: var(--cst-text-muted);
+
+            strong {
+                display: block;
+                font-family: var(--cst-font-head);
+                font-size: 14.5px;
+                color: var(--cst-navy);
+                margin-bottom: 2px;
+            }
+            &::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 2px;
+                width: 22px;
+                height: 22px;
+                border-radius: 999px;
+                background: var(--cst-ok-bg, #e3f5ee) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 6.4l2.2 2.2L9 4.2' fill='none' stroke='%230e8a5f' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 12px no-repeat;
+            }
+        }
+    }
+
+    /* Bandeau de promesses produit */
+    &__stats {
+        max-width: 1120px;
+        margin: 56px auto 0;
+        width: 100%;
+        padding: 0 32px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 18px;
+    }
+    &__stat {
+        background: #fff;
+        border: 1px solid var(--cst-border);
+        border-radius: 16px;
+        padding: 22px 24px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(18, 18, 66, 0.04);
+    }
+    &__stat-value {
+        display: block;
+        font-family: var(--cst-font-head);
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--cst-navy);
+        margin-bottom: 6px;
+    }
+    &__stat-label { font-size: 12.5px; line-height: 1.5; color: var(--cst-text-muted); }
+
+    &__features { padding: 72px 32px 72px; max-width: 1120px; margin: 0 auto; width: 100%; }
     &__steps { padding: 64px 32px 88px; max-width: 1120px; margin: 0 auto; width: 100%; }
 
     &__grid {
@@ -747,10 +851,21 @@ modern-layout {
         flex-wrap: wrap;
     }
 
+    @media (max-width: 960px) {
+        &__hero-inner { grid-template-columns: 1fr; gap: 36px; }
+        &__hero-copy { text-align: center; }
+        &__hero-copy .cst-landing__cta { justify-content: center; }
+        &__split { grid-template-columns: 1fr; gap: 32px; padding-top: 48px; }
+        &__split--reverse { direction: ltr; }
+        &__split .cst-landing__split-visual { order: -1; }
+    }
+
     @media (max-width: 640px) {
         &__nav { padding: 12px 16px; }
-        &__hero { padding: 56px 18px 72px; }
+        &__hero { padding: 48px 18px 64px; }
         &__band-inner { padding: 30px 24px; }
+        &__split { padding-left: 18px; padding-right: 18px; }
+        &__stats { padding: 0 18px; }
     }
 }
 
