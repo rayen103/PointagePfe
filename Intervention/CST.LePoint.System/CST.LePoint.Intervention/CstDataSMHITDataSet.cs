@@ -1,3 +1,0 @@
-﻿namespace CST.LePoint.Intervention
-{
-}
