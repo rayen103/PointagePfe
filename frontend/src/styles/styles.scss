@@ -551,7 +551,6 @@ modern-layout {
     color: var(--cst-text);
     display: flex;
     flex-direction: column;
-    overflow-x: hidden;
 
     &__nav {
         position: sticky;
