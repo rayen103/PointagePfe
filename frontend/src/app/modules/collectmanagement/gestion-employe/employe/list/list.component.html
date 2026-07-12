@@ -1,0 +1,111 @@
+<div class="cst-main" *transloco="let t">
+    <div class="cst-crumb">
+        <a routerLink="/fichier/employe">Gestion</a><span>/</span><b>{{ t('Employees') || 'Employés' }}</b>
+    </div>
+
+    <div class="cst-head">
+        <div>
+            <div class="cst-head__title">{{ t('Employees') || 'Employés' }}</div>
+            <div class="cst-head__sub">{{ employeslength ?? 0 }} employés</div>
+        </div>
+        <div class="cst-head__actions">
+            <button class="cst-btn cst-btn--ghost" type="button" (click)="SortChange()">
+                <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:arrow-down-tray'"></mat-icon>
+                {{ t('Export') || 'Exporter' }}
+            </button>
+            @if (hasActionPermission(FuseNavigationAction.Add)) {
+                <button class="cst-btn cst-btn--primary" routerLink="ajouter">
+                    <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                    {{ t('Add') || 'Ajouter' }}
+                </button>
+            }
+        </div>
+    </div>
+
+    <div class="cst-panel">
+        <!-- Filter and search bar -->
+        <div class="cst-filters">
+            <div class="cst-search">
+                <mat-icon [svgIcon]="'heroicons_outline:magnifying-glass'"></mat-icon>
+                <input [formControl]="searchInputControl" [placeholder]="t('Search') || 'Rechercher...'" autocomplete="off" />
+            </div>
+            <div class="cst-sort">
+                <button type="button" [class.is-on]="sortActive === 'matricule'"
+                        (click)="setSort('matricule', sortActive === 'matricule' && sortDirection === 'asc' ? 'desc' : 'asc')">
+                    {{ t('ID-Number') || 'Matricule' }}
+                    <span class="cst-sort__dir">{{ sortActive === 'matricule' ? (sortDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
+                </button>
+                <button type="button" [class.is-on]="sortActive === 'nom'"
+                        (click)="setSort('nom', sortActive === 'nom' && sortDirection === 'asc' ? 'desc' : 'asc')">
+                    {{ t('Name') || 'Nom' }}
+                    <span class="cst-sort__dir">{{ sortActive === 'nom' ? (sortDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
+                </button>
+            </div>
+            <div class="cst-filters__count">{{ employeslength ?? 0 }} résultats</div>
+        </div>
+
+        @if (isLoading) { <mat-progress-bar mode="indeterminate"></mat-progress-bar> }
+
+        <!-- Table -->
+        <div class="cst-tbl" style="--cols: 140px 1.5fr 1.2fr 1.2fr 110px 100px 100px 96px; --colmin: 960px">
+            <div class="cst-tbl__head">
+                <div>{{ t('ID-Number') || 'Matricule' }}</div>
+                <div>{{ t('Name') || 'Nom & Prénom' }}</div>
+                <div>{{ t('Circuit') || 'Circuit' }}</div>
+                <div>{{ t('Collection-Point') || 'Point Collecte' }}</div>
+                <div>{{ t('Bus') || 'Bus' }}</div>
+                <div>{{ t('Shift') || 'Shift' }}</div>
+                <div>{{ t('Status') || 'Statut' }}</div>
+                <div class="cst-tbl__end">Actions</div>
+            </div>
+
+            @if (employe$ | async; as employes) {
+                @if (employes.length > 0) {
+                    @for (employe of employes; track trackByFn($index, employe)) {
+                        <div class="cst-tbl__row">
+                            <div class="cst-strong cst-num">{{ employe.matricule || '—' }}</div>
+                            <div>{{ employe.nom }} {{ employe.prenom || '' }}</div>
+                            <div class="cst-mut">{{ employe.codeCircuit || '—' }}</div>
+                            <div class="cst-mut">{{ employe.codePointCollecte || '—' }}</div>
+                            <div class="cst-num cst-mut">{{ employe.codeBus || '—' }}</div>
+                            <div class="cst-num cst-mut">{{ employe.codeShift || '—' }}</div>
+                            <div>
+                                <span class="cst-pill" [ngClass]="employe.isActive ? 'cst-pill--ok' : 'cst-pill--off'">
+                                    {{ employe.isActive ? (t('Active') || 'ACTIF') : (t('Inactive') || 'INACTIF') }}
+                                </span>
+                            </div>
+                            <div class="cst-tbl__act">
+                                <button class="cst-round" type="button" [routerLink]="employe.employeId" [attr.aria-label]="t('Edit')">
+                                    <mat-icon [svgIcon]="'heroicons_outline:pencil-square'"></mat-icon>
+                                </button>
+                                @if (hasActionPermission(FuseNavigationAction.Delete)) {
+                                    <button class="cst-round cst-round--danger" type="button" (click)="deleteSelectedEmploye(employe)" [attr.aria-label]="t('Delete')">
+                                        <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    }
+                } @else {
+                    <div class="cst-tbl__empty">
+                        <div class="cst-tbl__empty-ic"><mat-icon [svgIcon]="'mat_outline:person'"></mat-icon></div>
+                        <div class="cst-tbl__empty-t">{{ t('No-employees-found') || 'Aucun employé trouvé' }}</div>
+                        <div class="cst-tbl__empty-s">Ajustez vos filtres ou créez un nouvel employé.</div>
+                    </div>
+                }
+            }
+        </div>
+
+        <!-- Pagination -->
+        <mat-paginator
+            class="cst-pager"
+            [ngClass]="{'pointer-events-none': isLoading}"
+            [length]="employeslength"
+            [pageIndex]="0"
+            [pageSize]="10"
+            [pageSizeOptions]="[5, 10, 25, 50, 100]"
+            [showFirstLastButtons]="true"
+            (page)="SortChange()">
+        </mat-paginator>
+    </div>
+</div>

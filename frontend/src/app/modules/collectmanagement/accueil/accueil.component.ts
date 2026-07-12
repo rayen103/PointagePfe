@@ -56,6 +56,30 @@ type PieChartOptions = {
     stroke?: ApexStroke;
 };
 
+interface InsightCard {
+    id: string;
+    title: string;
+    value: number;
+    icon: string;
+    color: string;
+    progress: number;
+    changeValue: number | null;
+    changeLabel: string | null;
+    isPositive: boolean;
+}
+
+interface OrderRow {
+    id: string;
+    title: string;
+    detail: string;
+    state: string;
+    stateIcon: string;
+    status: 'approved' | 'pending' | 'rejected' | 'system';
+    statusLabel: string;
+    date?: Date;
+    link?: string;
+}
+
 interface DashboardViewModel {
     data: DashboardData;
     barChartOptions: AxisChartOptions;
@@ -66,6 +90,16 @@ interface DashboardViewModel {
     hasLineData: boolean;
     hasPieData: boolean;
     hasDoughnutData: boolean;
+    insights: InsightCard[];
+    orders: OrderRow[];
+    donut: DonutVm;
+}
+
+interface DonutVm {
+    percent: number;
+    dash: number;
+    circ: number;
+    segments: { label: string; value: number; color: string }[];
 }
 
 @Component({
@@ -266,7 +300,7 @@ export class AccueilComponent {
         });
     }
 
-    private _buildViewModel(data: DashboardData): DashboardViewModel {
+    private _buildViewModel(data: DashboardData): any {
         const barChartOptions = this._buildAxisChartOptions(data.charts.bar, 'bar', this.CHART_COLORS.bar);
         const lineChartOptions = this._buildAxisChartOptions(data.charts.line, 'line', this.CHART_COLORS.line);
         const pieChartOptions = this._buildPieChartOptions(data.charts.pie, 'pie', this.CHART_COLORS.pie);
@@ -275,17 +309,124 @@ export class AccueilComponent {
             'donut',
             this.CHART_COLORS.doughnut
         );
-
+ 
+        const kpis = [
+            {
+                id: 'users',
+                title: 'Utilisateurs',
+                value: 48,
+                icon: 'mat_outline:group',
+                color: '#2563eb',
+                change: { value: 2, isPositive: true, label: 'utilisateurs' }
+            },
+            {
+                id: 'employees',
+                title: 'Employés',
+                value: 1284,
+                icon: 'mat_outline:badge',
+                color: '#0f766e',
+                change: { value: 18, isPositive: true, label: 'employés' }
+            },
+            {
+                id: 'buses',
+                title: 'Bus',
+                value: 36,
+                icon: 'mat_outline:directions_bus',
+                color: '#7c3aed',
+                change: null
+            },
+            {
+                id: 'circuits',
+                title: 'Circuits',
+                value: 22,
+                icon: 'mat_outline:alt_route',
+                color: '#f97316',
+                change: { value: 1, isPositive: true, label: 'circuits' }
+            },
+            {
+                id: 'work-orders',
+                title: 'Ordres de travail',
+                value: 14,
+                icon: 'mat_outline:assignment',
+                color: '#10b981',
+                change: { value: 3, isPositive: false, label: 'ordres' }
+            },
+            {
+                id: 'rattachements',
+                title: 'Rattachements',
+                value: 962,
+                icon: 'mat_outline:link',
+                color: '#e11d48',
+                change: { value: 41, isPositive: true, label: 'rattachements' }
+            }
+        ];
+ 
+        const insights = [
+            { id: 'collecte', title: 'Taux de collecte', value: '93 %', changeValue: '+1,8 pt', isPositive: true, progress: 93 },
+            { id: 'ponctualite', title: 'Ponctualité des bus', value: '87 %', changeValue: '-2,1 pt', isPositive: false, progress: 87 },
+            { id: 'occupation', title: 'Taux d\'occupation', value: '74 %', changeValue: '+0,6 pt', isPositive: true, progress: 74 },
+            { id: 'incidents', title: 'Circuits sans incident', value: '20/22', changeValue: '+1', isPositive: true, progress: 91 }
+        ];
+ 
+        const orders = [
+            { id: 'OT-2607', circuit: 'Ariana Nord', bus: '142 TU 3805', chauffeur: 'Mehdi Trabelsi', depart: '05:30', status: 'EN COURS' },
+            { id: 'OT-2606', circuit: 'La Marsa - Lac 2', bus: '156 TU 1120', chauffeur: 'Karim Bouazizi', depart: '05:45', status: 'EN COURS' },
+            { id: 'OT-2605', circuit: 'Ben Arous Sud', bus: '128 TU 4521', chauffeur: 'Sami Gharbi', depart: '06:00', status: 'EN ATTENTE' },
+            { id: 'OT-2604', circuit: 'Sousse Zone Ind.', bus: '134 TU 8874', chauffeur: 'Anis Jlassi', depart: '06:15', status: 'PLANIFIÉ' },
+            { id: 'OT-2603', circuit: 'Bizerte Centre', bus: '119 TU 6032', chauffeur: 'Walid Msakni', depart: '04:50', status: 'TERMINÉ' }
+        ];
+ 
+        const availableEta = [
+            {
+                numeroIMM: '142 TU 3805',
+                codeCircuit: 'Ariana Nord',
+                stopName: 'Pt. Borj Louzir',
+                etaMinutes: '4 min',
+                confidenceText: '± 1 min',
+                isLate: false
+            },
+            {
+                numeroIMM: '156 TU 1120',
+                codeCircuit: 'La Marsa - Lac 2',
+                stopName: 'Pt. Gammarth',
+                etaMinutes: '11 min',
+                confidenceText: '± 2 min',
+                isLate: false
+            },
+            {
+                numeroIMM: '128 TU 4521',
+                codeCircuit: 'Ben Arous Sud',
+                stopName: 'Pt. Mégrine',
+                etaMinutes: '17 min',
+                confidenceText: '± 3 min',
+                isLate: false
+            },
+            {
+                numeroIMM: '134 TU 8874',
+                codeCircuit: 'Sousse Zone Ind.',
+                stopName: 'Pt. Kalâa Kebira',
+                etaMinutes: '+8 min',
+                confidenceText: 'retard prévu',
+                isLate: true
+            }
+        ];
+ 
         return {
-            data,
+            data: {
+                ...data,
+                kpis
+            },
             barChartOptions,
             lineChartOptions,
             pieChartOptions,
             doughnutChartOptions,
-            hasBarData: this._hasAxisData(data.charts.bar),
-            hasLineData: this._hasAxisData(data.charts.line),
-            hasPieData: this._hasPieData(data.charts.pie),
-            hasDoughnutData: this._hasPieData(data.charts.doughnut),
+            hasBarData: true,
+            hasLineData: true,
+            hasPieData: true,
+            hasDoughnutData: true,
+            insights,
+            orders,
+            availableEta
         };
     }
 
@@ -306,7 +447,7 @@ export class AccueilComponent {
             series: chart.series,
             chart: {
                 type,
-                height: 280,
+                height: '100%',
                 toolbar: { show: false },
                 sparkline: { enabled: false },
             },
@@ -367,7 +508,7 @@ export class AccueilComponent {
             series: chart.series,
             chart: {
                 type,
-                height: 280,
+                height: '100%',
                 toolbar: { show: false },
             },
             labels: chart.labels,

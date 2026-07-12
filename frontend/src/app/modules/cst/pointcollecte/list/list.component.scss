@@ -1,15 +1,72 @@
-.entity-card {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-  position: relative;
-  overflow: hidden;
+/* =====================================================================
+   Point de collecte — list + map with multi-selection (CST design)
+   ===================================================================== */
+:host { display: block; width: 100%; min-height: 100%; }
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #f43f5e, #ec4899);
-  }
+.pc-split {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: 16px;
+    height: calc(100dvh - 215px);
+    min-height: 520px;
+}
+@media (max-width: 1100px) {
+    .pc-split { grid-template-columns: 1fr; height: auto; }
+    .pc-map { height: 420px; }
+}
+
+/* ---------- List panel ---------- */
+.pc-list { display: flex; flex-direction: column; min-height: 0; }
+.pc-list__bar { padding: 14px 16px; border-bottom: 1px solid var(--cst-border-soft); }
+.pc-list__tools {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px; border-bottom: 1px solid var(--cst-border-line); background: var(--cst-surface-2);
+}
+.pc-link {
+    display: inline-flex; align-items: center; gap: 6px; border: none; background: transparent;
+    font-family: var(--cst-font); font-size: 12px; font-weight: 700; color: var(--cst-blue-strong); cursor: pointer;
+    mat-icon { color: var(--cst-blue-strong); }
+    &:hover { color: var(--cst-navy); }
+}
+.pc-list__count { font-size: 12px; color: var(--cst-text-hint); }
+.pc-list__scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+
+.pc-item {
+    display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+    border-bottom: 1px solid var(--cst-border-soft); border-left: 3px solid transparent;
+    cursor: pointer; transition: background 0.15s ease, border-color 0.15s ease;
+    &:hover { background: #fbfdff; }
+    &.is-selected { background: var(--cst-blue-soft); border-left-color: var(--cst-blue); }
+}
+.pc-check {
+    width: 20px; height: 20px; flex: none; border-radius: 6px;
+    border: 1.5px solid var(--cst-text-disabled); background: #fff;
+    display: inline-flex; align-items: center; justify-content: center; transition: background 0.15s ease, border-color 0.15s ease;
+    svg { width: 12px; height: 12px; opacity: 0; transition: opacity 0.15s ease; }
+    &.on { background: var(--cst-blue); border-color: var(--cst-blue); svg { opacity: 1; } }
+}
+.pc-item__main { flex: 1 1 auto; min-width: 0; }
+.pc-item__top { display: flex; align-items: center; gap: 7px; }
+.pc-item__code { font-size: 14px; font-weight: 700; color: var(--cst-navy); font-variant-numeric: tabular-nums; }
+.pc-item__pin { width: 14px !important; height: 14px !important; font-size: 14px !important; color: var(--cst-blue) !important; }
+.pc-item__nogeo { font-size: 10px; font-weight: 700; color: var(--cst-warn); background: var(--cst-warn-bg); border-radius: 999px; padding: 1px 7px; }
+.pc-item__lib { font-size: 12.5px; color: var(--cst-text-2); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-item__meta { font-size: 11px; color: var(--cst-text-hint); margin-top: 2px; }
+.pc-item__side { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex: none; }
+.pc-item__act { display: flex; gap: 6px; }
+
+/* ---------- Map panel ---------- */
+.pc-map { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.pc-map__head {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 14px 18px; border-bottom: 1px solid var(--cst-border-soft); background: var(--cst-surface-2);
+}
+.pc-map__badge {
+    font-size: 11px; font-weight: 700; color: var(--cst-blue-strong);
+    background: var(--cst-blue-soft); border-radius: 999px; padding: 4px 11px;
+}
+.pc-map__body { flex: 1 1 auto; min-height: 0; position: relative; }
+.pc-map__empty {
+    position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; text-align: center; padding: 24px; color: var(--cst-text-hint);
 }

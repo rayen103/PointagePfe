@@ -102,7 +102,7 @@ export class ChauffeurService {
     }
 
     GetChauffeurById(id: string): Observable<Chauffeur> {
-        return this._apiservice.Get<Chauffeur>(`chauffeur/${id}`)
+        return this._apiservice.Get<Chauffeur>(`chauffeur/${id}/one`)
             .pipe(
                 tap((chauffeur) => {
                     this._chauffeur.next(chauffeur.data);

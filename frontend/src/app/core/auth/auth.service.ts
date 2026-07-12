@@ -90,7 +90,7 @@ export class AuthService {
      *
      * @param credentials
      */
-    signIn(credentials: { login: string; password: string; societeId: string; numeroChantier: string }): Observable<any> {
+    signIn(credentials: { login: string; password: string; societeId?: string; numeroChantier?: string }): Observable<any> {
         // Throw error, if the user is already logged in
         if ( this._authenticated )
         {
@@ -104,26 +104,63 @@ export class AuthService {
                     return of(response);
                 }
 
-                // Store the access token in the local storage
-                this.accessToken = response.data.token;
-
-                this.utilisateurId = response.data.utilisateurId;
-
-                console.log('user:',this.utilisateurId);
-
-                this.societeId = response.data.societeId;
-
-
-                // Set the authenticated flag to true
-                this._authenticated = true;
-
-                // Store the user on the user service
-                this._userService.user = response.data;
+                this.storeSession(response.data);
 
                 // Return a new observable with the response
                 return of(response);
             })
         );
+    }
+
+    /**
+     * Store the authenticated session (token + user) — shared by signIn and verifyEmail (auto-login).
+     */
+    private storeSession(user: User): void {
+        this.accessToken = user.token;
+        this.utilisateurId = user.utilisateurId;
+        this.societeId = user.societeId;
+        this._authenticated = true;
+        this._userService.user = user;
+    }
+
+    /**
+     * Register a new company (self-serve signup). A verification code is emailed.
+     */
+    registerCompany(payload: {
+        nomSociete: string;
+        nom: string;
+        prenom: string;
+        email: string;
+        password: string;
+    }): Observable<any> {
+        return this._apiService.SilentPost('authentication/v1/register', payload);
+    }
+
+    /**
+     * Verify the emailed code. On success the backend returns a full
+     * authentication response: the session is stored, i.e. auto-login.
+     */
+    verifyEmail(email: string, code: string): Observable<any> {
+        return this._apiService
+            .SilentPost<{ success: boolean; message?: string; authentication?: User }>(
+                'authentication/v1/verify-email',
+                { email, code }
+            )
+            .pipe(
+                switchMap((response) => {
+                    if (response?.success && response.data?.authentication) {
+                        this.storeSession(response.data.authentication);
+                    }
+                    return of(response);
+                })
+            );
+    }
+
+    /**
+     * Resend the verification code (60s cooldown server-side).
+     */
+    resendCode(email: string): Observable<any> {
+        return this._apiService.SilentPost('authentication/v1/resend-code', { email });
     }
 
     /**

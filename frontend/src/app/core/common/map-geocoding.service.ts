@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, catchError, map, of } from 'rxjs';
+import { Observable, catchError, map, of, shareReplay } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import * as L from 'leaflet';
 
@@ -25,6 +25,9 @@ interface NominatimResponseItem {
     providedIn: 'root',
 })
 export class MapGeocodingService {
+    /** Cache of resolved addresses — avoids re-hitting Nominatim for the same query. */
+    private readonly _addressCache = new Map<string, Observable<GeocodingResult | null>>();
+
     constructor(private _httpClient: HttpClient) {}
 
     searchAddress(address: string): Observable<GeocodingResult | null> {
@@ -33,6 +36,20 @@ export class MapGeocodingService {
             return of(null);
         }
 
+        const cacheKey = normalizedAddress.toLowerCase();
+        const cached = this._addressCache.get(cacheKey);
+        if (cached) {
+            return cached;
+        }
+
+        const request$ = this.fetchAddress(normalizedAddress).pipe(
+            shareReplay({ bufferSize: 1, refCount: false })
+        );
+        this._addressCache.set(cacheKey, request$);
+        return request$;
+    }
+
+    private fetchAddress(normalizedAddress: string): Observable<GeocodingResult | null> {
         const params = new HttpParams()
             .set('q', normalizedAddress)
             .set('format', 'jsonv2')

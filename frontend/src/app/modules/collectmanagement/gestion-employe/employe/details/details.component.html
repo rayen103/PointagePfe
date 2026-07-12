@@ -1,0 +1,272 @@
+<div class="cst-form-page" *transloco="let t">
+    <form class="cst-form-wrap" [formGroup]="form" #employeFormDirective="ngForm">
+
+        <!-- Breadcrumb -->
+        <div class="cst-crumb">
+            <a routerLink="/fichier/employe">Gestion</a><span>/</span><a routerLink="/fichier/employe">{{ t('Employees') || 'Employés' }}</a><span>/</span>
+            <b>{{ isNew ? (t('Add-Employee') || 'Ajouter un employé') : (employe?.matricule || t('Edit-Employee')) }}</b>
+        </div>
+
+        <!-- Header line -->
+        <div class="cst-form-topline">
+            <div class="cst-form-id">
+                <div class="cst-form-id__ic">
+                    <mat-icon [svgIcon]="'mat_outline:person'"></mat-icon>
+                </div>
+                <div>
+                    <div class="cst-form-id__title">
+                        <span>{{ isNew ? (t('Add-Employee') || 'Nouveau employé') : (employe?.nom || '') + ' ' + (employe?.prenom || '') }}</span>
+                        @if (!isNew) {
+                            <span class="cst-pill" [ngClass]="form.get('isActive')?.value ? 'cst-pill--ok' : 'cst-pill--off'">
+                                {{ form.get('isActive')?.value ? (t('Active') || 'ACTIF') : (t('Inactive') || 'INACTIF') }}
+                            </span>
+                        }
+                    </div>
+                    <div class="cst-form-id__meta">
+                        {{ isNew ? 'Créer une fiche employé' : ('Matricule: ' + (employe?.matricule || '—')) }}
+                    </div>
+                </div>
+            </div>
+            <div class="cst-head__actions">
+                <button class="cst-btn cst-btn--ghost" type="button" (click)="onBackdropClicked()">{{ t('Cancel') || 'Annuler' }}</button>
+                <button class="cst-btn cst-btn--primary" type="button" (click)="save()" [disabled]="isLoading">
+                    @if (isLoading) { <span class="cc-spin"></span> }
+                    {{ t('Save') || 'Enregistrer' }}
+                </button>
+            </div>
+        </div>
+
+        @if (flashMessage) {
+            <div class="cst-form-flash" [class.is-ok]="flashMessage === 'success'" [class.is-err]="flashMessage === 'error'">
+                {{ flashMessage === 'success' ? (t('Successfully-saved') || 'Enregistré avec succès') : (t('Something-went-wrong') || 'Veuillez corriger les erreurs du formulaire') }}
+            </div>
+        }
+
+        <div class="cst-form-card">
+            <!-- Section 1: Informations Générales -->
+            <div>
+                <div class="cst-form-sec__title">{{ t('General-Information') || 'Informations générales' }}</div>
+                <div class="cst-form-sec__sub">Données d'identité et profil de l'employé</div>
+                <div class="cst-form-grid">
+                    
+                    <!-- Matricule (ID-Number) -->
+                    <div class="cst-field">
+                        <label>{{ t('ID-Number') || 'Matricule' }} <span style="color:var(--cst-red)">*</span></label>
+                        <input class="cst-input" [class.is-err]="form.get('matricule')?.invalid && (form.get('matricule')?.touched || employeFormDirective.submitted)"
+                               formControlName="matricule" [placeholder]="t('Enter-matricule') || 'Ex: EMP-103'" />
+                        @if (form.get('matricule')?.invalid && (form.get('matricule')?.touched || employeFormDirective.submitted)) {
+                            <div class="cst-field__err">
+                                <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                {{ t('Matricule-required') || 'Le matricule est requis' }}
+                            </div>
+                        }
+                    </div>
+
+                    <!-- RFID -->
+                    <div class="cst-field">
+                        <label>{{ t('RFID') || 'RFID' }}</label>
+                        <input class="cst-input" formControlName="rfid" [placeholder]="t('Enter-rfid') || 'Ex: RFID-88219'" />
+                    </div>
+
+                    <!-- Nom -->
+                    <div class="cst-field">
+                        <label>{{ t('Name') || 'Nom' }} <span style="color:var(--cst-red)">*</span></label>
+                        <input class="cst-input" [class.is-err]="form.get('nom')?.invalid && (form.get('nom')?.touched || employeFormDirective.submitted)"
+                               formControlName="nom" [placeholder]="t('Enter-name') || 'Ex: Ben Ali'" />
+                        @if (form.get('nom')?.invalid && (form.get('nom')?.touched || employeFormDirective.submitted)) {
+                            <div class="cst-field__err">
+                                <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                {{ t('Name-required') || 'Le nom est requis' }}
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Prénom -->
+                    <div class="cst-field">
+                        <label>{{ t('First-Name') || 'Prénom' }} <span style="color:var(--cst-red)">*</span></label>
+                        <input class="cst-input" [class.is-err]="form.get('prenom')?.invalid && (form.get('prenom')?.touched || employeFormDirective.submitted)"
+                               formControlName="prenom" [placeholder]="t('Enter-firstname') || 'Ex: Mohamed'" />
+                        @if (form.get('prenom')?.invalid && (form.get('prenom')?.touched || employeFormDirective.submitted)) {
+                            <div class="cst-field__err">
+                                <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                {{ t('Firstname-required') || 'Le prénom est requis' }}
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Société (Autocomplete) -->
+                    <div class="cst-field" style="grid-column: span 2">
+                        <label>{{ t('Company') || 'Société' }} <span style="color:var(--cst-red)">*</span></label>
+                        <input class="cst-input" type="text" formControlName="societeId" [matAutocomplete]="autoSociete"
+                               [class.is-err]="form.get('societeId')?.invalid && (form.get('societeId')?.touched || employeFormDirective.submitted)"
+                               [placeholder]="t('Select-company') || 'Rechercher une société...'" />
+                        <mat-autocomplete #autoSociete="matAutocomplete" [displayWith]="displaySociete">
+                            @for (soc of filteredSocietes$ | async; track soc.societeId) {
+                                <mat-option [value]="soc.societeId">{{ soc.nom }}</mat-option>
+                            }
+                        </mat-autocomplete>
+                        @if (form.get('societeId')?.invalid && (form.get('societeId')?.touched || employeFormDirective.submitted)) {
+                            <div class="cst-field__err">
+                                <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                {{ t('Company-required') || 'La société est requise' }}
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="cst-divider"></div>
+
+            <!-- Section 2: Affectation & Logistique -->
+            <div>
+                <div class="cst-form-sec__title">{{ t('Assignment') || 'Affectation & Logistique' }}</div>
+                <div class="cst-form-sec__sub">Attributions de transport et horaires de travail</div>
+                <div class="cst-form-grid">
+                    
+                    <!-- Circuit -->
+                    <div class="cst-field">
+                        <label>{{ t('Circuit') || 'Circuit' }}</label>
+                        <div class="cst-select">
+                            <select formControlName="codeCircuit">
+                                <option value="">--</option>
+                                @for (circuit of getFilteredCircuits(); track circuit.circuitId) {
+                                    <option [value]="circuit.codeCircuit">
+                                        {{ circuit.codeCircuit }}@if (circuit.libelleCircuit) { — {{ circuit.libelleCircuit }} }
+                                    </option>
+                                }
+                                @if (form.get('codeCircuit')?.value && !hasExistingCircuitOption(form.get('codeCircuit')?.value)) {
+                                    <option [value]="form.get('codeCircuit')?.value">{{ form.get('codeCircuit')?.value }}</option>
+                                }
+                            </select>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
+                        </div>
+                    </div>
+
+                    <!-- Point Collecte -->
+                    <div class="cst-field">
+                        <label>{{ t('Collection-Point') || 'Point de collecte' }}</label>
+                        <div class="cst-select">
+                            <select formControlName="codePointCollecte">
+                                <option value="">--</option>
+                                @for (point of getFilteredPointsCollecte(); track point.pointCollecteId) {
+                                    <option [value]="point.codePointCollecte">
+                                        {{ point.codePointCollecte }}@if (point.libellePointCollecte) { — {{ point.libellePointCollecte }} }
+                                    </option>
+                                }
+                                @if (form.get('codePointCollecte')?.value && !hasExistingPointOption(form.get('codePointCollecte')?.value)) {
+                                    <option [value]="form.get('codePointCollecte')?.value">{{ form.get('codePointCollecte')?.value }}</option>
+                                }
+                            </select>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
+                        </div>
+                    </div>
+
+                    <!-- Bus -->
+                    <div class="cst-field">
+                        <label>{{ t('Bus') || 'Bus' }}</label>
+                        <div class="cst-select">
+                            <select formControlName="codeBus">
+                                <option value="">--</option>
+                                @for (bus of getFilteredBuses(); track bus.busId) {
+                                    <option [value]="bus.numeroIMM">
+                                        {{ bus.numeroIMM }}@if (bus.modelBus) { — {{ bus.modelBus }} }
+                                    </option>
+                                }
+                                @if (form.get('codeBus')?.value && !hasExistingBusOption(form.get('codeBus')?.value)) {
+                                    <option [value]="form.get('codeBus')?.value">{{ form.get('codeBus')?.value }}</option>
+                                }
+                            </select>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
+                        </div>
+                    </div>
+
+                    <!-- Shift -->
+                    <div class="cst-field">
+                        <label>{{ t('Shift') || 'Shift' }}</label>
+                        <div class="cst-select">
+                            <select formControlName="codeShift">
+                                <option value="">--</option>
+                                @for (shift of getFilteredShifts(); track shift.shiftId) {
+                                    <option [value]="shift.codeShift">
+                                        {{ shift.codeShift }}@if (shift.libelleShift) { — {{ shift.libelleShift }} }
+                                    </option>
+                                }
+                                @if (form.get('codeShift')?.value && !hasExistingShiftOption(form.get('codeShift')?.value)) {
+                                    <option [value]="form.get('codeShift')?.value">{{ form.get('codeShift')?.value }}</option>
+                                }
+                            </select>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cst-divider"></div>
+
+            <!-- Section 3: Localisation -->
+            <div>
+                <div class="cst-form-sec__title">{{ t('Location') || 'Localisation' }}</div>
+                <div class="cst-form-sec__sub">Adresse de résidence et coordonnées géographiques</div>
+                <div class="cst-form-grid">
+                    
+                    <!-- Adresse -->
+                    <div class="cst-field" style="grid-column: span 3">
+                        <label>{{ t('Address') || 'Adresse' }}</label>
+                        <input class="cst-input" formControlName="adresse" [placeholder]="t('Enter-address') || 'Ex: 15 Rue de Tunis, Ariana'" />
+                    </div>
+
+                    <!-- Gouvernorat -->
+                    <div class="cst-field">
+                        <label>{{ t('Governorate') || 'Gouvernorat' }}</label>
+                        <div class="cst-select">
+                            <select formControlName="codeGouvernorat">
+                                <option value="">--</option>
+                                @for (gouv of gouvernorats; track gouv.gouvernoratId) {
+                                    <option [value]="gouv.codeGouvernorat">{{ gouv.libelleGouvernorat }}</option>
+                                }
+                                @if (form.get('codeGouvernorat')?.value && !hasExistingGouvOption(form.get('codeGouvernorat')?.value)) {
+                                    <option [value]="form.get('codeGouvernorat')?.value">{{ form.get('codeGouvernorat')?.value }}</option>
+                                }
+                            </select>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
+                        </div>
+                    </div>
+
+                    <!-- Région -->
+                    <div class="cst-field">
+                        <label>{{ t('Region') || 'Région' }}</label>
+                        <div class="cst-select">
+                            <select formControlName="codeRegion">
+                                <option value="">--</option>
+                                @for (reg of regions; track reg.regionId) {
+                                    <option [value]="reg.codeRegion">{{ reg.libelleRegion }}</option>
+                                }
+                                @if (form.get('codeRegion')?.value && !hasExistingRegionOption(form.get('codeRegion')?.value)) {
+                                    <option [value]="form.get('codeRegion')?.value">{{ form.get('codeRegion')?.value }}</option>
+                                }
+                            </select>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cst-divider"></div>
+
+            <!-- Section 4: Statut de l'employé -->
+            <div class="cst-form-statusrow">
+                <div>
+                    <div class="cst-form-sec__title" style="margin-bottom:3px">{{ t('Employee-Status') || "Statut de l'employé" }}</div>
+                    <div class="cst-form-sec__sub" style="margin-bottom:0">Un employé inactif ne sera pas inclus dans les tournées de pointage de son équipe</div>
+                </div>
+                <div>
+                    <label class="cst-toggle">
+                        <span [ngClass]="form.get('isActive')?.value ? 'cst-toggle__on' : 'cst-toggle__off'">{{ form.get('isActive')?.value ? (t('Active') || 'Actif') : (t('Inactive') || 'Inactif') }}</span>
+                        <input type="checkbox" formControlName="isActive" />
+                        <span class="cst-toggle__track"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

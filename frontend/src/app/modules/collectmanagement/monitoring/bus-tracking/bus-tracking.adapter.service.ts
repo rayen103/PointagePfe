@@ -18,6 +18,8 @@ export interface BusTrackingItem {
     currentOccupancy?: number;
     lastPositionAt?: string;
     lastOccupancyUpdateAt?: string;
+    codeCircuit?: string;
+    codeChauffeur?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -47,6 +49,8 @@ export class BusTrackingAdapterService {
                 lastPositionAt: runtime?.lastPositionAt ?? bus.lastPositionAt,
                 lastOccupancyUpdateAt:
                     bus.lastOccupancyUpdateAt ?? runtime?.lastPositionAt,
+                codeCircuit: bus.codeCircuit,
+                codeChauffeur: bus.codeChauffeur,
             };
         });
     }
@@ -73,6 +77,8 @@ export class BusTrackingAdapterService {
                 lastPositionAt: runtime.lastPositionAt ?? item.lastPositionAt,
                 lastOccupancyUpdateAt:
                     runtime.lastOccupancyUpdateAt ?? item.lastOccupancyUpdateAt,
+                codeCircuit: item.codeCircuit,
+                codeChauffeur: item.codeChauffeur,
             };
         });
     }

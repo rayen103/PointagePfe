@@ -16,7 +16,7 @@ fuse-horizontal-navigation {
             }
 
             .fuse-horizontal-navigation-item-wrapper {
-                border-radius: 4px;
+                border-radius: 9999px !important;
                 overflow: hidden;
 
                 .fuse-horizontal-navigation-item {
@@ -36,7 +36,7 @@ fuse-horizontal-navigation {
             .fuse-horizontal-navigation-item-active,
             .fuse-horizontal-navigation-item-active-forced {
                 .fuse-horizontal-navigation-item-title {
-                    @apply text-primary #{'!important'};
+                    color: #fff !important;
                 }
 
                 .fuse-horizontal-navigation-item-subtitle {
@@ -48,7 +48,7 @@ fuse-horizontal-navigation {
                 }
 
                 .fuse-horizontal-navigation-item-icon {
-                    @apply text-primary #{'!important'};
+                    color: #fff !important;
                 }
             }
         }

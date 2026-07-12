@@ -1,132 +1,65 @@
-<div class="absolute inset-0 min-w-0 px-4 sm:px-6 md:px-8 overflow-x-hidden overflow-y-auto flex flex-col flex-auto bg-default" *transloco="let t">
-    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-4 sm:py-8 px-4 sm:px-6 md:px-8">
-        <div class="text-2xl sm:text-4xl font-extrabold tracking-tight">{{ t('Chantiers') }}</div>
-        <div class="flex flex-col sm:flex-row items-end sm:items-center w-full sm:w-auto mt-4 sm:mt-0 sm:ml-4">
-            <mat-form-field class="fuse-mat-dense w-full sm:min-w-64" [subscriptSizing]="'dynamic'">
-                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'search'"></mat-icon>
-                <input matInput [formControl]="searchInputControl" [autocomplete]="'off'" [placeholder]="t('Search')">
-            </mat-form-field>
-            @if(hasActionPermission(FuseNavigationAction.Add)){
-            <button class="btn-add mt-2 sm:mt-0 sm:ml-4 w-full sm:w-auto" mat-flat-button [color]="'primary'" routerLink="ajouter">
-                <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-                <span class="ml-2 mr-1">{{ t('Add') }}</span>
-            </button>}
+<div class="cst-main" *transloco="let t">
+    <div class="cst-crumb"><a routerLink="/fichier/bus">Gestion</a><span>/</span><b>{{ t('Chantiers') || 'Chantiers' }}</b></div>
+
+    <div class="cst-head">
+        <div>
+            <div class="cst-head__title">{{ t('Chantiers') || 'Chantiers' }}</div>
+            <div class="cst-head__sub">{{ chantiersLength ?? 0 }} chantiers</div>
+        </div>
+        <div class="cst-head__actions">
+            <button class="cst-btn cst-btn--ghost" type="button" (click)="SortChange()">
+                <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:arrow-down-tray'"></mat-icon> Exporter
+            </button>
+            @if (hasActionPermission(FuseNavigationAction.Add)) {
+                <button class="cst-btn cst-btn--primary" routerLink="ajouter">
+                    <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:plus'"></mat-icon> {{ t('Add') }}
+                </button>
+            }
         </div>
     </div>
-    <div class="flex flex-auto">
-        <div class="relative flex flex-col flex-auto sm:mb-18 overflow-hidden px-4 sm:px-8 pt-4 sm:pt-8 rounded-lg bg-card">
-            @if(chantiers$ | async; as chantiers){
-                @if(chantiers.length > 0){
-                    <div class="grid gap-4 pb-20">
-                        <fieldset class="flex flex-wrap items-center gap-2 mb-6">
-                            <legend class="text-sm text-hint">{{ t('Sort') }}</legend>
-                            <button
-                                mat-stroked-button
-                                type="button"
-                                [attr.aria-label]="t('Sort-by-numero-ascending')"
-                                [disabled]="sortActive === 'numeroChantier' && sortDirection === 'asc'"
-                                [ngClass]="{'bg-primary text-white': sortActive === 'numeroChantier' && sortDirection === 'asc'}"
-                                (click)="setSort('numeroChantier','asc')">
-                                {{ t('NumeroChantier') }} ↑
-                            </button>
-                            <button
-                                mat-stroked-button
-                                type="button"
-                                [attr.aria-label]="t('Sort-by-numero-descending')"
-                                [disabled]="sortActive === 'numeroChantier' && sortDirection === 'desc'"
-                                [ngClass]="{'bg-primary text-white': sortActive === 'numeroChantier' && sortDirection === 'desc'}"
-                                (click)="setSort('numeroChantier','desc')">
-                                {{ t('NumeroChantier') }} ↓
-                            </button>
-                            <button
-                                mat-stroked-button
-                                type="button"
-                                [attr.aria-label]="t('Sort-by-libelle-ascending')"
-                                [disabled]="sortActive === 'libelleChantier' && sortDirection === 'asc'"
-                                [ngClass]="{'bg-primary text-white': sortActive === 'libelleChantier' && sortDirection === 'asc'}"
-                                (click)="setSort('libelleChantier','asc')">
-                                {{ t('Libelle') }} ↑
-                            </button>
-                            <button
-                                mat-stroked-button
-                                type="button"
-                                [attr.aria-label]="t('Sort-by-libelle-descending')"
-                                [disabled]="sortActive === 'libelleChantier' && sortDirection === 'desc'"
-                                [ngClass]="{'bg-primary text-white': sortActive === 'libelleChantier' && sortDirection === 'desc'}"
-                                (click)="setSort('libelleChantier','desc')">
-                                {{ t('Libelle') }} ↓
-                            </button>
-                        </fieldset>
 
-                        <!-- Cards Grid -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
-                        @for(chantier of chantiers; track chantier.chantierId || $index){
-                            <div class="entity-card bg-card p-6 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                                <div class="flex items-start justify-between gap-4 mb-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg">
-                                            <mat-icon class="text-white text-2xl" svgIcon="mat_outline:apartment"></mat-icon>
-                                        </div>
-                                        <div>
-                                            <div class="font-bold text-lg">{{chantier.numeroChantier}}</div>
-                                            <div class="text-sm text-gray-500 dark:text-gray-400">{{chantier.libelleChantier || '-'}}</div>
-                                        </div>
-                                    </div>
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
-                                              [ngClass]="chantier.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'">
-                                        {{chantier.isActive ? t('Active') : t('Inactive')}}
-                                    </span>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4 text-sm mb-4">
-                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
-                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:person"></mat-icon>
-                                            Client
-                                        </div>
-                                        <div class="font-semibold">{{chantier.codeClient || '-'}}</div>
-                                    </div>
-                                    <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                        <div class="text-gray-500 dark:text-gray-400 text-xs mb-1 flex items-center gap-1">
-                                            <mat-icon class="icon-size-4" svgIcon="mat_outline:description"></mat-icon>
-                                            Nature
-                                        </div>
-                                        <div class="font-semibold">{{chantier.nature || '-'}}</div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-700">
-                                    @if(hasActionPermission(FuseNavigationAction.Edit)){
-                                    <a mat-icon-button [routerLink]="chantier.chantierId" class="!w-8 !h-8">
-                                        <mat-icon class="text-gray-500" svgIcon="heroicons_outline:pencil-square"></mat-icon>
-                                    </a>}
-                                    @if(hasActionPermission(FuseNavigationAction.Delete)){
-                                    <button mat-icon-button color="warn" (click)="deleteChantier(chantier)" class="!w-8 !h-8">
-                                        <mat-icon svgIcon="heroicons_outline:trash"></mat-icon>
-                                    </button>}
-                                </div>
+    <div class="cst-panel">
+        <div class="cst-filters">
+            <div class="cst-search">
+                <mat-icon [svgIcon]="'heroicons_outline:magnifying-glass'"></mat-icon>
+                <input [formControl]="searchInputControl" [placeholder]="t('Search')" autocomplete="off" />
+            </div>
+            <div class="cst-filters__count">{{ chantiersLength ?? 0 }} résultats</div>
+        </div>
+
+        @if (isLoading) { <mat-progress-bar mode="indeterminate"></mat-progress-bar> }
+
+        <div class="cst-tbl" style="--cols: 150px 1.6fr 1.2fr 130px 120px 96px; --colmin: 880px">
+            <div class="cst-tbl__head">
+                <div>N° {{ t('Chantier') || 'Chantier' }}</div><div>{{ t('Libelle') || 'Libellé' }}</div><div>{{ t('Client') || 'Client' }}</div><div>{{ t('Nature') || 'Nature' }}</div><div>{{ t('Status') || 'Statut' }}</div><div class="cst-tbl__end">Actions</div>
+            </div>
+            @if (chantiers$ | async; as chantiers) {
+                @if (chantiers.length > 0) {
+                    @for (chantier of chantiers; track chantier.chantierId || $index) {
+                        <div class="cst-tbl__row">
+                            <div class="cst-strong cst-num">{{ chantier.numeroChantier || '—' }}</div>
+                            <div>{{ chantier.libelleChantier || '—' }}</div>
+                            <div class="cst-mut">{{ chantier.codeClient || '—' }}</div>
+                            <div>{{ chantier.nature || '—' }}</div>
+                            <div><span class="cst-pill" [ngClass]="chantier.isActive ? 'cst-pill--ok' : 'cst-pill--off'">{{ chantier.isActive ? (t('Active') || 'ACTIF') : (t('Inactive') || 'INACTIF') }}</span></div>
+                            <div class="cst-tbl__act">
+                                <button class="cst-round" type="button" [routerLink]="chantier.chantierId"><mat-icon [svgIcon]="'heroicons_outline:pencil-square'"></mat-icon></button>
+                                @if (hasActionPermission(FuseNavigationAction.Delete)) {
+                                    <button class="cst-round cst-round--danger" type="button" (click)="deleteChantier(chantier)"><mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon></button>
+                                }
                             </div>
-                        }
                         </div>
-
-                        <!-- Paginator -->
-                        <mat-paginator
-                            class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
-                            [ngClass]="{'pointer-events-none': isLoading}"
-                            [length]="chantiersLength"
-                            [pageIndex]="0"
-                            [pageSize]="10"
-                            [pageSizeOptions]="[5, 10, 25, 100]"
-                            [showFirstLastButtons]="true"
-                            (page)="SortChange()">
-                        </mat-paginator>
-                    </div>
+                    }
                 } @else {
-                    <div class="flex flex-auto flex-col items-center justify-center bg-gray-50 dark:bg-transparent">
-                        <mat-icon class="icon-size-24" [svgIcon]="'heroicons_outline:building-office-2'"></mat-icon>
-                        <div class="mt-4 text-2xl font-semibold tracking-tight text-secondary">{{ t('No-chantier-found') }}</div>
+                    <div class="cst-tbl__empty">
+                        <div class="cst-tbl__empty-ic"><mat-icon [svgIcon]="'mat_outline:construction'"></mat-icon></div>
+                        <div class="cst-tbl__empty-t">{{ t('No-chantiers-found') || 'Aucun chantier' }}</div>
+                        <div class="cst-tbl__empty-s">Ajustez vos filtres ou créez un nouveau chantier.</div>
                     </div>
                 }
             }
         </div>
-        <router-outlet></router-outlet>
+
+        <mat-paginator class="cst-pager" [ngClass]="{'pointer-events-none': isLoading}" [length]="chantiersLength" [pageIndex]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]" [showFirstLastButtons]="true" (page)="SortChange()"></mat-paginator>
     </div>
 </div>

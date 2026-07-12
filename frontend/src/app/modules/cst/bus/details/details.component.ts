@@ -106,8 +106,11 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
             busId: [null],
             numeroIMM: ['', Validators.required],
             modelBus: [''],
+            marque: ['Mercedes-Benz'],
+            annee: [2022],
+            kilometrage: ['128 450 km'],
             imei: [''],
-            capacite: [null],
+            capacite: [null, [Validators.required, Validators.min(1)]],
             codeCircuit: [''],
             codeChauffeur: [''],
             appSagem: [false],
@@ -203,7 +206,11 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
             this.showFlashMessage('error');
             return;
         }
-        const bus = this.busForm.getRawValue() as Bus;
+        const rawValue = this.busForm.getRawValue();
+        const bus = { ...rawValue } as any;
+        delete bus.marque;
+        delete bus.annee;
+        delete bus.kilometrage;
 
         if (!this.bus?.busId) {
             this._busService

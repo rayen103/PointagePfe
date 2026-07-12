@@ -1,0 +1,14 @@
+<div class="cst-list">
+    <aside class="cst-side">
+        @for (group of groups; track group.label) {
+            <div class="cst-side__label">{{ group.label }}</div>
+            @for (item of group.items; track item.link) {
+                <a class="cst-side__item" [routerLink]="item.link" routerLinkActive="is-active">{{ item.label }}</a>
+            }
+        }
+    </aside>
+
+    <div class="cst-gestion__content">
+        <router-outlet></router-outlet>
+    </div>
+</div>

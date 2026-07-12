@@ -1,111 +1,184 @@
-<div class="rounded-lg bg-card border border-slate-200 dark:border-slate-700 overflow-hidden h-full">
-    <div class="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700">
-        <div class="font-semibold">Détails</div>
-        @if (bus) {
-            <div class="text-xs text-hint">{{ bus.numeroIMM }}</div>
-        }
-    </div>
-
+<div class="flex flex-col h-full bg-white dark:bg-gray-900 overflow-hidden">
     @if (!bus) {
-        <div class="p-6 text-sm text-hint">Sélectionnez un bus pour afficher les détails.</div>
+        <div class="flex flex-col items-center justify-center gap-2 p-10 text-sm text-hint flex-auto">
+            <mat-icon class="icon-size-10 opacity-30" [svgIcon]="'heroicons_outline:cursor-arrow-rays'"></mat-icon>
+            <span>Sélectionnez un bus pour afficher les détails.</span>
+        </div>
     } @else {
-        <div class="p-4 space-y-4">
-            <div class="flex items-start justify-between gap-4">
-                <div class="space-y-1">
-                    <div class="text-xs text-hint">IMEI</div>
-                    <div class="text-sm font-semibold">{{ bus.imei || '—' }}</div>
+        <!-- Panel Header -->
+        <div class="p-5 border-b border-gray-100 dark:border-gray-850">
+            <div class="flex items-center justify-between gap-4">
+                <div>
+                    <div class="text-[18px] font-bold text-primary tabular-nums">{{ bus.numeroIMM }}</div>
+                    <div class="text-[12px] text-secondary mt-1">
+                        {{ circuitInfo?.circuitName || circuitInfo?.circuitCode || 'Aucun circuit' }}
+                    </div>
                 </div>
+                <span class="cst-pill" [ngClass]="bus.isActive ? 'cst-pill--ok' : 'cst-pill--off'">
+                    {{ getStatusLabel() }}
+                </span>
+            </div>
+        </div>
 
-                <button
-                    mat-flat-button
-                    [color]="'warn'"
-                    type="button"
-                    [disabled]="!canEmptyBus"
-                    (click)="emptyBus.emit()">
-                    <mat-icon [svgIcon]="'mat_outline:delete_sweep'"></mat-icon>
-                    <span class="ml-2">Vider le Bus</span>
-                </button>
+        <!-- Scrollable Details & Stats Area -->
+        <div class="flex-auto overflow-y-auto flex flex-col">
+            
+            <!-- Circuit Progress Section -->
+            @if (circuitInfo && circuitInfo.totalCollectionPoints > 0) {
+                <div class="p-5 border-b border-gray-100 dark:border-gray-850">
+                    <div class="text-[13px] font-bold text-primary mb-3">Progression du circuit</div>
+                    
+                    <div class="flex items-center justify-between text-[12px] mb-2">
+                        <span class="text-secondary">Collection</span>
+                        <span class="text-primary font-bold tabular-nums">
+                            {{ circuitInfo.completedPoints }}/{{ circuitInfo.totalCollectionPoints }}
+                        </span>
+                    </div>
+                    
+                    <div class="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden mb-3">
+                        <div
+                            class="h-full rounded-full bg-[#121242] dark:bg-blue-600 transition-all duration-500"
+                            [style.width.%]="circuitInfo.progressPercent ?? 0">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+                            <div class="text-[11px] text-secondary uppercase tracking-wide mb-1">Prochain point</div>
+                            <div class="text-[12px] font-bold text-primary truncate">
+                                {{ circuitInfo.nextDestinationName || '—' }}
+                            </div>
+                        </div>
+                        <div class="p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+                            <div class="text-[11px] text-secondary uppercase tracking-wide mb-1">Distance restante</div>
+                            <div class="text-[12px] font-bold text-primary tabular-nums">
+                                @if (circuitInfo.remainingDistanceKm != null) {
+                                    {{ circuitInfo.remainingDistanceKm }} km
+                                } @else {
+                                    —
+                                }
+                            </div>
+                        </div>
+                        <div class="p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+                            <div class="text-[11px] text-secondary uppercase tracking-wide mb-1">ETA</div>
+                            <div class="text-[12px] font-bold text-primary tabular-nums">
+                                @if (circuitInfo.remainingEtaMinutes != null) {
+                                    {{ circuitInfo.remainingEtaMinutes }} min
+                                } @else {
+                                    —
+                                }
+                            </div>
+                        </div>
+                        <div class="p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+                            <div class="text-[11px] text-secondary uppercase tracking-wide mb-1">Progression</div>
+                            <div class="text-[12px] font-bold text-primary tabular-nums">
+                                {{ circuitInfo.progressPercent ?? 0 }} %
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Passenger SVG Circle Progress Chart & Stats -->
+            <div class="p-5 flex items-center gap-5 border-b border-gray-100 dark:border-gray-850">
+                <svg width="96" height="96" viewBox="0 0 96 96" class="flex-none">
+                    <circle cx="48" cy="48" r="40" fill="none" stroke="#EAF3FB" stroke-width="10" class="dark:stroke-gray-800"></circle>
+                    <circle
+                        cx="48"
+                        cy="48"
+                        r="40"
+                        fill="none"
+                        stroke="#42ABE0"
+                        stroke-width="10"
+                        stroke-linecap="round"
+                        [attr.stroke-dasharray]="getDashArray()"
+                        transform="rotate(-90 48 48)"
+                        class="transition-all duration-500">
+                    </circle>
+                    <text x="48" y="46" text-anchor="middle" font-family="Sora, sans-serif" font-size="16" font-weight="700" class="fill-current text-primary">
+                        {{ bus.currentOccupancy ?? 0 }}/{{ bus.capacite ?? 0 }}
+                    </text>
+                    <text x="48" y="62" text-anchor="middle" font-size="9" class="fill-current text-secondary font-medium">passagers</text>
+                </svg>
+
+                <div class="flex-auto flex flex-col gap-2 text-[12px]">
+                    <div class="flex justify-between">
+                        <span class="text-secondary font-medium">Occupation</span>
+                        <b class="text-primary font-bold">{{ getRatioPercent() }} %</b>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-secondary font-medium">Vitesse</span>
+                        <b class="text-primary font-bold tabular-nums">—</b>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-secondary font-medium">Position</span>
+                        <b class="text-primary font-bold tabular-nums">
+                            @if (bus.latitude != null && bus.longitude != null) {
+                                {{ bus.latitude | number:'1.4-4' }}, {{ bus.longitude | number:'1.4-4' }}
+                            } @else {
+                                —
+                            }
+                        </b>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-secondary font-medium">Heading</span>
+                        <b class="text-primary font-bold tabular-nums">—</b>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-secondary font-medium">Mise à jour</span>
+                        <b class="text-primary font-bold truncate max-w-28 text-right">{{ bus.lastOccupancyUpdateAt || '—' }}</b>
+                    </div>
+                </div>
             </div>
 
-            <div class="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-                <div class="flex items-center justify-between">
-                    <div class="text-sm font-semibold">Taux d’occupation</div>
-                    <div class="text-sm font-semibold">
-                        @if (bus.currentOccupancy !== null && bus.currentOccupancy !== undefined && bus.capacite) {
-                            {{ bus.currentOccupancy }}/{{ bus.capacite }} ({{ getRatioPercent() }}%)
-                        } @else {
-                            —
-                        }
-                    </div>
-                </div>
-
-                @if (getRatioPercent() !== null) {
-                    <mat-progress-bar class="mt-3" mode="determinate" [value]="getRatioPercent()!"></mat-progress-bar>
-                }
-
-                <div class="grid grid-cols-2 gap-3 mt-4 text-xs">
-                    <div>
-                        <div class="text-hint">Latitude</div>
-                        <div class="font-semibold">{{ bus.latitude ?? '—' }}</div>
-                    </div>
-                    <div>
-                        <div class="text-hint">Longitude</div>
-                        <div class="font-semibold">{{ bus.longitude ?? '—' }}</div>
-                    </div>
-                    <div>
-                        <div class="text-hint">Dernière position</div>
-                        <div class="font-semibold">{{ bus.lastPositionAt || '—' }}</div>
-                    </div>
-                    <div>
-                        <div class="text-hint">Maj occupation</div>
-                        <div class="font-semibold">{{ bus.lastOccupancyUpdateAt || '—' }}</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
-                <div class="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700">
-                    <div class="font-semibold">Timeline</div>
+            <!-- Event Timeline -->
+            <div class="p-5 flex-auto flex flex-col">
+                <div class="text-[13px] font-bold text-primary mb-4">Chronologie des événements</div>
+                
+                <div class="flex-auto overflow-y-auto min-h-40">
                     @if (eventsLoading) {
-                        <mat-progress-spinner diameter="18" mode="indeterminate"></mat-progress-spinner>
+                        <div class="flex items-center justify-center p-6">
+                            <mat-progress-spinner diameter="24" mode="indeterminate"></mat-progress-spinner>
+                        </div>
+                    } @else if ((events?.length ?? 0) === 0) {
+                        <div class="text-xs text-hint p-4 text-center">Aucun événement récent.</div>
                     } @else {
-                        <div class="text-xs text-hint">{{ (events?.length ?? 0) }} events</div>
-                    }
-                </div>
-
-                <div class="max-h-[38vh] overflow-auto">
-                    @if (!eventsLoading && (events?.length ?? 0) === 0) {
-                        <div class="p-4 text-sm text-hint">Aucun événement.</div>
-                    } @else {
-                        @for (ev of events; track ev.busRuntimeEventId) {
-                            <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
-                                <div class="flex items-start justify-between gap-3">
-                                    <div class="min-w-0">
-                                        <div class="font-semibold text-sm truncate">{{ ev.eventType }}</div>
-                                        <div class="text-xs text-hint mt-1">{{ ev.description }}</div>
-                                    </div>
-                                    <div class="text-[11px] text-hint whitespace-nowrap">
-                                        {{ ev.occurredAtUtc | date:'short' }}
-                                    </div>
-                                </div>
-                                <div class="flex items-center justify-between text-[11px] text-hint mt-2">
-                                    <div>
-                                        Occupation: {{ ev.occupancy ?? '—' }}
-                                    </div>
-                                    <div>
-                                        @if (ev.latitude != null && ev.longitude != null) {
-                                            {{ ev.latitude | number:'1.4-4' }}, {{ ev.longitude | number:'1.4-4' }}
-                                        } @else {
-                                            —
+                        <div class="flex flex-col pr-1">
+                            @for (ev of events; track ev.busRuntimeEventId) {
+                                <div class="flex gap-3.5">
+                                    <div class="flex flex-col align-middle items-center">
+                                        <div
+                                            class="w-3 h-3 rounded-full mt-1 flex-none"
+                                            [ngStyle]="{ 'background': getEventDotColor(ev), 'border': '3.5px solid ' + getEventRingColor(ev) }">
+                                        </div>
+                                        @if (!$last) {
+                                            <div class="w-0.5 flex-auto bg-gray-100 dark:bg-gray-800 min-h-8 my-1.5"></div>
                                         }
                                     </div>
+                                    <div class="pb-4 min-w-0 flex-auto">
+                                        <div class="text-[12px] font-semibold text-primary truncate">{{ ev.eventType }}</div>
+                                        <div class="text-[11px] text-secondary mt-1 tabular-nums">
+                                            {{ ev.occurredAtUtc | date:'HH:mm' }} · {{ ev.description }}
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        }
+                            }
+                        </div>
                     }
                 </div>
             </div>
         </div>
+
+        <!-- Panel Footer Actions -->
+        <div class="p-4 border-t border-gray-100 dark:border-gray-850 flex gap-2.5 bg-gray-50/50 dark:bg-gray-900/50">
+            <button class="cst-btn cst-btn--ghost flex-auto justify-center" type="button">Historique</button>
+            <button
+                class="cst-btn cst-btn--primary flex-auto justify-center"
+                type="button"
+                [disabled]="!canEmptyBus"
+                (click)="emptyBus.emit()">
+                Vider le bus
+            </button>
+        </div>
     }
 </div>
-

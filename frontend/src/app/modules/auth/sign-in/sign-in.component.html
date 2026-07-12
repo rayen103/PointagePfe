@@ -1,201 +1,79 @@
-<div
-    class="flex min-w-0 flex-auto flex-col items-center sm:flex-row sm:justify-center md:items-start md:justify-start"
->
-    <div
-        class="w-full px-4 py-8 sm:bg-card sm:w-auto sm:rounded-2xl sm:p-12 sm:shadow md:flex md:h-full md:w-1/2 md:items-center md:justify-end md:rounded-none md:p-16 md:shadow-none"
-    >
-        <div class="mx-auto w-full max-w-80 sm:mx-0 sm:w-80">
-            <!-- Logo -->
-            <div class="w-12">
-                <img src="images/logo/logo.svg" />
+<div class="cst-auth">
+    <!-- Decorative background -->
+    <div class="cst-auth__bg">
+        <div class="cst-auth__glow cst-auth__glow--1"></div>
+        <div class="cst-auth__glow cst-auth__glow--2"></div>
+        <svg class="cst-auth__paths" viewBox="0 0 1440 860" preserveAspectRatio="xMidYMax slice">
+            <path d="M-40 640 C 240 560, 420 720, 700 640 S 1180 540, 1480 620" fill="none" stroke="#C9DEF0" stroke-width="2" stroke-dasharray="1 10" stroke-linecap="round"></path>
+            <path d="M-40 720 C 260 660, 480 800, 760 720 S 1200 640, 1480 710" fill="none" stroke="#C9DEF0" stroke-width="2" stroke-dasharray="1 10" stroke-linecap="round"></path>
+        </svg>
+    </div>
+
+    <!-- Card -->
+    <div class="cst-auth__card">
+        <div class="cst-auth__brand">
+            <img src="images/logo/logo-text.svg" alt="CST — Canadian System Technology" />
+            <div class="cst-auth__welcome">Bienvenue</div>
+            <div class="cst-auth__sub">Connectez-vous à votre espace opérations</div>
+        </div>
+
+        @if (showAlert) {
+            <div class="cst-auth__alert" [class.is-error]="alert.type === 'error'" [@shake]="alert.type === 'error'">
+                {{ alert.message }}
+            </div>
+        }
+
+        <form class="cst-auth__form" [formGroup]="signInForm" #signInNgForm="ngForm">
+            <!-- Email -->
+            <div class="cst-field">
+                <label>Adresse email</label>
+                <input class="cst-input" type="text" formControlName="login" placeholder="prenom.nom@societe.tn" autocomplete="username" />
+                @if (signInForm.get('login')?.hasError('required') && signInNgForm.submitted) {
+                    <div class="cst-field__err">L'adresse email est requise</div>
+                }
             </div>
 
-
-            <!-- Title -->
-            <div
-                class="mt-8 text-4xl font-extrabold leading-tight tracking-tight"
-            >
-                Sign in
-            </div>
-
-
-            <!-- Alert -->
-            @if (showAlert) {
-                <fuse-alert
-                    class="mt-8"
-                    [appearance]="'outline'"
-                    [showIcon]="false"
-                    [type]="alert.type"
-                    [@shake]="alert.type === 'error'"
-                >
-                    {{ alert.message }}
-                </fuse-alert>
-            }
-
-            <!-- Sign in form -->
-            <form class="mt-8" [formGroup]="signInForm" #signInNgForm="ngForm" >
-                <!-- Email field -->
-                <mat-form-field class="w-full">
-                    <mat-label>Company</mat-label>
-                    <mat-select [formControlName]="'societeId'">
-                        @for (societe of societes; track societe.societeId) {
-                            <mat-option [value]="societe.societeId">
-                                {{ societe.nom }}
-                            </mat-option>
-                        }
-                    </mat-select>
-                    @if (signInForm.get('societeId')?.hasError('required')) {
-                        <mat-error> Company is required </mat-error>
-                    }
-                </mat-form-field>
-
-                <mat-form-field class="w-full">
-                    <mat-label>Site</mat-label>
-                    <mat-select [formControlName]="'numeroChantier'">
-                        @for (chantier of filteredChantiers; track chantier.chantierId) {
-                            <mat-option [value]="chantier.numeroChantier">
-                                {{ chantier.numeroChantier }}
-                                @if (chantier.libelleChantier) {
-                                    - {{ chantier.libelleChantier }}
-                                }
-                            </mat-option>
-                        }
-                    </mat-select>
-                    @if (signInForm.get('numeroChantier')?.hasError('required')) {
-                        <mat-error> Site is required </mat-error>
-                    }
-                </mat-form-field>
-
-                <mat-form-field class="w-full">
-                    <mat-label>Email address</mat-label>
-                    <input id="email" matInput [formControlName]="'login'" />
-                    @if (signInForm.get('login').hasError('required')) {
-                        <mat-error> Email address is required </mat-error>
-                    }
-                    @if (signInForm.get('login').hasError('email')) {
-                        <mat-error>
-                            Please enter a valid email address
-                        </mat-error>
-                    }
-                </mat-form-field>
-
-                <!-- Password field -->
-                <mat-form-field class="w-full">
-                    <mat-label>Password</mat-label>
-                    <input
-                        id="password"
-                        matInput
-                        type="password"
-                        [formControlName]="'password'"
-                        #passwordField
-                    />
-                    <button
-                        mat-icon-button
-                        type="button"
-                        (click)="
-                            passwordField.type === 'password'
-                                ? (passwordField.type = 'text')
-                                : (passwordField.type = 'password')
-                        "
-                        matSuffix
-                    >
-                        @if (passwordField.type === 'password') {
-                            <mat-icon
-                                class="icon-size-5"
-                                [svgIcon]="'heroicons_solid:eye'"
-                            ></mat-icon>
-                        }
-                        @if (passwordField.type === 'text') {
-                            <mat-icon
-                                class="icon-size-5"
-                                [svgIcon]="'heroicons_solid:eye-slash'"
-                            ></mat-icon>
+            <!-- Password -->
+            <div class="cst-field">
+                <label>Mot de passe</label>
+                <div class="cst-input cst-input--group">
+                    <input #pwField type="password" formControlName="password" placeholder="••••••••••" autocomplete="current-password" />
+                    <button type="button" class="cst-input__eye" (click)="pwField.type = pwField.type === 'password' ? 'text' : 'password'" aria-label="Afficher le mot de passe">
+                        @if (pwField.type === 'password') {
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        } @else {
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10 10 0 0112 20c-7 0-11-8-11-8a18 18 0 015.06-5.94M9.9 4.24A9 9 0 0112 4c7 0 11 8 11 8a18 18 0 01-2.16 3.19M1 1l22 22"></path></svg>
                         }
                     </button>
-                    <mat-error> Password is required </mat-error>
-                </mat-form-field>
-
-                <!-- Actions -->
-<!--                <div-->
-<!--                    class="mt-1.5 inline-flex w-full items-center justify-between"-->
-<!--                >-->
-<!--                    <mat-checkbox-->
-<!--                        class="-ml-2"-->
-<!--                        [color]="'primary'"-->
-<!--                        [formControlName]="'rememberMe'"-->
-<!--                    >-->
-<!--                        Remember me-->
-<!--                    </mat-checkbox>-->
-
-<!--                </div>-->
-
-                <!-- Submit button -->
-                <button
-                    class="fuse-mat-button-large mt-6 w-full"
-                    mat-flat-button
-                    [color]="'primary'"
-                    [disabled]="isLoading || isLocked"
-                    (click)="signIn()"
-                >
-                    @if (isLoading) {
-                        <mat-progress-spinner
-                            [diameter]="24"
-                            [mode]="'indeterminate'"
-                        ></mat-progress-spinner>
-                    }
-                    @if (!isLoading) {
-                        <span>Sign in</span>
-                    }
-                </button>
-
-                <!-- Ajoutez ceci après le bouton si vous voulez -->
-                @if (isLocked) {
-                    <div class="mt-4 text-center text-sm text-red-500" >
-                        Compte temporairement verrouillé. Réessayez dans {{remainingTime}} secondes.
-                    </div>
-                }
-            </form>
-
-        </div>
-    </div>
-    <div
-        class="relative hidden h-full w-1/2 flex-auto items-center justify-center overflow-hidden bg-gray-800 p-16 dark:border-l md:flex lg:px-28"
-    >
-        <!-- Background -->
-        <!-- Rings -->
-        <!-- prettier-ignore -->
-        <svg class="absolute inset-0 pointer-events-none"
-             viewBox="0 0 960 540" width="100%" height="100%" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
-            <g class="text-gray-700 opacity-25" fill="none" stroke="currentColor" stroke-width="100">
-                <circle r="234" cx="196" cy="23"></circle>
-                <circle r="234" cx="790" cy="491"></circle>
-            </g>
-        </svg>
-        <!-- Dots -->
-        <!-- prettier-ignore -->
-        <svg class="absolute -top-16 -right-16 text-gray-700"
-             viewBox="0 0 220 192" width="220" height="192" fill="none">
-            <defs>
-                <pattern id="837c3e70-6c3a-44e6-8854-cc48c737b659" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                    <rect x="0" y="0" width="4" height="4" fill="currentColor"></rect>
-                </pattern>
-            </defs>
-            <rect width="220" height="192" fill="url(#837c3e70-6c3a-44e6-8854-cc48c737b659)"></rect>
-        </svg>
-        <!-- Content -->
-        <div class="flex w-full flex-col items-center justify-center">
-            <div class="w-120">
-                <img src="images/logo/logo.png" />
+                </div>
             </div>
-<!--            <div class=" w-full ">-->
-<!--                <div class="text-7xl font-bold leading-none text-gray-100 text-center">-->
-<!--                    <div>INTERCOLOR</div>-->
-<!--                </div>-->
-<!--                <div class="mt-6 text-lg leading-6 tracking-tight text-gray-400 text-center ">-->
-<!--                    intercolor-->
-<!--                </div>-->
-<!--            </div>-->
 
-        </div>
+            <!-- Options -->
+            <div class="cst-auth__row">
+                <label class="cst-check">
+                    <input type="checkbox" formControlName="rememberMe" />
+                    <span class="cst-check__box"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M2 6.5l2.6 2.6L10 3.5"></path></svg></span>
+                    Se souvenir de moi
+                </label>
+                <a class="cst-auth__link" [routerLink]="['/forgot-password']">Mot de passe oublié ?</a>
+            </div>
+
+            <!-- Submit -->
+            <button type="button" class="cst-auth__submit" [disabled]="isLoading || isLocked" (click)="signIn()">
+                @if (isLoading) {
+                    <mat-progress-spinner [diameter]="22" [mode]="'indeterminate'"></mat-progress-spinner>
+                } @else {
+                    Se connecter
+                }
+            </button>
+
+            @if (isLocked) {
+                <div class="cst-auth__locked">Compte temporairement verrouillé. Réessayez dans {{ remainingTime }} s.</div>
+            }
+
+            <div class="cst-auth__foot">Pas encore de compte ? <a class="cst-auth__link" [routerLink]="['/sign-up']">Demander un accès</a></div>
+        </form>
     </div>
+
+    <div class="cst-auth__copy">© 2026 Canadian System Technology · FR / EN</div>
 </div>

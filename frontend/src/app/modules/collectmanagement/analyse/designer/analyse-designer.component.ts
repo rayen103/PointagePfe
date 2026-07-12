@@ -108,6 +108,9 @@ export class AnalyseDesignerComponent implements OnInit, OnDestroy {
 
     availableFields: AnalyseFieldDef[] = [];
     selectedFields: AnalyseFieldDef[] = [];
+    lignesFields: AnalyseFieldDef[] = [];
+    colonnesFields: AnalyseFieldDef[] = [];
+    valeursFields: AnalyseFieldDef[] = [];
 
     response: AnalyseQueryResponse | null = null;
     displayedColumns: string[] = [];
@@ -133,6 +136,9 @@ export class AnalyseDesignerComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.availableFields = [...this.fields];
         this.selectedFields = [];
+        this.lignesFields = [];
+        this.colonnesFields = [];
+        this.valeursFields = [];
 
         this.searchFieldControl.valueChanges
             .pipe(takeUntil(this._unsubscribeAll))
@@ -179,8 +185,25 @@ export class AnalyseDesignerComponent implements OnInit, OnDestroy {
         const selected = this.fields.filter((f) => fieldKeys.includes(f.key));
         const selectedSet = new Set(selected.map((f) => f.key));
 
-        this.selectedFields = selected;
         this.availableFields = this.fields.filter((f) => !selectedSet.has(f.key));
+
+        this.lignesFields = [];
+        this.colonnesFields = [];
+        this.valeursFields = [];
+        selected.forEach((f) => {
+            if (f.isNumeric) {
+                this.valeursFields.push(f);
+            } else if (
+                f.key.toLowerCase().includes('week') ||
+                f.key.toLowerCase().includes('semaine') ||
+                f.key.toLowerCase().includes('date')
+            ) {
+                this.colonnesFields.push(f);
+            } else {
+                this.lignesFields.push(f);
+            }
+        });
+        this.selectedFields = [...this.lignesFields, ...this.colonnesFields, ...this.valeursFields];
 
         const dateFrom = config?.dateFrom ? new Date(config.dateFrom) : null;
         const dateTo = config?.dateTo ? new Date(config.dateTo) : null;
@@ -199,24 +222,7 @@ export class AnalyseDesignerComponent implements OnInit, OnDestroy {
         this._changeDetectorRef.markForCheck();
     }
 
-    dropAvailable(event: CdkDragDrop<AnalyseFieldDef[]>): void {
-        if (event.previousContainer === event.container) {
-            moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-            return;
-        }
-
-        transferArrayItem(
-            event.previousContainer.data,
-            event.container.data,
-            event.previousIndex,
-            event.currentIndex
-        );
-
-        this.availableFields = [...this.availableFields].sort((a, b) => a.label.localeCompare(b.label));
-        this._changeDetectorRef.markForCheck();
-    }
-
-    dropSelected(event: CdkDragDrop<AnalyseFieldDef[]>): void {
+    onDrop(event: CdkDragDrop<AnalyseFieldDef[]>): void {
         if (event.previousContainer === event.container) {
             moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
         } else {
@@ -228,18 +234,29 @@ export class AnalyseDesignerComponent implements OnInit, OnDestroy {
             );
         }
 
+        this.syncSelectedFields();
         this._changeDetectorRef.markForCheck();
     }
 
-    removeSelected(key: string): void {
-        const index = this.selectedFields.findIndex((f) => f.key === key);
+    syncSelectedFields(): void {
+        this.availableFields = [...this.availableFields].sort((a, b) => a.label.localeCompare(b.label));
+        this.selectedFields = [...this.lignesFields, ...this.colonnesFields, ...this.valeursFields];
+    }
+
+    removeSelected(key: string, listType: 'lignes' | 'colonnes' | 'valeurs'): void {
+        let list: AnalyseFieldDef[];
+        if (listType === 'lignes') list = this.lignesFields;
+        else if (listType === 'colonnes') list = this.colonnesFields;
+        else list = this.valeursFields;
+
+        const index = list.findIndex((f) => f.key === key);
         if (index === -1) {
             return;
         }
 
-        const [removed] = this.selectedFields.splice(index, 1);
+        const [removed] = list.splice(index, 1);
         this.availableFields.push(removed);
-        this.availableFields = [...this.availableFields].sort((a, b) => a.label.localeCompare(b.label));
+        this.syncSelectedFields();
         this._changeDetectorRef.markForCheck();
     }
 

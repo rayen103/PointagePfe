@@ -25,6 +25,7 @@ import { catchError, EMPTY, Subject, takeUntil } from 'rxjs';
 import { ModemService } from '../../../../core/modem/modem.service';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UserService } from '../../../../core/user/user.service';
+import { BusService } from '../../../../core/bus/bus.service';
 
 @Component({
     selector: 'app-details',
@@ -58,6 +59,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
     modem: Modem;
     flashMessage: 'success' | 'error' | null = null;
     isLoading: boolean = false;
+    buses: any[] = [];
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     constructor(
@@ -66,7 +68,8 @@ export class DetailsComponent implements OnInit, OnDestroy {
         private formBuilder: FormBuilder,
         private _modemService: ModemService,
         private _changeDetectorRef: ChangeDetectorRef,
-        private _userService: UserService
+        private _userService: UserService,
+        private _busService: BusService
     ) { }
 
     ngOnInit(): void {
@@ -77,7 +80,16 @@ export class DetailsComponent implements OnInit, OnDestroy {
             numeroSim: [''],
             isActive: [true],
             societeId: ['', Validators.required],
+            busId: [''],
         });
+
+        this._busService.GetBuses(1, 1000, 'numeroIMM', 'asc', '').subscribe();
+        this._busService.buses$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((buses) => {
+                this.buses = buses || [];
+                this._changeDetectorRef.markForCheck();
+            });
 
         this._userService.user$
             .pipe(takeUntil(this._unsubscribeAll))

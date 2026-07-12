@@ -4,14 +4,15 @@ import { AuthGuard } from 'app/core/auth/guards/auth.guard';
 import { NoAuthGuard } from 'app/core/auth/guards/noAuth.guard';
 import { LayoutComponent } from 'app/layout/layout.component';
 import { navigationGuard } from './core/navigation/guards/navigation.guard';
+import { GestionShellComponent } from './modules/cst/gestion-shell/gestion-shell.component';
 
 // @formatter:off
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 export const appRoutes: Route[] = [
 
-    // Redirect empty path to '/example'
-    {path: '', pathMatch : 'full', redirectTo: 'Accueil/page'},
+    // La porte d'entrée publique : la landing page présente le produit.
+    {path: '', pathMatch : 'full', redirectTo: 'home'},
 
     // Redirect signed-in user to the '/example'
     //
@@ -34,7 +35,8 @@ export const appRoutes: Route[] = [
             {path: 'forgot-password', loadChildren: () => import('app/modules/auth/forgot-password/forgot-password.routes')},
             {path: 'reset-password', loadChildren: () => import('app/modules/auth/reset-password/reset-password.routes')},
             {path: 'sign-in', loadChildren: () => import('app/modules/auth/sign-in/sign-in.routes')},
-            {path: 'sign-up', loadChildren: () => import('app/modules/auth/sign-up/sign-up.routes')}
+            {path: 'sign-up', loadChildren: () => import('app/modules/auth/sign-up/sign-up.routes')},
+            {path: 'verify-code', loadChildren: () => import('app/modules/auth/verify-code/verify-code.routes')}
         ]
     },
 
@@ -123,8 +125,8 @@ export const appRoutes: Route[] = [
             {path: 'chantier', pathMatch: 'full', redirectTo: 'fichier/chantier'},
             {path: 'rattachement-employe', pathMatch: 'full', redirectTo: 'fichier/rattachement-employe'},
             {path: 'rattachement-article', pathMatch: 'full', redirectTo: 'fichier/rattachement-article'},
-            //Fichier
-            {path:'fichier', children:[
+            //Fichier — wrapped in the Gestion shell so children show as a left sidebar (not a dropdown)
+            {path:'fichier', component: GestionShellComponent, children:[
                     {path:'utilisateur',
                         data:{navigationId: 'fichier.utilisateur'},
                         loadChildren:() => import('app/modules/collectmanagement/gestion-utilisateur/utilisateur/utilisateur.routes')},

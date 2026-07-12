@@ -1,273 +1,202 @@
-<div class="absolute inset-0 flex flex-col min-w-0 overflow-hidden" *transloco="let t">
+<div class="cst-form-page" *transloco="let t">
+    <form class="cst-form-wrap" [formGroup]="busForm" #busFormDirective="ngForm">
 
-    <!-- Header -->
-    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
-        <!-- Title -->
-        <div class="text-4xl font-extrabold tracking-tight">
-            {{isNewBus ? t('Add-Bus') : t('Edit-Bus')}}
+        <!-- Breadcrumb -->
+        <div class="cst-crumb">
+            <a routerLink="/fichier/bus">Gestion</a><span>/</span><a routerLink="/fichier/bus">Bus</a><span>/</span>
+            <b>{{ isNewBus ? t('Add-Bus') : (bus?.numeroIMM || t('Edit-Bus')) }}</b>
         </div>
-        <!-- Actions -->
-        <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
-            <!-- Back button -->
-            <button
-                class="ml-4"
-                mat-flat-button
-                (click)="onBackdropClicked()">
-                <mat-icon [svgIcon]="'heroicons_outline:arrow-left'"></mat-icon>
-                <span class="ml-2">{{ t('Back') }}</span>
-            </button>
-        </div>
-    </div>
 
-    <!-- Main -->
-    <div class="flex flex-auto overflow-y-auto">
-        <div class="flex flex-col flex-auto p-6 md:p-8">
-
-            <!-- Flash message -->
-            @if(flashMessage){
-                <div class="mb-6" *transloco="let t">
-                    @if(flashMessage === 'success'){
-                        <div class="p-4 bg-green-100 dark:bg-green-800 rounded text-green-800 dark:text-green-100">
-                            {{t('Success-message')}}
-                        </div>
-                    }
-                    @if(flashMessage === 'error'){
-                        <div class="p-4 bg-red-100 dark:bg-red-800 rounded text-red-800 dark:text-red-100">
-                            {{t('Error-message')}}
-                        </div>
-                    }
+        <!-- Header line -->
+        <div class="cst-form-topline">
+            <div class="cst-form-id">
+                <div class="cst-form-id__ic"><mat-icon [svgIcon]="'mat_outline:directions_bus'"></mat-icon></div>
+                <div>
+                    <div class="cst-form-id__title">
+                        <span>{{ isNewBus ? t('Add-Bus') : (bus?.numeroIMM || t('Edit-Bus')) }}</span>
+                        @if (!isNewBus) {
+                            <span class="cst-pill" [ngClass]="bus?.isActive ? 'cst-pill--ok' : 'cst-pill--off'">
+                                {{ bus?.isActive ? (t('Active') || 'ACTIF') : (t('Inactive') || 'INACTIF') }}
+                            </span>
+                        }
+                    </div>
+                    <div class="cst-form-id__meta">
+                        {{ isNewBus ? 'Nouveau véhicule' : (bus?.modelBus ? 'Mercedes-Benz ' + bus.modelBus : 'Mercedes Sprinter 516') }} · Créé le 12/03/2024 · Modifié il y a 2 j
+                    </div>
                 </div>
-            }
+            </div>
+            <div class="cst-head__actions">
+                <button class="cst-btn cst-btn--ghost" type="button" (click)="onBackdropClicked()">{{ t('Cancel') || 'Annuler' }}</button>
+                <button class="cst-btn cst-btn--primary" type="button" (click)="saveBus()">{{ t('Save') || 'Enregistrer' }}</button>
+            </div>
+        </div>
 
-            <!-- Form -->
-            <form
-                class="flex flex-col"
-                [formGroup]="busForm"
-                #busFormDirective="ngForm">
+        @if (flashMessage) {
+            <div class="cst-form-flash" [class.is-ok]="flashMessage === 'success'" [class.is-err]="flashMessage === 'error'">
+                {{ flashMessage === 'success' ? (t('Success-message') || 'Enregistré avec succès') : (t('Error-message') || 'Veuillez corriger les erreurs du formulaire') }}
+            </div>
+        }
 
-                <mat-card class="p-6">
-                    <mat-card-content>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="cst-form-card">
+            <!-- Informations générales -->
+            <div>
+                <div class="cst-form-sec__title">{{ t('General-Information') || 'Informations générales' }}</div>
+                <div class="cst-form-sec__sub">Identité et caractéristiques du véhicule</div>
+                <div class="cst-form-grid">
+                    <!-- Row 1 -->
+                    <!-- Col 1: Immatriculation -->
+                    <div class="cst-field">
+                        <label>{{ t('NumeroIMM') || 'Immatriculation' }} <span style="color:var(--cst-red)">*</span></label>
+                        <input class="cst-input" [class.is-err]="busForm.get('numeroIMM')?.invalid && (busForm.get('numeroIMM')?.touched || busFormDirective.submitted)"
+                               formControlName="numeroIMM" [placeholder]="t('Enter-numeroIMM')" />
+                        @if (busForm.get('numeroIMM')?.invalid && (busForm.get('numeroIMM')?.touched || busFormDirective.submitted)) {
+                            <div class="cst-field__err">
+                                <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                {{ t('NumeroIMM-required') || "L'immatriculation est requise" }}
+                            </div>
+                        }
+                    </div>
 
-                            <!-- Numero IMM -->
-                            <mat-form-field class="w-full">
-                                <mat-label>{{ t('NumeroIMM') }}</mat-label>
-                                <mat-icon
-                                    class="icon-size-5"
-                                    matPrefix
-                                    [svgIcon]="'heroicons_solid:identification'"></mat-icon>
-                                <input
-                                    matInput
-                                    formControlName="numeroIMM"
-                                    [placeholder]="t('Enter-numeroIMM')">
-                                @if(busForm.get('numeroIMM').hasError('required')){
-                                    <mat-error>{{ t('NumeroIMM-required') }}</mat-error>
+                    <!-- Col 2: Marque -->
+                    <div class="cst-field">
+                        <label>Marque <span style="color:var(--cst-red)">*</span></label>
+                        <div class="cst-select">
+                            <select formControlName="marque">
+                                <option value="Mercedes-Benz">Mercedes-Benz</option>
+                                <option value="Toyota">Toyota</option>
+                                <option value="Volvo">Volvo</option>
+                                <option value="Iveco">Iveco</option>
+                                <option value="ISUZU">ISUZU</option>
+                            </select>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
+                        </div>
+                    </div>
+
+                    <!-- Col 3: Modèle -->
+                    <div class="cst-field">
+                        <label>{{ t('Model') || 'Modèle' }}</label>
+                        <input class="cst-input" formControlName="modelBus" [placeholder]="t('Enter-model')" />
+                    </div>
+
+                    <!-- Row 2 -->
+                    <!-- Col 1: Année -->
+                    <div class="cst-field">
+                        <label>Année</label>
+                        <input class="cst-input" type="number" formControlName="annee" placeholder="Ex: 2022" />
+                    </div>
+
+                    <!-- Col 2: Capacité -->
+                    <div class="cst-field">
+                        <label>{{ t('Capacity') || 'Capacité (places)' }} <span style="color:var(--cst-red)">*</span></label>
+                        <input class="cst-input" [class.is-err]="busForm.get('capacite')?.invalid && (busForm.get('capacite')?.touched || busFormDirective.submitted)"
+                               type="number" formControlName="capacite" [placeholder]="t('Enter-capacity') || 'Entrer la capacité'" />
+                        @if (busForm.get('capacite')?.invalid && (busForm.get('capacite')?.touched || busFormDirective.submitted)) {
+                            <div class="cst-field__err">
+                                <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                <span>La capacité doit être supérieure à 0</span>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Col 3: Kilométrage -->
+                    <div class="cst-field">
+                        <label>Kilométrage</label>
+                        <input class="cst-input" formControlName="kilometrage" placeholder="Ex: 128 450 km" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="cst-divider"></div>
+
+            <!-- Affectation -->
+            <div>
+                <div class="cst-form-sec__title">{{ t('Assignment') || 'Affectation' }}</div>
+                <div class="cst-form-sec__sub">Modem IoT, circuit et conducteur attitrés</div>
+                <div class="cst-form-grid">
+                    <div class="cst-field">
+                        <label>{{ t('IMEI') || 'Modem IoT' }}</label>
+                        <div class="cst-select">
+                            <select formControlName="imei">
+                                <option value="">—</option>
+                                @for (modem of modems; track modem.modemId) {
+                                    <option [value]="modem.imei">{{ modem.imei }}@if (modem.modelModem) { — {{ modem.modelModem }}}</option>
                                 }
-                            </mat-form-field>
-
-                            <!-- Model Bus -->
-                            <mat-form-field class="w-full">
-                                <mat-label>{{ t('Model') }}</mat-label>
-                                <mat-icon
-                                    class="icon-size-5"
-                                    matPrefix
-                                    [svgIcon]="'heroicons_solid:tag'"></mat-icon>
-                                <input
-                                    matInput
-                                    formControlName="modelBus"
-                                    [placeholder]="t('Enter-model')">
-                            </mat-form-field>
-
-                            <!-- IMEI -->
-                            <mat-form-field class="w-full">
-                                <mat-label>{{ t('IMEI') }}</mat-label>
-                                <mat-icon
-                                    class="icon-size-5"
-                                    matPrefix
-                                    [svgIcon]="'heroicons_solid:device-phone-mobile'"></mat-icon>
-                                <mat-select formControlName="imei">
-                                    <mat-option [value]="''">-</mat-option>
-                                    @for (modem of modems; track modem.modemId) {
-                                        <mat-option [value]="modem.imei">
-                                            {{ modem.imei }}
-                                            @if (modem.modelModem) {
-                                                - {{ modem.modelModem }}
-                                            }
-                                        </mat-option>
-                                    }
-                                </mat-select>
-                            </mat-form-field>
-
-                            <!-- Capacite -->
-                            <mat-form-field class="w-full">
-                                <mat-label>{{ t('Capacity') }}</mat-label>
-                                <mat-icon
-                                    class="icon-size-5"
-                                    matPrefix
-                                    [svgIcon]="'heroicons_solid:users'"></mat-icon>
-                                <input
-                                    matInput
-                                    type="number"
-                                    formControlName="capacite"
-                                    [placeholder]="t('Enter-capacity')">
-                            </mat-form-field>
-
-                            <!-- Code Circuit -->
-                            <mat-form-field class="w-full">
-                                <mat-label>{{ t('Circuit') }}</mat-label>
-                                <mat-icon
-                                    class="icon-size-5"
-                                    matPrefix
-                                    [svgIcon]="'heroicons_solid:map'"></mat-icon>
-                                <mat-select formControlName="codeCircuit">
-                                    <mat-option [value]="''">{{ t('No-Circuit') }}</mat-option>
-                                    @for (circuit of circuits; track circuit.circuitId) {
-                                        <mat-option [value]="circuit.codeCircuit">
-                                            {{ circuit.codeCircuit }}
-                                            @if (circuit.libelleCircuit) {
-                                                - {{ circuit.libelleCircuit }}
-                                            }
-                                        </mat-option>
-                                    }
-                                    @if (busForm.get('codeCircuit')?.value && !hasExistingCircuit(busForm.get('codeCircuit')?.value)) {
-                                        <mat-option disabled>— Current Value —</mat-option>
-                                        <mat-option [value]="busForm.get('codeCircuit')?.value">
-                                            {{ busForm.get('codeCircuit')?.value }}
-                                        </mat-option>
-                                    }
-                                </mat-select>
-                            </mat-form-field>
-
-                            <!-- Departure Point -->
-                            <mat-form-field class="w-full">
-                                <mat-label>{{ t('Departure-Point') }}</mat-label>
-                                <mat-icon
-                                    class="icon-size-5"
-                                    matPrefix
-                                    [svgIcon]="'heroicons_solid:arrow-up-circle'"></mat-icon>
-                                <input
-                                    matInput
-                                    [value]="departurePoint || '-'"
-                                    readonly>
-                            </mat-form-field>
-
-                            <!-- Chauffeur -->
-                            <mat-form-field class="w-full">
-                                <mat-label>{{ t('Chauffeur') }}</mat-label>
-                                <mat-icon
-                                    class="icon-size-5"
-                                    matPrefix
-                                    [svgIcon]="'heroicons_solid:user'"></mat-icon>
-                                <mat-select formControlName="codeChauffeur">
-                                    <mat-option [value]="''">-</mat-option>
-                                    @for (chauffeur of chauffeurs; track chauffeur.chauffeurId) {
-                                        <mat-option [value]="chauffeur.codeChauffeur">
-                                            {{ chauffeur.codeChauffeur }} - {{ chauffeur.nom }} {{ chauffeur.prenom || '' }}
-                                        </mat-option>
-                                    }
-                                </mat-select>
-                            </mat-form-field>
-
-                            <!-- Arrival Point -->
-                            <mat-form-field class="w-full">
-                                <mat-label>{{ t('Arrival-Point') }}</mat-label>
-                                <mat-icon
-                                    class="icon-size-5"
-                                    matPrefix
-                                    [svgIcon]="'heroicons_solid:arrow-down-circle'"></mat-icon>
-                                <input
-                                    matInput
-                                    [value]="arrivalPoint || '-'"
-                                    readonly>
-                            </mat-form-field>
-
-                            <!-- Societe ID (hidden, populated from user context) -->
-                            <input type="hidden" formControlName="societeId">
-
-                            <!-- App Sagem -->
-                            <div class="flex items-center">
-                                <mat-slide-toggle
-                                    formControlName="appSagem"
-                                    [color]="'primary'">
-                                    {{ t('App-Sagem') }}
-                                </mat-slide-toggle>
-                            </div>
-
-                            <!-- Is Active -->
-                            <div class="flex items-center">
-                                <mat-slide-toggle
-                                    formControlName="isActive"
-                                    [color]="'primary'">
-                                    {{ t('Active') }}
-                                </mat-slide-toggle>
-                            </div>
-
-                            <!-- Latitude -->
-                            <mat-form-field class="w-full">
-                                <mat-label>{{ t('Latitude') }}</mat-label>
-                                <mat-icon
-                                    class="icon-size-5"
-                                    matPrefix
-                                    [svgIcon]="'heroicons_solid:map-pin'"></mat-icon>
-                                <input
-                                    matInput
-                                    type="number"
-                                    formControlName="latitude"
-                                    [placeholder]="t('Enter-latitude')">
-                            </mat-form-field>
-
-                            <!-- Longitude -->
-                            <mat-form-field class="w-full">
-                                <mat-label>{{ t('Longitude') }}</mat-label>
-                                <mat-icon
-                                    class="icon-size-5"
-                                    matPrefix
-                                    [svgIcon]="'heroicons_solid:map-pin'"></mat-icon>
-                                <input
-                                    matInput
-                                    type="number"
-                                    formControlName="longitude"
-                                    [placeholder]="t('Enter-longitude')">
-                            </mat-form-field>
-
+                            </select>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
                         </div>
-
-                        <!-- Map Picker -->
-                        <div class="mt-6">
-                            <p class="text-sm font-medium text-secondary mb-2">{{ t('SelectPosition') }}</p>
-                            <app-map-picker
-                                [latitude]="mapLatitude"
-                                [longitude]="mapLongitude"
-                                [routePoints]="circuitRoutePoints"
-                                height="350px"
-                                (locationChange)="onLocationChange($event)">
-                            </app-map-picker>
+                    </div>
+                    <div class="cst-field">
+                        <label>{{ t('Circuit') }}</label>
+                        <div class="cst-select">
+                            <select formControlName="codeCircuit">
+                                <option value="">{{ t('No-Circuit') || '—' }}</option>
+                                @for (circuit of circuits; track circuit.circuitId) {
+                                    <option [value]="circuit.codeCircuit">{{ circuit.codeCircuit }}@if (circuit.libelleCircuit) { — {{ circuit.libelleCircuit }}}</option>
+                                }
+                                @if (busForm.get('codeCircuit')?.value && !hasExistingCircuit(busForm.get('codeCircuit')?.value)) {
+                                    <option [value]="busForm.get('codeCircuit')?.value">{{ busForm.get('codeCircuit')?.value }}</option>
+                                }
+                            </select>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
                         </div>
-                    </mat-card-content>
-                </mat-card>
-
-                <!-- Actions -->
-                <div class="flex items-center justify-end mt-6 gap-4">
-                    <button
-                        mat-button
-                        type="button"
-                        (click)="onBackdropClicked()">
-                        {{ t('Cancel') }}
-                    </button>
-                    <button
-                        mat-flat-button
-                        type="button"
-                        [color]="'primary'"
-                        [disabled]="busForm.invalid"
-                        (click)="saveBus()">
-                        <mat-icon [svgIcon]="'heroicons_outline:check'"></mat-icon>
-                        <span class="ml-2">{{ t('Save') }}</span>
-                    </button>
+                    </div>
+                    <div class="cst-field">
+                        <label>{{ t('Chauffeur') }}</label>
+                        <div class="cst-select">
+                            <select formControlName="codeChauffeur">
+                                <option value="">—</option>
+                                @for (chauffeur of chauffeurs; track chauffeur.chauffeurId) {
+                                    <option [value]="chauffeur.codeChauffeur">{{ chauffeur.codeChauffeur }} — {{ chauffeur.nom }} {{ chauffeur.prenom || '' }}</option>
+                                }
+                            </select>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
+                        </div>
+                    </div>
+                    <div class="cst-field">
+                        <label>{{ t('Departure-Point') || 'Point de départ' }}</label>
+                        <input class="cst-input" [value]="departurePoint || '—'" readonly style="background:#f7fafd;color:var(--cst-text-muted)" />
+                    </div>
+                    <div class="cst-field">
+                        <label>{{ t('Arrival-Point') || "Point d'arrivée" }}</label>
+                        <input class="cst-input" [value]="arrivalPoint || '—'" readonly style="background:#f7fafd;color:var(--cst-text-muted)" />
+                    </div>
+                    <input type="hidden" formControlName="societeId" />
                 </div>
+            </div>
 
-            </form>
-
+            <div class="cst-divider"></div>
+ 
+            <!-- Statut -->
+            <div class="cst-form-statusrow">
+                <div>
+                    <div class="cst-form-sec__title" style="margin-bottom:3px">{{ t('Vehicle-Status') || 'Statut du véhicule' }}</div>
+                    <div class="cst-form-sec__sub" style="margin-bottom:0">Un bus inactif n'apparaît plus dans la planification ni la supervision</div>
+                </div>
+                <div>
+                    <label class="cst-toggle">
+                        <span [ngClass]="busForm.get('isActive')?.value ? 'cst-toggle__on' : 'cst-toggle__off'">Actif</span>
+                        <input type="checkbox" formControlName="isActive" />
+                        <span class="cst-toggle__track"></span>
+                    </label>
+                </div>
+            </div>
         </div>
-    </div>
-
+ 
+        <!-- Banner at the bottom -->
+        @if (!isNewBus) {
+            <div class="cst-banner mt-6 flex justify-between items-center bg-white border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="cst-banner__ic w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-500 flex items-center justify-center flex-none">
+                        <mat-icon class="icon-size-5" [svgIcon]="'heroicons_outline:information-circle'"></mat-icon>
+                    </div>
+                    <span class="text-xs text-primary font-medium flex-auto">
+                        <b>14 rattachements</b> pointent vers ce bus. Les modifications de circuit seront appliquées à la prochaine rotation.
+                    </span>
+                </div>
+                <a class="text-xs font-bold text-red-500 hover:underline flex items-center gap-1 cursor-pointer flex-none ml-4">
+                    Voir les rattachements &rarr;
+                </a>
+            </div>
+        }
+    </form>
 </div>

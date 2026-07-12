@@ -6,8 +6,9 @@ export interface CircuitPointCollecte {
     latitude?: number;
     longitude?: number;
     ordre?: number;
+    isActive?: boolean; // Optional property for UI display
 }
 
 export interface CircuitPointCollecteList {
-    circuitPointsCollecte: CircuitPointCollecte[];
+    items: CircuitPointCollecte[]; // Changed from circuitPointsCollecte to items
 }

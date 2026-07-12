@@ -1,65 +1,55 @@
-<div
-    class="absolute inset-0 min-w-0 px-4 sm:px-6 md:px-8 overflow-x-hidden overflow-y-auto flex flex-col flex-auto bg-default">
-    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-4 sm:py-8 px-4 sm:px-6 md:px-8">
-        <div class="text-2xl sm:text-4xl font-extrabold tracking-tight">Monitoring · Bus Tracking</div>
-
-        <div class="flex flex-col sm:flex-row sm:items-center gap-3 mt-4 sm:mt-0">
-            <mat-form-field class="fuse-mat-dense w-full sm:min-w-72" [subscriptSizing]="'dynamic'">
-                <mat-icon class="icon-size-5" matPrefix [svgIcon]="'search'"></mat-icon>
-                <input
-                    matInput
-                    [formControl]="searchInputControl"
-                    [autocomplete]="'off'"
-                    placeholder="Rechercher (IMM / IMEI)">
-            </mat-form-field>
-
-            <button
-                mat-stroked-button
-                type="button"
-                (click)="manualRefresh()"
-                [disabled]="isLoading">
-                <mat-icon [svgIcon]="'heroicons_outline:arrow-path'"></mat-icon>
-                <span class="ml-2">Rafraîchir</span>
-            </button>
-
-            <mat-slide-toggle [formControl]="autoRefreshControl">Auto</mat-slide-toggle>
-        </div>
-    </div>
-
+<div class="cst-supervision-page">
     @if (isLoading) {
-        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        <mat-progress-bar mode="indeterminate" class="rounded-full flex-none absolute top-0 left-0 right-0 z-50 h-1"></mat-progress-bar>
     }
 
-    <div class="flex flex-auto gap-4 pb-6">
-        <div class="w-full lg:w-4/12">
+    <!-- Supervision Grid Card wrapper -->
+    <div class="cst-supervision-grid bg-white dark:bg-gray-900 overflow-hidden grid grid-cols-1 lg:grid-cols-[320px_1fr_360px] h-full w-full">
+        
+        <!-- Left Column: Bus List -->
+        <div class="h-full overflow-hidden">
             <app-bus-tracking-list
                 [buses]="filteredBuses"
                 [selectedBusId]="selectedBus?.busId ?? null"
                 [isLoading]="isLoading"
+                [searchControl]="searchInputControl"
                 (selectBus)="onSelectBus($event)">
             </app-bus-tracking-list>
         </div>
 
-        <div class="w-full lg:w-4/12">
+        <!-- Middle Column: Live Map -->
+        <div class="h-full border-l border-r border-gray-200 dark:border-gray-700 overflow-hidden">
+            <app-bus-tracking-map
+                [locations]="getMapLocations()"
+                [showAll]="showAllOnMapControl.value === true"
+                [circuitPoints]="CircuitPoints"
+                [optimizedRoute]="OptimizedRouteForMap"
+                [selectedBusPosition]="SelectedBusPosition"
+                [routeLoading]="circuitLoading"
+                (toggleShowAll)="onToggleShowAllOnMap($event)">
+            </app-bus-tracking-map>
+        </div>
+
+        <!-- Right Column: Detail Panel -->
+        <div class="h-full overflow-hidden">
             <app-bus-tracking-panel
                 [bus]="selectedBus"
                 [events]="selectedEvents"
                 [eventsLoading]="selectedBusEventsLoading"
                 [canEmptyBus]="hasActionPermission(FuseNavigationAction.Edit)"
+                [circuitInfo]="circuitData ? {
+                    circuitId: circuitData.circuitId,
+                    circuitCode: circuitData.circuitCode,
+                    circuitName: circuitData.circuitName,
+                    completedPoints: completedCollectionPoints,
+                    totalCollectionPoints: circuitData.collectionPoints.length,
+                    progressPercent: routeProgressPercent,
+                    nextDestinationName: nextDestinationName,
+                    remainingDistanceKm: remainingDistanceKm,
+                    remainingEtaMinutes: remainingEtaMinutes
+                } : null"
                 (emptyBus)="emptySelectedBus()">
             </app-bus-tracking-panel>
         </div>
-
-        <div class="w-full lg:w-4/12">
-            <app-bus-tracking-map
-                [locations]="getMapLocations()"
-                [showAll]="showAllOnMapControl.value === true"
-                (toggleShowAll)="onToggleShowAllOnMap($event)">
-            </app-bus-tracking-map>
-        </div>
-    </div>
-
-    <div class="text-xs text-hint px-4 sm:px-6 md:px-8 pb-4">
-        Dernier snapshot: {{ lastRefreshAtUtc || '—' }}
     </div>
 </div>

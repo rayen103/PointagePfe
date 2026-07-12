@@ -1,95 +1,105 @@
-<div class="flex flex-col flex-auto min-w-0" *transloco="let t">
+<div class="cst-form-page" *transloco="let t">
+    <form class="cst-form-wrap" [formGroup]="modemForm" #modemFormDirective="ngForm">
 
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
-        <div class="flex-1 min-w-0">
-            <!-- Breadcrumbs -->
-            <div class="flex flex-wrap items-center font-medium">
+        <!-- Breadcrumb -->
+        <div class="cst-crumb">
+            <a routerLink="/fichier/modem">Gestion</a><span>/</span><a routerLink="/fichier/modem">Modems</a><span>/</span>
+            <b>{{ isNewModem ? t('Add-Modem') : (modem?.imei || t('Edit-Modem')) }}</b>
+        </div>
+
+        <!-- Header line -->
+        <div class="cst-form-topline">
+            <div class="cst-form-id">
+                <div class="cst-form-id__ic"><mat-icon [svgIcon]="'mat_outline:router'"></mat-icon></div>
                 <div>
-                    <a class="whitespace-nowrap text-primary-500" routerLink="..">{{ t('Modems') }}</a>
-                </div>
-                <div class="flex items-center ml-1 whitespace-nowrap">
-                    <mat-icon
-                        class="icon-size-5 text-secondary"
-                        [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-                    <span class="ml-1 text-secondary">{{ isNewModem ? t('Add') : t('Edit') }}</span>
-                </div>
-            </div>
-            <!-- Title -->
-            <div class="mt-2">
-                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
-                    {{ isNewModem ? t('New-Modem') : modem?.imei }}
-                </h2>
-            </div>
-        </div>
-        <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
-            <button
-                mat-flat-button
-                [color]="'primary'"
-                (click)="saveModem()">
-                <mat-icon [svgIcon]="'heroicons_outline:check'"></mat-icon>
-                <span class="ml-2">{{ t('Save') }}</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- Main -->
-    <div class="flex-auto p-6 sm:p-10">
-        <div class="max-w-3xl">
-            <form [formGroup]="modemForm" #modemFormDirective="ngForm">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-                    <!-- IMEI -->
-                    <mat-form-field class="fuse-mat-dense">
-                        <mat-label>{{ t('IMEI') }}</mat-label>
-                        <input matInput formControlName="imei">
-                        <mat-icon
-                            matPrefix
-                            class="icon-size-5"
-                            [svgIcon]="'heroicons_solid:hashtag'"></mat-icon>
-                    </mat-form-field>
-
-                    <!-- Model -->
-                    <mat-form-field class="fuse-mat-dense">
-                        <mat-label>{{ t('Model') }}</mat-label>
-                        <input matInput formControlName="modelModem">
-                        <mat-icon
-                            matPrefix
-                            class="icon-size-5"
-                            [svgIcon]="'heroicons_solid:device-tablet'"></mat-icon>
-                    </mat-form-field>
-
-                    <!-- Numero Sim -->
-                    <mat-form-field class="fuse-mat-dense">
-                        <mat-label>{{ t('Numero-Sim') }}</mat-label>
-                        <input matInput formControlName="numeroSim">
-                        <mat-icon
-                            matPrefix
-                            class="icon-size-5"
-                            [svgIcon]="'heroicons_solid:phone'"></mat-icon>
-                    </mat-form-field>
-
-                    <!-- Status -->
-                    <div class="flex items-center mt-4">
-                        <mat-slide-toggle
-                            [color]="'primary'"
-                            formControlName="isActive">
-                            {{ t('Active') }}
-                        </mat-slide-toggle>
+                    <div class="cst-form-id__title">
+                        <span>{{ isNewModem ? t('New-Modem') : (modem?.imei || t('Edit-Modem')) }}</span>
+                        @if (!isNewModem) {
+                            <span class="cst-pill" [ngClass]="modem?.isActive ? 'cst-pill--ok' : 'cst-pill--off'">
+                                {{ modem?.isActive ? (t('Active') || 'ACTIF') : (t('Inactive') || 'INACTIF') }}
+                            </span>
+                        }
+                    </div>
+                    <div class="cst-form-id__meta">
+                        {{ isNewModem ? 'Nouveau modem IoT' : (modem?.modelModem ? modem.modelModem : 'Modem IoT') }} · {{ isNewModem ? 'En attente de configuration' : 'Modem de collecte' }}
                     </div>
                 </div>
-
-                <!-- Flash message -->
-                @if (flashMessage) {
-                    <div
-                        class="mt-8 p-4 rounded-lg"
-                        [ngClass]="{
-                            'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100': flashMessage === 'success',
-                            'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100': flashMessage === 'error'
-                        }">
-                        {{ flashMessage === 'success' ? t('Successfully-saved') : t('Something-went-wrong') }}
-                    </div>
-                }
-            </form>
+            </div>
+            <div class="cst-head__actions">
+                <button class="cst-btn cst-btn--ghost" type="button" (click)="onBackdropClicked()">{{ t('Cancel') || 'Annuler' }}</button>
+                <button class="cst-btn cst-btn--primary" type="button" (click)="saveModem()">{{ t('Save') || 'Enregistrer' }}</button>
+            </div>
         </div>
-    </div>
+
+        @if (flashMessage) {
+            <div class="cst-form-flash" [class.is-ok]="flashMessage === 'success'" [class.is-err]="flashMessage === 'error'">
+                {{ flashMessage === 'success' ? (t('Successfully-saved') || 'Enregistré avec succès') : (t('Something-went-wrong') || 'Veuillez corriger les erreurs du formulaire') }}
+            </div>
+        }
+
+        <div class="cst-form-card">
+            <!-- Informations générales -->
+            <div>
+                <div class="cst-form-sec__title">{{ t('General-Information') || 'Informations générales' }}</div>
+                <div class="cst-form-sec__sub">Identité et caractéristiques du modem</div>
+                <div class="cst-form-grid">
+                    <!-- Row 1 -->
+                    <!-- Col 1: IMEI -->
+                    <div class="cst-field">
+                        <label>IMEI <span style="color:var(--cst-red)">*</span></label>
+                        <input class="cst-input" [class.is-err]="modemForm.get('imei')?.invalid && (modemForm.get('imei')?.touched || modemFormDirective.submitted)"
+                               formControlName="imei" [placeholder]="t('Enter-IMEI') || 'Entrer l\'IMEI'" />
+                        @if (modemForm.get('imei')?.invalid && (modemForm.get('imei')?.touched || modemFormDirective.submitted)) {
+                            <div class="cst-field__err">
+                                <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                <span>L'IMEI est requis</span>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Col 2: Modèle -->
+                    <div class="cst-field">
+                        <label>{{ t('Model') || 'Modèle' }}</label>
+                        <input class="cst-input" formControlName="modelModem" [placeholder]="'Entrer le modèle' || 'Ex: Quectel EC25'" />
+                    </div>
+
+                    <!-- Col 3: Numéro SIM -->
+                    <div class="cst-field">
+                        <label>{{ t('Numero-Sim') || 'N° SIM' }}</label>
+                        <input class="cst-input" formControlName="numeroSim" [placeholder]="t('Enter-sim') || 'Ex: 216XXXXXXXX'" />
+                    </div>
+
+                    <!-- Col 4: Bus -->
+                    <div class="cst-field">
+                        <label>{{ t('Bus') || 'Bus' }}</label>
+                        <mat-select class="cst-input" formControlName="busId">
+                            <mat-option value="">-- Aucun --</mat-option>
+                            @for (bus of buses; track bus.busId) {
+                                <mat-option [value]="bus.busId">{{ bus.numeroIMM }} ({{ bus.modelBus }})</mat-option>
+                            }
+                        </mat-select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cst-divider"></div>
+
+            <!-- Statut -->
+            <div class="cst-form-statusrow">
+                <div>
+                    <div class="cst-form-sec__title" style="margin-bottom:3px">{{ t('Modem-Status') || 'Statut du modem' }}</div>
+                    <div class="cst-form-sec__sub" style="margin-bottom:0">Un modem inactif ne pourra pas être assigné à un nouveau bus</div>
+                </div>
+                <div>
+                    <label class="cst-toggle">
+                        <span [ngClass]="modemForm.get('isActive')?.value ? 'cst-toggle__on' : 'cst-toggle__off'">Actif</span>
+                        <input type="checkbox" formControlName="isActive" />
+                        <span class="cst-toggle__track"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <input type="hidden" formControlName="societeId" />
+    </form>
 </div>

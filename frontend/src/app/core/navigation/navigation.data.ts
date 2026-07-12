@@ -8,6 +8,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
         title: 'Fichier',
         type : 'group',
         icon : 'mat_outline:assignment',
+        link : '/fichier/bus',
         children: [
 
             {
@@ -66,14 +67,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 link : '/fichier/equipe',
                 action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
             },
-            {
-                id   : 'fichier.ordretravail',
-                title: 'Ordre de Travail',
-                type : 'basic',
-                icon : 'mat_outline:assignment',
-                link : '/fichier/ordretravail',
-                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
-            },
+
             {
                 id   : 'fichier.rattachement',
                 title: 'Rattachement',
@@ -145,7 +139,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
         id: 'monitoring',
         title: 'Monitoring',
         type: 'group',
-        icon: 'mat_outline:monitoring',
+        icon: 'mat_outline:my_location',
         children: [
             {
                 id: 'monitoring.bus-tracking',
@@ -307,22 +301,31 @@ export const futuristicNavigation: FuseNavigationItem[] = [
 export const horizontalNavigation: FuseNavigationItem[] = [
 
     {
+        id   : 'accueil',
+        title: 'Accueil',
+        type : 'basic',
+        icon : 'mat_outline:home',
+        link : '/Accueil/page'
+    },
+    {
         id   : 'fichier',
         title: 'Fichier',
         type : 'group',
         icon : 'mat_outline:assignment',
+        link : '/fichier/bus',
         children: []
     },
     {
         id   : 'monitoring',
         title: 'Monitoring',
         type : 'group',
-        icon : 'mat_outline:monitoring',
+        icon : 'mat_outline:my_location',
+        link : '/monitoring/bus-tracking',
         children: []
     },
     {
         id   : 'analyse',
-        title: 'Anaalyse',
+        title: 'Analyse',
         type : 'group',
         icon : 'mat_outline:analytics',
         children: []
