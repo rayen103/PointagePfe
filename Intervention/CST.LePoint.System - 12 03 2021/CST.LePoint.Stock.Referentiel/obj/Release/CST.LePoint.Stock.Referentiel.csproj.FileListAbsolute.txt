@@ -1,9 +1,0 @@
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Stock.Referentiel\bin\Release\CST.LePoint.Stock.Referentiel.dll
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Stock.Referentiel\bin\Release\CST.LePoint.Stock.Referentiel.pdb
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Stock.Referentiel\bin\Release\CST.LePoint.Referentiel.dll
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Stock.Referentiel\bin\Release\CST.LePoint.Tools.dll
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Stock.Referentiel\bin\Release\CST.LePoint.Referentiel.pdb
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Stock.Referentiel\bin\Release\CST.LePoint.Tools.pdb
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Stock.Referentiel\obj\Release\CST.LePoint.Stock.Referentiel.csprojResolveAssemblyReference.cache
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Stock.Referentiel\obj\Release\CST.LePoint.Stock.Referentiel.dll
-D:\Code Sources\SINCER\Intervention\CST.LePoint.System\CST.LePoint.Stock.Referentiel\obj\Release\CST.LePoint.Stock.Referentiel.pdb

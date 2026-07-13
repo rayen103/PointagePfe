@@ -155,9 +155,9 @@ if (app.Environment.IsDevelopment())
 {
     try
     {
-        // Get project root path (relative from WebAPI to ml-services)
+        // Get project root path (relative from WebAPI to ml-service)
         var solutionRoot = Path.GetFullPath(Path.Combine(app.Environment.ContentRootPath, "..", "..", ".."));
-        var mlServicePath = Path.Combine(solutionRoot, "ml-services", "eta_prediction");
+        var mlServicePath = Path.Combine(solutionRoot, "ml-service");
 
         if (Directory.Exists(mlServicePath))
         {
