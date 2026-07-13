@@ -59,6 +59,21 @@ export interface BusRuntimeEvent {
     occurredAtUtc: string;
 }
 
+export interface BusPointage {
+    pointageId: string;
+    busId: string;
+    tag: string;
+    matricule?: string;
+    nomEmploye?: string;
+    codeCircuitEmploye?: string;
+    codeCircuitBus?: string;
+    isSuccess: boolean;
+    message: string;
+    latitude?: number;
+    longitude?: number;
+    heurePointageUtc: string;
+}
+
 export interface UpdateBusRuntimePositionPayload {
     imei: string;
     latitude?: number;

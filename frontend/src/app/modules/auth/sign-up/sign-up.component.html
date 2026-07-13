@@ -1,117 +1,220 @@
-<div class="cst-auth">
-    <!-- Decorative background -->
-    <div class="cst-auth__bg">
-        <div class="cst-auth__glow cst-auth__glow--1"></div>
-        <div class="cst-auth__glow cst-auth__glow--2"></div>
-        <svg class="cst-auth__paths" viewBox="0 0 1440 860" preserveAspectRatio="xMidYMax slice">
-            <path d="M-40 640 C 240 560, 420 720, 700 640 S 1180 540, 1480 620" fill="none" stroke="#C9DEF0" stroke-width="2" stroke-dasharray="1 10" stroke-linecap="round"></path>
-            <path d="M-40 720 C 260 660, 480 800, 760 720 S 1200 640, 1480 710" fill="none" stroke="#C9DEF0" stroke-width="2" stroke-dasharray="1 10" stroke-linecap="round"></path>
-        </svg>
+<div class="cst-signup-split">
+    <!-- Left panel: Visual & Showcase (Desktop) -->
+    <div class="cst-signup-visual">
+        <div class="cst-signup-visual__overlay"></div>
+        <div class="cst-signup-visual__content">
+            <!-- Brand Logo -->
+            <div class="cst-signup-visual__logo">
+                <img src="images/logo/logo-text.svg" alt="CST Logo" />
+            </div>
+
+            <!-- Body -->
+            <div class="cst-signup-visual__body">
+                <div>
+                    <h1 class="cst-signup-visual__title">Optimisez votre gestion de flotte en temps réel</h1>
+                    <p class="cst-signup-visual__subtitle">Rejoignez Canadian System Technology et accédez à une plateforme moderne d'analyse, de géolocalisation et d'optimisation de circuits.</p>
+                </div>
+
+                <!-- Mini Dashboard Widget (CSS + SVG mockup) -->
+                <div class="cst-signup-widget">
+                    <div class="cst-signup-widget__header">
+                        <span class="cst-signup-widget__title">Activité de la Flotte</span>
+                        <span class="cst-signup-widget__badge">En direct</span>
+                    </div>
+                    <div class="cst-signup-widget__stats">
+                        <div class="cst-signup-widget__stat">
+                            <span class="cst-signup-widget__label">Véhicules</span>
+                            <span class="cst-signup-widget__val">24/28 active</span>
+                        </div>
+                        <div class="cst-signup-widget__stat">
+                            <span class="cst-signup-widget__label">Efficacité</span>
+                            <span class="cst-signup-widget__val color-green">+14.2%</span>
+                        </div>
+                    </div>
+                    <!-- SVG Chart line -->
+                    <div class="cst-signup-widget__chart">
+                        <svg viewBox="0 0 300 70" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="chartGlow" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="var(--cst-blue)" stop-opacity="0.4" />
+                                    <stop offset="100%" stop-color="var(--cst-blue)" stop-opacity="0.0" />
+                                </linearGradient>
+                            </defs>
+                            <!-- Path fill -->
+                            <path d="M 0 50 C 30 40, 60 55, 90 35 C 120 15, 150 45, 180 25 C 210 5, 240 15, 270 10 L 300 5 L 300 70 L 0 70 Z" fill="url(#chartGlow)" />
+                            <!-- Path outline -->
+                            <path d="M 0 50 C 30 40, 60 55, 90 35 C 120 15, 150 45, 180 25 C 210 5, 240 15, 270 10 L 300 5" fill="none" stroke="var(--cst-blue)" stroke-width="3" stroke-linecap="round" />
+                            <!-- Highlight Point -->
+                            <circle cx="270" cy="10" r="5" fill="#ffffff" stroke="var(--cst-blue)" stroke-width="2.5" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Features list -->
+                <div class="cst-signup-features">
+                    <div class="cst-signup-feature">
+                        <div class="cst-signup-feature__icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+                            </svg>
+                        </div>
+                        <div class="cst-signup-feature__text">
+                            <h3>Géolocalisation & circuits</h3>
+                            <p>Suivez vos chauffeurs en temps réel et optimisez vos circuits de collecte intelligents.</p>
+                        </div>
+                    </div>
+                    <div class="cst-signup-feature">
+                        <div class="cst-signup-feature__icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="9" y1="9" x2="15" y2="9"></line>
+                                <line x1="9" y1="13" x2="15" y2="13"></line>
+                                <line x1="9" y1="17" x2="15" y2="17"></line>
+                            </svg>
+                        </div>
+                        <div class="cst-signup-feature__text">
+                            <h3>Rapports & KPI avancés</h3>
+                            <p>Analysez les performances globales, l'assiduité et la consommation de carburant en un clic.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="cst-signup-visual__footer">
+                © 2026 Canadian System Technology. Tous droits réservés.
+            </div>
+        </div>
     </div>
 
-    <!-- Card -->
-    <div class="cst-auth__card">
-        <div class="cst-auth__brand">
-            <img src="images/logo/logo-text.svg" alt="CST — Canadian System Technology" />
-            <div class="cst-auth__welcome">Inscrivez votre société</div>
-            <div class="cst-auth__sub">Créez votre espace et gérez votre flotte en quelques minutes</div>
-        </div>
+    <!-- Right panel: Registration Form -->
+    <div class="cst-signup-form-panel">
+        <!-- Back to home button -->
+        <a class="cst-auth-home-btn" [routerLink]="['/home']">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            Retour au site
+        </a>
 
-        @if (showAlert) {
-            <div class="cst-auth__alert" [class.is-error]="alert.type === 'error'" [@shake]="alert.type === 'error'">
-                {{ alert.message }}
-            </div>
-        }
-
-        <form class="cst-auth__form" [formGroup]="signUpForm" #signUpNgForm="ngForm">
-            <!-- Société -->
-            <div class="cst-field">
-                <label>Nom de la société</label>
-                <input class="cst-input" type="text" formControlName="nomSociete" placeholder="Ma Société de Transport" />
-                @if (signUpForm.get('nomSociete')?.hasError('required') && signUpNgForm.submitted) {
-                    <div class="cst-field__err">Le nom de la société est requis</div>
-                }
-            </div>
-
-            <!-- Nom / Prénom -->
-            <div class="cst-auth__grid2">
-                <div class="cst-field">
-                    <label>Nom</label>
-                    <input class="cst-input" type="text" formControlName="nom" placeholder="Nom" autocomplete="family-name" />
-                    @if (signUpForm.get('nom')?.hasError('required') && signUpNgForm.submitted) {
-                        <div class="cst-field__err">Le nom est requis</div>
-                    }
+        <div class="cst-signup-form-container">
+            <div class="cst-signup-card">
+                <div class="cst-signup-card__brand">
+                    <img src="images/logo/logo-text.svg" alt="CST Logo" />
+                    <h2 class="cst-signup-card__welcome">Inscrivez votre société</h2>
+                    <p class="cst-signup-card__sub">Créez votre espace de travail et gérez votre flotte en quelques minutes</p>
                 </div>
-                <div class="cst-field">
-                    <label>Prénom</label>
-                    <input class="cst-input" type="text" formControlName="prenom" placeholder="Prénom" autocomplete="given-name" />
-                    @if (signUpForm.get('prenom')?.hasError('required') && signUpNgForm.submitted) {
-                        <div class="cst-field__err">Le prénom est requis</div>
+
+                @if (showAlert) {
+                    <div class="cst-signup-card__alert">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; flex-shrink: 0;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        <span>{{ alert.message }}</span>
+                    </div>
+                }
+
+                <form class="cst-auth__form" [formGroup]="signUpForm" #signUpNgForm="ngForm">
+                    <!-- Société -->
+                    <div class="cst-field">
+                        <label>Nom de la société</label>
+                        <input class="cst-input" type="text" formControlName="nomSociete" placeholder="Ma Société de Transport" />
+                        @if (signUpForm.get('nomSociete')?.hasError('required') && signUpNgForm.submitted) {
+                            <div class="cst-field__err">Le nom de la société est requis</div>
+                        }
+                    </div>
+
+                    <!-- Nom / Prénom -->
+                    <div class="cst-auth__grid2">
+                        <div class="cst-field">
+                            <label>Nom</label>
+                            <input class="cst-input" type="text" formControlName="nom" placeholder="Nom" autocomplete="family-name" />
+                            @if (signUpForm.get('nom')?.hasError('required') && signUpNgForm.submitted) {
+                                <div class="cst-field__err">Le nom est requis</div>
+                            }
+                        </div>
+                        <div class="cst-field">
+                            <label>Prénom</label>
+                            <input class="cst-input" type="text" formControlName="prenom" placeholder="Prénom" autocomplete="given-name" />
+                            @if (signUpForm.get('prenom')?.hasError('required') && signUpNgForm.submitted) {
+                                <div class="cst-field__err">Le prénom est requis</div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="cst-field">
+                        <label>Adresse email professionnelle</label>
+                        <input class="cst-input" type="email" formControlName="email" placeholder="prenom.nom@societe.tn" autocomplete="email" />
+                        @if (signUpForm.get('email')?.hasError('required') && signUpNgForm.submitted) {
+                            <div class="cst-field__err">L'adresse email est requise</div>
+                        }
+                        @if (signUpForm.get('email')?.hasError('email') && signUpNgForm.submitted) {
+                            <div class="cst-field__err">L'adresse email n'est pas valide</div>
+                        }
+                    </div>
+
+                    <!-- Password -->
+                    <div class="cst-field">
+                        <label>Mot de passe</label>
+                        <div class="cst-input cst-input--group">
+                            <input #pwField type="password" formControlName="password" placeholder="Au moins 8 caractères" autocomplete="new-password" />
+                            <button type="button" class="cst-input__eye" (click)="pwField.type = pwField.type === 'password' ? 'text' : 'password'" aria-label="Afficher le mot de passe">
+                                @if (pwField.type === 'password') {
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                } @else {
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10 10 0 0112 20c-7 0-11-8-11-8a18 18 0 015.06-5.94M9.9 4.24A9 9 0 0112 4c7 0 11 8 11 8a18 18 0 01-2.16 3.19M1 1l22 22"></path></svg>
+                                }
+                            </button>
+                        </div>
+                        @if (signUpForm.get('password')?.hasError('minlength') && signUpNgForm.submitted) {
+                            <div class="cst-field__err">Le mot de passe doit contenir au moins 8 caractères</div>
+                        }
+
+                        <!-- Password Helper Rule -->
+                        @if (signUpForm.get('password')?.value) {
+                            <div class="cst-pw-strength__rules">
+                                <div class="cst-pw-strength__rule" [class.is-valid]="signUpForm.get('password')?.value?.length >= 8">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+                                        <path d="M20 6L9 17l-5-5"></path>
+                                    </svg>
+                                    Au moins 8 caractères
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Password confirm -->
+                    <div class="cst-field">
+                        <label>Confirmer le mot de passe</label>
+                        <input class="cst-input" type="password" formControlName="passwordConfirm" placeholder="••••••••••" autocomplete="new-password" />
+                        @if (signUpForm.hasError('passwordsMismatch') && signUpNgForm.submitted) {
+                            <div class="cst-field__err">Les mots de passe ne correspondent pas</div>
+                        }
+                    </div>
+
+                    <!-- CGU -->
+                    <label class="cst-check">
+                        <input type="checkbox" formControlName="agreements" />
+                        <span class="cst-check__box"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M2 6.5l2.6 2.6L10 3.5"></path></svg></span>
+                        <span>J'accepte les conditions d'utilisation</span>
+                    </label>
+                    @if (signUpForm.get('agreements')?.hasError('required') && signUpNgForm.submitted) {
+                        <div class="cst-field__err">Vous devez accepter les conditions d'utilisation</div>
                     }
-                </div>
-            </div>
 
-            <!-- Email -->
-            <div class="cst-field">
-                <label>Adresse email professionnelle</label>
-                <input class="cst-input" type="email" formControlName="email" placeholder="prenom.nom@societe.tn" autocomplete="email" />
-                @if (signUpForm.get('email')?.hasError('required') && signUpNgForm.submitted) {
-                    <div class="cst-field__err">L'adresse email est requise</div>
-                }
-                @if (signUpForm.get('email')?.hasError('email') && signUpNgForm.submitted) {
-                    <div class="cst-field__err">L'adresse email n'est pas valide</div>
-                }
-            </div>
-
-            <!-- Password -->
-            <div class="cst-field">
-                <label>Mot de passe</label>
-                <div class="cst-input cst-input--group">
-                    <input #pwField type="password" formControlName="password" placeholder="Au moins 8 caractères" autocomplete="new-password" />
-                    <button type="button" class="cst-input__eye" (click)="pwField.type = pwField.type === 'password' ? 'text' : 'password'" aria-label="Afficher le mot de passe">
-                        @if (pwField.type === 'password') {
-                            <svg viewBox="0 0 24 24" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    <!-- Submit -->
+                    <button type="button" class="cst-signup-submit" [disabled]="isLoading" (click)="signUp()">
+                        @if (isLoading) {
+                            <mat-progress-spinner [diameter]="22" [mode]="'indeterminate'"></mat-progress-spinner>
                         } @else {
-                            <svg viewBox="0 0 24 24" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10 10 0 0112 20c-7 0-11-8-11-8a18 18 0 015.06-5.94M9.9 4.24A9 9 0 0112 4c7 0 11 8 11 8a18 18 0 01-2.16 3.19M1 1l22 22"></path></svg>
+                            Créer mon compte
                         }
                     </button>
-                </div>
-                @if (signUpForm.get('password')?.hasError('minlength') && signUpNgForm.submitted) {
-                    <div class="cst-field__err">Le mot de passe doit contenir au moins 8 caractères</div>
-                }
+
+                    <div class="cst-signup-card__foot">Déjà inscrit ? <a class="cst-signup-card__link" [routerLink]="['/sign-in']">Se connecter</a></div>
+                </form>
             </div>
+        </div>
 
-            <!-- Password confirm -->
-            <div class="cst-field">
-                <label>Confirmer le mot de passe</label>
-                <input class="cst-input" type="password" formControlName="passwordConfirm" placeholder="••••••••••" autocomplete="new-password" />
-                @if (signUpForm.hasError('passwordsMismatch') && signUpNgForm.submitted) {
-                    <div class="cst-field__err">Les mots de passe ne correspondent pas</div>
-                }
-            </div>
-
-            <!-- CGU -->
-            <label class="cst-check">
-                <input type="checkbox" formControlName="agreements" />
-                <span class="cst-check__box"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M2 6.5l2.6 2.6L10 3.5"></path></svg></span>
-                J'accepte les conditions d'utilisation
-            </label>
-            @if (signUpForm.get('agreements')?.hasError('required') && signUpNgForm.submitted) {
-                <div class="cst-field__err">Vous devez accepter les conditions d'utilisation</div>
-            }
-
-            <!-- Submit -->
-            <button type="button" class="cst-auth__submit" [disabled]="isLoading" (click)="signUp()">
-                @if (isLoading) {
-                    <mat-progress-spinner [diameter]="22" [mode]="'indeterminate'"></mat-progress-spinner>
-                } @else {
-                    Créer mon compte
-                }
-            </button>
-
-            <div class="cst-auth__foot">Déjà inscrit ? <a class="cst-auth__link" [routerLink]="['/sign-in']">Se connecter</a></div>
-        </form>
+        <div class="cst-signup-copy">© 2026 Canadian System Technology · FR / EN</div>
     </div>
-
-    <div class="cst-auth__copy">© 2026 Canadian System Technology · FR / EN</div>
 </div>

@@ -22,6 +22,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatOptionModule, MatRippleModule } from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSelectModule } from '@angular/material/select';
@@ -44,6 +45,7 @@ import { TranslocoDirective } from '@ngneat/transloco';
         MatFormFieldModule,
         MatIconModule,
         MatInputModule,
+        MatProgressBarModule,
         MatOptionModule,
         MatRippleModule,
         MatSelectModule,

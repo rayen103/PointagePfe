@@ -2,11 +2,11 @@ import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/
 import { RouterOutlet } from '@angular/router';
 
 @Component({
-    selector: 'app-utilisateur',
+    selector: 'app-pointage',
     standalone: true,
     imports: [RouterOutlet],
     template: '<router-outlet></router-outlet>',
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UtilisateurComponent {}
+export class PointageComponent {}

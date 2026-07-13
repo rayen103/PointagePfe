@@ -14,10 +14,18 @@
         <div class="cst-auth__brand">
             <img src="images/logo/logo-text.svg" alt="CST — Canadian System Technology" />
             <div class="cst-auth__welcome">Vérifiez votre email</div>
-            <div class="cst-auth__sub">
-                Un code à 6 chiffres a été envoyé à<br />
-                <strong>{{ email }}</strong>
-            </div>
+            @if (pendingApproval) {
+                <div class="cst-auth__sub">
+                    Votre demande d'inscription est <strong>en cours de validation</strong>.<br />
+                    Dès qu'elle sera approuvée, un code à 6 chiffres sera envoyé à<br />
+                    <strong>{{ email }}</strong> — vous pourrez le saisir ci-dessous.
+                </div>
+            } @else {
+                <div class="cst-auth__sub">
+                    Un code à 6 chiffres a été envoyé à<br />
+                    <strong>{{ email }}</strong>
+                </div>
+            }
         </div>
 
         @if (showAlert) {

@@ -1,0 +1,219 @@
+<div class="cst-main" *transloco="let t">
+    <div class="cst-crumb"><a routerLink="/fichier/bus">Gestion</a><span>/</span><b>{{ t('Pointages') || 'Pointages' }}</b></div>
+
+    <div class="cst-head">
+        <div>
+            <div class="cst-head__title">{{ t('Pointages') || 'Pointages' }}</div>
+            <div class="cst-head__sub">Journal d'émargement et pointages par cartes RFID en temps réel</div>
+        </div>
+        <div class="cst-head__actions">
+            <button class="cst-btn cst-btn--ghost flex items-center gap-1.5 shadow-sm border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 h-10 px-4 text-xs font-semibold rounded-lg" type="button" (click)="SortChange()">
+                <mat-icon class="cst-btn__i w-4 h-4" [svgIcon]="'heroicons_outline:arrow-down-tray'"></mat-icon> Exporter
+            </button>
+        </div>
+    </div>
+
+    <!-- Analytics Summary KPIs -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <!-- Card 1: Total -->
+        <div class="bg-white dark:bg-gray-800/80 p-4 rounded-xl shadow-sm border border-gray-150/40 dark:border-gray-700/50 flex items-center justify-between transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
+            <div>
+                <span class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider block">Total Pointages</span>
+                <span class="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-1 block">{{ statTotal }}</span>
+            </div>
+            <div class="p-3 bg-blue-50 dark:bg-blue-500/10 text-blue-500 rounded-lg">
+                <mat-icon [svgIcon]="'heroicons_outline:identification'"></mat-icon>
+            </div>
+        </div>
+
+        <!-- Card 2: Success Rate -->
+        <div class="bg-white dark:bg-gray-800/80 p-4 rounded-xl shadow-sm border border-gray-150/40 dark:border-gray-700/50 flex items-center justify-between transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
+            <div>
+                <span class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider block">Taux de Validation</span>
+                <span class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 block">{{ successRate }}%</span>
+            </div>
+            <div class="p-3 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 rounded-lg">
+                <mat-icon [svgIcon]="'heroicons_outline:check-circle'"></mat-icon>
+            </div>
+        </div>
+
+        <!-- Card 3: Anomalies -->
+        <div class="bg-white dark:bg-gray-800/80 p-4 rounded-xl shadow-sm border border-gray-150/40 dark:border-gray-700/50 flex items-center justify-between transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
+            <div>
+                <span class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider block">Anomalies</span>
+                <span class="text-2xl font-bold text-rose-600 dark:text-rose-450 mt-1 block">{{ statAnomalies }}</span>
+            </div>
+            <div class="p-3 bg-rose-50 dark:bg-rose-500/10 text-rose-500 rounded-lg">
+                <mat-icon [svgIcon]="'heroicons_outline:exclamation-circle'"></mat-icon>
+            </div>
+        </div>
+
+        <!-- Card 4: Active Buses -->
+        <div class="bg-white dark:bg-gray-800/80 p-4 rounded-xl shadow-sm border border-gray-150/40 dark:border-gray-700/50 flex items-center justify-between transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
+            <div>
+                <span class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider block">Bus Traqués</span>
+                <span class="text-2xl font-bold text-violet-600 dark:text-violet-400 mt-1 block">{{ statBuses }}</span>
+            </div>
+            <div class="p-3 bg-violet-50 dark:bg-violet-500/10 text-violet-500 rounded-lg">
+                <mat-icon [svgIcon]="'heroicons_outline:truck'"></mat-icon>
+            </div>
+        </div>
+    </div>
+
+    <div class="cst-panel p-6">
+        <div class="cst-filters flex flex-wrap gap-y-4 gap-x-6 items-center mb-6">
+            <!-- Search field -->
+            <div class="cst-search min-w-[240px] flex-1">
+                <mat-icon [svgIcon]="'heroicons_outline:magnifying-glass'"></mat-icon>
+                <input [formControl]="searchInputControl" [placeholder]="t('Search') || 'Rechercher...'" autocomplete="off" />
+            </div>
+
+            <!-- Date Range Filter in single field -->
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Date range</span>
+                <div class="cst-date-wrapper flex items-center bg-white dark:bg-gray-850 transition-colors">
+                    <mat-icon class="w-4 h-4 ml-3 text-gray-400 pointer-events-none" [svgIcon]="'heroicons_outline:calendar'"></mat-icon>
+                    <mat-form-field class="cst-date-range-field text-xs" appearance="fill" subscriptSizing="dynamic">
+                        <mat-date-range-input [rangePicker]="picker" class="text-xs px-2">
+                            <input matStartDate [formControl]="startDateControl" placeholder="Du">
+                            <input matEndDate [formControl]="endDateControl" placeholder="Au">
+                        </mat-date-range-input>
+                        <mat-datepicker-toggle matIconSuffix [for]="picker" class="w-4 h-4 mr-1 text-gray-400 scale-75"></mat-datepicker-toggle>
+                        <mat-date-range-picker #picker></mat-date-range-picker>
+                    </mat-form-field>
+                </div>
+            </div>
+
+            <!-- Bus Dropdown Filter -->
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Bus</span>
+                <div class="cst-select relative">
+                    <select [formControl]="busIdControl" class="pl-3 pr-8 bg-white dark:bg-gray-850 transition-colors appearance-none cursor-pointer">
+                        <option value="">Tous les bus</option>
+                        @for (bus of buses; track bus.busId) {
+                            <option [value]="bus.busId">{{ bus.numeroIMM }}</option>
+                        }
+                    </select>
+                    <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+            </div>
+
+            <!-- Success Status Filter -->
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Statut</span>
+                <div class="cst-select relative">
+                    <select [formControl]="isSuccessControl" class="pl-3 pr-8 bg-white dark:bg-gray-850 transition-colors appearance-none cursor-pointer">
+                        <option value="">Tous</option>
+                        <option value="true">Succès</option>
+                        <option value="false">Anomalie</option>
+                    </select>
+                    <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+            </div>
+
+            <!-- Reset Button -->
+            <button class="cst-btn h-[38px] px-4 text-xs flex items-center justify-center gap-1.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors rounded-lg shadow-sm font-semibold" type="button" (click)="resetFilters()">
+                <mat-icon class="w-4 h-4 text-sm" [svgIcon]="'heroicons_outline:arrow-path'"></mat-icon> Réinitialiser
+            </button>
+
+            <!-- Results Counter -->
+            <div class="cst-filters__count text-xs font-semibold text-gray-505 ml-auto">{{ pointagesLength ?? 0 }} résultats</div>
+        </div>
+
+        @if (isLoading) { <mat-progress-bar mode="indeterminate"></mat-progress-bar> }
+
+        <div class="cst-tbl" matSort (matSortChange)="SortChange()" style="--cols: 130px 1.8fr 110px 1.5fr 1.5fr 150px 115px 1.8fr; --colmin: 1100px">
+            <div class="cst-tbl__head">
+                <div mat-sort-header="tag">Badge / Tag</div>
+                <div mat-sort-header="nomemploye">Employé</div>
+                <div mat-sort-header="busnumeroimm">Bus</div>
+                <div mat-sort-header="codecircuitemploye">Circuit (Chauffeur)</div>
+                <div mat-sort-header="codecircuitbus">Circuit (Bus)</div>
+                <div mat-sort-header="heurepointageutc" mat-sort-start="desc">Heure Pointage</div>
+                <div mat-sort-header="issuccess">Statut</div>
+                <div>Message</div>
+            </div>
+            @if (pointages$ | async; as pointages) {
+                @if (pointages.length > 0) {
+                    @for (pointage of pointages; track pointage.pointageId) {
+                        <div class="cst-tbl__row align-middle py-3 transition-all duration-200 hover:bg-gray-50/80 dark:hover:bg-gray-800/40">
+                            <!-- Badge RFID / Tag -->
+                            <div class="flex items-center">
+                                <span class="px-2 py-0.5 text-[11px] font-semibold font-mono bg-gray-100 dark:bg-gray-700/80 text-gray-750 dark:text-gray-300 rounded-md border border-gray-200 dark:border-gray-600/50 flex items-center gap-1.5 shadow-sm">
+                                    <mat-icon class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" [svgIcon]="'heroicons_outline:signal'"></mat-icon>
+                                    {{ pointage.tag }}
+                                </span>
+                            </div>
+
+                            <!-- Employé Avatar & Name & Matricule (Merged) -->
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-inner transform hover:scale-105 transition-transform"
+                                     [style.background-color]="getAvatarColor(pointage.nomEmploye)">
+                                    {{ getInitials(pointage.nomEmploye) }}
+                                </div>
+                                <div class="flex flex-col min-w-0">
+                                    <span class="font-semibold text-gray-800 dark:text-gray-200 truncate">{{ pointage.nomEmploye || '—' }}</span>
+                                    <span class="text-[10px] text-gray-400 dark:text-gray-500 font-mono mt-0.5 flex items-center gap-1">
+                                        <mat-icon class="w-3 h-3 text-[10px] text-gray-400" [svgIcon]="'heroicons_outline:identification'"></mat-icon>
+                                        {{ pointage.matricule || 'Sans matricule' }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Bus License Plate Badge -->
+                            <div class="flex items-center">
+                                <span class="px-2 py-0.5 text-[10px] font-bold font-mono bg-amber-50 dark:bg-amber-950/20 text-amber-800 dark:text-amber-450 rounded border border-amber-250 dark:border-amber-900/40 uppercase tracking-wide shadow-sm">
+                                    {{ pointage.busNumeroIMM || '—' }}
+                                </span>
+                            </div>
+
+                            <!-- Circuit Chauffeur -->
+                            <div class="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                                <mat-icon class="w-3.5 h-3.5 text-gray-400" [svgIcon]="'heroicons_outline:map'"></mat-icon>
+                                <span class="text-xs truncate font-medium" [title]="pointage.codeCircuitEmploye">{{ pointage.codeCircuitEmploye || '—' }}</span>
+                            </div>
+
+                            <!-- Circuit Bus -->
+                            <div class="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                                <mat-icon class="w-3.5 h-3.5 text-gray-400" [svgIcon]="'heroicons_outline:map'"></mat-icon>
+                                <span class="text-xs truncate font-medium" [title]="pointage.codeCircuitBus">{{ pointage.codeCircuitBus || '—' }}</span>
+                            </div>
+
+                            <!-- Heure Pointage -->
+                            <div class="flex items-center gap-1.5 text-gray-600 dark:text-gray-400 font-mono text-[11px]">
+                                <mat-icon class="w-3.5 h-3.5 text-gray-400" [svgIcon]="'heroicons_outline:clock'"></mat-icon>
+                                <span>{{ pointage.heurePointageUtc | date:'dd/MM/yyyy HH:mm:ss' }}</span>
+                            </div>
+
+                            <!-- Statut Pill with Glow & Icon -->
+                            <div class="flex items-center">
+                                <span class="px-2.5 py-1 text-[9px] font-extrabold rounded-full uppercase tracking-wider flex items-center gap-1 shadow-sm border"
+                                      [ngClass]="pointage.isSuccess 
+                                          ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-emerald-150/40 dark:border-emerald-900/30' 
+                                          : 'bg-rose-50 dark:bg-rose-950/20 text-rose-700 dark:text-rose-450 border-rose-150/40 dark:border-rose-900/30'">
+                                    <mat-icon class="w-3 h-3 text-[10px]" [svgIcon]="pointage.isSuccess ? 'heroicons_outline:check-circle' : 'heroicons_outline:exclamation-circle'"></mat-icon>
+                                    {{ pointage.isSuccess ? 'VALIDE' : 'ANOMALIE' }}
+                                </span>
+                            </div>
+
+                            <!-- Message -->
+                            <div class="flex items-center text-xs text-gray-500 dark:text-gray-400 italic truncate max-w-[200px]" [title]="pointage.message">
+                                {{ pointage.message || '—' }}
+                            </div>
+                        </div>
+                    }
+                } @else {
+                    <div class="cst-tbl__empty py-16">
+                        <div class="cst-tbl__empty-ic text-gray-300 dark:text-gray-700 mb-2">
+                            <mat-icon class="w-12 h-12 text-5xl" [svgIcon]="'heroicons_outline:identification'"></mat-icon>
+                        </div>
+                        <div class="cst-tbl__empty-t font-semibold text-lg text-gray-700 dark:text-gray-300">{{ t('No-pointages-found') || 'Aucun pointage trouvé' }}</div>
+                        <div class="cst-tbl__empty-s text-sm text-gray-400 dark:text-gray-500 mt-1">Ajustez vos filtres de recherche ou de date.</div>
+                    </div>
+                }
+            }
+        </div>
+
+        <mat-paginator class="cst-pager mt-2" [ngClass]="{'pointer-events-none': isLoading}" [length]="pointagesLength" [pageIndex]="0" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 50, 100]" [showFirstLastButtons]="true" (page)="SortChange()"></mat-paginator>
+    </div>
+</div>

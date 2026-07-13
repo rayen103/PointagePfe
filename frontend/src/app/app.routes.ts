@@ -123,6 +123,7 @@ export const appRoutes: Route[] = [
             {path: 'chauffeur', pathMatch: 'full', redirectTo: 'fichier/chauffeur'},
             {path: 'modem', pathMatch: 'full', redirectTo: 'fichier/modem'},
             {path: 'chantier', pathMatch: 'full', redirectTo: 'fichier/chantier'},
+            {path: 'pointage', pathMatch: 'full', redirectTo: 'fichier/pointage'},
             {path: 'rattachement-employe', pathMatch: 'full', redirectTo: 'fichier/rattachement-employe'},
             {path: 'rattachement-article', pathMatch: 'full', redirectTo: 'fichier/rattachement-article'},
             //Fichier — wrapped in the Gestion shell so children show as a left sidebar (not a dropdown)
@@ -175,6 +176,9 @@ export const appRoutes: Route[] = [
                     {path:'chantier',
                         data:{navigationId:'fichier.chantier'},
                         loadChildren:() => import('./modules/cst/chantier/chantier.routes')},
+                    {path:'pointage',
+                        data:{navigationId:'fichier.pointage'},
+                        loadChildren:() => import('./modules/cst/pointage/pointage.routes')},
                     {path:'rattachement-employe',
                         data:{navigationId:'fichier.rattachement-employe'},
                         loadChildren:() => import('./modules/cst/rattachement-employe/rattachement-employe.routes')},
