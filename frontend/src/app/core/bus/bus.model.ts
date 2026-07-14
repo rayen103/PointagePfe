@@ -65,6 +65,7 @@ export interface BusPointage {
     tag: string;
     matricule?: string;
     nomEmploye?: string;
+    codePointCollecteEmploye?: string;
     codeCircuitEmploye?: string;
     codeCircuitBus?: string;
     isSuccess: boolean;

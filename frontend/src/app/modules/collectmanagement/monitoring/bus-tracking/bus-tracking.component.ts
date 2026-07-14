@@ -291,11 +291,35 @@ export class BusTrackingComponent implements OnInit, OnDestroy {
         if (!this.circuitData) {
             return [];
         }
-        return this.circuitData.allPoints.map((p) => ({
-            ...p,
-            pointCategory: p.pointCategory as 'departure' | 'collection' | 'arrival',
-            name: p.libellePointCollecte || p.codePointCollecte,
-        }));
+
+        // Regroupe les badges réussis par point de collecte de l'employé.
+        const taggedByPoint = new Map<string, { nom: string; matricule?: string; heure: string; message?: string }[]>();
+        for (const p of this.selectedPointages ?? []) {
+            const code = (p.codePointCollecteEmploye ?? '').trim();
+            if (!p.isSuccess || !code) {
+                continue;
+            }
+            const key = code.toLowerCase();
+            const list = taggedByPoint.get(key) ?? [];
+            list.push({
+                nom: p.nomEmploye || p.matricule || p.tag,
+                matricule: p.matricule,
+                heure: new Date(p.heurePointageUtc).toLocaleTimeString('fr-FR'),
+                message: p.message,
+            });
+            taggedByPoint.set(key, list);
+        }
+
+        return this.circuitData.allPoints.map((p) => {
+            const employees = taggedByPoint.get((p.codePointCollecte ?? '').trim().toLowerCase());
+            return {
+                ...p,
+                pointCategory: p.pointCategory as 'departure' | 'collection' | 'arrival',
+                name: p.libellePointCollecte || p.codePointCollecte,
+                tagged: !!employees && employees.length > 0,
+                taggedEmployees: employees ?? [],
+            };
+        });
     }
 
     get OptimizedRouteForMap() {
