@@ -19,6 +19,8 @@ export class AuthVerifyCodeComponent implements OnInit, OnDestroy {
     @ViewChildren('digitInput') digitInputs: QueryList<ElementRef<HTMLInputElement>>;
 
     email: string = '';
+    /** True juste après l'inscription : l'admin n'a pas encore approuvé, aucun code envoyé. */
+    pendingApproval: boolean = false;
     digits: string[] = ['', '', '', '', '', ''];
     isLoading: boolean = false;
     showAlert: boolean = false;
@@ -35,6 +37,7 @@ export class AuthVerifyCodeComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.email = this._activatedRoute.snapshot.queryParamMap.get('email') ?? '';
+        this.pendingApproval = this._activatedRoute.snapshot.queryParamMap.get('pending') === '1';
 
         // Sans email, impossible de vérifier : retour à l'inscription.
         if (!this.email) {
@@ -42,8 +45,10 @@ export class AuthVerifyCodeComponent implements OnInit, OnDestroy {
             return;
         }
 
-        // L'inscription vient d'envoyer un code : cooldown initial du renvoi.
-        this.startResendCooldown();
+        // Un code vient d'être envoyé (hors attente d'approbation) : cooldown initial du renvoi.
+        if (!this.pendingApproval) {
+            this.startResendCooldown();
+        }
     }
 
     ngOnDestroy(): void {

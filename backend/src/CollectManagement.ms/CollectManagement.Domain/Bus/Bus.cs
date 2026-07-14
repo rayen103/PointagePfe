@@ -5,7 +5,7 @@ using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Domain.Bus;
 
-public class Bus : AuditableEntity
+public class Bus : AuditableEntity, ITenantOwned
 {
     public BusId BusId { get; private set; }
 
@@ -35,6 +35,12 @@ public class Bus : AuditableEntity
 
     public DateTime? LastOccupancyUpdateAt { get; private set; }
 
+    public DateTime? DeviceRecordedAtUtc { get; private set; }
+
+    public int? BatteryPercentage { get; private set; }
+
+    public double? BatteryVoltage { get; private set; }
+
     public SocieteId SocieteId { get; private set; }
 
     public Societe? Societe { get; private set; }
@@ -54,6 +60,9 @@ public class Bus : AuditableEntity
         int currentOccupancy,
         DateTime? lastPositionAt,
         DateTime? lastOccupancyUpdateAt,
+        DateTime? deviceRecordedAtUtc,
+        int? batteryPercentage,
+        double? batteryVoltage,
         SocieteId societeId)
     {
         BusId = busId;
@@ -70,6 +79,9 @@ public class Bus : AuditableEntity
         CurrentOccupancy = currentOccupancy;
         LastPositionAt = lastPositionAt;
         LastOccupancyUpdateAt = lastOccupancyUpdateAt;
+        DeviceRecordedAtUtc = deviceRecordedAtUtc;
+        BatteryPercentage = batteryPercentage;
+        BatteryVoltage = batteryVoltage;
         SocieteId = societeId;
     }
 
@@ -100,6 +112,9 @@ public class Bus : AuditableEntity
             latitude,
             longitude,
             0,
+            null,
+            null,
+            null,
             null,
             null,
             societeId);
@@ -134,6 +149,9 @@ public class Bus : AuditableEntity
         double? latitude,
         double? longitude,
         int? occupancy,
+        DateTime? deviceRecordedAtUtc,
+        int? batteryPercentage,
+        double? batteryVoltage,
         DateTime eventDateUtc)
     {
         if (!string.IsNullOrWhiteSpace(imei))
@@ -150,6 +168,15 @@ public class Bus : AuditableEntity
             CurrentOccupancy = Math.Max(0, occupancy.Value);
             LastOccupancyUpdateAt = eventDateUtc;
         }
+
+        if (deviceRecordedAtUtc is not null)
+            DeviceRecordedAtUtc = deviceRecordedAtUtc;
+
+        if (batteryPercentage is not null)
+            BatteryPercentage = batteryPercentage;
+
+        if (batteryVoltage is not null)
+            BatteryVoltage = batteryVoltage;
 
         LastPositionAt = eventDateUtc;
     }
@@ -175,6 +202,9 @@ public class Bus : AuditableEntity
         int currentOccupancy,
         DateTime? lastPositionAt,
         DateTime? lastOccupancyUpdateAt,
+        DateTime? deviceRecordedAtUtc,
+        int? batteryPercentage,
+        double? batteryVoltage,
         SocieteId societeId)
     {
         return new Bus(
@@ -192,6 +222,9 @@ public class Bus : AuditableEntity
             currentOccupancy,
             lastPositionAt,
             lastOccupancyUpdateAt,
+            deviceRecordedAtUtc,
+            batteryPercentage,
+            batteryVoltage,
             societeId);
     }
 

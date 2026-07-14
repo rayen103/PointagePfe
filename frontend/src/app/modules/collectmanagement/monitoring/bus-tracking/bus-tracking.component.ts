@@ -42,7 +42,7 @@ import { FuseConfirmationService } from '../../../../../@fuse/services/confirmat
 import { FuseNavigationAction } from '../../../../../@fuse/components/navigation';
 import { RoleNavigation } from '../../../../core/role-utilisateur/role-utilisateur.model';
 import { BusService } from '../../../../core/bus/bus.service';
-import { BusRuntimeEvent } from '../../../../core/bus/bus.model';
+import { BusRuntimeEvent, BusPointage } from '../../../../core/bus/bus.model';
 import { Circuit } from '../../../../core/circuit/circuit.model';
 import { CircuitPointCollecte } from '../../../../core/circuit/circuit-point-collecte.model';
 import { CircuitPointCollecteService } from '../../../../core/circuit/circuit-point-collecte.service';
@@ -101,6 +101,8 @@ export class BusTrackingComponent implements OnInit, OnDestroy {
     selectedBus: BusTrackingItem | null = null;
     selectedEvents: BusRuntimeEvent[] = [];
     selectedBusEventsLoading: boolean = false;
+    selectedPointages: BusPointage[] = [];
+    selectedBusPointagesLoading: boolean = false;
 
     circuitLoading: boolean = false;
     circuitData: CircuitData | null = null;
@@ -182,6 +184,38 @@ export class BusTrackingComponent implements OnInit, OnDestroy {
                 this._changeDetectorRef.markForCheck();
             });
 
+        // Pointages (badges RFID) du bus sélectionné.
+        this._selectedBusId$
+            .pipe(
+                switchMap((busId) => {
+                    if (!busId) {
+                        this.selectedPointages = [];
+                        this._changeDetectorRef.markForCheck();
+                        return of([]);
+                    }
+
+                    this.selectedBusPointagesLoading = true;
+                    this._changeDetectorRef.markForCheck();
+
+                    return this._busService.GetBusPointages(busId).pipe(
+                        catchError(() => of([])),
+                        finalize(() => {
+                            this.selectedBusPointagesLoading = false;
+                            this._changeDetectorRef.markForCheck();
+                        })
+                    );
+                }),
+                takeUntil(this._unsubscribeAll)
+            )
+            .subscribe((pointages) => {
+                this.selectedPointages = [...(pointages ?? [])].sort(
+                    (a, b) =>
+                        new Date(b.heurePointageUtc).getTime() -
+                        new Date(a.heurePointageUtc).getTime()
+                );
+                this._changeDetectorRef.markForCheck();
+            });
+
         this.startPolling();
     }
 
@@ -257,11 +291,35 @@ export class BusTrackingComponent implements OnInit, OnDestroy {
         if (!this.circuitData) {
             return [];
         }
-        return this.circuitData.allPoints.map((p) => ({
-            ...p,
-            pointCategory: p.pointCategory as 'departure' | 'collection' | 'arrival',
-            name: p.libellePointCollecte || p.codePointCollecte,
-        }));
+
+        // Regroupe les badges réussis par point de collecte de l'employé.
+        const taggedByPoint = new Map<string, { nom: string; matricule?: string; heure: string; message?: string }[]>();
+        for (const p of this.selectedPointages ?? []) {
+            const code = (p.codePointCollecteEmploye ?? '').trim();
+            if (!p.isSuccess || !code) {
+                continue;
+            }
+            const key = code.toLowerCase();
+            const list = taggedByPoint.get(key) ?? [];
+            list.push({
+                nom: p.nomEmploye || p.matricule || p.tag,
+                matricule: p.matricule,
+                heure: new Date(p.heurePointageUtc).toLocaleTimeString('fr-FR'),
+                message: p.message,
+            });
+            taggedByPoint.set(key, list);
+        }
+
+        return this.circuitData.allPoints.map((p) => {
+            const employees = taggedByPoint.get((p.codePointCollecte ?? '').trim().toLowerCase());
+            return {
+                ...p,
+                pointCategory: p.pointCategory as 'departure' | 'collection' | 'arrival',
+                name: p.libellePointCollecte || p.codePointCollecte,
+                tagged: !!employees && employees.length > 0,
+                taggedEmployees: employees ?? [],
+            };
+        });
     }
 
     get OptimizedRouteForMap() {

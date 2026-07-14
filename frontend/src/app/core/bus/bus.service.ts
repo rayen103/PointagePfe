@@ -5,6 +5,7 @@ import {
     Bus,
     BusLivePositionSnapshot,
     BusRuntimeEvent,
+    BusPointage,
     BusRuntimeState,
     UpdateBusRuntimePositionPayload
 } from './bus.model';
@@ -150,6 +151,11 @@ export class BusService {
 
     GetBusRuntimeEvents(busId: string): Observable<BusRuntimeEvent[]> {
         return this._apiservice.Get<BusRuntimeEvent[]>(`bus/${busId}/events`)
+            .pipe(map(r => r.data ?? []));
+    }
+
+    GetBusPointages(busId: string): Observable<BusPointage[]> {
+        return this._apiservice.Get<BusPointage[]>(`bus/${busId}/pointages`)
             .pipe(map(r => r.data ?? []));
     }
 }

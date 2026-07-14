@@ -1,0 +1,281 @@
+// Pointage list styles
+.font-mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+// KPI Grid & Micro-animations
+.bg-white {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// Clean unified filter controls design
+.cst-filters {
+    background: transparent !important;
+    border-bottom: none !important;
+    padding: 0 !important;
+    margin-bottom: 24px !important;
+    display: flex;
+    align-items: center;
+    gap: 16px !important;
+    flex-wrap: wrap;
+
+    // Search input override
+    .cst-search {
+        background: #fff !important;
+        border: 1px solid var(--cst-border-line, #cbd5e1) !important;
+        border-radius: 8px !important;
+        height: 38px !important;
+        padding: 0 12px !important;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+
+        mat-icon {
+            color: #94a3b8 !important;
+            width: 16px !important;
+            height: 16px !important;
+            font-size: 16px !important;
+            margin-right: 2px;
+        }
+
+        input {
+            font-size: 12px !important;
+            color: #1e293b !important;
+            background: transparent;
+            border: none;
+            outline: none;
+            height: 100%;
+            &::placeholder {
+                color: #94a3b8 !important;
+            }
+        }
+
+        &:focus-within {
+            border-color: var(--fuse-primary, #3b82f6) !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+        }
+    }
+
+    // Label styling
+    span.uppercase {
+        font-size: 10px !important;
+        font-weight: 700 !important;
+        color: #94a3b8 !important;
+        letter-spacing: 0.05em !important;
+    }
+
+    // Dropdown selects
+    .cst-select {
+        height: 38px !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+
+        select {
+            height: 38px !important;
+            border-radius: 8px !important;
+            border: 1px solid var(--cst-border-line, #cbd5e1) !important;
+            padding-left: 12px !important;
+            padding-right: 32px !important;
+            font-size: 12px !important;
+            font-weight: 500 !important;
+            color: #1e293b !important;
+            transition: all 0.2s ease;
+            background: #fff;
+            outline: none;
+
+            &:hover {
+                border-color: #94a3b8 !important;
+            }
+
+            &:focus {
+                border-color: var(--fuse-primary, #3b82f6) !important;
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+            }
+        }
+    }
+}
+
+// Glassmorphic Date input wrapper
+.cst-date-wrapper {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    border: 1px solid var(--cst-border-line, #cbd5e1);
+    background: #fff;
+    border-radius: 8px;
+    height: 38px !important;
+    width: 255px !important; // Enlarge container width to prevent text overflow
+    display: flex;
+    align-items: center;
+    padding: 0 4px 0 10px !important; // Clean internal paddings
+    transition: all 0.2s ease;
+
+    mat-icon.pointer-events-none {
+        margin-left: 0 !important; // clear margins
+        margin-right: 6px !important;
+        color: #94a3b8 !important;
+        font-size: 16px !important;
+        width: 16px !important;
+        height: 16px !important;
+    }
+
+    &:hover {
+        border-color: #94a3b8;
+    }
+
+    &:focus-within {
+        border-color: var(--fuse-primary, #3b82f6);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+}
+
+.cst-date-range-field {
+    flex: 1; // take remaining width
+    display: inline-flex !important;
+    align-items: center;
+    height: 36px;
+
+    .mat-mdc-text-field-wrapper {
+        padding: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        height: 36px !important;
+        border: none !important;
+    }
+
+    .mat-mdc-form-field-flex {
+        align-items: center !important;
+        padding: 0 !important;
+        height: 36px !important;
+    }
+
+    .mat-mdc-form-field-infix {
+        padding: 0 !important;
+        height: 36px !important;
+        display: flex;
+        align-items: center;
+        border: none !important;
+        min-height: auto !important;
+        width: auto !important;
+        flex: 1;
+    }
+
+    .mat-mdc-form-field-error-wrapper,
+    .mat-mdc-form-field-subscript-wrapper {
+        display: none !important;
+    }
+
+    .mdc-line-ripple,
+    .mat-mdc-form-field-focus-indicator {
+        display: none !important;
+    }
+
+    .mat-date-range-input {
+        height: auto !important;
+        width: 100% !important;
+    }
+
+    .mat-date-range-input-container {
+        display: flex;
+        align-items: center;
+    }
+
+    .mat-date-range-input-inner {
+        font-size: 12px !important;
+        font-weight: 500 !important;
+        color: #1e293b !important;
+    }
+
+    .mat-datepicker-toggle {
+        button {
+            width: 28px !important;
+            height: 28px !important;
+            padding: 4px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+}
+
+// Dark Mode integration support
+.dark {
+    .cst-filters {
+        .cst-search, select, .cst-date-wrapper {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f1f5f9 !important;
+
+            .mat-date-range-input-inner {
+                color: #f1f5f9 !important;
+            }
+
+            input {
+                color: #f1f5f9 !important;
+                &::placeholder {
+                    color: #64748b !important;
+                }
+            }
+
+            select {
+                background-color: #1e293b !important;
+                color: #f1f5f9 !important;
+                border-color: #334155 !important;
+            }
+
+            &:focus-within, &:focus {
+                border-color: var(--fuse-primary, #3b82f6) !important;
+            }
+        }
+    }
+}
+
+// Visual refinements for grid table rows
+.cst-tbl {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+
+    .cst-tbl__head {
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 10px;
+        letter-spacing: 0.05em;
+        background-color: var(--cst-bg-head, #f8fafc) !important;
+        color: var(--cst-text-muted, #64748b) !important;
+        border-bottom: 2px solid var(--cst-border, #e2e8f0);
+        padding-top: 14px;
+        padding-bottom: 14px;
+    }
+
+    .cst-tbl__row {
+        border-bottom: 1px solid var(--cst-border, #f1f5f9);
+        transition: all 0.2s ease-in-out;
+        
+        &:hover {
+            box-shadow: inset 4px 0 0 var(--fuse-primary, #3b82f6), 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            background-color: var(--cst-bg-hover, #f8fafc) !important;
+        }
+    }
+}
+
+// Status badges styling
+.cst-pill {
+    letter-spacing: 0.05em;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    transition: all 0.2s ease;
+
+    &.cst-pill--ok {
+        box-shadow: 0 0 12px rgba(16, 185, 129, 0.1);
+        &:hover {
+            box-shadow: 0 0 16px rgba(16, 185, 129, 0.25);
+            transform: translateY(-0.5px);
+        }
+    }
+
+    &.cst-pill--danger {
+        box-shadow: 0 0 12px rgba(244, 63, 94, 0.1);
+        &:hover {
+            box-shadow: 0 0 16px rgba(244, 63, 94, 0.25);
+            transform: translateY(-0.5px);
+        }
+    }
+}

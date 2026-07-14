@@ -11,7 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { BusRuntimeEvent } from 'app/core/bus/bus.model';
+import { BusRuntimeEvent, BusPointage } from 'app/core/bus/bus.model';
 import { BusTrackingAdapterService, BusTrackingItem } from '../bus-tracking.adapter.service';
 
 export interface CircuitPanelInfo {
@@ -45,6 +45,8 @@ export class BusTrackingPanelComponent {
     @Input() bus: BusTrackingItem | null = null;
     @Input() events: BusRuntimeEvent[] = [];
     @Input() eventsLoading: boolean = false;
+    @Input() pointages: BusPointage[] = [];
+    @Input() pointagesLoading: boolean = false;
     @Input() canEmptyBus: boolean = false;
     @Input() circuitInfo: CircuitPanelInfo | null = null;
     @Output() readonly emptyBus = new EventEmitter<void>();
@@ -79,6 +81,12 @@ export class BusTrackingPanelComponent {
         if (type.includes('départ') || type.includes('start') || type.includes('fin')) return '#E3F5EE';
         if (type.includes('ralentissement') || type.includes('incident') || type.includes('alerte')) return '#FFF6E3';
         return '#EDF1F6';
+    }
+
+    getPointageLabel(p: BusPointage): string {
+        if (p.nomEmploye && p.nomEmploye.trim()) return p.nomEmploye.trim();
+        if (p.matricule && p.matricule.trim()) return p.matricule.trim();
+        return `Badge ${p.tag}`;
     }
 
     getStatusLabel(): string {

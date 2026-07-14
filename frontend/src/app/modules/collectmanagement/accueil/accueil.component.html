@@ -17,13 +17,17 @@
                 <div class="cst-greet__sub">Lundi 6 juillet 2026 · Site Ben Arous · 28 bus en circulation</div>
             </div>
             <div class="cst-greet__actions">
+                <a class="cst-btn cst-btn--ghost" [routerLink]="['/home']">
+                    <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:home'"></mat-icon>
+                    Retour au site
+                </a>
                 <button class="cst-btn cst-btn--ghost" (click)="refresh()" [disabled]="isLoading$ | async">
                     <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:arrow-down-tray'"></mat-icon>
                     Exporter
                 </button>
-                <button class="cst-btn cst-btn--primary" routerLink="/fichier/ordretravail/ajouter">
-                    <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-                    Nouvel ordre de travail
+                <button class="cst-btn cst-btn--primary" routerLink="/fichier/pointage">
+                    <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:clock'"></mat-icon>
+                    Pointage
                 </button>
             </div>
         </div>

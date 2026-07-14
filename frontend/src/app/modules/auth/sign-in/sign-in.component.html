@@ -1,79 +1,177 @@
-<div class="cst-auth">
-    <!-- Decorative background -->
-    <div class="cst-auth__bg">
-        <div class="cst-auth__glow cst-auth__glow--1"></div>
-        <div class="cst-auth__glow cst-auth__glow--2"></div>
-        <svg class="cst-auth__paths" viewBox="0 0 1440 860" preserveAspectRatio="xMidYMax slice">
-            <path d="M-40 640 C 240 560, 420 720, 700 640 S 1180 540, 1480 620" fill="none" stroke="#C9DEF0" stroke-width="2" stroke-dasharray="1 10" stroke-linecap="round"></path>
-            <path d="M-40 720 C 260 660, 480 800, 760 720 S 1200 640, 1480 710" fill="none" stroke="#C9DEF0" stroke-width="2" stroke-dasharray="1 10" stroke-linecap="round"></path>
-        </svg>
-    </div>
-
-    <!-- Card -->
-    <div class="cst-auth__card">
-        <div class="cst-auth__brand">
-            <img src="images/logo/logo-text.svg" alt="CST — Canadian System Technology" />
-            <div class="cst-auth__welcome">Bienvenue</div>
-            <div class="cst-auth__sub">Connectez-vous à votre espace opérations</div>
-        </div>
-
-        @if (showAlert) {
-            <div class="cst-auth__alert" [class.is-error]="alert.type === 'error'" [@shake]="alert.type === 'error'">
-                {{ alert.message }}
-            </div>
-        }
-
-        <form class="cst-auth__form" [formGroup]="signInForm" #signInNgForm="ngForm">
-            <!-- Email -->
-            <div class="cst-field">
-                <label>Adresse email</label>
-                <input class="cst-input" type="text" formControlName="login" placeholder="prenom.nom@societe.tn" autocomplete="username" />
-                @if (signInForm.get('login')?.hasError('required') && signInNgForm.submitted) {
-                    <div class="cst-field__err">L'adresse email est requise</div>
-                }
+<div class="cst-signin-split">
+    <!-- Left panel: Visual & Showcase (Desktop) -->
+    <div class="cst-signin-visual">
+        <div class="cst-signin-visual__overlay"></div>
+        <div class="cst-signin-visual__content">
+            <!-- Brand Logo -->
+            <div class="cst-signin-visual__logo">
+                <img src="images/logo/logo-text.svg" alt="CST Logo" />
             </div>
 
-            <!-- Password -->
-            <div class="cst-field">
-                <label>Mot de passe</label>
-                <div class="cst-input cst-input--group">
-                    <input #pwField type="password" formControlName="password" placeholder="••••••••••" autocomplete="current-password" />
-                    <button type="button" class="cst-input__eye" (click)="pwField.type = pwField.type === 'password' ? 'text' : 'password'" aria-label="Afficher le mot de passe">
-                        @if (pwField.type === 'password') {
-                            <svg viewBox="0 0 24 24" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                        } @else {
-                            <svg viewBox="0 0 24 24" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10 10 0 0112 20c-7 0-11-8-11-8a18 18 0 015.06-5.94M9.9 4.24A9 9 0 0112 4c7 0 11 8 11 8a18 18 0 01-2.16 3.19M1 1l22 22"></path></svg>
-                        }
-                    </button>
+            <!-- Body -->
+            <div class="cst-signin-visual__body">
+                <div>
+                    <h1 class="cst-signin-visual__title">Gérez vos opérations de transport en un seul endroit</h1>
+                    <p class="cst-signin-visual__subtitle">Suivez votre flotte, gérez les circuits de collecte et analysez les performances en temps réel avec Canadian System Technology.</p>
+                </div>
+
+                <!-- Live Route Map Widget (CSS + SVG mockup) -->
+                <div class="cst-signin-widget">
+                    <div class="cst-signin-widget__header">
+                        <span class="cst-signin-widget__title">Réseau Opérationnel</span>
+                        <span class="cst-signin-widget__badge">En direct</span>
+                    </div>
+                    <div class="cst-signin-widget__stats">
+                        <div class="cst-signin-widget__stat">
+                            <span class="cst-signin-widget__label">Chauffeurs Actifs</span>
+                            <span class="cst-signin-widget__val color-blue">42</span>
+                        </div>
+                        <div class="cst-signin-widget__stat">
+                            <span class="cst-signin-widget__label">Taux de Service</span>
+                            <span class="cst-signin-widget__val color-green">98.7%</span>
+                        </div>
+                    </div>
+                    <!-- SVG Route Grid Map -->
+                    <div class="cst-signin-widget__map">
+                        <svg viewBox="0 0 400 100" preserveAspectRatio="none">
+                            <!-- Background Map Grid Lines -->
+                            <line x1="0" y1="20" x2="400" y2="20" class="map-grid" />
+                            <line x1="0" y1="50" x2="400" y2="50" class="map-grid" />
+                            <line x1="0" y1="80" x2="400" y2="80" class="map-grid" />
+                            <line x1="80" y1="0" x2="80" y2="100" class="map-grid" />
+                            <line x1="200" y1="0" x2="200" y2="100" class="map-grid" />
+                            <line x1="320" y1="0" x2="320" y2="100" class="map-grid" />
+                            
+                            <!-- Static background route lines -->
+                            <path d="M 10 50 Q 100 20, 200 60 T 390 40" class="route-line route-line--bg" />
+                            <path d="M 20 80 C 120 50, 180 90, 280 30 T 380 70" class="route-line route-line--bg" />
+                            
+                            <!-- Animated active flow lines -->
+                            <path d="M 10 50 Q 100 20, 200 60 T 390 40" class="route-line route-line--primary" />
+                            <path d="M 20 80 C 120 50, 180 90, 280 30 T 380 70" class="route-line route-line--secondary" />
+                            
+                            <!-- Blinking network nodes (vehicles) -->
+                            <circle cx="100" cy="35" r="4.5" class="map-node map-node--blue" />
+                            <circle cx="280" cy="30" r="4.5" class="map-node map-node--red" />
+                            <circle cx="200" cy="60" r="4" class="map-node map-node--blue" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Features list -->
+                <div class="cst-signin-features">
+                    <div class="cst-signin-feature">
+                        <div class="cst-signin-feature__icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+                            </svg>
+                        </div>
+                        <div class="cst-signin-feature__text">
+                            <h3>Suivi intelligent de la flotte</h3>
+                            <p>Supervisez en temps réel le trajet de vos véhicules, les arrêts effectués et l'avancement global.</p>
+                        </div>
+                    </div>
+                    <div class="cst-signin-feature">
+                        <div class="cst-signin-feature__icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="9" y1="3" x2="9" y2="21"></line>
+                            </svg>
+                        </div>
+                        <div class="cst-signin-feature__text">
+                            <h3>Optimisation des ressources</h3>
+                            <p>Associez chauffeurs, bus et circuits efficacement pour réduire l'empreinte carbone et les retards.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Options -->
-            <div class="cst-auth__row">
-                <label class="cst-check">
-                    <input type="checkbox" formControlName="rememberMe" />
-                    <span class="cst-check__box"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M2 6.5l2.6 2.6L10 3.5"></path></svg></span>
-                    Se souvenir de moi
-                </label>
-                <a class="cst-auth__link" [routerLink]="['/forgot-password']">Mot de passe oublié ?</a>
+            <!-- Footer -->
+            <div class="cst-signin-visual__footer">
+                © 2026 Canadian System Technology. Tous droits réservés.
             </div>
-
-            <!-- Submit -->
-            <button type="button" class="cst-auth__submit" [disabled]="isLoading || isLocked" (click)="signIn()">
-                @if (isLoading) {
-                    <mat-progress-spinner [diameter]="22" [mode]="'indeterminate'"></mat-progress-spinner>
-                } @else {
-                    Se connecter
-                }
-            </button>
-
-            @if (isLocked) {
-                <div class="cst-auth__locked">Compte temporairement verrouillé. Réessayez dans {{ remainingTime }} s.</div>
-            }
-
-            <div class="cst-auth__foot">Pas encore de compte ? <a class="cst-auth__link" [routerLink]="['/sign-up']">Demander un accès</a></div>
-        </form>
+        </div>
     </div>
 
-    <div class="cst-auth__copy">© 2026 Canadian System Technology · FR / EN</div>
+    <!-- Right panel: Sign-In Form -->
+    <div class="cst-signin-form-panel">
+        <!-- Back to home button -->
+        <a class="cst-auth-home-btn" [routerLink]="['/home']">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            Retour au site
+        </a>
+
+        <div class="cst-signin-form-container">
+            <div class="cst-signin-card">
+                <div class="cst-signin-card__brand">
+                    <img src="images/logo/logo-text.svg" alt="CST Logo" />
+                    <h2 class="cst-signin-card__welcome">Bienvenue</h2>
+                    <p class="cst-signin-card__sub">Connectez-vous à votre espace opérations</p>
+                </div>
+
+                @if (showAlert) {
+                    <div class="cst-signin-card__alert">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; flex-shrink: 0;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        <span>{{ alert.message }}</span>
+                    </div>
+                }
+
+                <form class="cst-auth__form" [formGroup]="signInForm" #signInNgForm="ngForm">
+                    <!-- Email -->
+                    <div class="cst-field">
+                        <label>Adresse email</label>
+                        <input class="cst-input" type="text" formControlName="login" placeholder="prenom.nom@societe.tn" autocomplete="username" />
+                        @if (signInForm.get('login')?.hasError('required') && signInNgForm.submitted) {
+                            <div class="cst-field__err">L'adresse email est requise</div>
+                        }
+                    </div>
+
+                    <!-- Password -->
+                    <div class="cst-field">
+                        <label>Mot de passe</label>
+                        <div class="cst-input cst-input--group">
+                            <input #pwField type="password" formControlName="password" placeholder="••••••••••" autocomplete="current-password" />
+                            <button type="button" class="cst-input__eye" (click)="pwField.type = pwField.type === 'password' ? 'text' : 'password'" aria-label="Afficher le mot de passe">
+                                @if (pwField.type === 'password') {
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                } @else {
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10 10 0 0112 20c-7 0-11-8-11-8a18 18 0 015.06-5.94M9.9 4.24A9 9 0 0112 4c7 0 11 8 11 8a18 18 0 01-2.16 3.19M1 1l22 22"></path></svg>
+                                }
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Options -->
+                    <div class="cst-auth__row">
+                        <label class="cst-check">
+                            <input type="checkbox" formControlName="rememberMe" />
+                            <span class="cst-check__box"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M2 6.5l2.6 2.6L10 3.5"></path></svg></span>
+                            <span>Se souvenir de moi</span>
+                        </label>
+                        <a class="cst-auth__link" [routerLink]="['/forgot-password']">Mot de passe oublié ?</a>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="button" class="cst-signin-submit" [disabled]="isLoading || isLocked" (click)="signIn()">
+                        @if (isLoading) {
+                            <mat-progress-spinner [diameter]="22" [mode]="'indeterminate'"></mat-progress-spinner>
+                        } @else {
+                            Se connecter
+                        }
+                    </button>
+
+                    @if (isLocked) {
+                        <div class="cst-auth__locked">Compte temporairement verrouillé. Réessayez dans {{ remainingTime }} s.</div>
+                    }
+
+                    <div class="cst-signin-card__foot">Pas encore de compte ? <a class="cst-signin-card__link" [routerLink]="['/sign-up']">Demander un accès</a></div>
+                </form>
+            </div>
+        </div>
+
+        <div class="cst-signin-copy">© 2026 Canadian System Technology · FR / EN</div>
+    </div>
 </div>

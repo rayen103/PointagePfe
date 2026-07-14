@@ -16,6 +16,8 @@ export interface CircuitPointWithType {
   isActive?: boolean;
   pointCategory: 'departure' | 'collection' | 'arrival';
   name?: string;
+  tagged?: boolean;
+  taggedEmployees?: { nom: string; matricule?: string; heure: string; message?: string }[];
 }
 
 export interface CircuitData {

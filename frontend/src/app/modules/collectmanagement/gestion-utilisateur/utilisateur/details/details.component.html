@@ -1,0 +1,224 @@
+<div class="cst-form-page" *transloco="let t">
+    <form class="cst-form-wrap" [formGroup]="form" #utilisateurFormDirective="ngForm">
+
+        <!-- Breadcrumb -->
+        <div class="cst-crumb">
+            <a routerLink="/fichier/utilisateur">Gestion</a><span>/</span>
+            <a routerLink="/fichier/utilisateur">{{ t('User') || 'Utilisateurs' }}</a><span>/</span>
+            <b>{{ isNew ? (t('Add-User') || 'Ajouter un utilisateur') : (utilisateur?.nomUtilisateur || t('Edit-User')) }}</b>
+        </div>
+
+        <!-- Header line -->
+        <div class="cst-form-topline">
+            <div class="cst-form-id">
+                <div class="cst-form-id__ic">
+                    <mat-icon [svgIcon]="'mat_outline:person'"></mat-icon>
+                </div>
+                <div>
+                    <div class="cst-form-id__title">
+                        <span>{{ isNew ? (t('Add-User') || 'Nouvel utilisateur') : (utilisateur?.nomUtilisateur || '') }}</span>
+                        @if (!isNew) {
+                            <span class="cst-pill" [ngClass]="form.get('isActive')?.value ? 'cst-pill--ok' : 'cst-pill--off'">
+                                {{ form.get('isActive')?.value ? (t('Active') || 'ACTIF') : (t('Inactive') || 'INACTIF') }}
+                            </span>
+                        }
+                    </div>
+                    <div class="cst-form-id__meta">
+                        {{ isNew ? "Créer un compte utilisateur" : (utilisateur?.email || '—') }}
+                    </div>
+                </div>
+            </div>
+            <div class="cst-head__actions">
+                <button class="cst-btn cst-btn--ghost" type="button" (click)="onBackdropClicked()">{{ t('Cancel') || 'Annuler' }}</button>
+                <button class="cst-btn cst-btn--primary" type="button" (click)="save()" [disabled]="isLoading">
+                    @if (isLoading) { <span class="cc-spin"></span> }
+                    {{ t('Save') || 'Enregistrer' }}
+                </button>
+            </div>
+        </div>
+
+        @if (flashMessage) {
+            <div class="cst-form-flash" [class.is-ok]="flashMessage === 'success'" [class.is-err]="flashMessage === 'error'">
+                {{ flashMessage === 'success' ? (t('Successfully-saved') || 'Enregistré avec succès') : (t('Something-went-wrong') || 'Veuillez corriger les erreurs du formulaire') }}
+            </div>
+        }
+
+        <div class="cst-form-card">
+            <!-- Section 1: Informations générales -->
+            <div>
+                <div class="cst-form-sec__title">{{ t('General-Information') || 'Informations générales' }}</div>
+                <div class="cst-form-sec__sub">Identité et rattachement de l'utilisateur</div>
+                <div class="cst-form-grid">
+
+                    <!-- Nom d'utilisateur -->
+                    <div class="cst-field">
+                        <label>{{ t('Username') || "Nom d'utilisateur" }} <span style="color:var(--cst-red)">*</span></label>
+                        <input class="cst-input" [class.is-err]="form.get('nomUtilisateur')?.invalid && (form.get('nomUtilisateur')?.touched || utilisateurFormDirective.submitted)"
+                               formControlName="nomUtilisateur" [placeholder]="t('Enter-username') || 'Ex: m.benali'" />
+                        @if (form.get('nomUtilisateur')?.invalid && (form.get('nomUtilisateur')?.touched || utilisateurFormDirective.submitted)) {
+                            <div class="cst-field__err">
+                                <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                {{ t('Username-required') || "Le nom d'utilisateur est requis" }}
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Email -->
+                    <div class="cst-field">
+                        <label>{{ t('E-mail') || 'Email' }} <span style="color:var(--cst-red)">*</span></label>
+                        <input class="cst-input" type="email" [class.is-err]="form.get('email')?.invalid && (form.get('email')?.touched || utilisateurFormDirective.submitted)"
+                               formControlName="email" [placeholder]="t('Enter-email') || 'prenom.nom@societe.tn'" />
+                        @if (form.get('email')?.invalid && (form.get('email')?.touched || utilisateurFormDirective.submitted)) {
+                            <div class="cst-field__err">
+                                <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                {{ form.get('email')?.hasError('email') ? (t('Email-invalid') || "L'email n'est pas valide") : (t('Email-required') || "L'email est requis") }}
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Nom -->
+                    <div class="cst-field">
+                        <label>{{ t('Name') || 'Nom' }}</label>
+                        <input class="cst-input" formControlName="nom" [placeholder]="t('Enter-name') || 'Ex: Ben Ali'" />
+                    </div>
+
+                    <!-- Prénom -->
+                    <div class="cst-field">
+                        <label>{{ t('First-Name') || 'Prénom' }}</label>
+                        <input class="cst-input" formControlName="prenom" [placeholder]="t('Enter-firstname') || 'Ex: Mohamed'" />
+                    </div>
+
+                    <!-- Société (Autocomplete) -->
+                    <div class="cst-field" style="grid-column: span 2">
+                        <label>{{ t('Company') || 'Société' }}</label>
+                        <input class="cst-input" type="text" formControlName="societeId" [matAutocomplete]="autoSociete"
+                               [placeholder]="t('Select-company') || 'Rechercher une société...'" />
+                        <mat-autocomplete #autoSociete="matAutocomplete" [displayWith]="displaySociete">
+                            @for (soc of filteredSocietes$ | async; track soc.societeId) {
+                                <mat-option [value]="soc.societeId">{{ soc.nom }}</mat-option>
+                            }
+                        </mat-autocomplete>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cst-divider"></div>
+
+            <!-- Section 2: Accès & sécurité -->
+            <div>
+                <div class="cst-form-sec__title">{{ t('Access-Security') || 'Accès & sécurité' }}</div>
+                <div class="cst-form-sec__sub">Rôle attribué et mot de passe du compte</div>
+                <div class="cst-form-grid">
+
+                    <!-- Rôle -->
+                    <div class="cst-field">
+                        <label>{{ t('Role') || 'Rôle' }} <span style="color:var(--cst-red)">*</span></label>
+                        <div class="cst-select">
+                            <select formControlName="roleUtilisateurId"
+                                    [class.is-err]="form.get('roleUtilisateurId')?.invalid && (form.get('roleUtilisateurId')?.touched || utilisateurFormDirective.submitted)">
+                                <option [ngValue]="null" disabled>{{ t('Select-role') || 'Sélectionner un rôle' }}</option>
+                                @for (role of roleUtilisateurs; track role.roleUtilisateurId) {
+                                    <option [ngValue]="role.roleUtilisateurId">{{ role.libelleRoleUtilisateur }}</option>
+                                }
+                            </select>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
+                        </div>
+                        @if (form.get('roleUtilisateurId')?.invalid && (form.get('roleUtilisateurId')?.touched || utilisateurFormDirective.submitted)) {
+                            <div class="cst-field__err">
+                                <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                {{ t('Role-required') || 'Le rôle est requis' }}
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Mot de passe -->
+                    @if (isNew || isChangingPassword) {
+                        <div class="cst-field" style="grid-column: span 2">
+                            <label>
+                                {{ isNew ? (t('Password') || 'Mot de passe') : (t('New-password') || 'Nouveau mot de passe') }}
+                                @if (isNew) { <span style="color:var(--cst-red)">*</span> }
+                            </label>
+                            <div class="cst-input cst-input--group">
+                                <input #pwField type="password" formControlName="password" placeholder="••••••••••" autocomplete="new-password" />
+                                <button type="button" class="cst-input__eye" (click)="pwField.type = pwField.type === 'password' ? 'text' : 'password'" aria-label="Afficher le mot de passe">
+                                    @if (pwField.type === 'password') {
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                    } @else {
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10 10 0 0112 20c-7 0-11-8-11-8a18 18 0 015.06-5.94M9.9 4.24A9 9 0 0112 4c7 0 11 8 11 8a18 18 0 01-2.16 3.19M1 1l22 22"></path></svg>
+                                    }
+                                </button>
+                            </div>
+                            @if (form.get('password')?.hasError('required') && (form.get('password')?.touched || utilisateurFormDirective.submitted)) {
+                                <div class="cst-field__err">
+                                    <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                    {{ t('Password-required') || 'Le mot de passe est requis' }}
+                                </div>
+                            }
+                            @if (form.get('password')?.hasError('pattern')) {
+                                <div class="cst-field__err">
+                                    <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                    {{ t('Password-complexity') || '8 caractères min., une majuscule, une minuscule, un chiffre et un caractère spécial' }}
+                                </div>
+                            }
+                            @if (!isNew) {
+                                <button type="button" class="cst-linkbtn" (click)="toggleChangePassword()">{{ t('Cancel') || 'Annuler la modification' }}</button>
+                            }
+                        </div>
+                    } @else {
+                        <div class="cst-field">
+                            <label>{{ t('Password') || 'Mot de passe' }}</label>
+                            <button type="button" class="cst-btn cst-btn--ghost" style="align-self:flex-start" (click)="toggleChangePassword()">
+                                <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:key'"></mat-icon>
+                                {{ t('Change-password') || 'Modifier le mot de passe' }}
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="cst-divider"></div>
+
+            <!-- Section 3: Sites autorisés -->
+            <div>
+                <div class="cst-form-sec__title">{{ t('Sites') || 'Sites autorisés' }}</div>
+                <div class="cst-form-sec__sub">Sélectionnez les sites accessibles à cet utilisateur</div>
+
+                @if (allSites.length > 0) {
+                    <label class="cst-check" style="margin-bottom:12px">
+                        <input type="checkbox" [checked]="allSitesSelected" (change)="toggleAllSites()" />
+                        <span class="cst-check__box"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M2 6.5l2.6 2.6L10 3.5"></path></svg></span>
+                        {{ t('Select-all') || 'Tout sélectionner' }}
+                    </label>
+                    <div class="cst-check-grid">
+                        @for (site of allSites; track site.siteId) {
+                            <label class="cst-check">
+                                <input type="checkbox" [checked]="isSiteSelected(site.siteId)" (change)="toggleSite(site.siteId)" />
+                                <span class="cst-check__box"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M2 6.5l2.6 2.6L10 3.5"></path></svg></span>
+                                {{ site.libelleSite }} @if (site.code) { <span class="cst-mut">({{ site.code }})</span> }
+                            </label>
+                        }
+                    </div>
+                } @else {
+                    <div class="cst-form-sec__sub" style="margin:0">{{ t('No-sites') || 'Aucun site disponible' }}</div>
+                }
+            </div>
+
+            <div class="cst-divider"></div>
+
+            <!-- Section 4: Statut -->
+            <div class="cst-form-statusrow">
+                <div>
+                    <div class="cst-form-sec__title" style="margin-bottom:3px">{{ t('User-Status') || "Statut du compte" }}</div>
+                    <div class="cst-form-sec__sub" style="margin-bottom:0">Un compte inactif ne peut pas se connecter à la plateforme</div>
+                </div>
+                <div>
+                    <label class="cst-toggle">
+                        <span [ngClass]="form.get('isActive')?.value ? 'cst-toggle__on' : 'cst-toggle__off'">{{ form.get('isActive')?.value ? (t('Active') || 'Actif') : (t('Inactive') || 'Inactif') }}</span>
+                        <input type="checkbox" formControlName="isActive" />
+                        <span class="cst-toggle__track"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

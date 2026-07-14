@@ -1,138 +1,94 @@
-<div class="absolute inset-0 min-w-0 overflow-x-hidden overflow-y-auto flex flex-col flex-auto bg-default px-6 md:px-8" *transloco="let t">
+<div class="cst-main" *transloco="let t">
+    <div class="cst-crumb">
+        <a routerLink="/fichier/role-utilisateur">Gestion</a><span>/</span><b>{{ t('User Role') || 'Rôles utilisateur' }}</b>
+    </div>
 
-    <div class="relative flex flex-row flex-0 items-center justify-between py-8 h-16 my-4">
-
-        <!-- Title -->
-        <div class="text-4xl font-extrabold tracking-tight">{{ t('User Role') }}</div>
-
-        <div class="flex items-center gap-2">
-
-            <form
-                class="flex items-center gap-2"
-                [formGroup]="roleUtilisateurFilterForm">
-                <mat-form-field
-                    class="fuse-mat-dense min-w-64"
-                    [subscriptSizing]="'dynamic'">
-                    <mat-icon
-                        class="icon-size-5"
-                        matPrefix
-                        [svgIcon]="'search'"></mat-icon>
-                    <input
-                        matInput
-                        [formControlName]="'search'"
-                        [autocomplete]="'off'"
-                        [placeholder]="t('Search')">
-                </mat-form-field>
-
-            </form>
-
-            @if(hasActionPermission(FuseNavigationAction.Add)){
-                <a
-                    class="ml-4"
-                    mat-flat-button
-                    [color]="'primary'"
-                    [routerLink]="['ajouter']">
-                    <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-                    <span class="ml-2 mr-1">{{ t('Add') }}</span>
+    <div class="cst-head">
+        <div>
+            <div class="cst-head__title">{{ t('User Role') || 'Rôles utilisateur' }}</div>
+            <div class="cst-head__sub">{{ roleUtilisateursLength ?? 0 }} rôles</div>
+        </div>
+        <div class="cst-head__actions">
+            @if (hasActionPermission(FuseNavigationAction.Add)) {
+                <a class="cst-btn cst-btn--primary" [routerLink]="['ajouter']">
+                    <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                    {{ t('Add') || 'Ajouter' }}
                 </a>
             }
         </div>
     </div>
 
-    <!-- Main -->
-    <div class="flex flex-auto">
-
-        <!-- Role Utilisateur list -->
-        <div class="relative flex flex-col flex-auto mb-8 overflow-hidden rounded-lg bg-card justify-between">
-
-            @if(roleUtilisateurs?.length > 0){
-                <div class="grid gap-4 pb-20">
-                    <!-- Sort controls -->
-                    <fieldset class="flex flex-wrap items-center gap-2 mb-6">
-                        <legend class="text-sm text-hint">{{ t('Sort') }}</legend>
-                        <button
-                            mat-stroked-button
-                            type="button"
-                            [attr.aria-label]="t('Sort-by-label-ascending')"
-                            [disabled]="sortActive === 'libelleRoleUtilisateur' && sortDirection === 'asc'"
-                            [ngClass]="{'bg-primary text-white': sortActive === 'libelleRoleUtilisateur' && sortDirection === 'asc'}"
-                            (click)="setSort('libelleRoleUtilisateur','asc')">
-                            {{ t('Label') }} ↑
-                        </button>
-                        <button
-                            mat-stroked-button
-                            type="button"
-                            [attr.aria-label]="t('Sort-by-label-descending')"
-                            [disabled]="sortActive === 'libelleRoleUtilisateur' && sortDirection === 'desc'"
-                            [ngClass]="{'bg-primary text-white': sortActive === 'libelleRoleUtilisateur' && sortDirection === 'desc'}"
-                            (click)="setSort('libelleRoleUtilisateur','desc')">
-                            {{ t('Label') }} ↓
-                        </button>
-                    </fieldset>
-
-                    <!-- Cards Grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
-                        @for(item of roleUtilisateurs; track item.roleUtilisateurId || $index){
-                            <div class="entity-card bg-card p-6 rounded-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
-                                 (click)="toggleDetails(item.roleUtilisateurId)">
-                                <div class="flex items-start justify-between gap-4 mb-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg">
-                                            <mat-icon class="text-white text-2xl" svgIcon="mat_outline:shield"></mat-icon>
-                                        </div>
-                                        <div>
-                                            <div class="font-bold text-lg">{{item.libelleRoleUtilisateur}}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center justify-end gap-2 pt-3 border-t border-gray-100 dark:border-gray-700">
-                                    @if(hasActionPermission(FuseNavigationAction.Delete)){
-                                        <a
-                                            mat-icon-button
-                                            (click)="$event.stopPropagation(); deleteRoleUtilisateur(item.roleUtilisateurId)"
-                                            [matTooltip]="'Supprimer'"
-                                            [color]="'warn'">
-                                            <mat-icon
-                                                [svgIcon]="'heroicons_outline:trash'"></mat-icon>
-                                        </a>
-                                    }
-                                </div>
-                                @if(selectedRoleUtilisateur?.roleUtilisateurId === item.roleUtilisateurId){
-                                    <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                                        <div class="grid grid-cols-1 gap-4 text-sm">
-                                            <div>
-                                                <span class="font-semibold">{{ t('Label') }}:</span>
-                                                <span class="ml-2">{{item.libelleRoleUtilisateur}}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        }
-                    </div>
-
-                    <mat-paginator
-                        class="sm:absolute sm:inset-x-0 sm:bottom-0 border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
-                        [ngClass]="{'pointer-events-none': isLoading}"
-                        [length]="roleUtilisateursLength"
-                        [pageIndex]="0"
-                        [pageSize]="50"
-                        [pageSizeOptions]="[5, 10, 25, 50, 100]"
-                        [showFirstLastButtons]="true"
-                        (page)="SortChange()">
-                    </mat-paginator>
+    <div class="cst-panel">
+        <!-- Filter and search bar -->
+        <div class="cst-filters">
+            <form [formGroup]="roleUtilisateurFilterForm">
+                <div class="cst-search">
+                    <mat-icon [svgIcon]="'heroicons_outline:magnifying-glass'"></mat-icon>
+                    <input formControlName="search" [placeholder]="t('Search') || 'Rechercher...'" autocomplete="off" />
                 </div>
-
-            } @else {
-
-                <div class="flex items-center justify-center h-full p-8 sm:p-16 text-4xl font-semibold tracking-tight text-center">
-                    {{ t('Empty-List!') }}
-                </div>
-
-            }
-
+            </form>
+            <div class="cst-sort">
+                <button type="button" [class.is-on]="sortActive === 'libelleRoleUtilisateur'"
+                        (click)="setSort('libelleRoleUtilisateur', sortActive === 'libelleRoleUtilisateur' && sortDirection === 'asc' ? 'desc' : 'asc')">
+                    {{ t('Label') || 'Libellé' }}
+                    <span class="cst-sort__dir">{{ sortActive === 'libelleRoleUtilisateur' ? (sortDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
+                </button>
+            </div>
+            <div class="cst-filters__count">{{ roleUtilisateursLength ?? 0 }} résultats</div>
         </div>
 
-    </div>
+        @if (isLoading) { <mat-progress-bar mode="indeterminate"></mat-progress-bar> }
 
+        <!-- Table -->
+        <div class="cst-tbl" style="--cols: 2fr 1.2fr 1fr 96px; --colmin: 720px">
+            <div class="cst-tbl__head">
+                <div>{{ t('Label') || 'Libellé du rôle' }}</div>
+                <div>{{ t('Scope') || 'Portée' }}</div>
+                <div>{{ t('Permissions') || 'Permissions' }}</div>
+                <div class="cst-tbl__end">Actions</div>
+            </div>
+
+            @if (roleUtilisateurs?.length > 0) {
+                @for (item of roleUtilisateurs; track item.roleUtilisateurId || $index) {
+                    <div class="cst-tbl__row">
+                        <div class="cst-strong">{{ item.libelleRoleUtilisateur || '—' }}</div>
+                        <div>
+                            <span class="cst-pill" [ngClass]="item.societeId ? 'cst-pill--info' : 'cst-pill--off'">
+                                {{ item.societeId ? (t('Company-scoped') || 'SOCIÉTÉ') : (t('Global') || 'GLOBAL') }}
+                            </span>
+                        </div>
+                        <div class="cst-num cst-mut">{{ item.navigations?.length || 0 }} module(s)</div>
+                        <div class="cst-tbl__act">
+                            <a class="cst-round" [routerLink]="[item.roleUtilisateurId]" [attr.aria-label]="t('Edit')">
+                                <mat-icon [svgIcon]="'heroicons_outline:pencil-square'"></mat-icon>
+                            </a>
+                            @if (hasActionPermission(FuseNavigationAction.Delete)) {
+                                <button class="cst-round cst-round--danger" type="button" (click)="deleteRoleUtilisateur(item.roleUtilisateurId)" [attr.aria-label]="t('Delete')">
+                                    <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+            } @else {
+                <div class="cst-tbl__empty">
+                    <div class="cst-tbl__empty-ic"><mat-icon [svgIcon]="'mat_outline:shield'"></mat-icon></div>
+                    <div class="cst-tbl__empty-t">{{ t('No-roles-found') || 'Aucun rôle trouvé' }}</div>
+                    <div class="cst-tbl__empty-s">Créez un rôle pour définir les permissions de vos utilisateurs.</div>
+                </div>
+            }
+        </div>
+
+        <!-- Pagination -->
+        <mat-paginator
+            class="cst-pager"
+            [ngClass]="{'pointer-events-none': isLoading}"
+            [length]="roleUtilisateursLength"
+            [pageIndex]="0"
+            [pageSize]="50"
+            [pageSizeOptions]="[5, 10, 25, 50, 100]"
+            [showFirstLastButtons]="true"
+            (page)="SortChange()">
+        </mat-paginator>
+    </div>
 </div>

@@ -26,6 +26,7 @@ function passwordsMatch(control: AbstractControl): ValidationErrors | null {
 @Component({
     selector: 'auth-sign-up',
     templateUrl: './sign-up.component.html',
+    styleUrls: ['./sign-up.component.scss'],
     encapsulation: ViewEncapsulation.None,
     animations: fuseAnimations,
     standalone: true,
@@ -82,8 +83,8 @@ export class AuthSignUpComponent implements OnInit {
             next: (response) => {
                 this.isLoading = false;
                 if (response?.success) {
-                    // Le code de vérification a été envoyé : place à la saisie du code.
-                    this._router.navigate(['/verify-code'], { queryParams: { email: email.trim().toLowerCase() } });
+                    // La demande part chez l'administrateur : le client attend son code sur la page de saisie.
+                    this._router.navigate(['/verify-code'], { queryParams: { email: email.trim().toLowerCase(), pending: 1 } });
                 } else {
                     this.showErrorAlert(response?.message || "L'inscription a échoué. Veuillez réessayer.");
                 }
