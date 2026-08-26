@@ -272,6 +272,8 @@ public class AuthenticationEndpoints : ICarterModule
         utilisateur.SetVerificationCode(code);
         utilisateur.ClearApprovalToken(); // One-time use
 
+        utilisateurRepository.Update(utilisateur);
+
         await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         // Send email to the user with the code
@@ -328,6 +330,7 @@ public class AuthenticationEndpoints : ICarterModule
         // Code matches and account is active!
         // Clear verification code
         utilisateur.ClearVerificationCode();
+        utilisateurRepository.Update(utilisateur);
         await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         // Generate auto-login JWT token
@@ -379,6 +382,7 @@ public class AuthenticationEndpoints : ICarterModule
         // Generate new 6-digit code
         var code = Random.Shared.Next(100000, 999999).ToString("D6");
         utilisateur.SetVerificationCode(code);
+        utilisateurRepository.Update(utilisateur);
 
         await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
