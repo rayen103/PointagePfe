@@ -145,7 +145,7 @@ public class AuthenticationEndpoints : ICarterModule
             telephone2: null,
             fax1: null,
             fax2: null,
-            email: request.Email,
+            email: request.Email.Length > 30 ? request.Email.Substring(0, 30) : request.Email,
             adresse: null,
             codePostal: null,
             ville: null,
