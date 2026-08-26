@@ -117,6 +117,17 @@ public class AuthenticationEndpoints : ICarterModule
         HttpContext httpContext,
         CancellationToken cancellationToken)
     {
+        // 0. Check duplicate email
+        var existingEmailUser = await utilisateurRepository.GetAsync(u => u.Email == request.Email, cancellationToken).ConfigureAwait(false);
+        if (existingEmailUser is not null)
+        {
+            return Results.Ok(new ApiResponse<object>(new
+            {
+                success = false,
+                message = "Un compte avec cette adresse e-mail existe déjà."
+            }));
+        }
+
         // 1. Create Societe
         var societeId = new SocieteId(Ulid.NewUlid());
         var societe = Societe.Create(
