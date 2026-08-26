@@ -72,6 +72,7 @@ public static class DependencyInjection
         services.AddScoped<ILoggedInUserService, LoggedInUserService>();
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         services.Configure<PuppeteerOptions>(configuration.GetSection(PuppeteerOptions.SectionName));
+        services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.SectionName));
         services.Configure<JsonOptions>(options =>
         {
             options.SerializerOptions.Converters.Add(new NullableUlidJsonConverter());
@@ -87,6 +88,7 @@ public static class DependencyInjection
 
         
         services.AddScoped<IPasswordService, PasswordService>();
+        services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IFileSystem, FileSystem>();
         services.AddScoped<IImageService, ImageService>();
         services.AddScoped<IPdfGeneratorService, PdfGeneratorService>();

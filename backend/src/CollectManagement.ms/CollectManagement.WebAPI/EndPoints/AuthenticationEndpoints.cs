@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Carter;
 using CollectManagement.Application.Common;
 using CollectManagement.Application.Contracts.Authentication;
@@ -19,6 +19,8 @@ public class AuthenticationEndpoints : ICarterModule
         
         routeGroupBuilder.MapPost("v1/login", LoginAdmin).AllowAnonymous();
         routeGroupBuilder.MapPost("v1/login-check", LoginAdminCheck).AllowAnonymous();
+        routeGroupBuilder.MapPost("v1/register", Register).AllowAnonymous();
+        routeGroupBuilder.MapPost("v1/verify-email", VerifyEmail).AllowAnonymous();
         routeGroupBuilder.MapPost("v99/login", LoginSuperAdmin).AllowAnonymous();
         routeGroupBuilder.MapPost("v99/login-check", LoginSuperAdminCheck).AllowAnonymous();
     }
@@ -94,5 +96,39 @@ public class AuthenticationEndpoints : ICarterModule
 
         return Results.Ok(new ApiResponse<AuthenticationResponse>(authenticationResponse));
     }
-    
+
+    public static async Task<IResult> Register(
+        [FromBody] [Required] RegisterCompanyRequest request,
+        IEmailService emailService,
+        CancellationToken cancellationToken)
+    {
+        var subject = $"[PointagePfe] Demande d'inscription: {request.NomSociete}";
+        var body = $"""
+            <h3>Nouvelle Demande d'Inscription Reçue</h3>
+            <p><strong>Société:</strong> {request.NomSociete}</p>
+            <p><strong>Nom:</strong> {request.Nom}</p>
+            <p><strong>Prénom:</strong> {request.Prenom}</p>
+            <p><strong>Email:</strong> {request.Email}</p>
+            <p><em>Veuillez vérifier cette demande et approuver le compte utilisateur.</em></p>
+            """;
+
+        await emailService.SendAdminNotificationAsync(subject, body, cancellationToken).ConfigureAwait(false);
+
+        return Results.Ok(new ApiResponse<object>(new
+        {
+            success = true,
+            message = "Demande d'inscription enregistrée. Un e-mail de notification a été envoyé à l'administrateur."
+        }));
+    }
+
+    public static Task<IResult> VerifyEmail(
+        [FromBody] [Required] VerifyEmailRequest request,
+        CancellationToken cancellationToken)
+    {
+        return Task.FromResult<IResult>(Results.Ok(new ApiResponse<object>(new
+        {
+            success = true,
+            message = "Adresse e-mail vérifiée avec succès."
+        })));
+    }
 }

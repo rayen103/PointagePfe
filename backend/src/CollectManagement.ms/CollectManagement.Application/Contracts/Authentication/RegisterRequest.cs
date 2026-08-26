@@ -5,3 +5,14 @@ public record RegisterModeratorRequest(
     string Nom,
     string Prenom,
     string Email);
+
+public record RegisterCompanyRequest(
+    string NomSociete,
+    string Nom,
+    string Prenom,
+    string Email,
+    string Password);
+
+public record VerifyEmailRequest(
+    string Email,
+    string Code);
