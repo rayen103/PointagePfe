@@ -126,7 +126,7 @@ public class AuthenticationEndpoints : ICarterModule
             initiales: null,
             tva: null,
             rc: null,
-            matriculeFiscal: null,
+            matriculeFiscal: "PENDING",
             rne: null,
             capital: null,
             dateOverture: DateTime.UtcNow,
