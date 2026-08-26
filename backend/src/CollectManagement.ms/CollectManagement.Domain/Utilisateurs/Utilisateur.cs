@@ -25,6 +25,9 @@ public sealed class Utilisateur : AuditableEntity
     
     public bool IsActive { get; private set; } = true;
     
+    public string? VerificationCode { get; private set; }
+    public string? ApprovalToken { get; private set; }
+    
     public SocieteId SocieteId { get; private set; } // Clé étrangère
     public Societe? Societe { get; private set; }    // Navigation Property
 
@@ -133,6 +136,26 @@ public sealed class Utilisateur : AuditableEntity
     {
         _sites.Clear();
         _sites.AddRange(sites);
+    }
+
+    public void SetVerificationCode(string code)
+    {
+        VerificationCode = code;
+    }
+
+    public void ClearVerificationCode()
+    {
+        VerificationCode = null;
+    }
+
+    public void SetApprovalToken(string token)
+    {
+        ApprovalToken = token;
+    }
+
+    public void ClearApprovalToken()
+    {
+        ApprovalToken = null;
     }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.

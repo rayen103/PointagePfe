@@ -1,5 +1,6 @@
 using Carter;
 using CollectManagement.Application;
+using CollectManagement.Application.Interfaces.Services;
 using CollectManagement.Infrastructure;
 using CollectManagement.Infrastructure.Persistence.Context;
 using CollectManagement.WebAPI.Authorization;
@@ -155,34 +156,47 @@ if (app.Environment.IsDevelopment())
 {
     try
     {
-        // Get project root path (relative from WebAPI to ml-service)
         var solutionRoot = Path.GetFullPath(Path.Combine(app.Environment.ContentRootPath, "..", "..", ".."));
         var mlServicePath = Path.Combine(solutionRoot, "ml-service");
 
         if (Directory.Exists(mlServicePath))
         {
-            Console.WriteLine("🚀 Starting ML ETA Prediction Service automatically...");
+            var venvPythonWin = Path.Combine(mlServicePath, ".venv", "Scripts", "python.exe");
+            var venvPythonUnix = Path.Combine(mlServicePath, ".venv", "bin", "python");
+
+            string pythonExec;
+            if (OperatingSystem.IsWindows() && File.Exists(venvPythonWin))
+            {
+                pythonExec = venvPythonWin;
+            }
+            else if (!OperatingSystem.IsWindows() && File.Exists(venvPythonUnix))
+            {
+                pythonExec = venvPythonUnix;
+            }
+            else
+            {
+                pythonExec = OperatingSystem.IsWindows() ? "python" : "python3";
+            }
+
+            Console.WriteLine($"🚀 Starting ML ETA Prediction Service automatically using '{pythonExec}'...");
 
             var processStartInfo = new System.Diagnostics.ProcessStartInfo
             {
-                FileName = OperatingSystem.IsWindows() ? "python" : "python3",
-                Arguments = "-m uvicorn main:app --host 0.0.0.0 --port 8001 --reload",
+                FileName = pythonExec,
+                Arguments = "-m uvicorn main:app --host 0.0.0.0 --port 8000 --reload",
                 WorkingDirectory = mlServicePath,
                 UseShellExecute = true,
                 CreateNoWindow = false,
-                WindowStyle = OperatingSystem.IsWindows() 
-                    ? System.Diagnostics.ProcessWindowStyle.Normal 
-                    : System.Diagnostics.ProcessWindowStyle.Normal
+                WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal
             };
 
             var mlProcess = System.Diagnostics.Process.Start(processStartInfo);
-            
+
             if (mlProcess != null)
             {
-                Console.WriteLine($"✅ ML Service started (PID: {mlProcess.Id}) at http://localhost:8001");
-                
-                // Keep track of the ML process so we can clean it up if needed
-                AppDomain.CurrentDomain.ProcessExit += (s, e) => 
+                Console.WriteLine($"✅ ML Service started (PID: {mlProcess.Id}) at http://localhost:8000");
+
+                AppDomain.CurrentDomain.ProcessExit += (s, e) =>
                 {
                     if (!mlProcess.HasExited)
                     {
@@ -202,6 +216,26 @@ if (app.Environment.IsDevelopment())
     {
         Console.WriteLine($"❌ Failed to auto-start ML service: {ex.Message}");
     }
+
+    // Auto-trigger ML Initialization and Warmup on startup
+    Task.Run(async () =>
+    {
+        await Task.Delay(3000);
+        try
+        {
+            using var scope = app.Services.CreateScope();
+            var predictionService = scope.ServiceProvider.GetService<IExternalPredictionService>();
+            if (predictionService != null)
+            {
+                var meta = await predictionService.GetModelMetadataAsync();
+                Console.WriteLine($"🤖 ML Service Initialized: Version={meta.ModelVersion}, DurationSamples={meta.DurationSampleCount}, AbsenceSamples={meta.AbsenceSampleCount}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"⚠️ ML Warmup trigger warning: {ex.Message}");
+        }
+    });
 }
 
 app.Run();

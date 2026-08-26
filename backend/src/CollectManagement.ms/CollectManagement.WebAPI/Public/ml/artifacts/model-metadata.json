@@ -2,7 +2,7 @@
   "modelVersion": "external-cold-start-v1",
   "durationDatasetSource": "duration_external_dataset.json",
   "absenceDatasetSource": "absence_external_dataset.json",
-  "trainedAtUtc": "2026-07-07T11:20:07.7465348Z",
+  "trainedAtUtc": "2026-05-15T13:31:45.8092351Z",
   "durationSampleCount": 12,
   "absenceSampleCount": 12,
   "durationMaeEstimate": 1.35,

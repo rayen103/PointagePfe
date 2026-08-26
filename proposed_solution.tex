@@ -1,0 +1,801 @@
+\chapter{Proposed Solution}
+\label{chap:proposed_solution}
+
+\section{Introduction}
+\label{sec:solution_intro}
+
+This chapter details the comprehensive architectural and technical design of the \Tech{CST LePoint} platform. To overcome the structural limitations of the legacy ecosystem identified in Chapter~2 and fulfill the operational, predictive, and administrative requirements established in Chapter~3, the proposed solution adopts a modern, service-oriented, multi-tier architecture. The platform is engineered to deliver high scalability, strict data integrity, modular maintainability, and real-time fleet visibility for enterprise transit operations.
+
+In this chapter, we focus strictly on the conceptual, architectural, and structural foundations of the system, setting aside specific technology choices and software libraries for Chapter~\ref{chap:implementation}.
+
+In the following sections, we systematically present:
+\begin{itemize}
+  \item The global multi-tier system architecture and its inter-service communication protocols;
+  \item The physical deployment topology orchestrated through containerized microservices;
+  \item The backend logical architecture governed by Clean Architecture and Domain-Driven Design principles;
+  \item The in-process CQRS request processing pipeline and transactional behavior chain;
+  \item The relational database design, shared-schema multi-tenancy model, and domain schemas;
+  \item The stateless authentication, cryptographic protections, and navigation-based RBAC security model;
+  \item The high-throughput IoT telemetry ingestion pipeline and automated geofencing engine;
+  \item The predictive machine learning microservice integration for real-time bus arrival forecasting;
+  \item The client-side Single Page Application architecture, reactive state management, and internationalization framework.
+\end{itemize}
+
+\section{Global System Architecture}
+\label{sec:global_architecture}
+
+The platform is structured as a decoupled, multi-tier distributed system composed of four specialized functional layers: the Client Layer, the Backend Layer, the Data Layer, and the Artificial Intelligence (AI) Layer. Each tier fulfills a distinct operational responsibility while communicating over standardized protocols, ensuring loose coupling, independent scalability, and testability.
+
+Figure~\ref{fig:global_architecture} provides an overview of the global system architecture and the communication pathways connecting each subsystem.
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=0.92\textwidth]
+%%{init: { "theme": "default", "themeVariables": { "fontSize": "22px", "fontFamily": "Arial, sans-serif" } }}%%
+graph TD
+    subgraph Client["Client Layer"]
+        SPA["Single Page Application (SPA)<br/>(Client Web Interface)"]
+    end
+
+    subgraph Backend["Backend Layer"]
+        API["Application Backend API<br/>(Clean Architecture + CQRS)"]
+    end
+
+    subgraph StorageAI["Data & Intelligence Layers"]
+        DB[("Relational Database<br/>(Transactional Store)")]
+        ML["Predictive AI Microservice<br/>(ETA Forecasting Engine)"]
+    end
+
+    SPA -->|"REST API + Security Tokens"| API
+    API -->|"Object-Relational Mapping (ORM)"| DB
+    API -->|"HTTP Client Protocol"| ML
+  \end{mermaid}
+  \caption{Global System Architecture -- Multi-Tier Conceptual View}
+  \label{fig:global_architecture}
+\end{figure}
+
+The four architectural tiers operate as follows:
+\begin{enumerate}
+  \item \textbf{Client Layer (Single Page Application)}: Delivers an interactive, responsive web user interface executed within the end-user's browser. It is served statically through an optimized web server and communicates with the backend exclusively via asynchronous RESTful HTTP calls carrying signed cryptographic security tokens for authentication and authorization.
+  \item \textbf{Backend Layer (Application Web API)}: Functions as the central business orchestration engine. Adhering to Clean Architecture and Command Query Responsibility Segregation (\Tech{CQRS}) principles, this layer handles business logic execution, domain invariants enforcement, role-based authorization, telemetry processing, and background coordination.
+  \item \textbf{Data Layer (Relational Database Management System)}: Serves as the centralized transactional data store. It guarantees ACID compliance for all master data, operational work orders, attendance logs, and high-frequency telemetry events. The backend interacts with the database through an Object-Relational Mapping (\Tech{ORM}) persistence layer.
+  \item \textbf{AI Layer (Predictive Machine Learning Service)}: A dedicated, decoupled microservice encapsulating trained machine learning models for estimated time of arrival (\Tech{ETA}) forecasting. The application backend invokes this service synchronously or in parallel batches via a resilient HTTP client.
+\end{enumerate}
+
+\section{Physical Deployment Architecture}
+\label{sec:deployment_architecture}
+
+To ensure environment parity between development, staging, and production environments, the entire platform is containerized and orchestrated through a dedicated container platform. Each service executes within an isolated container environment on a shared internal virtual network, exposing only the necessary ingress ports to the host system while isolating database and internal services from direct external exposure.
+
+Figure~\ref{fig:physical_deployment} illustrates the container topology, network routing, and storage volume bindings.
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=0.92\textwidth]
+%%{init: { "theme": "default", "themeVariables": { "fontSize": "21px", "fontFamily": "Arial, sans-serif" } }}%%
+graph TD
+    User["Client Web Browser"] -->|"HTTP Ingress"| FE
+
+    subgraph Docker["Container Orchestration Platform (Internal Bridge Network)"]
+        subgraph FE["Frontend Container"]
+            NG["Static Web Server"]
+            AB["SPA Production Bundle"]
+            NG --- AB
+        end
+
+        subgraph BE["Backend Container"]
+            RT["Application Runtime Engine"]
+            MG["Automatic Schema Migrations"]
+            RT --- MG
+        end
+
+        subgraph DBC["Database Container"]
+            SQL[("Relational Database Engine")]
+            VOL[("Persistent Storage Volume")]
+            SQL --- VOL
+        end
+
+        subgraph MLC["AI Prediction Container"]
+            FA["ML Inference Server Engine"]
+            ART[("Model Serialization Volume")]
+            FA --- ART
+        end
+    end
+
+    FE -->|"REST Proxy Route"| BE
+    BE -->|"Internal TCP Connection"| DBC
+    BE -->|"Internal HTTP RPC"| MLC
+  \end{mermaid}
+  \caption{Physical Deployment -- Containerized Microservice Topology}
+  \label{fig:physical_deployment}
+\end{figure}
+
+The physical deployment architecture implements several key operational mechanisms:
+\begin{itemize}
+  \item \textbf{Health Checks and Dependency Sequencing}: Distributed startup order is strictly managed. The database container includes an active health check querying database responsiveness. The backend container depends on this health status, guaranteeing that the application API does not attempt to execute schema migrations or listen for incoming requests until the database engine is fully initialized and accepting connections.
+  \item \textbf{Multi-Stage Container Compilation}: To minimize attack surface and reduce production image footprints, both the backend and frontend utilize multi-stage container builds. Intermediate compilation tools and development SDKs are isolated from the final deployment containers, exporting only lean, pre-compiled runtime assets to hardened production containers.
+  \item \textbf{Persistent Storage Volumes}: Container state volatility is resolved through dedicated persistent storage volumes. Database tables, transaction logs, and indexes reside on dedicated persistent volumes, ensuring complete data persistence across container restarts or upgrades. The AI service mounts a specialized host volume for serialized predictive models, enabling zero-downtime model updates and hot-swaps without rebuilding container images.
+\end{itemize}
+
+\section{Backend Logical Architecture (Clean Architecture)}
+\label{sec:backend_logical_architecture}
+
+The backend is architected in strict adherence to \Tech{Clean Architecture} principles, emphasizing the \Tech{Dependency Inversion Principle}. Software dependencies flow strictly inwards: inner layers define domain policies and business contracts, while outer layers provide infrastructural adapters and entry points. The Domain layer sits at the center with zero dependencies on external frameworks, databases, or UI libraries.
+
+Figure~\ref{fig:clean_architecture} depicts the concentric layer dependencies and data flow across the backend.
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=0.98\textwidth]
+%%{init: { "theme": "default", "themeVariables": { "fontSize": "20px", "fontFamily": "Arial, sans-serif" } }}%%
+flowchart TD
+    subgraph Presentation["1. Presentation Layer (API Entry Point)"]
+        EP["Modular Endpoint Slices &bull; API Documentation &bull; Global Exception Middleware"]
+    end
+
+    subgraph CoreBackend["Application & Domain Core"]
+        direction LR
+        subgraph App["2. Application Layer (CQRS & Use Cases)"]
+            direction TB
+            Cmd["Commands (Write Operations)"]
+            Qry["Queries (Read Operations)"]
+            Val["Input Validation Rules"]
+            Intf["Repository & Service Contracts"]
+        end
+        subgraph Domain["3. Domain Layer (Enterprise Core &bull; Zero External Dependencies)"]
+            direction TB
+            Ent["Aggregates & Entities"]
+            VO["Strongly-Typed ULID Value Objects"]
+            Inv["Business Invariants & Domain Rules"]
+        end
+    end
+
+    subgraph Infra["4. Infrastructure Layer (Technical Adapters)"]
+        direction LR
+        Repos["ORM Database Context & Repositories"]
+        Svc["Cryptographic Hashing & Token Issuance"]
+        Ext["Predictive AI Client & Document Services"]
+    end
+
+    EP ==>|"Dispatches Commands & Queries"| Cmd
+    EP --> Qry
+    Cmd --> Intf
+    Qry --> Intf
+    Cmd --> Ent
+    Qry --> Ent
+    Repos -.->|"Implements"| Intf
+    Svc -.->|"Implements"| Intf
+    Ext -.->|"Implements"| Intf
+  \end{mermaid}
+  \caption{Backend Logical Architecture -- Clean Architecture Layer Dependencies}
+  \label{fig:clean_architecture}
+\end{figure}
+
+The responsibilities of each concentric layer are defined as follows:
+
+\subsection{Domain Layer}
+The Domain layer represents the core of the enterprise system. It contains domain aggregates, entities, value objects, domain exceptions, and business invariant methods. The layer is completely independent of external packages, third-party persistence mechanisms, and communication protocols.
+\begin{itemize}
+  \item \textbf{Encapsulation}: Entity state is protected through private property setters and explicit factory methods, preventing invalid state mutations from external callers.
+  \item \textbf{Strongly-Typed Identifiers}: To eliminate primitive obsession and prevent accidental ID-swapping defects (such as providing an \texttt{EmployeId} where a \texttt{BusId} is expected), every aggregate root and entity uses a strongly-typed value object wrapping a 26-character Universally Unique Lexicographically Sortable Identifier (\Tech{ULID}).
+  \item \textbf{Domain Invariants}: State transitions (such as modifying bus occupancy, changing circuit sequences, or calculating geofence distances) are executed through encapsulated domain methods that validate business rules before applying updates.
+\end{itemize}
+
+\subsection{Application Layer}
+The Application layer coordinates system use cases by orchestrating domain entities and infrastructural interfaces. It implements the CQRS pattern using an in-process message dispatcher:
+\begin{itemize}
+  \item \textbf{Commands}: Data structures representing state-modifying write operations (e.g., creating a circuit, ingesting a telemetry coordinate, or registering an employee).
+  \item \textbf{Queries}: Data structures representing read-only operations returning optimized data transfer objects (\Tech{DTOs}) without mutating system state.
+  \item \textbf{Validation Rules}: Declarative input validation rules attached to each command to enforce data integrity before business handlers execute.
+  \item \textbf{Contract Interfaces}: Abstract interfaces defining repository operations, cryptographic services, token issuance, and external prediction services.
+\end{itemize}
+
+\subsection{Infrastructure Layer}
+The Infrastructure layer provides technical implementations for the abstractions declared in the Application layer. It handles all I/O operations and external communications:
+\begin{itemize}
+  \item \textbf{Persistence}: Object-Relational Mapping configurations, entity mappings, index specifications, and concrete repository implementations.
+  \item \textbf{Security Services}: One-way adaptive password hashing and stateless cryptographic token generation.
+  \item \textbf{External Integration}: Resilient HTTP client adapters communicating with the machine learning prediction microservice and document rendering services.
+\end{itemize}
+
+\subsection{Presentation Layer}
+The Presentation layer is the public HTTP entry point for external clients:
+\begin{itemize}
+  \item \textbf{Modular API Routing}: HTTP endpoint mappings organized into modular feature slices, avoiding bloated monolithic controller structures.
+  \item \textbf{Global Middleware}: Centralized exception handling that intercepts application errors and translates them into standard RFC-7807 Problem Details responses.
+  \item \textbf{Security and Documentation}: Cross-Origin Resource Sharing (\Tech{CORS}) policies, token-based authentication schemes, and automated OpenAPI documentation generation.
+\end{itemize}
+
+\section{CQRS Request Pipeline}
+\label{sec:cqrs_pipeline}
+
+The backend employs Command Query Responsibility Segregation (\Tech{CQRS}) using an in-process mediator pipeline. Every incoming request dispatched to the message bus travels through a structured sequence of cross-cutting behaviors before reaching its targeted domain handler.
+
+Figure~\ref{fig:cqrs_pipeline} illustrates the sequence of execution across the pipeline behaviors.
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=0.98\textwidth]
+%%{init: { "theme": "default", "themeVariables": { "fontSize": "23px", "actorFontSize": "22px", "noteFontSize": "20px", "messageFontSize": "20px", "fontFamily": "Arial, sans-serif" }, "sequence": { "actorWidth": 150, "actorHeight": 52, "boxWidth": 150, "messageMargin": 36 } }}%%
+sequenceDiagram
+    autonumber
+    participant C as Client Application
+    participant EP as API Endpoint Router
+    participant M as In-Process Mediator Bus
+    participant L as Logging Behavior
+    participant V as Validation Behavior
+    participant U as Unit of Work Behavior
+    participant H as Request Handler
+    participant DB as Relational Database
+
+    C->>EP: 1. HTTP Request (JSON Body)
+    EP->>M: 2. Dispatch(Command / Query)
+    M->>L: 3. Intercept & Start Diagnostic Timer
+    L->>V: 4. Invoke Input Validation Rules
+
+    alt Validation Fails
+        V-->>EP: Return ValidationException (HTTP 400)
+        EP-->>C: Standard Problem Details Response
+    end
+
+    V->>U: 5. Begin Transaction (Commands Only)
+    U->>H: 6. Execute Domain Business Logic
+    H->>DB: 7. ORM Read / Mutation Operation
+    DB-->>H: 8. Database Records / Acknowledgement
+    H-->>U: 9. Return Result DTO
+    U->>DB: 10. Persist State + Commit Transaction
+    U-->>M: 11. API Response Payload
+    M-->>EP: 12. Return Processed Result
+    EP-->>C: 13. HTTP 200 / 201 JSON Response
+  \end{mermaid}
+  \caption{CQRS Request Pipeline -- In-Process Mediator Behavior Chain}
+  \label{fig:cqrs_pipeline}
+\end{figure}
+
+The pipeline executes three automated behaviors sequentially:
+\begin{itemize}
+  \item \textbf{Logging Behavior}: Intercepts every command and query upon entry. It captures execution start timestamps, request type names, user identity claims, and contextual telemetry payloads. Upon completion, it computes total execution duration and logs structured operational diagnostics, enabling proactive bottleneck identification.
+  \item \textbf{Validation Behavior}: Executes all registered input validation rules associated with the incoming request. If any constraint fails (e.g., missing mandatory parameters, negative route distances, or invalid GPS bounds), the pipeline fails fast, short-circuiting handler execution and returning a standardized HTTP 400 Bad Request error.
+  \item \textbf{Unit of Work Behavior}: Enforces transactional boundaries for state-modifying commands. It initiates an explicit database transaction prior to handler execution. If the handler completes successfully, the behavior commits the transaction atomically. If an unhandled exception or persistence conflict occurs, the transaction is automatically rolled back, preventing partial data corruption.
+\end{itemize}
+
+\section{Database Design}
+\label{sec:database_design}
+
+The persistence model is implemented on a relational database system under a dedicated relational schema. The schema is organized into distinct domain aggregates that balance third normal form (3NF) relational integrity with optimized query performance for real-time monitoring and reporting.
+
+\subsection{Multi-Tenancy Strategy}
+\label{sec:multitenancy}
+
+To support multi-organizational operations while maintaining administrative simplicity, the platform adopts a \textbf{Shared-Database, Shared-Schema Multi-Tenancy} architecture:
+\begin{itemize}
+  \item \textbf{Tenant Scoping}: Every organizational aggregate (including users, buses, circuits, pickup points, employees, and work orders) contains a mandatory foreign key reference to \texttt{SocieteId}.
+  \item \textbf{Query Isolation}: The application enforces strict data filtering. When an authenticated user issues a query, the repository layer automatically scopes all read and write operations by the active company identifier extracted from the user's verified security token claims.
+  \item \textbf{Operational Advantages}: This design eliminates the database maintenance overhead of managing hundreds of individual database instances while simplifying unified database backups, indexing, and automated schema migrations.
+\end{itemize}
+
+\subsection{Core Domain Schema}
+\label{sec:core_schema}
+
+The Core Domain models the transit infrastructure, fleet entities, driver assignments, and runtime event streams. To maintain maximum clarity and readable proportions, the Core Domain is presented in two complementary structural diagrams:
+
+Figure~\ref{fig:er_core_fleet} illustrates the transit fleet, route definitions, ordered pickup points, hardware pairing, and runtime telemetry event logs.
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=0.98\textwidth]
+%%{init: { "theme": "default", "themeVariables": { "fontSize": "21px", "fontFamily": "Arial, sans-serif" } }}%%
+erDiagram
+    Societe ||--o{ Bus : "owns fleet"
+    Societe ||--o{ Circuit : "defines routes"
+    Societe ||--o{ PointCollecte : "registers stops"
+    Societe ||--o{ Chauffeur : "employs drivers"
+    Societe ||--o{ Shift : "schedules shifts"
+    Societe ||--o{ Modem : "owns devices"
+
+    Circuit ||--o{ CircuitPointCollecte : "sequences"
+    CircuitPointCollecte }o--|| PointCollecte : "targets"
+    Bus ||--o{ BusRuntimeEvent : "streams"
+
+    Bus {
+        string BusId PK
+        string NumeroIMM
+        string IMEI
+        int Capacite
+        string CodeCircuit
+        string CodeChauffeur
+        int CurrentOccupancy
+        decimal Latitude
+        decimal Longitude
+        string SocieteId FK
+    }
+
+    BusRuntimeEvent {
+        string BusRuntimeEventId PK
+        string BusId FK
+        string EventType
+        string Description
+        decimal Latitude
+        decimal Longitude
+        int Occupancy
+        datetime OccurredAtUtc
+    }
+
+    Circuit {
+        string CircuitId PK
+        string CodeCircuit
+        decimal DistanceKm
+        int DureeMinutes
+        string Couleur
+        string SocieteId FK
+    }
+
+    PointCollecte {
+        string PointCollecteId PK
+        string CodePointCollecte
+        decimal Latitude
+        decimal Longitude
+        string SocieteId FK
+    }
+
+    CircuitPointCollecte {
+        string CircuitId FK
+        string CodePointCollecte
+        decimal Latitude
+        decimal Longitude
+        int Ordre
+    }
+
+    Modem {
+        string ModemId PK
+        string IMEI
+        string NumeroSim
+        string SocieteId FK
+    }
+
+    Chauffeur {
+        string ChauffeurId PK
+        string CodeChauffeur
+        string RFIDChauffeur
+        string SocieteId FK
+    }
+
+    Shift {
+        string ShiftId PK
+        string CodeShift
+        time HeureDebut
+        time HeureFin
+        string SocieteId FK
+    }
+  \end{mermaid}
+  \caption{Core Domain -- Transit Fleet, Circuits, and Telemetry Events Schema}
+  \label{fig:er_core_fleet}
+\end{figure}
+
+Figure~\ref{fig:er_core_identity} presents the multi-tenant identity, role navigation permissions, employee personnel records, and operational site entities.
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=0.95\textwidth]
+%%{init: { "theme": "default", "themeVariables": { "fontSize": "21px", "fontFamily": "Arial, sans-serif" } }}%%
+erDiagram
+    Societe ||--o{ Utilisateur : "manages accounts"
+    Societe ||--o{ Employe : "employs workforce"
+    Societe ||--o{ Site : "operates facilities"
+    RoleUtilisateur ||--o{ Utilisateur : "assigned to"
+
+    Societe {
+        string SocieteId PK
+        string Nom
+        string CodeSociete
+        string MatriculeFiscal
+    }
+
+    RoleUtilisateur {
+        string RoleUtilisateurId PK
+        string Nom
+        string Navigations_JSON
+    }
+
+    Utilisateur {
+        string UtilisateurId PK
+        string NomUtilisateur
+        string Password_Hash
+        string RoleUtilisateurId FK
+        string SocieteId FK
+        boolean IsActive
+    }
+
+    Employe {
+        string EmployeId PK
+        string Matricule
+        string RFID
+        string Nom
+        string Prenom
+        string CodeCircuit
+        string CodePointCollecte
+        string CodeShift
+        string SocieteId FK
+    }
+
+    Site {
+        string SiteId PK
+        string CodeSite
+        string Libelle
+        string SocieteId FK
+    }
+  \end{mermaid}
+  \caption{Core Domain -- Multi-Tenant Identity, Role Access, and Staff Directory Schema}
+  \label{fig:er_core_identity}
+\end{figure}
+
+\subsection{Operations Domain Schema}
+\label{sec:operations_schema}
+
+The Operations Domain encompasses workforce attributions, construction site management, maintenance work orders, administrative subdivisions, and user-defined Business Intelligence report layouts. Figure~\ref{fig:er_operations_domain} illustrates the Operations Domain entity relationships.
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=0.98\textwidth]
+%%{init: { "theme": "default", "themeVariables": { "fontSize": "21px", "fontFamily": "Arial, sans-serif" } }}%%
+erDiagram
+    Societe ||--o{ Equipe : "manages"
+    Societe ||--o{ OrdreTravail : "issues"
+    Societe ||--o{ Rattachement : "tracks"
+    Societe ||--o{ Chantier : "operates"
+    Societe ||--o{ ReportLayout : "configures"
+
+    OrdreTravail ||--o{ OrdreTravailDetail : "contains"
+    Rattachement ||--o{ RattachementEmploye : "assigns"
+    Rattachement ||--o{ RattachementArticle : "consumes"
+    Gouvernorat ||--o{ Region : "subdivides"
+
+    Equipe {
+        string EquipeId PK
+        string CodeEquipe
+        string LibelleEquipe
+        boolean IsInternal
+        string SocieteId FK
+    }
+
+    Chantier {
+        string ChantierId PK
+        string NumeroChantier
+        string Libelle
+        string SocieteId FK
+    }
+
+    OrdreTravail {
+        string OrdreTravailId PK
+        string NumeroOrdreTravail
+        string NumeroChantier
+        string CodeEquipe
+        string EtatOT
+        decimal Montant
+        string SocieteId FK
+    }
+
+    OrdreTravailDetail {
+        string OrdreTravailDetailId PK
+        string OrdreTravailId FK
+        string Description
+    }
+
+    Rattachement {
+        string RattachementId PK
+        string NumeroRattachement
+        date DateRattachement
+        string Type
+        string Nature
+        decimal Cout
+        string Status
+        string SocieteId FK
+    }
+
+    RattachementEmploye {
+        string RattachementId FK
+        string EmployeId FK
+    }
+
+    RattachementArticle {
+        string RattachementId FK
+        string Article
+    }
+
+    ReportLayout {
+        string ReportLayoutId PK
+        string Nom
+        string ReportType
+        string LayoutJson
+        string SocieteId FK
+    }
+
+    Gouvernorat {
+        string GouvernoratId PK
+        string CodeGouvernorat
+        string Libelle
+    }
+
+    Region {
+        string RegionId PK
+        string CodeRegion
+        string CodeGouvernorat FK
+    }
+  \end{mermaid}
+  \caption{Operations Domain Entity-Relationship Diagram}
+  \label{fig:er_operations_domain}
+\end{figure}
+
+\subsection{Key Database Design Decisions}
+\label{sec:db_decisions}
+
+The persistence layer architecture reflects four foundational engineering decisions:
+\begin{itemize}
+  \item \textbf{ULID Primary Keys}: Rather than using random UUID/GUID values (which cause severe B-tree index fragmentation in clustered database indexes) or sequential integers (which expose predictable enumerations and hinder distributed generation), all primary keys utilize 26-character sortable ULIDs. These identifiers combine an epoch millisecond timestamp with cryptographically secure randomness, ensuring chronological sorting, high insert locality, and URL safety.
+  \item \textbf{Shared-Schema Multi-Tenancy Scoping}: Consolidating tenant data with mandatory \texttt{SocieteId} foreign keys enables efficient database pooling and single-pass migrations, avoiding the operational complexity and resource overhead of database-per-tenant architectures.
+  \item \textbf{JSON Permission Serialization}: The \texttt{RoleUtilisateur} entity stores granular navigation-to-action matrices directly as structured JSON payloads. This eliminates multi-table junction overhead while enabling instant client deserialization of UI permission rules.
+  \item \textbf{Unified Audit Trail}: All domain entities inherit standard audit properties (\texttt{InsererPar}, \texttt{DateInsertion}, \texttt{ModifierPar}, and \texttt{DateModification}) through a shared base class (\texttt{AuditableEntity}), automatically populated by persistence interceptors during transactional commits.
+\end{itemize}
+
+\section{Authentication and Security Architecture}
+\label{sec:auth_security}
+
+The platform implements a defense-in-depth security architecture designed to enforce strict identification, credential confidentiality, and granular access control across all operational boundaries.
+
+\subsection{Token-Based Authentication Flow}
+\label{sec:jwt_flow}
+
+Authentication is completely stateless, relying on signed cryptographic access tokens containing verifiable identity claims. Figure~\ref{fig:jwt_auth_flow} details the complete login, token issuance, and client routing cycle.
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=0.98\textwidth]
+%%{init: { "theme": "default", "themeVariables": { "fontSize": "23px", "actorFontSize": "22px", "noteFontSize": "20px", "messageFontSize": "20px", "fontFamily": "Arial, sans-serif" }, "sequence": { "actorWidth": 150, "actorHeight": 52, "boxWidth": 150, "messageMargin": 36 } }}%%
+sequenceDiagram
+    autonumber
+    actor U as End User
+    participant SPA as Client Application
+    participant API as Application Backend API
+    participant DB as Relational Database
+
+    U->>SPA: 1. Enter Username, Password & SocieteId
+    SPA->>API: 2. POST /authentication/login
+    API->>DB: 3. Query User by Username + SocieteId
+    DB-->>API: 4. Return User Record (Password Hash, RoleId)
+    API->>API: 5. Verify Password via Adaptive Salt Hash
+    API->>DB: 6. Fetch Role Navigation Matrix
+    DB-->>API: 7. Return Permissions JSON
+    API->>API: 8. Generate Signed Cryptographic Token
+    API-->>SPA: 9. Return Token + User Profile + Navigations
+    SPA->>SPA: 10. Store Token in Client Storage
+    SPA->>SPA: 11. Dynamically Filter Menu by Navigations
+    SPA-->>U: 12. Redirect to Dashboard Interface
+  \end{mermaid}
+  \caption{Token-Based Authentication Flow}
+  \label{fig:jwt_auth_flow}
+\end{figure}
+
+The authentication lifecycle proceeds through three coordinated phases:
+\begin{enumerate}
+  \item \textbf{Stateless Token Issuance}: Upon submission of user credentials and organizational scope, the API verifies the user's existence within the specified company, computes one-way cryptographic hash verification with adaptive salt rounds, and constructs a digitally signed token. The token payload encapsulates the user ID, username, company ID, role identifier, and expiration timestamp.
+  \item \textbf{Session Restoration (\Tech{login-check})}: On initial browser load or page refresh, the client application retrieves the stored token and dispatches a lightweight validation probe to the \texttt{/authentication/login-check} endpoint. If valid, user claims and fresh role navigations are returned, restoring the active session without prompting for re-authentication.
+  \item \textbf{Interception and Expiration Handling}: A security interceptor automatically injects the authorization token header into all outgoing API requests. If an endpoint responds with HTTP 401 Unauthorized (signifying token expiration or revocation), the interceptor flushes client session storage and redirects the user to the login screen.
+\end{enumerate}
+
+\subsection{Navigation-Based Role-Based Access Control (RBAC)}
+\label{sec:rbac_model}
+
+System authorization combines coarse-grained menu navigation access with fine-grained HTTP action permissions (Read, Add, Edit, Delete). Figure~\ref{fig:rbac_resolution} illustrates the dynamic permission resolution process executed on incoming API requests.
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=0.98\textwidth]
+%%{init: { "theme": "default", "themeVariables": { "fontSize": "20px", "fontFamily": "Arial, sans-serif" } }}%%
+flowchart TD
+    REQ["Incoming HTTP Request: <b>PATCH /circuit/update</b>"] --> PIPELINE
+
+    subgraph PIPELINE["Authorization Pipeline Flow"]
+        direction LR
+        subgraph STAGE1["Stage 1: Metadata Resolution"]
+            NAV["1. Extract Target Module:<br/><b>NavigationId = 'fichier.circuit'</b>"]
+            ACT["2. Map HTTP Method to Action:<br/><b>PATCH &rarr; 'Edit' Action</b>"]
+            NAV --- ACT
+        end
+
+        subgraph STAGE2["Stage 2: Policy Verification"]
+            LOAD["3. Load Role Navigations Matrix<br/>from User Security Token Claims"]
+            HAS{"Has 'fichier.circuit'?"}
+            CAN{"Has 'Edit' Action?"}
+            LOAD --> HAS
+            HAS -->|"Yes"| CAN
+        end
+    end
+
+    ACT --> LOAD
+    HAS -->|"No (Missing)"| DENY["<b>403 Forbidden</b><br/>(Access Denied)"]
+    CAN -->|"No (Unauthorized)"| DENY
+    CAN -->|"Yes (Authorized)"| OK["<b>Request Allowed</b><br/>(Proceeds to Pipeline)"]
+  \end{mermaid}
+  \caption{Navigation-Based RBAC -- Permission Resolution Pipeline}
+  \label{fig:rbac_resolution}
+\end{figure}
+
+The platform implements a robust \textbf{dual-layer enforcement} mechanism:
+\begin{itemize}
+  \item \textbf{Backend Inviolable Enforcement}: Every API endpoint declares its required \texttt{NavigationId} and minimum action privilege. When a request arrives, the authorization handler inspects the user's role navigation matrix loaded from the database or verified security claims. If the required module or action is absent, the pipeline terminates immediately with an HTTP 403 Forbidden status.
+  \item \textbf{Frontend Contextual Enforcement}: In parallel, the client application parses the user's navigation matrix to conditionally render navigation menu entries, action buttons, and route guards. This provides an intuitive user experience by hiding inaccessible operations while relying on backend handlers for absolute security guarantees.
+\end{itemize}
+
+\section{IoT Telemetry Ingestion and Geofencing}
+\label{sec:iot_geofencing}
+
+The IoT Telemetry engine processes high-frequency spatial data transmitted by onboard vehicular modems, updates active fleet state in the relational store, calculates route proximity deviations, and feeds real-time cartographic dashboards.
+
+Figure~\ref{fig:iot_telemetry_pipeline} details the end-to-end ingestion pipeline from hardware transmission to live map visualization.
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=0.98\textwidth]
+%%{init: { "theme": "default", "themeVariables": { "fontSize": "23px", "actorFontSize": "22px", "noteFontSize": "20px", "messageFontSize": "20px", "fontFamily": "Arial, sans-serif" }, "sequence": { "actorWidth": 150, "actorHeight": 52, "boxWidth": 150, "messageMargin": 36 } }}%%
+sequenceDiagram
+    autonumber
+    participant M as Onboard IoT Modem
+    participant API as Application Backend API
+    participant GF as Geofencing Engine
+    participant DB as Relational Database
+    participant UI as Operator Live Map
+
+    M->>API: 1. POST /bus/runtime/position (IMEI, Lat, Lng, Occupancy, Timestamp)
+
+    API->>API: 2. Validate Timestamp Window (+/- 15 min UTC)
+    API->>DB: 3. Resolve Active Bus and Circuit by IMEI
+    DB-->>API: 4. Return Bus Entity and Ordered Circuit Stops
+    API->>API: 5. Update Current Bus Position and Passenger Occupancy
+
+    API->>GF: 6. Compute Haversine Distance to All Circuit Stops
+
+    alt All Stops Exceed 250m Radius
+        GF-->>API: Proximity Alert (Out of Radius)
+        API->>DB: 7a. Auto-create Stop: PC-AUTO-{Timestamp}
+        API->>DB: 7b. Record OutOfRadiusScan Audit Event
+    else Within Stop Radius (under 250m)
+        GF-->>API: Normal Transit State (Within Geofence)
+    end
+
+    API->>DB: 8. Log PositionUpdated Event and Commit
+    API-->>M: 9. Return HTTP 200 OK Acknowledgement
+
+    Note over UI,API: Operator UI Polls Periodically
+    UI->>API: 10. GET /bus/runtime/positions/stream
+    API-->>UI: 11. Stream Active Coordinate Vectors
+    UI->>UI: 12. Smoothly Transition Cartographic Bus Markers
+  \end{mermaid}
+  \caption{IoT Telemetry Ingestion Pipeline -- From Modem to Map}
+  \label{fig:iot_telemetry_pipeline}
+\end{figure}
+
+The telemetry ingestion workflow is structured into four core stages:
+\begin{itemize}
+  \item \textbf{Anti-Replay Timestamp Validation}: Incoming telemetry packets are evaluated against the current UTC clock. Payloads with timestamps deviating by more than $\pm 15$ minutes are rejected immediately. This protects the ingestion pipeline against replay attacks and eliminates corrupted telemetry logs caused by misconfigured modem clocks.
+  \item \textbf{Hardware-Based Vehicle Resolution}: Hardware modems identify themselves exclusively by their unique International Mobile Equipment Identity (\Tech{IMEI}) number. The backend queries the modem-to-bus relationship table to resolve the active vehicle, driver, and assigned transit circuit without exposing internal database identifiers to the hardware layer.
+  \item \textbf{Automated Geofencing and Stop Detection}: The engine evaluates the bus's coordinates against all ordered pickup points assigned to its active circuit using the Great-Circle \Tech{Haversine} distance formula. If the bus deviates beyond a configurable 250-meter tolerance from all authorized stops while recording passenger boardings, the system automatically creates an audit-ready pickup stop (\texttt{PC-AUTO-\{timestamp\}}) and logs an \texttt{OutOfRadiusScan} event.
+  \item \textbf{Cartographic Stream Synchronization}: Operational dashboards poll the telemetry stream endpoint periodically, retrieving optimized coordinate vectors to smoothly transition cartographic bus markers and display real-time passenger capacity badges.
+\end{itemize}
+
+\section{ML ETA Prediction Integration}
+\label{sec:ml_integration}
+
+To provide plant supervisors with accurate, real-time arrival estimates, the platform integrates a dedicated Machine Learning microservice. The predictive service is decoupled from the transactional backend, executing independently within an isolated microservice container.
+
+Figure~\ref{fig:ml_prediction_pipeline} depicts the asynchronous coordination between the application backend and the machine learning prediction engine.
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=0.98\textwidth]
+%%{init: { "theme": "default", "themeVariables": { "fontSize": "23px", "actorFontSize": "22px", "noteFontSize": "20px", "messageFontSize": "20px", "fontFamily": "Arial, sans-serif" }, "sequence": { "actorWidth": 150, "actorHeight": 52, "boxWidth": 150, "messageMargin": 36 } }}%%
+sequenceDiagram
+    autonumber
+    actor Op as Fleet Supervisor
+    participant SPA as Client Tracking Panel
+    participant API as Application Backend API
+    participant DB as Relational Database
+    participant ML as Predictive ML Microservice
+
+    Op->>SPA: 1. Open Real-Time Fleet Tracking Dashboard
+    SPA->>API: 2. GET /prediction/bus-eta/available
+
+    API->>DB: 3. Query Active Vehicles, Circuits & Next Stops
+    DB-->>API: 4. Return Fleet Spatial Dataset
+
+    loop Concurrent Inference (Asynchronous Batch Execution)
+        API->>API: 5. Compute Haversine Distance to Target Stop
+        API->>ML: 6. POST /predict/bus-eta {Distance, Occupancy, Time}
+        ML->>ML: 7. Execute Trained Regression Model
+        ML-->>API: 8. Return Predicted ETA (Minutes) & Confidence Score
+    end
+
+    alt ML Service Timeout or Failure
+        API->>API: Activate Deterministic Fallback (40 km/h Heuristic)
+    end
+
+    API-->>SPA: 9. Return Fleet Collection with Predicted ETAs
+    SPA-->>Op: 10. Render Live Bus Badges with Arrival Forecasts
+  \end{mermaid}
+  \caption{ETA Prediction Integration -- Application Backend to ML Microservice}
+  \label{fig:ml_prediction_pipeline}
+\end{figure}
+
+The predictive integration encompasses three specialized architectural features:
+\begin{itemize}
+  \item \textbf{Hierarchical Distance Resolution}: To guarantee robust spatial inputs for the ML model, the backend resolves the bus's target destination through a four-level fallback hierarchy: (1) coordinates of the assigned destination pickup stop; (2) coordinates of the highest-order stop on the circuit; (3) geometric midpoint coordinates of the circuit route; and (4) deterministic circuit length heuristics.
+  \item \textbf{Parallel Batch Execution}: When operators load the fleet tracking dashboard, the backend resolves arrival predictions for all active buses concurrently. Using non-blocking asynchronous concurrent execution over HTTP requests, total dashboard prediction latency is bounded by the single slowest inference request rather than the sum of sequential calls.
+  \item \textbf{Graceful Degradation and Resilience}: If the ML microservice is temporarily unreachable, experiencing heavy load, or undergoing a model re-deployment, the HTTP client intercepts connection timeouts and automatically activates a deterministic fallback calculation based on average circuit velocity ($40\text{ km/h}$). The tracking interface displays an approximate ETA alongside an operational warning, ensuring uninterrupted supervisory visibility.
+\end{itemize}
+
+\section{Frontend Architecture}
+\label{sec:frontend_architecture}
+
+The client application is developed as a Single Page Application (\Tech{SPA}), leveraging modern architectural paradigms including standalone modular views, functional route guards, reactive state streams, and enterprise data grid integration.
+
+Figure~\ref{fig:frontend_architecture} presents the modular organization of core services, guards, feature modules, and UI integration layers.
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=0.98\textwidth]
+%%{init: { "theme": "default", "themeVariables": { "fontSize": "20px", "fontFamily": "Arial, sans-serif" } }}%%
+flowchart TD
+    subgraph ClientApp["Single Page Application Architecture"]
+        subgraph CoreFoundation["Core Layer & Routing Security"]
+            direction LR
+            subgraph CoreSvc["Core Services"]
+                Auth["Auth Service<br/>(Token Lifecycle)"]
+                Api["API Gateway Client<br/>(HTTP Transport)"]
+                Nav["Navigation Service<br/>(Menu Filtering)"]
+                User["User Service<br/>(Profile State)"]
+            end
+            subgraph Security["Guards & Interceptors"]
+                INT["Security Interceptor<br/>(Token Injection & 401 Catch)"]
+                AG["Authentication Guard<br/>(Session Verification)"]
+                NG["Navigation Guard<br/>(RBAC Module Protection)"]
+            end
+        end
+
+        subgraph PresentationLayer["Presentation Layer & Features"]
+            direction LR
+            subgraph Features["Feature Slices (Modular Views)"]
+                SignIn["Authentication<br/>(Sign-In / Sign-Out)"]
+                CRUD["Master Data<br/>(17 Admin Modules)"]
+                Track["Live Tracking<br/>(Bus Map Supervision)"]
+                BI["BI Analytics<br/>(Dynamic Reporting)"]
+            end
+            subgraph UILibs["UI Component Systems"]
+                DX["Tabular Data Grid<br/>(Virtual Scrolling)"]
+                Leaf["Cartographic Engine<br/>(Interactive Maps)"]
+                Apex["Statistical Charts<br/>(Analytical Visuals)"]
+                Mat["UI Controls<br/>(Forms & Dialogs)"]
+            end
+        end
+    end
+
+    CoreSvc --> INT
+    Security --> CoreSvc
+    Features --> CoreSvc
+    Features --> UILibs
+  \end{mermaid}
+  \caption{Frontend Application Architecture -- Services, Guards, and Modular Slices}
+  \label{fig:frontend_architecture}
+\end{figure}
+
+The frontend architecture is structured into three key design dimensions:
+\begin{itemize}
+  \item \textbf{Dynamic Configuration Loading}: Application configuration settings (including backend API base URLs, telemetry streaming intervals, and map tile provider endpoints) are decoupled from the compiled client bundles. During the client bootstrap lifecycle, the runtime asynchronously fetches an externalized configuration manifest. This enables the identical container image to be promoted across development, staging, and production environments without recompilation.
+  \item \textbf{Comprehensive Internationalization}: Localization is powered by an internationalization subsystem, supporting seamless real-time switching between six languages: French (FR), English (EN), Arabic (AR), Spanish (ES), Italian (IT), and Turkish (TR). Translation catalogs are loaded lazily on demand, and right-to-left (\Tech{RTL}) directional layouts are dynamically activated for Arabic locales.
+  \item \textbf{Reactive State Management}: Instead of introducing heavy centralized state stores, the application utilizes domain-focused reactive state services. Each functional service maintains an immutable event stream, ensuring reactive UI updates, minimal change detection overhead, and clean component decoupling.
+\end{itemize}
+
+\section{Conclusion}
+\label{sec:solution_conclusion}
+
+This chapter presented the comprehensive design and architectural foundations of the \Tech{CST LePoint} platform. By combining Clean Architecture, CQRS, and Domain-Driven Design in the backend, containerized microservices for AI-driven ETA predictions, shared-schema multi-tenancy in the relational persistence layer, and a reactive Single Page Application, the proposed solution directly addresses the operational bottlenecks and functional requirements established in Chapter~3.
+
+The decoupling of concerns across layers guarantees high testability, robust data consistency, granular security enforcement, and high-throughput IoT telemetry ingestion. With the structural and architectural blueprints defined, Chapter~\ref{chap:implementation} transitions to the concrete implementation, detailing the selected technology stacks, development frameworks, third-party libraries, operational interfaces, and empirical validation of the CST LePoint system.

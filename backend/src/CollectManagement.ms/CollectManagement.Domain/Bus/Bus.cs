@@ -5,7 +5,7 @@ using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Domain.Bus;
 
-public class Bus : AuditableEntity, ITenantOwned
+public class Bus : AuditableEntity
 {
     public BusId BusId { get; private set; }
 
@@ -142,6 +142,11 @@ public class Bus : AuditableEntity, ITenantOwned
         IsActive = isActive;
         Latitude = latitude;
         Longitude = longitude;
+    }
+
+    public void AssignChauffeur(string? codeChauffeur)
+    {
+        CodeChauffeur = codeChauffeur;
     }
 
     public void UpdateRuntimeState(

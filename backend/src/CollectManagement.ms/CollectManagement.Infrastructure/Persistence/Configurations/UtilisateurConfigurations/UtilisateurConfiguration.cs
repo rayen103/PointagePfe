@@ -1,4 +1,4 @@
-﻿using CollectManagement.Domain.Societes.ValueObjects;
+using CollectManagement.Domain.Societes.ValueObjects;
 using CollectManagement.Domain.Utilisateurs;
 using CollectManagement.Domain.Utilisateurs.ValueObjects;
 using Microsoft.EntityFrameworkCore;
@@ -44,6 +44,14 @@ public class UtilisateurConfiguration
             .HasDefaultValue(true)
             .IsRequired()
             .ValueGeneratedNever();
+
+        builder.Property(x => x.VerificationCode)
+            .HasColumnType("nvarchar(10)")
+            .IsRequired(false);
+
+        builder.Property(x => x.ApprovalToken)
+            .HasColumnType("nvarchar(100)")
+            .IsRequired(false);
 
         builder.HasIndex(x => x.Email)
             .IsUnique();

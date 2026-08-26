@@ -10,3 +10,4 @@ import { RouterOutlet } from '@angular/router';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UtilisateurComponent {}
+

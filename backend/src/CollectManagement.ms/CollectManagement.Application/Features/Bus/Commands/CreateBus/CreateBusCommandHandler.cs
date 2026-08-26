@@ -1,7 +1,9 @@
 using CollectManagement.Application.Exceptions;
 using CollectManagement.Application.Interfaces.Repositories.Bus;
 using CollectManagement.Application.Interfaces.Repositories.Modems;
+using CollectManagement.Application.Interfaces.Repositories.Chauffeurs;
 using CollectManagement.Domain.Bus.ValueObjects;
+using CollectManagement.Domain.Chauffeurs;
 using CollectManagement.Domain.Societes.ValueObjects;
 using FluentValidation.Results;
 
@@ -12,15 +14,18 @@ public class CreateBusCommandHandler
 {
     private readonly IBusRepository _busRepository;
     private readonly IModemRepository _modemRepository;
+    private readonly IChauffeurRepository _chauffeurRepository;
     private readonly IMapper _mapper;
 
     public CreateBusCommandHandler(
         IBusRepository busRepository,
         IModemRepository modemRepository,
+        IChauffeurRepository chauffeurRepository,
         IMapper mapper)
     {
         _busRepository = busRepository;
         _modemRepository = modemRepository;
+        _chauffeurRepository = chauffeurRepository;
         _mapper = mapper;
     }
 
@@ -61,6 +66,30 @@ public class CreateBusCommandHandler
         await _busRepository
             .AddAsync(bus, cancellationToken)
             .ConfigureAwait(false);
+
+        if (!string.IsNullOrWhiteSpace(request.CodeChauffeur))
+        {
+            var normalizedCode = request.CodeChauffeur.Trim().ToLower();
+            var chauffeur = await _chauffeurRepository
+                .GetAsync(x => x.CodeChauffeur.ToLower() == normalizedCode, cancellationToken)
+                .ConfigureAwait(false);
+
+            if (chauffeur is not null)
+            {
+                chauffeur.AssignBus(busId);
+                _chauffeurRepository.Update(chauffeur);
+
+                var otherBuses = await _busRepository
+                    .GetManyAsync(x => x.CodeChauffeur != null && x.CodeChauffeur.ToLower() == normalizedCode && x.BusId != busId, cancellationToken)
+                    .ConfigureAwait(false);
+
+                foreach (var otherBus in otherBuses)
+                {
+                    otherBus.AssignChauffeur(null);
+                    _busRepository.Update(otherBus);
+                }
+            }
+        }
 
         return _mapper.Map<CreateBusResponse>(bus);
     }

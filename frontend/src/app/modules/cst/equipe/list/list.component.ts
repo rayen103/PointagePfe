@@ -1,3 +1,6 @@
+import { PdfExportService } from '../../../../core/common/pdf-export.service';
+import { CsvExportService } from '../../../../core/common/csv-export.service';
+import { take } from 'rxjs';
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
@@ -63,6 +66,10 @@ export class ListComponent implements OnInit, OnDestroy {
     sortDirection: 'asc' | 'desc' = 'asc';
 
     constructor(
+        private _pdfExportService: PdfExportService,
+
+        private _csvExportService: CsvExportService,
+
         private _equipeService: EquipeService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseConfirmationService: FuseConfirmationService
@@ -232,4 +239,24 @@ export class ListComponent implements OnInit, OnDestroy {
     }
 
     protected readonly FuseNavigationAction = FuseNavigationAction;
+
+    exportData(): void {
+        if (this._equipeService) {
+            const obs$ = (this as any).equipes$ || this._equipeService.equipes$ || this._equipeService.equipes$;
+            if (obs$) {
+                obs$.pipe(take(1)).subscribe((data: any) => {
+                    const items = Array.isArray(data) ? data : (data?.items || data?.equipes || data?.equipes || []);
+                    if (items && items.length > 0) {
+                        const columns = [
+            { header: 'Code Équipe', dataKey: 'codeEquipe' },
+            { header: 'Libellé Équipe', dataKey: 'libelleEquipe' }
+        ];
+                        this._pdfExportService.exportToPdf('Rapport Équipes', columns, items, 'Equipes_Export.pdf');
+                    } else {
+                        console.warn('No data available to export to PDF');
+                    }
+                });
+            }
+        }
+    }
 }

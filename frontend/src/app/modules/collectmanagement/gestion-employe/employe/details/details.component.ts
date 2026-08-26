@@ -368,39 +368,6 @@ export class DetailsComponent implements OnInit, OnDestroy {
     }
 
     private validateBusCircuitAssignment(): boolean {
-        const selectedCodeBus = (this.form.get('codeBus')?.value ?? '').trim();
-        const selectedCodeCircuit = (this.form.get('codeCircuit')?.value ?? '').trim();
-
-        if (!selectedCodeBus || !selectedCodeCircuit) {
-            return true;
-        }
-
-        const selectedBus = this.buses.find((bus) => bus.numeroIMM === selectedCodeBus);
-        if (!selectedBus) {
-            return true;
-        }
-
-        const busCircuit = (selectedBus.codeCircuit ?? '').trim();
-        if (busCircuit !== selectedCodeCircuit) {
-            this._fuseConfirmationService.open({
-                title: 'Incompatibilité Bus/Circuit',
-                message: busCircuit
-                    ? `Le bus sélectionné (${selectedCodeBus}) est affecté au circuit "${busCircuit}", pas "${selectedCodeCircuit}".`
-                    : `Le bus sélectionné (${selectedCodeBus}) n'est affecté à aucun circuit.`,
-                icon: {
-                    show: false,
-                },
-                actions: {
-                    confirm: {
-                        label: 'OK',
-                        color: 'primary'
-                    }
-                },
-                dismissible: true
-            });
-            return false;
-        }
-
         return true;
     }
 

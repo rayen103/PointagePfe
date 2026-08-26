@@ -1,3 +1,6 @@
+import { PdfExportService } from '../../../../core/common/pdf-export.service';
+import { CsvExportService } from '../../../../core/common/csv-export.service';
+import { take } from 'rxjs';
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
@@ -62,6 +65,10 @@ export class ListComponent implements OnInit, OnDestroy {
     sortDirection: 'asc' | 'desc' = 'asc';
 
     constructor(
+        private _pdfExportService: PdfExportService,
+
+        private _csvExportService: CsvExportService,
+
         private _chauffeurService: ChauffeurService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseConfirmationService: FuseConfirmationService
@@ -181,4 +188,27 @@ export class ListComponent implements OnInit, OnDestroy {
     }
 
     protected readonly FuseNavigationAction = FuseNavigationAction;
+
+    exportData(): void {
+        if (this._chauffeurService) {
+            const obs$ = (this as any).chauffeurs$ || this._chauffeurService.chauffeurs$ || this._chauffeurService.chauffeurs$;
+            if (obs$) {
+                obs$.pipe(take(1)).subscribe((data: any) => {
+                    const items = Array.isArray(data) ? data : (data?.items || data?.chauffeurs || data?.chauffeurs || []);
+                    if (items && items.length > 0) {
+                        const columns = [
+            { header: 'Code Chauffeur', dataKey: 'codeChauffeur' },
+            { header: 'Nom', dataKey: 'nom' },
+            { header: 'Prénom', dataKey: 'prenom' },
+            { header: 'Téléphone', dataKey: 'telephone' },
+            { header: 'Permis', dataKey: 'numeroPermis' }
+        ];
+                        this._pdfExportService.exportToPdf('Rapport Chauffeurs', columns, items, 'Chauffeurs_Export.pdf');
+                    } else {
+                        console.warn('No data available to export to PDF');
+                    }
+                });
+            }
+        }
+    }
 }

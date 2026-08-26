@@ -1,3 +1,6 @@
+import { PdfExportService } from '../../../../core/common/pdf-export.service';
+import { CsvExportService } from '../../../../core/common/csv-export.service';
+import { take } from 'rxjs';
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
@@ -73,6 +76,10 @@ export class ListComponent implements OnInit, OnDestroy {
     isViewMode: boolean = false;
 
     constructor(
+        private _pdfExportService: PdfExportService,
+
+        private _csvExportService: CsvExportService,
+
         private _shiftService: ShiftService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseConfirmationService: FuseConfirmationService
@@ -230,4 +237,26 @@ export class ListComponent implements OnInit, OnDestroy {
     }
 
     protected readonly FuseNavigationAction = FuseNavigationAction;
+
+    exportData(): void {
+        if (this._shiftService) {
+            const obs$ = (this as any).shifts$ || this._shiftService.shifts$ || this._shiftService.shifts$;
+            if (obs$) {
+                obs$.pipe(take(1)).subscribe((data: any) => {
+                    const items = Array.isArray(data) ? data : (data?.items || data?.shifts || data?.shifts || []);
+                    if (items && items.length > 0) {
+                        const columns = [
+            { header: 'Code Shift', dataKey: 'codeShift' },
+            { header: 'Libellé', dataKey: 'libelleShift' },
+            { header: 'Heure Début', dataKey: 'heureDebut' },
+            { header: 'Heure Fin', dataKey: 'heureFin' }
+        ];
+                        this._pdfExportService.exportToPdf('Rapport Shifts de Travail', columns, items, 'Shifts_Export.pdf');
+                    } else {
+                        console.warn('No data available to export to PDF');
+                    }
+                });
+            }
+        }
+    }
 }

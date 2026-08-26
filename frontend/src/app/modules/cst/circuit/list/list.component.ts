@@ -1,3 +1,5 @@
+import { PdfExportService } from '../../../../core/common/pdf-export.service';
+import { CsvExportService } from '../../../../core/common/csv-export.service';
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
@@ -90,6 +92,10 @@ export class ListComponent implements OnInit, OnDestroy {
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     constructor(
+        private _pdfExportService: PdfExportService,
+
+        private _csvExportService: CsvExportService,
+
         private _circuitService: CircuitService,
         private _circuitPointCollecteService: CircuitPointCollecteService,
         private _changeDetectorRef: ChangeDetectorRef,
@@ -385,4 +391,26 @@ export class ListComponent implements OnInit, OnDestroy {
     }
 
     protected readonly FuseNavigationAction = FuseNavigationAction;
+
+    exportData(): void {
+        if (this._circuitService) {
+            const obs$ = (this as any).circuits$ || this._circuitService.circuits$ || this._circuitService.circuit$;
+            if (obs$) {
+                obs$.pipe(take(1)).subscribe((data: any) => {
+                    const items = Array.isArray(data) ? data : (data?.items || data?.circuits || data?.circuit || []);
+                    if (items && items.length > 0) {
+                        const columns = [
+            { header: 'Code Circuit', dataKey: 'codeCircuit' },
+            { header: 'Libellé', dataKey: 'libelle' },
+            { header: 'Distance (km)', dataKey: 'distance' },
+            { header: 'Statut', dataKey: 'isActive' }
+        ];
+                        this._pdfExportService.exportToPdf('Rapport Circuits de Collecte', columns, items, 'Circuits_Export.pdf');
+                    } else {
+                        console.warn('No data available to export to PDF');
+                    }
+                });
+            }
+        }
+    }
 }

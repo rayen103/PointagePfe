@@ -13,8 +13,8 @@
         <!-- Greeting -->
         <div class="cst-greet">
             <div>
-                <div class="cst-greet__title">Bonjour, Sami&nbsp;👋</div>
-                <div class="cst-greet__sub">Lundi 6 juillet 2026 · Site Ben Arous · 28 bus en circulation</div>
+                <div class="cst-greet__title">Bonjour, {{ (user$ | async)?.prenom || (user$ | async)?.name || (user$ | async)?.nomUtilisateur || 'Utilisateur' }}&nbsp;👋</div>
+                <div class="cst-greet__sub">{{ todayFormatted }} · {{ vm.data.buses?.length || 28 }} bus en circulation</div>
             </div>
             <div class="cst-greet__actions">
                 <a class="cst-btn cst-btn--ghost" [routerLink]="['/home']">
@@ -22,6 +22,10 @@
                     Retour au site
                 </a>
                 <button class="cst-btn cst-btn--ghost" (click)="refresh()" [disabled]="isLoading$ | async">
+                    <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:arrow-path'"></mat-icon>
+                    Actualiser
+                </button>
+                <button class="cst-btn cst-btn--ghost" (click)="exportData()" [disabled]="isLoading$ | async">
                     <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:arrow-down-tray'"></mat-icon>
                     Exporter
                 </button>
@@ -156,7 +160,7 @@
                             <circle cx="46" cy="46" r="38" fill="none" stroke="#EAF3FB" stroke-width="10"></circle>
                             <circle cx="46" cy="46" r="38" fill="none" stroke="#42ABE0" stroke-width="10" stroke-linecap="round"
                                     stroke-dasharray="222.05 238.76" transform="rotate(-90 46 46)"></circle>
-                            <text x="46" y="44" text-anchor="middle" font-family="Sora,sans-serif" font-size="19" font-weight="700" fill="#121242">93%</text>
+                            <text x="46" y="44" text-anchor="middle" font-family="Sora,sans-serif" font-size="19" font-weight="700" fill="#121242">{{ vm.presenceStats?.badgePercentage ?? 93 }}%</text>
                             <text x="46" y="60" text-anchor="middle" font-size="9" fill="#8CA2BD">badgés</text>
                         </svg>
                         <div class="cst-donut__legend">
@@ -165,21 +169,21 @@
                                     <span class="cst-donut__sq" style="background:#42abe0"></span>
                                     Collectés
                                 </span>
-                                <b>1 194</b>
+                                <b>{{ vm.presenceStats?.collectes | number }}</b>
                             </div>
                             <div class="cst-donut__row">
                                 <span class="cst-donut__k">
                                     <span class="cst-donut__sq" style="background:#f2b33d"></span>
                                     En attente
                                 </span>
-                                <b>52</b>
+                                <b>{{ vm.presenceStats?.enAttente | number }}</b>
                             </div>
                             <div class="cst-donut__row">
                                 <span class="cst-donut__k">
                                     <span class="cst-donut__sq" style="background:#d12b28"></span>
                                     Absents
                                 </span>
-                                <b>38</b>
+                                <b>{{ vm.presenceStats?.absents | number }}</b>
                             </div>
                         </div>
                     </div>

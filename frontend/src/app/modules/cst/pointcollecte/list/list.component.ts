@@ -1,3 +1,4 @@
+import { PdfExportService } from '../../../../core/common/pdf-export.service';
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
@@ -18,7 +19,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { fuseAnimations } from '../../../../../@fuse/animations';
-import { map, Observable, Subject, switchMap, takeUntil } from 'rxjs';
+import { map, Observable, Subject, switchMap, take, takeUntil } from 'rxjs';
 import { PointCollecte } from '../../../../core/point-collecte/point-collecte.model';
 import { PointCollecteService } from '../../../../core/point-collecte/point-collecte.service';
 import { FuseConfirmationService } from '../../../../../@fuse/services/confirmation';
@@ -69,6 +70,8 @@ export class ListComponent implements OnInit, OnDestroy {
     selectedPoints = new Map<string, PointCollecte>();
 
     constructor(
+        private _pdfExportService: PdfExportService,
+
         private _pointCollecteService: PointCollecteService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseConfirmationService: FuseConfirmationService
@@ -315,4 +318,27 @@ export class ListComponent implements OnInit, OnDestroy {
     }
 
     protected readonly FuseNavigationAction = FuseNavigationAction;
+
+    exportData(): void {
+        if (this._pointCollecteService) {
+            const obs$ = (this as any).pointsCollecte$ || this._pointCollecteService.pointsCollecte$ || this._pointCollecteService.pointsCollecte$;
+            if (obs$) {
+                obs$.pipe(take(1)).subscribe((data: any) => {
+                    const items = Array.isArray(data) ? data : (data?.items || data?.pointsCollecte || data?.pointsCollecte || []);
+                    if (items && items.length > 0) {
+                        const columns = [
+            { header: 'Code Point', dataKey: 'codePointCollecte' },
+            { header: 'Libellé', dataKey: 'libelle' },
+            { header: 'Latitude', dataKey: 'latitude' },
+            { header: 'Longitude', dataKey: 'longitude' }
+        ];
+                        this._pdfExportService.exportToPdf('Rapport Points de Collecte', columns, items, 'PointsCollecte_Export.pdf');
+                    } else {
+                        console.warn('No data available to export to PDF');
+                    }
+                });
+            }
+        }
+    }
+
 }

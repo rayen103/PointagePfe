@@ -1,3 +1,5 @@
+import { CsvExportService } from '../../../../../core/common/csv-export.service';
+import { take } from 'rxjs';
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
@@ -62,6 +64,8 @@ export class ListComponent implements OnInit, OnDestroy {
     sortDirection: 'asc' | 'desc' = 'asc';
 
     constructor(
+        private _csvExportService: CsvExportService,
+
         private _employeService: EmployeService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseConfirmationService: FuseConfirmationService,
@@ -173,4 +177,17 @@ export class ListComponent implements OnInit, OnDestroy {
     }
 
     protected readonly FuseNavigationAction = FuseNavigationAction;
+
+    exportData(): void {
+        if (this._employeService && this._employeService.employes$) {
+            this._employeService.employes$.pipe(take(1)).subscribe((data: any) => {
+                const items = Array.isArray(data) ? data : (data?.items || data?.employes || []);
+                if (items && items.length > 0) {
+                    this._csvExportService.exportToCsv('Employe_Export', items);
+                } else {
+                    console.warn('No data available to export');
+                }
+            });
+        }
+    }
 }
