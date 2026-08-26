@@ -16,3 +16,8 @@ public record RegisterCompanyRequest(
 public record VerifyEmailRequest(
     string Email,
     string Code);
+
+public record VerifyEmailResponse(
+    bool Success,
+    string Message,
+    AuthenticationResponse? Authentication);
