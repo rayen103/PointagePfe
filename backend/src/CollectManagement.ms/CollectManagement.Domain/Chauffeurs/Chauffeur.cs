@@ -103,6 +103,11 @@ public class Chauffeur : AuditableEntity
         BusId = busId;
     }
 
+    public void AssignBus(BusId? busId)
+    {
+        BusId = busId;
+    }
+
     public static Chauffeur QueryCreate(
         ChauffeurId chauffeurId,
         string codeChauffeur,

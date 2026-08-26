@@ -7,9 +7,10 @@
             <div class="cst-head__sub">{{ gouvernoratsLength ?? 0 }} gouvernorats</div>
         </div>
         <div class="cst-head__actions">
-            <button class="cst-btn cst-btn--ghost" type="button" (click)="SortChange()">
-                <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:arrow-down-tray'"></mat-icon> Exporter
-            </button>
+            <button class="cst-btn cst-btn--ghost" type="button" (click)="exportData()">
+                    <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:document-text'"></mat-icon>
+                    Exporter PDF
+                </button>
             @if (hasActionPermission(FuseNavigationAction.Add)) {
                 <button class="cst-btn cst-btn--primary" routerLink="ajouter">
                     <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:plus'"></mat-icon> {{ t('Add') }}

@@ -37,6 +37,7 @@ export class GestionShellComponent {
                 { label: 'Rattachements', link: '/fichier/rattachement' },
                 { label: 'Sociétés', link: '/fichier/societe' },
                 { label: 'Chantiers', link: '/fichier/chantier' },
+                { label: 'Pointages', link: '/fichier/pointage' },
             ],
         },
         {

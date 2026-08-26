@@ -97,32 +97,15 @@
 
             <div class="cst-divider"></div>
 
-            <!-- Section 2: Affectation & Statut -->
+            <!-- Section 2: Type de Chauffeur -->
             <div>
-                <div class="cst-form-sec__title">{{ t('Assignment-Status') || 'Affectation & Statut' }}</div>
-                <div class="cst-form-sec__sub">Véhicule assigné et état de service du chauffeur</div>
+                <div class="cst-form-sec__title">{{ t('Complementary-Info') || 'Informations complémentaires' }}</div>
+                <div class="cst-form-sec__sub">Statut et type de prestation du chauffeur</div>
                 <div class="cst-form-grid">
-                    
-                    <!-- Bus -->
-                    <div class="cst-field">
-                        <label>{{ t('Bus') || 'Bus attitré' }}</label>
-                        <div class="cst-select">
-                            <select formControlName="busId">
-                                <option [value]="''">--</option>
-                                @for (bus of buses; track bus.busId) {
-                                    <option [value]="bus.busId">
-                                        {{ bus.numeroIMM }}@if (bus.modelBus) { — {{ bus.modelBus }} }
-                                    </option>
-                                }
-                            </select>
-                            <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
-                        </div>
-                    </div>
-
                     <!-- Externe Toggle -->
-                    <div class="cst-field flex justify-center" style="height: 100%; align-items: flex-start; padding-top: 24px;">
+                    <div class="cst-field flex items-center" style="height: 100%; padding-top: 8px;">
                         <label class="cst-toggle">
-                            <span [ngClass]="chauffeurForm.get('externe')?.value ? 'cst-toggle__on' : 'cst-toggle__off'">{{ t('Externe') || 'Externe' }}</span>
+                            <span [ngClass]="chauffeurForm.get('externe')?.value ? 'cst-toggle__on' : 'cst-toggle__off'">{{ t('Externe') || 'Chauffeur Externe' }}</span>
                             <input type="checkbox" formControlName="externe" />
                             <span class="cst-toggle__track"></span>
                         </label>

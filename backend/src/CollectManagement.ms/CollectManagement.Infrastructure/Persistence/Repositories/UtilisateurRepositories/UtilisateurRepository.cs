@@ -69,13 +69,19 @@ public class UtilisateurRepository : RepositoryBase<Utilisateur>, IUtilisateurRe
         Ulid societeId,
         CancellationToken cancellationToken)
     {
-        return _dbSet.Where(u=>
-                (u.Email==login || u.NomUtilisateur == login) &&
-                u.SocieteId == new SocieteId(societeId) &&
-                u.IsActive
-            )
-            .Include(i=>i.RoleUtilisateur)
-            .Include(i=>i.Societe)
+        var query = _dbSet.Where(u =>
+            (u.Email == login || u.NomUtilisateur == login) &&
+            u.IsActive
+        );
+
+        if (societeId != Ulid.Empty)
+        {
+            query = query.Where(u => u.SocieteId == new SocieteId(societeId));
+        }
+
+        return query
+            .Include(i => i.RoleUtilisateur)
+            .Include(i => i.Societe)
             .FirstOrDefaultAsync(cancellationToken);
     }
 

@@ -131,6 +131,54 @@
                 </div>
             </div>
 
+            <!-- Pointages employés (badges RFID) -->
+            <div class="p-5 border-b border-gray-100 dark:border-gray-850">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="text-[13px] font-bold text-primary">Pointages employés</div>
+                    @if ((pointages?.length ?? 0) > 0) {
+                        <span class="text-[11px] text-secondary tabular-nums">{{ pointages.length }}</span>
+                    }
+                </div>
+
+                @if (pointagesLoading) {
+                    <div class="flex items-center justify-center p-4">
+                        <mat-progress-spinner diameter="22" mode="indeterminate"></mat-progress-spinner>
+                    </div>
+                } @else if ((pointages?.length ?? 0) === 0) {
+                    <div class="text-xs text-hint p-3 text-center">Aucun pointage pour ce bus.</div>
+                } @else {
+                    <div class="flex flex-col gap-2 max-h-72 overflow-y-auto pr-1">
+                        @for (p of pointages; track p.pointageId) {
+                            <div class="rounded-lg border p-3"
+                                 [ngClass]="p.isSuccess
+                                    ? 'border-green-200 bg-green-50 dark:border-green-900/40 dark:bg-green-900/10'
+                                    : 'border-red-200 bg-red-50 dark:border-red-900/40 dark:bg-red-900/10'">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <mat-icon class="icon-size-4 flex-none"
+                                                  [ngClass]="p.isSuccess ? 'text-green-600' : 'text-red-600'"
+                                                  [svgIcon]="p.isSuccess ? 'heroicons_solid:check-circle' : 'heroicons_solid:exclamation-triangle'">
+                                        </mat-icon>
+                                        <span class="text-[12px] font-bold text-primary truncate">{{ getPointageLabel(p) }}</span>
+                                    </div>
+                                    <span class="text-[11px] font-semibold tabular-nums flex-none"
+                                          [ngClass]="p.isSuccess ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'">
+                                        {{ p.heurePointageUtc | date:'HH:mm:ss' }}
+                                    </span>
+                                </div>
+                                <div class="text-[11px] text-secondary mt-1.5 leading-snug">{{ p.message }}</div>
+                                @if (p.matricule) {
+                                    <div class="text-[10px] text-hint mt-1 tabular-nums">
+                                        Matricule {{ p.matricule }}
+                                        @if (p.codeCircuitEmploye) { · Circuit {{ p.codeCircuitEmploye }} }
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
             <!-- Event Timeline -->
             <div class="p-5 flex-auto flex flex-col">
                 <div class="text-[13px] font-bold text-primary mb-4">Chronologie des événements</div>

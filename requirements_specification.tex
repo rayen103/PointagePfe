@@ -1,0 +1,579 @@
+\chapter{Requirements Specification}
+\label{chap:requirements_specification}
+
+\section{Introduction}
+
+Defining precise requirements is essential to building an enterprise-grade solution that aligns technical implementations with operational realities. This chapter details the functional and non-functional requirements, presents the global and sub-system use case models, and establishes the boundaries of the CST LePoint system.
+
+\section{Functional Requirements}
+
+The functional requirements cover all the actions that the system must support. To align these requirements with modern software engineering practices, they are organized into core operational modules and detailed as User Stories:
+
+\subsection{Authentication and Authorization}
+\begin{itemize}
+  \item \textbf{FR-01: Secure Sign-In} (Sprint 1, 3 SP, Priority: High) \\
+  As a User, I want to authenticate with credentials and SocieteId so that I can access my company scope.
+  \item \textbf{FR-02: Stateless Token Generation} (Sprint 1, 2 SP, Priority: High) \\
+  As a User, I want to receive a signed JWT token upon login so that my session is authenticated without server-side state.
+  \item \textbf{FR-03: Token Revalidation} (Sprint 1, 1 SP, Priority: Medium) \\
+  As a Client App, I want to verify the token validity on startup so that I can automatically restore active sessions.
+  \item \textbf{FR-04: Granular Access Control} (Sprint 2, 5 SP, Priority: High) \\
+  As an Administrator, I want to assign navigation and API permissions to roles so that users only see and execute authorized actions.
+\end{itemize}
+
+\subsection{Fleet Management}
+\begin{itemize}
+  \item \textbf{FR-05: Bus Registration} (Sprint 2, 2 SP, Priority: High) \\
+  As an Administrator, I want to manage buses (immatriculation, model, capacity) so that they can be assigned to routes.
+  \item \textbf{FR-06: Driver Assignment} (Sprint 2, 2 SP, Priority: High) \\
+  As an Operator, I want to link drivers to buses and RFID badges so that operational attendance can be registered.
+  \item \textbf{FR-07: Modem Association} (Sprint 2, 2 SP, Priority: Medium) \\
+  As an Administrator, I want to catalog IoT modems and pair them with buses so that telemetry can be mapped to active vehicles.
+\end{itemize}
+
+\subsection{Pickup Planning}
+\begin{itemize}
+  \item \textbf{FR-08: Circuit Definition} (Sprint 2, 3 SP, Priority: High) \\
+  As an Operator, I want to create circuits with GPS coordinates, distance, and duration so that routes can be planned.
+  \item \textbf{FR-09: Ordered Pickup Points} (Sprint 2, 3 SP, Priority: High) \\
+  As an Operator, I want to sequence pickup points along a circuit so that the bus follows a strict logistical route.
+\end{itemize}
+
+\subsection{Passenger and Shift Management}
+\begin{itemize}
+  \item \textbf{FR-10: Employee Directory} (Sprint 2, 3 SP, Priority: High) \\
+  As an Administrator, I want to manage employee records, RFID tags, and geographic coordinates so that pickups can be targeted.
+  \item \textbf{FR-11: Shift Configuration} (Sprint 2, 2 SP, Priority: Medium) \\
+  As an Administrator, I want to define working shifts (start/end times) so that employees can be scheduled on transit routes.
+  \item \textbf{FR-12: Operational Work Orders} (Sprint 2, 3 SP, Priority: Medium) \\
+  As an Operator, I want to schedule site work orders for teams so that logistical transport matches factory demand.
+\end{itemize}
+
+\subsection{IoT Telemetry Ingestion}
+\begin{itemize}
+  \item \textbf{FR-13: Real-Time Telemetry Ingestion} (Sprint 4, 5 SP, Priority: High) \\
+  As a Modem, I want to submit periodic GPS/RFID occupancy payloads to the API so that fleet status is updated in real-time.
+  \item \textbf{FR-14: Telemetry Replay Protection} (Sprint 4, 2 SP, Priority: High) \\
+  As a System, I want to reject telemetry payloads older than 15 minutes so that replay attacks are prevented.
+  \item \textbf{FR-15: Automatic Geofence Tracking} (Sprint 4, 5 SP, Priority: High) \\
+  As a System, I want to flag a bus detour if it deviates more than 250m from the route so that deviations are logged immediately.
+\end{itemize}
+
+\subsection{Real-Time Supervision}
+\begin{itemize}
+  \item \textbf{FR-16: Cartographic Tracking} (Sprint 3, 5 SP, Priority: High) \\
+  As an Operator, I want to view active buses moving in real-time on a map so that I can supervise fleet routes visually.
+  \item \textbf{FR-17: Telemetry Timeline} (Sprint 3, 3 SP, Priority: Medium) \\
+  As an Operator, I want to see a chronological log of events for each bus so that I can analyze runtime alerts and updates.
+\end{itemize}
+
+\subsection{Predictive Analytics}
+\begin{itemize}
+  \item \textbf{FR-18: ETA Forecasting} (Sprint 4, 5 SP, Priority: High) \\
+  As an Operator, I want to receive machine-learning predicted ETAs for active buses so that I can inform plants of potential delays.
+  \item \textbf{FR-19: Batch ETA Calculations} (Sprint 4, 3 SP, Priority: High) \\
+  As a Backend, I want to query FastAPI for ETAs of all active buses in parallel so that tracking updates remain efficient.
+\end{itemize}
+
+\subsection{Business Intelligence Reporting}
+\begin{itemize}
+  \item \textbf{FR-20: Dynamic Querying \& Reporting} (Sprint 5, 5 SP, Priority: High) \\
+  As an Analyst, I want to run historical telemetry and attendance reports with sorting, grouping, and exporting so that I can run audits.
+  \item \textbf{FR-21: Custom Report Layouts} (Sprint 5, 3 SP, Priority: Medium) \\
+  As an Analyst, I want to save my custom column groupings and configurations so that I can reload them with one click.
+\end{itemize}
+
+\section{Non-Functional Requirements}
+
+The non-functional requirements describe the quality attributes, technological standards, and operational constraints achieved in the CST LePoint project:
+
+\subsection{Performance and Ingestion Latency}
+To handle high-frequency data generated by the active fleet, the system must adhere to strict performance targets:
+\begin{itemize}
+  \item \textbf{Ingestion Response Time}: Telemetry ingestion API requests (\texttt{POST /cm/bus/runtime/positions}) must be processed and resolved in under 200ms to avoid network queues on cellular IoT devices.
+  \item \textbf{High Concurrency Support}: The backend must support concurrent telemetry updates from 50+ IoT modems broadcasting GPS/RFID packet data every 30 seconds without database deadlock or memory leaks.
+  \item \textbf{UI Grid Load Latency}: Historical datagrids rendering thousands of telemetry trace records must complete client-side sorting, pagination, and filtering in less than 500ms using virtual scrolling and optimized EF Core query parameters.
+\end{itemize}
+
+\subsection{Scalability and Containerization Boundary}
+The system architecture must support horizontal scaling as the company's fleet size grows:
+\begin{itemize}
+  \item \textbf{Container Separation}: Services must be isolated into independent container layers (Frontend client, .NET Core WebAPI, SQL Server 2019, and FastAPI ML prediction service) orchestrated using Docker Compose.
+  \item \textbf{Stateless API Layers}: The backend application is stateless, allowing multiple instances of the .NET WebAPI container to run behind a reverse proxy (Nginx) to distribute concurrent REST traffic.
+\end{itemize}
+
+\subsection{Data Integrity and CQRS Transactional Boundaries}
+Operational logs and financial reports demand absolute data consistency:
+\begin{itemize}
+  \item \textbf{Unit of Work Pattern}: Database mutations must be bound by transactional boundaries managed via MediatR Pipeline Behaviors. A failure in any handler step must trigger an automatic transaction rollback.
+  \item \textbf{Fail-Fast Input Validation}: Before committing modifications to the persistence layer, incoming data must pass strict FluentValidation checks at the application commands boundary.
+\end{itemize}
+
+\subsection{Security, Cryptography, and Privacy Standards}
+As an enterprise-grade platform, security controls are configured at both transmission and storage levels:
+\begin{itemize}
+  \item \textbf{Stateless Authentication}: All client-server communication must be authenticated using JSON Web Tokens (JWT) signed via HMAC-SHA256, carrying expiration times and client metadata claims.
+  \item \textbf{Credential Hashing}: Passwords must never be stored in plain text. They are hashed using BCrypt, utilizing a configurable work factor to protect against brute-force attacks.
+  \item \textbf{Action-Level Authorization}: System operations are restricted based on user role permissions (Read, Add, Edit, Delete) mapped dynamically to application routing modules.
+\end{itemize}
+
+\subsection{System Maintainability and DDD Architectural Styles}
+To ensure long-term code quality and reduce technical debt:
+\begin{itemize}
+  \item \textbf{Clean Architecture Rules}: Core business logic (Domain and Application layers) must remain pure, with zero dependencies on external frameworks, SGBDs, or third-party mapping libraries.
+  \item \textbf{Domain Invariants Enforcements}: Domain models must use private setters, requiring state changes to flow through explicit constructor factories and validation methods.
+  \item \textbf{ULID Indexing}: Distributed, lexicographically sortable ULIDs (Universally Unique Lexicographically Sortable Identifiers) are used as primary database keys to optimize clustering indexing over classic random GUIDs.
+\end{itemize}
+
+\subsection{Robustness and Fault Tolerance}
+The platform must degrade gracefully when external dependencies fail:
+\begin{itemize}
+  \item \textbf{ML Service Failure Handling}: If the FastAPI machine learning container becomes unreachable, the WebAPI backend must fallback to static duration heuristics based on deterministic circuit distances, logging a warning while keeping the user experience uninterrupted.
+  \item \textbf{Replay Attack Defenses}: The ingestion engine must validate telemetry packet timestamps, rejecting any payload delayed by more than 15 minutes to protect against data injection.
+\end{itemize}
+
+\section{Use Case Model}
+
+To model the interactions between users, external systems, and the CST LePoint platform, we establish a formal use case model. We present the global use case diagram first, followed by the definitions of actors, external systems, detailed use case descriptions, and sub-system diagrams.
+
+\subsection{Global Use Case Diagram}
+
+The global use case diagram illustrates the complete scope of the platform, linking human actors and external systems to the core administrative, tracking, predictive, and analytical capabilities of the system.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth,height=0.75\textheight,keepaspectratio]{figures/global-usecase}
+  \caption{Global Use Case Diagram -- CST LePoint Platform}
+  \label{fig:global-usecase}
+\end{figure}
+
+\subsection{Actors}
+The system defines the following primary human actors:
+\begin{itemize}
+  \item \textbf{Administrator}: Manages security configurations, users, roles, and master data catalogs.
+  \item \textbf{Operator / Dispatcher}: Supervises active routes, assigns buses to drivers, and monitors operational alerts.
+  \item \textbf{Analyst}: Evaluates historical geolocation traces, runs operational reports, and customizes BI dashboards.
+  \item \textbf{Employee}: Accesses the application to view real-time bus locations, schedule information, and verify which vehicle they are assigned to for transport.
+  \item \textbf{Driver / Chauffeur}: Accesses the application to view vehicle details and verify their bus assignments.
+\end{itemize}
+
+\subsection{External Systems}
+The system interacts with the following external systems:
+\begin{itemize}
+  \item \textbf{IoT Telemetry Modem}: A physical device installed onboard the buses that automatically sends GPS coordinates and passenger occupancy counts to the API.
+  \item \textbf{ML Prediction Microservice}: An external FastAPI service that processes input features to generate ETA predictions and absence-risk evaluations.
+\end{itemize}
+
+\subsection{Use Case Specifications}
+
+This section details the primary use cases developed in the project, providing their formal flows and preconditions:
+
+\subsubsection{UC-1: Authenticate User}
+\begin{itemize}
+  \item \textbf{Primary Actors}: Administrator, Operator, Analyst, Employee, Driver.
+  \item \textbf{Preconditions}: The user account is active, and the client application is loaded at the login screen.
+  \item \textbf{Postconditions}: The user session is initialized, a JWT Bearer token is saved in the browser, and the authorized navigation menu is rendered.
+  \item \textbf{Main Flow}:
+  \begin{enumerate}
+    \item The user enters their username, password, and company reference (\texttt{SocieteId}).
+    \item The user clicks the "Sign In" button.
+    \item The client application validates the inputs locally and sends an HTTP POST request containing credentials to the backend login route.
+    \item The WebAPI receives the payload and dispatches a login command through the MediatR bus.
+    \item The command handler hashes the input password and compares it against the stored BCrypt hash.
+    \item The handler fetches the user's role and associated navigation permission matrix.
+    \item The system generates a cryptographically signed JWT token containing user identity and permission scopes.
+    \item The API returns an HTTP 200 response wrapping the token and profile metadata.
+    \item The client application saves the JWT token to local storage and updates the current session state.
+    \item The router redirects the user to the default landing dashboard.
+  \end{enumerate}
+  \item \textbf{Alternative Flows}:
+  \begin{itemize}
+    \item \emph{Invalid Credentials}: If the username or password does not match, the system aborts, returning an HTTP 401 response. The client displays a warning notification and keeps the user on the login screen.
+    \item \emph{Inactive Account}: If the user account is disabled (\texttt{IsActive = false}), the system returns an HTTP 403 response, preventing login.
+  \end{itemize}
+\end{itemize}
+
+\subsubsection{UC-2: Track Fleet Geolocation}
+\begin{itemize}
+  \item \textbf{Primary Actors / Systems}: IoT Telemetry Modem, Operator.
+  \item \textbf{Preconditions}: The vehicle is active, equipped with an initialized modem, and the operator is logged into the tracking board.
+  \item \textbf{Postconditions}: The vehicle position and occupancy are updated in the database, and the new marker state is broadcast to the map UI.
+  \item \textbf{Main Flow}:
+  \begin{enumerate}
+    \item The onboard IoT modem collects GPS coordinates and passenger counts.
+    \item The modem transmits an HTTP POST request to the API's telemetry route.
+    \item The WebAPI validates that the coordinate timestamp falls within a 15-minute replay-protection buffer.
+    \item The system maps the incoming IMEI code to the corresponding bus entity.
+    \item The API dispatches the update command through MediatR, initiating a database transaction.
+    \item The handler calculates the distance between the vehicle position and scheduled route points.
+    \item The handler updates the current latitude, longitude, occupancy, and timestamps on the bus record.
+    \item The repository commits the database changes, closing the transaction.
+    \item The system publishes a telemetry update event to the WebSocket channel.
+    \item The client's Leaflet map receives the WebSocket payload and moves the bus marker to the new coordinates.
+  \end{enumerate}
+  \item \textbf{Alternative Flows}:
+  \begin{itemize}
+    \item \emph{Geofence Route Detour}: If the distance between the bus and scheduled route points exceeds 250 meters, the system automatically instantiates a new pickup point and records a geofence alert event before committing.
+    \item \emph{Unrecognized IMEI}: If the IMEI does not map to any registered bus, the API rejects the request with an HTTP 404 response.
+  \end{itemize}
+\end{itemize}
+
+\subsubsection{UC-3: Request ETA Prediction}
+\begin{itemize}
+  \item \textbf{Primary Actors}: Operator / Dispatcher.
+  \item \textbf{Preconditions}: The dispatcher is logged in, and a bus is actively operating on a scheduled circuit.
+  \item \textbf{Postconditions}: The predicted arrival time and model confidence score are rendered on the tracking board.
+  \item \textbf{Main Flow}:
+  \begin{enumerate}
+    \item The dispatcher selects an active bus on the monitoring map.
+    \item The client application requests the current telemetry values of the bus.
+    \item The backend API receives the query and aggregates current bus variables (coordinates, speed, occupancy, capacity, and circuit ID).
+    \item The API generates an HTTP prediction request payload.
+    \item The backend HttpClient calls the FastAPI ML microservice endpoint on port 8001.
+    \item The FastAPI microservice loads the trained model artifacts, runs the prediction logic, and calculates the ETA in minutes along with a confidence metric.
+    \item The FastAPI service returns the prediction results over HTTP.
+    \item The backend WebAPI receives the response and wraps it in a standard API contract.
+    \item The frontend tracking panel receives the results and displays the minutes remaining for the bus to reach its destination.
+  \end{enumerate}
+  \item \textbf{Alternative Flows}:
+  \begin{itemize}
+    \item \emph{FastAPI Service Offline}: If the Python microservice is unreachable, the backend API logs a critical warning and returns a default estimated duration based on deterministic circuit distances.
+  \end{itemize}
+\end{itemize}
+
+\subsubsection{UC-4: Consult Assignment and Bus Status}
+\begin{itemize}
+  \item \textbf{Primary Actors}: Employee, Driver.
+  \item \textbf{Preconditions}: The employee or driver is authenticated and holds standard read-only access.
+  \item \textbf{Postconditions}: The user's specific bus assignment details, schedules, and active locations are rendered on screen.
+  \item \textbf{Main Flow}:
+  \begin{enumerate}
+    \item The employee or driver logs into the mobile-responsive web client.
+    \item The application reads the user identity and resolves their employee matricule or driver code from the JWT claims.
+    \item The frontend sends a GET request to retrieve the user's specific assignment metadata.
+    \item The backend database queries the active assignments (\texttt{Rattachement}) table to resolve matching shifts, circuits, and buses.
+    \item The API returns the details of the assigned bus (e.g. driver name, circuit code, immatriculation number).
+    \item The client client displays the vehicle details, schedule timings, and active route paths.
+    \item The user views the real-time position of the assigned vehicle on a Leaflet map.
+  \end{enumerate}
+  \item \textbf{Alternative Flows}:
+  \begin{itemize}
+    \item \emph{No Active Assignment}: If the user is not assigned to any route or bus for the current date, the application displays a friendly message stating that no active transportation roster is scheduled.
+  \end{itemize}
+\end{itemize}
+\subsubsection{UC-5: Manage Roles and Permissions}
+\begin{itemize}
+  \item \textbf{Primary Actors}: Administrator.
+  \item \textbf{Preconditions}: The Administrator is authenticated and has navigated to the Roles and Permissions module.
+  \item \textbf{Postconditions}: A security role is registered or updated in the database with custom navigation-to-action mapping.
+  \item \textbf{Main Flow}:
+  \begin{enumerate}
+    \item The Administrator requests the list of security roles.
+    \item The system retrieves active roles and displays them in a DevExtreme grid.
+    \item The Administrator clicks "Add Role" or selects an existing role to edit.
+    \item The system opens the role details panel, rendering a checkbox grid of application modules (e.g. \texttt{fichier.circuit}, \texttt{monitoring.bus-tracking}, \texttt{analyse.bi-bus}) and actions (\emph{Read}, \emph{Add}, \emph{Edit}, \emph{Delete}).
+    \item The Administrator selects the authorized actions for each module.
+    \item The Administrator enters a descriptive name for the role and clicks "Save".
+    \item The client application compiles the permission selections into a JSON array and transmits a PATCH/POST request to the backend.
+    \item The backend API receives the payload, validates parameters, and dispatches the command.
+    \item The command handler updates the \texttt{RoleUtilisateur} entity and serializes the permissions list into the database column.
+    \item The transaction commits, returning an HTTP 200 OK success response to the client.
+  \end{enumerate}
+  \item \textbf{Alternative Flows}:
+  \begin{itemize}
+    \item \emph{Duplicate Role Name}: If a role with the same name already exists in the same company context, the API returns a validation error, and saving is aborted.
+  \end{itemize}
+\end{itemize}
+
+\subsubsection{UC-6: Save BI Report Layout}
+\begin{itemize}
+  \item \textbf{Primary Actors}: Analyst.
+  \item \textbf{Preconditions}: The Analyst is authenticated and has customized a BI grid layout (column reordering, sorting, or grouping filters).
+  \item \textbf{Postconditions}: The layout configuration JSON is persisted in the database and linked to the Analyst's company context.
+  \item \textbf{Main Flow}:
+  \begin{enumerate}
+    \item The Analyst opens a dynamic BI dashboard (e.g. BI Bus or BI Employee).
+    \item The Analyst adjusts grid column layouts (hiding specific fields, reordering headers, or establishing default grouping parameters).
+    \item The Analyst clicks the "Save Layout" button.
+    \item The client application displays a dialog prompting the Analyst for a configuration name.
+    \item The Analyst enters a name (e.g. "Monthly Transit Summary") and submits the dialog.
+    \item The client application serializes the current grid layout metadata into a JSON string and sends a POST request to \texttt{/cm/analyse/layouts}.
+    \item The WebAPI receives the command and dispatches it through MediatR.
+    \item The command handler updates or creates a \texttt{ReportLayout} aggregate, scoping it by \texttt{SocieteId}.
+    \item The database commits the changes, returning a confirmation.
+    \item The frontend adds the saved layout to the dashboard menu for future one-click loading.
+  \end{enumerate}
+  \item \textbf{Alternative Flows}:
+  \begin{itemize}
+    \item \emph{Invalid Layout Name}: If the Analyst submits an empty layout name, the client rejects the submission and displays an inline validation error.
+  \end{itemize}
+\end{itemize}
+
+\subsection{Input Validation Constraints}
+
+To maintain data integrity and prevent corrupt persistence writes, the CST LePoint platform enforces strict validation rules at the application boundary using FluentValidation. Inbound requests are checked against the following constraints:
+
+\begin{itemize}
+  \item \textbf{Bus Entity Constraints}:
+  \begin{itemize}
+    \item \texttt{NumeroIMM} (Immatriculation plate format): Required, must not exceed 50 characters, and must follow standard Tunisian plate expressions (regex: \verb|^[0-9]+-TN-[0-9]+$|).
+    \item \texttt{IMEI} (Onboard modem identifier): Required, must be exactly 15 numeric digits.
+    \item \texttt{Capacite} (Vehicle seating capacity): Required, must be an integer between 1 and 150.
+  \end{itemize}
+
+  \item \textbf{Employee Entity Constraints}:
+  \begin{itemize}
+    \item \texttt{Matricule} (HR employee identification): Required, unique, and cannot exceed 20 characters.
+    \item \texttt{RFID} (Badge hardware identifier): Required, must be a valid alphanumeric hexadecimal token up to 50 characters.
+    \item \texttt{Latitude/Longitude} (Home geolocation): Must fall within the geographic bounds of Tunisia (Latitude: $[30.0, 38.0]$, Longitude: $[7.0, 12.0]$).
+  \end{itemize}
+
+  \item \textbf{Circuit Entity Constraints}:
+  \begin{itemize}
+    \item \texttt{CodeCircuit} (Route catalog identifier): Required, unique, alphanumeric code up to 20 characters.
+    \item \texttt{DistanceKm} (Transit path length): Required, must be a positive decimal value greater than 0.0.
+    \item \texttt{DureeMinutes} (Estimated transit duration): Required, must be a positive integer greater than 0.
+  \end{itemize}
+\end{itemize}
+
+\subsection{Sub-System Use Case Diagrams}
+The diagrams below represent the detailed use case models for specific operational sub-systems:
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=1.0\textwidth]
+flowchart LR
+    %%{init: { "theme": "default", "themeVariables": { "fontSize": "20px", "actorFontSize": "20px", "noteFontSize": "18px", "messageFontSize": "18px" } }}%%
+    
+    subgraph Actors ["Actors"]
+        direction TB
+        dispatcher["fa:fa-user Operator / Dispatcher"]
+        driver["fa:fa-user Driver / Chauffeur"]
+        employee["fa:fa-user Employee"]
+    end
+    
+    subgraph System ["Bus & Route Supervision Sub-System"]
+        direction LR
+        subgraph Col1 ["Configuration & Setup"]
+            direction TB
+            UC_auth(["Authenticate User (UC-1)"])
+            UC_assign(["Assign Bus to Route & Driver"])
+            UC_manage_routes(["Manage Circuits & Pickup Points"])
+        end
+        subgraph Col2 ["Supervision & Real-time"]
+            direction TB
+            UC_track(["Track Fleet Geolocation (UC-2)"])
+            UC_map(["Supervise Active Routes on Map"])
+            UC_eta(["Request Bus ETA Prediction (UC-3)"])
+            UC_alerts(["Receive Geofencing Route Alerts"])
+            UC_consult(["Consult Assignment & Bus Status (UC-4)"])
+        end
+    end
+    
+    dispatcher --- UC_auth
+    dispatcher --- UC_map
+    dispatcher --- UC_assign
+    dispatcher --- UC_manage_routes
+    dispatcher --- UC_eta
+    dispatcher --- UC_alerts
+    
+    driver --- UC_auth
+    driver --- UC_consult
+    
+    employee --- UC_auth
+    employee --- UC_consult
+    
+    UC_map -.->|include| UC_track
+    UC_eta -.->|include| UC_track
+  \end{mermaid}
+  \caption{Sub-System Use Case -- Bus and Route Supervision}
+  \label{fig:usecase-bus}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=1.0\textwidth]
+flowchart LR
+    %%{init: { "theme": "default", "themeVariables": { "fontSize": "20px", "actorFontSize": "20px", "noteFontSize": "18px", "messageFontSize": "18px" } }}%%
+    
+    subgraph Actors ["Actors"]
+        direction TB
+        admin["fa:fa-user Administrator"]
+        operator["fa:fa-user Operator"]
+        employee["fa:fa-user Employee"]
+    end
+    
+    subgraph System ["Pickup Point & Employee Management Sub-System"]
+        direction LR
+        subgraph Col1 ["Management & Config"]
+            direction TB
+            UC_auth(["Authenticate User (UC-1)"])
+            UC_employees(["Manage Employees"])
+            UC_points(["Manage Pickup Points"])
+            UC_assign(["Manage Assignments (Rattachements)"])
+        end
+        subgraph Col2 ["Execution & Monitoring"]
+            direction TB
+            UC_assign_point(["Assign Employee to Pickup Point & Route"])
+            UC_consult(["Consult Assigned Pickup Point & Status (UC-4)"])
+            UC_map(["Visualize Pickup Points Map"])
+        end
+    end
+    
+    admin --- UC_auth
+    admin --- UC_employees
+    admin --- UC_points
+    admin --- UC_assign
+    
+    operator --- UC_auth
+    operator --- UC_employees
+    operator --- UC_points
+    operator --- UC_assign
+    operator --- UC_assign_point
+    operator --- UC_map
+    
+    employee --- UC_auth
+    employee --- UC_consult
+    employee --- UC_map
+    
+    UC_employees -.->|include| UC_auth
+    UC_points -.->|include| UC_auth
+    UC_assign -.->|include| UC_auth
+    UC_assign_point -.->|include| UC_auth
+    UC_consult -.->|include| UC_auth
+    UC_map -.->|include| UC_auth
+  \end{mermaid}
+  \caption{Sub-System Use Case -- Pickup Point and Employee Management}
+  \label{fig:usecase-pointcollecte}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=1.0\textwidth]
+flowchart LR
+    %%{init: { "theme": "default", "themeVariables": { "fontSize": "20px", "actorFontSize": "20px", "noteFontSize": "18px", "messageFontSize": "18px" } }}%%
+    
+    subgraph Actors ["Actors"]
+        admin["fa:fa-user Administrator"]
+    end
+    
+    subgraph System ["Administration Sub-system"]
+        direction LR
+        subgraph Col1 ["Base Data"]
+            direction TB
+            UC_login(["UC-1: Authenticate User"])
+            UC_societe(["Manage Societies (CRUD)"])
+            UC_sites(["Manage Sites & Networks (CRUD)"])
+            UC_users(["Manage Users (CRUD)"])
+            UC_roles(["UC-5: Manage Roles & Permissions"])
+        end
+        subgraph Col2 ["Resources & Logs"]
+            direction TB
+            UC_shifts(["Manage Shifts (CRUD)"])
+            UC_modems(["Manage Modems (CRUD)"])
+            UC_geographics(["Manage Geographics (Regions/Gouvernorats)"])
+            UC_chantiers(["Manage Chantiers (CRUD)"])
+        end
+    end
+    
+    admin --- UC_login
+    admin --- UC_societe
+    admin --- UC_sites
+    admin --- UC_users
+    admin --- UC_roles
+    admin --- UC_shifts
+    admin --- UC_modems
+    admin --- UC_geographics
+    admin --- UC_chantiers
+    
+    UC_societe -.->|include| UC_login
+    UC_sites -.->|include| UC_login
+    UC_users -.->|include| UC_login
+    UC_roles -.->|include| UC_login
+    UC_shifts -.->|include| UC_login
+    UC_modems -.->|include| UC_login
+    UC_geographics -.->|include| UC_login
+    UC_chantiers -.->|include| UC_login
+  \end{mermaid}
+  \caption{Sub-System Use Case -- Administration and Security Configurations}
+  \label{fig:usecase-admin}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=1.0\textwidth]
+flowchart LR
+    %%{init: { "theme": "default", "themeVariables": { "fontSize": "20px", "actorFontSize": "20px", "noteFontSize": "18px", "messageFontSize": "18px" } }}%%
+    
+    subgraph Actors ["Actors"]
+        direction TB
+        operator["fa:fa-user Operator"]
+        analyst["fa:fa-user Analyst"]
+    end
+    
+    subgraph System ["Operations & Work Management Sub-system"]
+        direction LR
+        subgraph Col1 ["Operations"]
+            direction TB
+            UC_login(["UC-1: Authenticate User"])
+            UC_orders(["Manage Work Orders (CRUD OrdreTravail)"])
+            UC_teams(["Manage Teams (CRUD Equipe)"])
+            UC_assignments(["Manage Assignments (CRUD Rattachement)"])
+        end
+        subgraph Col2 ["BI & Analysis"]
+            direction TB
+            UC_layout(["UC-6: Save BI Report Layout"])
+            UC_queries(["Execute Analytical Queries"])
+        end
+    end
+    
+    operator --- UC_login
+    operator --- UC_orders
+    operator --- UC_teams
+    operator --- UC_assignments
+    
+    analyst --- UC_login
+    analyst --- UC_layout
+    analyst --- UC_queries
+    
+    UC_orders -.->|include| UC_login
+    UC_teams -.->|include| UC_login
+    UC_assignments -.->|include| UC_login
+    UC_layout -.->|include| UC_login
+    UC_queries -.->|include| UC_login
+  \end{mermaid}
+  \caption{Sub-System Use Case -- Operations and Work Management}
+  \label{fig:usecase-ops}
+\end{figure}
+
+\subsection{Scope Boundaries}
+The system boundary separates the software components from physical hardware. The telemetry modems and raw cellular data carriers are treated as external systems. The ML prediction service is run as an external FastAPI container, communicating with the backend over HTTP.
+
+\section{Requirements Traceability Summary}
+
+To ensure complete coverage of the design scope, we cross-reference our functional requirements with the corresponding use cases and implementation features in the table below:
+
+\begin{table}[H]
+  \small
+  \centering
+  \begin{tabularx}{\textwidth}{lXX}
+    \toprule
+    \textbf{ID} & \textbf{Requirement Name} & \textbf{Traceable Use Cases / Implementation Components} \\
+    \midrule
+    REQ-01 & User Authentication & UC-1, BCrypt Hashing, JWT Bearer Token validation \\
+    REQ-02 & Navigation Permissions & RoleUtilisateur navigation matrices, Navigation Guards \\
+    REQ-03 & Fleet CRUD Catalogs & Admin dashboard, DevExtreme DataGrids, EF Core context \\
+    REQ-04 & Telemetry Ingestion & UC-2, minimal API telemetry endpoint, IMEI validation \\
+    REQ-05 & Live Geofencing alerts & Haversine distance tracking, BusRuntimeEvent logging \\
+    REQ-06 & Cartographic Map View & ngx-leaflet component, WebSocket polling, marker states \\
+    REQ-07 & Machine Learning ETA & UC-3, Python FastAPI microservice, PredictBusEta queries \\
+    REQ-08 & Custom BI Layouts & ReportLayout entity, UpsertReportLayout, ApexCharts \\
+    \bottomrule
+  \end{tabularx}
+  \caption{Functional Requirements Traceability Matrix}
+  \label{tab:traceability_matrix}
+\end{table}
+
+\section{Conclusion}
+
+This chapter presented the detailed functional and non-functional requirements of the CST LePoint platform, specified the flows of four core use cases, and mapped these requirements to implementation components. Having defined the system specifications, the next chapter presents the proposed system architecture, database modeling, and logical design solutions.

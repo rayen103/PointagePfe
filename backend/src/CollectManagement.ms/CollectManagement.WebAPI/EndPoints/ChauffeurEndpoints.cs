@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Carter;
 using CollectManagement.Application.Common;
+using CollectManagement.Application.Interfaces.Repositories.Bus;
 using CollectManagement.Application.Interfaces.Repositories.Chauffeurs;
 using CollectManagement.Application.Shared;
 using CollectManagement.Domain.Bus.ValueObjects;
@@ -75,6 +76,7 @@ public class ChauffeurEndpoints : ICarterModule
     private static async Task<IResult> Create(
         [FromBody] [Required] UpsertChauffeurRequest request,
         IChauffeurRepository repository,
+        IBusRepository busRepository,
         IUnitOfWork unitOfWork,
         CancellationToken cancellationToken)
     {
@@ -92,6 +94,37 @@ public class ChauffeurEndpoints : ICarterModule
             busId);
 
         await repository.AddAsync(chauffeur, cancellationToken).ConfigureAwait(false);
+
+        if (busId is not null)
+        {
+            var bus = await busRepository.GetAsync(x => x.BusId == busId, cancellationToken).ConfigureAwait(false);
+            if (bus is not null)
+            {
+                bus.AssignChauffeur(request.CodeChauffeur);
+                busRepository.Update(bus);
+
+                var otherBuses = await busRepository
+                    .GetManyAsync(x => x.CodeChauffeur != null && x.CodeChauffeur.ToLower() == request.CodeChauffeur.Trim().ToLower() && x.BusId != busId, cancellationToken)
+                    .ConfigureAwait(false);
+
+                foreach (var otherBus in otherBuses)
+                {
+                    otherBus.AssignChauffeur(null);
+                    busRepository.Update(otherBus);
+                }
+
+                var otherChauffeurs = await repository
+                    .GetManyAsync(x => x.BusId == busId && x.CodeChauffeur.ToLower() != request.CodeChauffeur.Trim().ToLower(), cancellationToken)
+                    .ConfigureAwait(false);
+
+                foreach (var otherChauffeur in otherChauffeurs)
+                {
+                    otherChauffeur.AssignBus(null);
+                    repository.Update(otherChauffeur);
+                }
+            }
+        }
+
         await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return Results.Ok(new ApiResponse<ChauffeurDto>(new ChauffeurDto(
@@ -110,6 +143,7 @@ public class ChauffeurEndpoints : ICarterModule
     private static async Task<IResult> Update(
         [FromBody] [Required] UpdateChauffeurRequest request,
         IChauffeurRepository repository,
+        IBusRepository busRepository,
         IUnitOfWork unitOfWork,
         CancellationToken cancellationToken)
     {
@@ -119,7 +153,9 @@ public class ChauffeurEndpoints : ICarterModule
         if (chauffeur is null)
             return Results.NotFound(new ApiResponse<string>("Chauffeur not found", false, StatusCodes.Status404NotFound));
 
-        BusId? busId = request.BusId.HasValue ? new BusId(request.BusId.Value) : null;
+        BusId? oldBusId = chauffeur.BusId;
+        BusId? newBusId = request.BusId.HasValue ? new BusId(request.BusId.Value) : null;
+        string oldCodeChauffeur = chauffeur.CodeChauffeur;
         
         chauffeur.Update(
             request.CodeChauffeur,
@@ -129,9 +165,53 @@ public class ChauffeurEndpoints : ICarterModule
             request.RFIDChauffeur,
             request.Externe,
             request.IsActive,
-            busId);
+            newBusId);
 
         repository.Update(chauffeur);
+
+        if (oldBusId != newBusId || !string.Equals(oldCodeChauffeur, request.CodeChauffeur, StringComparison.OrdinalIgnoreCase))
+        {
+            if (oldBusId is not null)
+            {
+                var oldBus = await busRepository.GetAsync(x => x.BusId == oldBusId && x.CodeChauffeur != null && x.CodeChauffeur.ToLower() == oldCodeChauffeur.Trim().ToLower(), cancellationToken).ConfigureAwait(false);
+                if (oldBus is not null)
+                {
+                    oldBus.AssignChauffeur(null);
+                    busRepository.Update(oldBus);
+                }
+            }
+
+            if (newBusId is not null)
+            {
+                var newBus = await busRepository.GetAsync(x => x.BusId == newBusId, cancellationToken).ConfigureAwait(false);
+                if (newBus is not null)
+                {
+                    newBus.AssignChauffeur(request.CodeChauffeur);
+                    busRepository.Update(newBus);
+
+                    var otherChauffeurs = await repository
+                        .GetManyAsync(x => x.BusId == newBusId && x.ChauffeurId != chauffeurId, cancellationToken)
+                        .ConfigureAwait(false);
+
+                    foreach (var otherChauffeur in otherChauffeurs)
+                    {
+                        otherChauffeur.AssignBus(null);
+                        repository.Update(otherChauffeur);
+                    }
+
+                    var otherBuses = await busRepository
+                        .GetManyAsync(x => x.CodeChauffeur != null && x.CodeChauffeur.ToLower() == request.CodeChauffeur.Trim().ToLower() && x.BusId != newBusId, cancellationToken)
+                        .ConfigureAwait(false);
+
+                    foreach (var otherBus in otherBuses)
+                    {
+                        otherBus.AssignChauffeur(null);
+                        busRepository.Update(otherBus);
+                    }
+                }
+            }
+        }
+
         await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         return Results.Ok(new ApiResponse<bool>(true));

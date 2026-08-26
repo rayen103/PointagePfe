@@ -32,9 +32,20 @@ export interface MapLocation {
     color?: string;
 }
 
+export interface TaggedEmployee {
+    nom: string;
+    matricule?: string;
+    heure: string;
+    message?: string;
+}
+
 export interface CircuitPointLocation extends MapLocation {
     pointCategory: 'departure' | 'collection' | 'arrival';
     ordre?: number;
+    codePointCollecte?: string;
+    /** True quand au moins un employé affecté à ce point a badgé (pointage réussi). */
+    tagged?: boolean;
+    taggedEmployees?: TaggedEmployee[];
 }
 
 export interface OptimizedRouteData {
@@ -205,6 +216,9 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
             this.routeLines.push(routeLine);
         }
 
+        // Segments colorés (vert = pointé, orange = non pointé) entre les points du circuit.
+        this.drawCircuitSegments();
+
         (this.circuitPoints ?? []).forEach((point, index) => {
             if (point.latitude == null || point.longitude == null) {
                 return;
@@ -219,11 +233,15 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
         const isArrival = point.pointCategory === 'arrival';
         const isDeparture = point.pointCategory === 'departure';
         const isCollection = point.pointCategory === 'collection';
+        // Point de collecte : vert si un employé y a badgé, orange sinon.
+        const isTagged = isCollection && point.tagged === true;
 
         let iconUrl: string;
         if (isArrival) {
             iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png';
         } else if (isDeparture) {
+            iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png';
+        } else if (isTagged) {
             iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png';
         } else {
             iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png';
@@ -240,7 +258,7 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
 
         const labelContent = isCollection
             ? `<div style="
-                  background:#f97316;
+                  background:${isTagged ? '#16a34a' : '#f97316'};
                   color:#fff;
                   width:20px;
                   height:20px;
@@ -325,17 +343,78 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
                   : `Point ${index}`;
 
         const ordre = point.ordre != null ? `Ordre: ${point.ordre}` : '';
+        const isTagged = point.pointCategory === 'collection' && point.tagged === true;
+        const headerColor = point.pointCategory === 'departure'
+            ? '#0E8A5F'
+            : point.pointCategory === 'arrival'
+              ? '#D12B28'
+              : isTagged ? '#16A34A' : '#F97316';
+
+        const employees = point.taggedEmployees ?? [];
+        const taggedBlock = isTagged && employees.length > 0
+            ? `<div style="margin-top:8px;border-top:1px solid #eef2f7;padding-top:6px;">
+                   <div style="font-size:11px;font-weight:700;color:#16A34A;text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px;">
+                       ${employees.length} employé(s) pointé(s)
+                   </div>
+                   ${employees.map((e) => `
+                       <div style="display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:2px 0;">
+                           <span style="font-weight:600;color:#121242;">${e.nom}${e.matricule ? ` <span style="color:#8ca2bd;font-weight:400;">· ${e.matricule}</span>` : ''}</span>
+                           <span style="color:#5a6b85;white-space:nowrap;font-variant-numeric:tabular-nums;">${e.heure}</span>
+                       </div>`).join('')}
+               </div>`
+            : '';
 
         return `
-            <div class="p-2">
+            <div class="p-2" style="min-width:200px;">
                 <div class="font-bold text-base mb-1">${point.name}</div>
-                <div class="text-xs font-semibold uppercase tracking-wide mb-1" style="color: ${point.pointCategory === 'departure' ? '#0E8A5F' : point.pointCategory === 'arrival' ? '#D12B28' : '#F97316'}">${categoryLabel}</div>
+                <div class="text-xs font-semibold uppercase tracking-wide mb-1" style="color: ${headerColor}">${categoryLabel}${isTagged ? ' · Pointé' : ''}</div>
                 ${ordre ? `<div class="text-xs text-gray-500">${ordre}</div>` : ''}
                 <div class="text-xs text-gray-500 mt-2">
                     ${point.latitude.toFixed(6)}, ${point.longitude.toFixed(6)}
                 </div>
+                ${taggedBlock}
             </div>
         `;
+    }
+
+    /**
+     * Trace les segments entre points consécutifs du circuit : vert si le point
+     * d'arrivée du segment est un point de collecte pointé, orange sinon.
+     */
+    private drawCircuitSegments(): void {
+        if (!this.map) {
+            return;
+        }
+
+        const pts = (this.circuitPoints ?? []).filter(
+            (p) => p.latitude != null && p.longitude != null
+        );
+        if (pts.length < 2) {
+            return;
+        }
+
+        for (let i = 0; i < pts.length - 1; i++) {
+            const from = pts[i];
+            const to = pts[i + 1];
+            // Le segment est vert dès que l'un de ses deux extrémités est un point pointé.
+            const green =
+                (to.pointCategory === 'collection' && to.tagged === true) ||
+                (from.pointCategory === 'collection' && from.tagged === true);
+
+            const segment = L.polyline(
+                [
+                    [from.latitude, from.longitude],
+                    [to.latitude, to.longitude],
+                ],
+                {
+                    color: green ? '#16A34A' : '#F97316',
+                    weight: 4,
+                    opacity: 0.9,
+                }
+            ).addTo(this.map);
+
+            this.routeLines.push(segment);
+        }
     }
 
     private drawCircuitRoutes(validLocations: MapLocation[]): void {

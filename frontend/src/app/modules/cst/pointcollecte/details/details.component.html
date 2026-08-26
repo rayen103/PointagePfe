@@ -33,225 +33,188 @@
         <div class="flex flex-col lg:flex-row w-full gap-0 h-full">
             
             <!-- LEFT SIDE: Form Section -->
-            <div class="flex-1 lg:w-[45%] flex flex-col bg-white dark:bg-gray-800 shadow-xl relative">
-                
-                <!-- Floating Back Button -->
-                <button
-                    mat-icon-button
-                    (click)="onBackdropClicked()"
-                    class="absolute top-4 left-4 z-10 w-10 h-10 bg-white dark:bg-gray-800 shadow-lg rounded-full hover:shadow-xl transition-all duration-300"
-                    [matTooltip]="t('Back') || 'Back'"
-                    matTooltipPosition="right">
-                    <mat-icon class="icon-size-5 text-gray-700 dark:text-gray-300" [svgIcon]="'heroicons_outline:arrow-left'"></mat-icon>
-                </button>
-
-                <!-- Floating Title Badge -->
-                <div class="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">
-                    <div class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full shadow-lg">
-                        <span class="text-sm font-bold uppercase tracking-wide">
-                            {{isNewPointCollecte ? t('Add-Point-Collecte') : t('Edit-Point-Collecte')}}
-                        </span>
+            <div class="flex-1 lg:w-[45%] flex flex-col bg-white dark:bg-gray-800 border-r border-gray-200 relative overflow-y-auto">
+                <div class="p-6 flex flex-col gap-6" style="font-family: var(--cst-font); color: var(--cst-text);">
+                    <!-- Breadcrumb -->
+                    <div class="cst-crumb">
+                        <a routerLink="/fichier/bus">Gestion</a><span>/</span><a (click)="onBackdropClicked()" class="cursor-pointer">Points de collecte</a><span>/</span>
+                        <b>{{ isNewPointCollecte ? t('Add-Point-Collecte') : t('Edit-Point-Collecte') }}</b>
                     </div>
-                </div>
 
-                <div class="flex flex-col h-full p-6 pt-16">
-                    <form
-                        class="flex flex-col h-full"
-                        [formGroup]="pointCollecteForm"
-                        #pointCollecteFormDirective="ngForm">
-
-                        <!-- Compact Progress Indicator -->
-                        <div class="flex items-center justify-center space-x-2 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-                            <div class="flex items-center space-x-1">
-                                <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300" 
-                                     [ngClass]="pointCollecteForm.get('codePointCollecte')?.valid && pointCollecteForm.get('libellePointCollecte')?.value ? 'bg-green-500 text-white scale-110' : 'bg-blue-500 text-white'">
-                                    1
+                    <!-- Header block -->
+                    <div class="cst-form-topline">
+                        <div class="cst-form-id">
+                            <a class="cst-round" (click)="onBackdropClicked()">
+                                <mat-icon [svgIcon]="'heroicons_outline:arrow-left'"></mat-icon>
+                            </a>
+                            <div>
+                                <div class="cst-form-id__title">
+                                    <span>{{ isNewPointCollecte ? t('Add-Point-Collecte') : t('Edit-Point-Collecte') }}</span>
                                 </div>
-                                <div class="h-0.5 w-8 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                    <div class="h-full bg-blue-500 transition-all duration-500"
-                                         [style.width]="pointCollecteForm.get('codePointCollecte')?.valid && pointCollecteForm.get('libellePointCollecte')?.value ? '100%' : '0%'"></div>
-                                </div>
-                            </div>
-                            <div class="flex items-center space-x-1">
-                                <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300"
-                                     [ngClass]="pointCollecteForm.get('latitude')?.value && pointCollecteForm.get('longitude')?.value ? 'bg-green-500 text-white scale-110' : 'bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-400'">
-                                    2
-                                </div>
-                                <div class="h-0.5 w-8 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                    <div class="h-full bg-blue-500 transition-all duration-500"
-                                         [style.width]="pointCollecteForm.get('latitude')?.value && pointCollecteForm.get('longitude')?.value ? '100%' : '0%'"></div>
-                                </div>
-                            </div>
-                            <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300"
-                                 [ngClass]="pointCollecteForm.valid && !locationOutOfTunisia ? 'bg-green-500 text-white scale-110' : 'bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-400'">
-                                3
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Form Content - No Scroll Layout -->
-                        <div class="flex-1 flex flex-col min-h-0">
-                            
-                            <!-- SECTION 1: Basic Information -->
-                            <div class="mb-5">
-                                <div class="flex items-center space-x-2 mb-3">
-                                    <div class="w-7 h-7 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-md">
-                                        <mat-icon class="icon-size-4 text-white" [svgIcon]="'heroicons_solid:information-circle'"></mat-icon>
-                                    </div>
-                                    <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wide">{{ t('Basic-Information') || 'Basic Information' }}</h3>
-                                </div>
-                                
-                                <div class="grid grid-cols-2 gap-3">
-                                    <!-- Code -->
-                                    <mat-form-field class="w-full compact-field" appearance="outline">
-                                        <mat-label>{{ t('Point-Collecte-Code') }}</mat-label>
-                                        <input
-                                            matInput
-                                            formControlName="codePointCollecte"
-                                            [placeholder]="t('Enter-point-collecte-code')">
-                                        @if(pointCollecteForm.get('codePointCollecte').hasError('required')){
-                                            <mat-error>{{ t('Code-required') }}</mat-error>
-                                        }
-                                    </mat-form-field>
+                    <!-- Compact Progress Indicator -->
+                    <div class="flex items-center justify-center space-x-2 pb-4 border-b border-gray-150">
+                        <div class="flex items-center space-x-1">
+                            <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300" 
+                                 [ngClass]="pointCollecteForm.get('codePointCollecte')?.valid && pointCollecteForm.get('libellePointCollecte')?.value ? 'bg-green-500 text-white scale-110' : 'bg-blue-500 text-white'">
+                                1
+                            </div>
+                            <div class="h-0.5 w-8 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-500 transition-all duration-500"
+                                     [style.width]="pointCollecteForm.get('codePointCollecte')?.valid && pointCollecteForm.get('libellePointCollecte')?.value ? '100%' : '0%'"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300"
+                                 [ngClass]="pointCollecteForm.get('latitude')?.value && pointCollecteForm.get('longitude')?.value ? 'bg-green-500 text-white scale-110' : 'bg-gray-300 text-gray-400'">
+                                2
+                            </div>
+                            <div class="h-0.5 w-8 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-blue-500 transition-all duration-500"
+                                     [style.width]="pointCollecteForm.get('latitude')?.value && pointCollecteForm.get('longitude')?.value ? '100%' : '0%'"></div>
+                            </div>
+                        </div>
+                        <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300"
+                             [ngClass]="pointCollecteForm.valid && !locationOutOfTunisia ? 'bg-green-500 text-white scale-110' : 'bg-gray-300 text-gray-400'">
+                            3
+                        </div>
+                    </div>
 
-                                    <!-- Circuit -->
-                                    <mat-form-field class="w-full compact-field" appearance="outline">
-                                        <mat-label>{{ t('Circuit') || 'Circuit' }}</mat-label>
-                                        <mat-select formControlName="circuitId">
-                                            <mat-option [value]="null">Aucun</mat-option>
-                                            @for (circuit of circuits; track circuit.circuitId) {
-                                                <mat-option [value]="circuit.circuitId">{{ circuit.libelleCircuit || circuit.codeCircuit }}</mat-option>
-                                            }
-                                        </mat-select>
-                                    </mat-form-field>
-                                </div>
-
-                                <!-- Label with Autocomplete -->
-                                <mat-form-field class="w-full compact-field" appearance="outline">
-                                    <mat-label>{{ t('Point-Collecte-Label') }}</mat-label>
-                                    <input
-                                        matInput
-                                        formControlName="libellePointCollecte"
-                                        [placeholder]="t('Type-to-search-address') || 'Type to search address'"
-                                        [matAutocomplete]="auto">
-                                </mat-form-field>
-
-                                <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectAutocompleteResult($event.option.value)">
-                                    @for (result of autocompleteResults; track result) {
-                                        <mat-option [value]="result" class="text-sm">
-                                            <div class="flex items-center py-1">
-                                                <mat-icon class="icon-size-4 mr-2 text-blue-500" [svgIcon]="'heroicons_solid:map-pin'"></mat-icon>
-                                                <span class="text-xs truncate">{{ result.displayName }}</span>
+                    <form [formGroup]="pointCollecteForm" #pointCollecteFormDirective="ngForm" class="flex flex-col gap-6">
+                        <!-- Card Fields -->
+                        <div class="cst-form-card" style="padding: 20px; box-shadow: none; border-color: var(--cst-border);">
+                            <!-- Basic Information -->
+                            <div>
+                                <div class="cst-form-sec__title">{{ t('Basic-Information') || 'Basic Information' }}</div>
+                                <div class="cst-form-sec__sub">Identifiants et circuit du point de collecte</div>
+                                <div class="cst-form-grid" style="grid-template-columns: 1fr 1fr; gap: 12px;">
+                                    <div class="cst-field">
+                                        <label>{{ t('Point-Collecte-Code') }} <span style="color:var(--cst-red)">*</span></label>
+                                        <input class="cst-input" [class.is-err]="pointCollecteForm.get('codePointCollecte')?.invalid && (pointCollecteForm.get('codePointCollecte')?.touched || pointCollecteFormDirective.submitted)"
+                                               formControlName="codePointCollecte" [placeholder]="t('Enter-point-collecte-code')" />
+                                        @if(pointCollecteForm.get('codePointCollecte').hasError('required') && (pointCollecteForm.get('codePointCollecte')?.touched || pointCollecteFormDirective.submitted)){
+                                            <div class="cst-field__err">
+                                                <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                                {{ t('Code-required') || 'Code requis' }}
                                             </div>
-                                        </mat-option>
-                                    }
-                                </mat-autocomplete>
+                                        }
+                                    </div>
+                                    <div class="cst-field">
+                                        <label>{{ t('Circuit') || 'Circuit' }}</label>
+                                        <div class="cst-select">
+                                            <select formControlName="circuitId">
+                                                <option [value]="null">Aucun</option>
+                                                @for (circuit of circuits; track circuit.circuitId) {
+                                                    <option [value]="circuit.circuitId">{{ circuit.libelleCircuit || circuit.codeCircuit }}</option>
+                                                }
+                                            </select>
+                                            <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="cst-field mt-3">
+                                    <label>{{ t('Point-Collecte-Label') }}</label>
+                                    <input class="cst-input" formControlName="libellePointCollecte" [placeholder]="t('Type-to-search-address') || 'Type to search address'" [matAutocomplete]="auto" />
+                                    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectAutocompleteResult($event.option.value)">
+                                        @for (result of autocompleteResults; track result) {
+                                            <mat-option [value]="result" class="text-sm">
+                                                <div class="flex items-center py-1">
+                                                    <mat-icon class="icon-size-4 mr-2 text-blue-500" [svgIcon]="'heroicons_solid:map-pin'"></mat-icon>
+                                                    <span class="text-xs truncate">{{ result.displayName }}</span>
+                                                </div>
+                                            </mat-option>
+                                        }
+                                    </mat-autocomplete>
+                                </div>
                             </div>
 
-                            <!-- SECTION 2: Location Details -->
-                            <div class="mb-5">
-                                <div class="flex items-center space-x-2 mb-3">
-                                    <div class="w-7 h-7 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-md">
-                                        <mat-icon class="icon-size-4 text-white" [svgIcon]="'heroicons_solid:map'"></mat-icon>
+                            <div class="cst-divider"></div>
+
+                            <!-- Location Details -->
+                            <div>
+                                <div class="cst-form-sec__title">{{ t('Location-Details') || 'Location Details' }}</div>
+                                <div class="cst-form-sec__sub">Positionnement géographique du point</div>
+                                <div class="cst-form-grid" style="grid-template-columns: 1fr 1fr; gap: 12px;">
+                                    <div class="cst-field">
+                                        <label>{{ t('Gouvernorat') }}</label>
+                                        <div class="cst-select">
+                                            <select formControlName="codeGouvernorat">
+                                                <option [value]="null">Aucun</option>
+                                                @for (gouvernorat of gouvernorats; track gouvernorat.gouvernoratId) {
+                                                    <option [value]="gouvernorat.codeGouvernorat">{{ gouvernorat.libelleGouvernorat }}</option>
+                                                }
+                                            </select>
+                                            <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
+                                        </div>
                                     </div>
-                                    <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wide">{{ t('Location-Details') || 'Location Details' }}</h3>
-                                </div>
-                                
-                                <div class="grid grid-cols-2 gap-3">
-                                    <mat-form-field class="w-full compact-field" appearance="outline">
-                                        <mat-label>{{ t('Gouvernorat') }}</mat-label>
-                                        <mat-select [formControlName]="'codeGouvernorat'">
-                                            <mat-option [value]="null">Aucun</mat-option>
-                                            @for (gouvernorat of gouvernorats; track gouvernorat.gouvernoratId) {
-                                                <mat-option [value]="gouvernorat.codeGouvernorat">{{ gouvernorat.libelleGouvernorat }}</mat-option>
-                                            }
-                                        </mat-select>
-                                    </mat-form-field>
-                                    
-                                    <mat-form-field class="w-full compact-field" appearance="outline">
-                                        <mat-label>{{ t('Region') }}</mat-label>
-                                        <mat-select [formControlName]="'codeRegion'">
-                                            <mat-option [value]="null">Aucune</mat-option>
-                                            @for (region of regions; track region.regionId) {
-                                                <mat-option [value]="region.codeRegion">{{ region.libelleRegion }}</mat-option>
-                                            }
-                                        </mat-select>
-                                    </mat-form-field>
+                                    <div class="cst-field">
+                                        <label>{{ t('Region') }}</label>
+                                        <div class="cst-select">
+                                            <select formControlName="codeRegion">
+                                                <option [value]="null">Aucune</option>
+                                                @for (region of regions; track region.regionId) {
+                                                    <option [value]="region.codeRegion">{{ region.libelleRegion }}</option>
+                                                }
+                                            </select>
+                                            <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <!-- Validation Warning -->
                                 @if (locationOutOfTunisia) {
-                                    <div class="mt-3 p-2 bg-red-50 dark:bg-red-900/20 rounded-lg border-l-2 border-red-500 flex items-center">
-                                        <mat-icon class="icon-size-4 mr-2 text-red-600 dark:text-red-400" [svgIcon]="'heroicons_solid:exclamation-triangle'"></mat-icon>
-                                        <span class="text-xs font-medium text-red-800 dark:text-red-200">{{ t('Location-Tunisia-Only') || 'Must be in Tunisia' }}</span>
+                                    <div class="cst-form-flash is-err flex items-center gap-2 mt-3" style="font-weight: 500;">
+                                        <mat-icon [svgIcon]="'heroicons_solid:exclamation-triangle'"></mat-icon>
+                                        <span>{{ t('Location-Tunisia-Only') || 'Must be in Tunisia' }}</span>
                                     </div>
                                 }
 
-                                <!-- Coordinates Display -->
                                 @if(pointCollecteForm.get('latitude')?.value && pointCollecteForm.get('longitude')?.value && !locationOutOfTunisia) {
-                                    <div class="mt-3 p-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border-l-2 border-blue-500 flex items-center justify-between">
+                                    <div class="mt-3 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/10 dark:to-indigo-900/10 rounded-xl border border-blue-100 flex items-center justify-between">
                                         <div class="flex items-center min-w-0">
-                                            <mat-icon class="icon-size-4 mr-2 flex-shrink-0 text-blue-600 dark:text-blue-400" [svgIcon]="'heroicons_solid:map-pin'"></mat-icon>
+                                            <mat-icon class="icon-size-5 mr-2 text-blue-500" [svgIcon]="'heroicons_solid:map-pin'"></mat-icon>
                                             <div class="min-w-0">
-                                                <p class="text-xs font-bold text-blue-900 dark:text-blue-100">{{ t('Coordinates') || 'Coordinates' }}</p>
-                                                <p class="text-xs text-blue-700 dark:text-blue-300 font-mono truncate">
+                                                <p class="text-xs font-bold text-navy">{{ t('Coordinates') || 'Coordonnées' }}</p>
+                                                <p class="text-xs text-gray-500 font-mono truncate mt-0.5">
                                                     {{ pointCollecteForm.get('latitude')?.value | number:'1.4-4' }}, {{ pointCollecteForm.get('longitude')?.value | number:'1.4-4' }}
                                                 </p>
                                             </div>
                                         </div>
-                                        <mat-icon class="icon-size-4 text-green-500 flex-shrink-0" [svgIcon]="'heroicons_solid:check-badge'"></mat-icon>
+                                        <mat-icon class="icon-size-4 text-green-500" [svgIcon]="'heroicons_solid:check-badge'"></mat-icon>
                                     </div>
                                 }
                             </div>
 
-                            <!-- SECTION 3: Status -->
-                            <div class="mb-4">
-                                <div class="flex items-center space-x-2 mb-3">
-                                    <div class="w-7 h-7 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-md">
-                                        <mat-icon class="icon-size-4 text-white" [svgIcon]="'heroicons_solid:cog-6-tooth'"></mat-icon>
-                                    </div>
-                                    <h3 class="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wide">{{ t('Status') || 'Status' }}</h3>
+                            <div class="cst-divider"></div>
+
+                            <!-- Status -->
+                            <div class="cst-form-statusrow">
+                                <div>
+                                    <div class="cst-form-sec__title" style="margin-bottom:3px">{{ t('Status') || 'Statut' }}</div>
+                                    <div class="cst-form-sec__sub" style="margin-bottom:0">Activer ou désactiver ce point de collecte</div>
                                 </div>
-                                
-                                <div class="flex items-center justify-between p-3 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                                    <div class="flex items-center">
-                                        <mat-slide-toggle
-                                            formControlName="isActive"
-                                            [color]="'primary'">
-                                        </mat-slide-toggle>
-                                        <span class="ml-2 text-sm font-semibold text-gray-900 dark:text-white">{{ t('Active') }}</span>
-                                    </div>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ t('Active-Description') || 'Enable/Disable' }}</span>
+                                <div>
+                                    <label class="cst-toggle">
+                                        <span [ngClass]="pointCollecteForm.get('isActive')?.value ? 'cst-toggle__on' : 'cst-toggle__off'">Actif</span>
+                                        <input type="checkbox" formControlName="isActive" />
+                                        <span class="cst-toggle__track"></span>
+                                    </label>
                                 </div>
                             </div>
-
-                            <!-- Hidden Fields -->
                             <input type="hidden" formControlName="societeId">
                         </div>
 
-                        <!-- Fixed Actions at Bottom -->
-                        <div class="pt-4 border-t-2 border-gray-200 dark:border-gray-700">
-                            <div class="flex items-center gap-3">
-                                <button
-                                    mat-stroked-button
-                                    type="button"
-                                    (click)="onBackdropClicked()"
-                                    class="flex-1 h-10">
-                                    <mat-icon class="icon-size-4" [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
-                                    <span class="ml-1 text-sm">{{ t('Cancel') }}</span>
-                                </button>
-                                <button
-                                    mat-flat-button
-                                    type="button"
-                                    [color]="'primary'"
-                                    [disabled]="pointCollecteForm.invalid || locationOutOfTunisia"
-                                    (click)="savePointCollecte()"
-                                    class="flex-1 h-10">
-                                    <mat-icon class="icon-size-4" [svgIcon]="'heroicons_outline:check'"></mat-icon>
-                                    <span class="ml-1 text-sm font-semibold">{{ t('Save') }}</span>
-                                </button>
-                            </div>
+                        <!-- Actions -->
+                        <div class="flex items-center gap-3">
+                            <button class="cst-btn cst-btn--ghost flex-1 justify-center" type="button" (click)="onBackdropClicked()">
+                                <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:x-mark'"></mat-icon> {{ t('Cancel') || 'Annuler' }}
+                            </button>
+                            <button class="cst-btn cst-btn--primary flex-1 justify-center" type="button" [disabled]="pointCollecteForm.invalid || locationOutOfTunisia" (click)="savePointCollecte()">
+                                <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:check'"></mat-icon> {{ t('Save') || 'Enregistrer' }}
+                            </button>
                         </div>
-
                     </form>
                 </div>
             </div>

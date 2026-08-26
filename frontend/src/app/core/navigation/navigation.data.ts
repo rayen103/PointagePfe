@@ -132,6 +132,14 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 link : '/fichier/chantier',
                 action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
             },
+            {
+                id   : 'fichier.pointage',
+                title: 'Pointage',
+                type : 'basic',
+                icon : 'mat_outline:assignment',
+                link : '/fichier/pointage',
+                action:[FuseNavigationAction.View, FuseNavigationAction.Add, FuseNavigationAction.Edit, FuseNavigationAction.Delete, FuseNavigationAction.Preview, FuseNavigationAction.Print, FuseNavigationAction.Export, FuseNavigationAction.Search, FuseNavigationAction.Duplicate]
+            },
         ]
     },
 

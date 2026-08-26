@@ -1,3 +1,6 @@
+import { PdfExportService } from '../../../../core/common/pdf-export.service';
+import { CsvExportService } from '../../../../core/common/csv-export.service';
+import { take } from 'rxjs';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { TranslocoModule } from '@ngneat/transloco';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -43,6 +46,10 @@ export class ListComponent implements OnInit, OnDestroy {
     FuseNavigationAction = FuseNavigationAction;
 
     constructor(
+        private _pdfExportService: PdfExportService,
+
+        private _csvExportService: CsvExportService,
+
         private _chantierService: ChantierService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseConfirmationService: FuseConfirmationService
@@ -79,4 +86,25 @@ export class ListComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void { this._unsubscribeAll.next(null); this._unsubscribeAll.complete(); }
+
+    exportData(): void {
+        if (this._chantierService) {
+            const obs$ = (this as any).chantiers$ || this._chantierService.chantiers$ || this._chantierService.chantiers$;
+            if (obs$) {
+                obs$.pipe(take(1)).subscribe((data: any) => {
+                    const items = Array.isArray(data) ? data : (data?.items || data?.chantiers || data?.chantiers || []);
+                    if (items && items.length > 0) {
+                        const columns = [
+            { header: 'Code Chantier', dataKey: 'codeChantier' },
+            { header: 'Libellé Chantier', dataKey: 'libelleChantier' },
+            { header: 'Code Société', dataKey: 'codeSociete' }
+        ];
+                        this._pdfExportService.exportToPdf('Rapport Chantiers', columns, items, 'Chantiers_Export.pdf');
+                    } else {
+                        console.warn('No data available to export to PDF');
+                    }
+                });
+            }
+        }
+    }
 }

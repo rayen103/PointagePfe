@@ -36,15 +36,15 @@ cd ..
 echo "Frontend started with PID: $FRONTEND_PID"
 
 echo ""
-echo "[3/3] Starting ETA Prediction ML Service (if exists)..."
-if [ -d "ml-services/eta_prediction" ]; then
-    cd ml-services/eta_prediction
-    python3 -m uvicorn main:app --host 0.0.0.0 --port 8001 --reload &
+echo "[3/3] Starting ETA Prediction ML Service..."
+if [ -d "ml-service" ]; then
+    cd ml-service
+    python3 -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload &
     ML_PID=$!
-    cd ../..
+    cd ..
     echo "ETA Prediction Service started with PID: $ML_PID"
 else
-    echo "Warning: ml-services/eta_prediction directory not found!"
+    echo "Warning: ml-service directory not found!"
 fi
 
 echo ""
@@ -52,7 +52,7 @@ echo "========================================"
 echo "All services are starting!"
 echo "- Backend: http://localhost:6064"
 echo "- Frontend: http://localhost:4200"
-echo "- ETA Prediction: http://localhost:8001"
+echo "- ETA Prediction: http://localhost:8000"
 echo ""
 echo "Press Ctrl+C to stop all services"
 echo "========================================"

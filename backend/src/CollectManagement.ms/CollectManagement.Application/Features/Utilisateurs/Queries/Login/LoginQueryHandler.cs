@@ -1,4 +1,4 @@
-﻿using CollectManagement.Application.Common;
+using CollectManagement.Application.Common;
 using CollectManagement.Application.Contracts.Authentication;
 using CollectManagement.Application.Exceptions;
 using CollectManagement.Application.Interfaces.Repositories.Chantiers;
@@ -39,10 +39,12 @@ public sealed class LoginQueryHandler
             request.SocieteId,
             cancellationToken).ConfigureAwait(false);
 
-        var hasActiveSite = await _chantierRepository.ExistsActiveByNumeroAndSocieteAsync(
-            request.NumeroChantier,
-            new SocieteId(request.SocieteId),
-            cancellationToken).ConfigureAwait(false);
+        var hasActiveSite = string.IsNullOrWhiteSpace(request.NumeroChantier) ||
+                            (utilisateur is not null &&
+                             await _chantierRepository.ExistsActiveByNumeroAndSocieteAsync(
+                                 request.NumeroChantier,
+                                 utilisateur.SocieteId,
+                                 cancellationToken).ConfigureAwait(false));
         
         var utilisateurIdForVerification = utilisateur?.UtilisateurId
                                         ?? new UtilisateurId(Ulid.Parse("00000000000000000000000000"));

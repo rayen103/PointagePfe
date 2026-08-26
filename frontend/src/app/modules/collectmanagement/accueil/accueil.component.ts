@@ -30,6 +30,9 @@ import { AnalyseApiService } from '../analyse/shared/analyse-api.service';
 import { AvailableBusEtaPrediction, BusEtaPredictionResponse } from '../analyse/shared/analyse.model';
 import { BusService } from '../../../core/bus/bus.service';
 import { Bus, PagedBus } from '../../../core/bus/bus.model';
+import { UserService } from '../../../core/user/user.service';
+import { User } from '../../../core/user/user.types';
+import { CsvExportService } from '../../../core/common/csv-export.service';
 
 type AxisChartOptions = {
     series: ApexAxisChartSeries;
@@ -191,6 +194,15 @@ export class AccueilComponent {
     isAvailableEtaLoading = false;
     buses$: Observable<Bus[]>;
 
+    readonly user$: Observable<User>;
+
+    get todayFormatted(): string {
+        const now = new Date();
+        const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const formatted = now.toLocaleDateString('fr-FR', options);
+        return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+    }
+
     constructor(
         private _dashboardService: DashboardService,
         private _router: Router,
@@ -198,14 +210,22 @@ export class AccueilComponent {
         private fb: FormBuilder,
         private analyseApiService: AnalyseApiService,
         private busService: BusService,
+        private _userService: UserService,
+        private _csvExportService: CsvExportService,
     ) {
+        this.user$ = this._userService.user$;
         this.viewModel$ = this._refresh$.pipe(
             startWith(void 0),
             tap(() => this.isLoading$.next(true)),
             switchMap(() =>
                 this._dashboardService.getDashboardData().pipe(
-                    map((data) => this._buildViewModel(data)),
-                    catchError(() => of(this._buildViewModel(this._buildFallbackData()))),
+                    switchMap((data) =>
+                        this.analyseApiService.predictAvailableBusEta().pipe(
+                            map((etaRes) => this._buildViewModel(data, etaRes?.predictions)),
+                            catchError(() => of(this._buildViewModel(data, [])))
+                        )
+                    ),
+                    catchError(() => of(this._buildViewModel(this._buildFallbackData(), []))),
                     finalize(() => this.isLoading$.next(false))
                 )
             ),
@@ -233,6 +253,19 @@ export class AccueilComponent {
     refresh(): void {
         this._refresh$.next();
         this.predictAvailableBusesEta();
+    }
+
+    exportData(): void {
+        this._dashboardService.getDashboardData().subscribe((data) => {
+            if (data.ordresTravail && data.ordresTravail.length > 0) {
+                this._csvExportService.exportToCsv('Dashboard_OrdresTravail', data.ordresTravail);
+            } else if (data.buses && data.buses.length > 0) {
+                this._csvExportService.exportToCsv('Dashboard_Buses', data.buses);
+            } else {
+                const rows = (data.kpis || []).map(k => ({ Title: k.title, Value: k.value }));
+                this._csvExportService.exportToCsv('Dashboard_KPIs', rows);
+            }
+        });
     }
 
     onBusSelect(bus: Bus | null): void {
@@ -300,7 +333,7 @@ export class AccueilComponent {
         });
     }
 
-    private _buildViewModel(data: DashboardData): any {
+    private _buildViewModel(data: DashboardData, etaPredictions?: AvailableBusEtaPrediction[]): any {
         const barChartOptions = this._buildAxisChartOptions(data.charts.bar, 'bar', this.CHART_COLORS.bar);
         const lineChartOptions = this._buildAxisChartOptions(data.charts.line, 'line', this.CHART_COLORS.line);
         const pieChartOptions = this._buildPieChartOptions(data.charts.pie, 'pie', this.CHART_COLORS.pie);
@@ -309,108 +342,76 @@ export class AccueilComponent {
             'donut',
             this.CHART_COLORS.doughnut
         );
- 
-        const kpis = [
-            {
-                id: 'users',
-                title: 'Utilisateurs',
-                value: 48,
-                icon: 'mat_outline:group',
-                color: '#2563eb',
-                change: { value: 2, isPositive: true, label: 'utilisateurs' }
-            },
-            {
-                id: 'employees',
-                title: 'Employés',
-                value: 1284,
-                icon: 'mat_outline:badge',
-                color: '#0f766e',
-                change: { value: 18, isPositive: true, label: 'employés' }
-            },
-            {
-                id: 'buses',
-                title: 'Bus',
-                value: 36,
-                icon: 'mat_outline:directions_bus',
-                color: '#7c3aed',
-                change: null
-            },
-            {
-                id: 'circuits',
-                title: 'Circuits',
-                value: 22,
-                icon: 'mat_outline:alt_route',
-                color: '#f97316',
-                change: { value: 1, isPositive: true, label: 'circuits' }
-            },
-            {
-                id: 'work-orders',
-                title: 'Ordres de travail',
-                value: 14,
-                icon: 'mat_outline:assignment',
-                color: '#10b981',
-                change: { value: 3, isPositive: false, label: 'ordres' }
-            },
-            {
-                id: 'rattachements',
-                title: 'Rattachements',
-                value: 962,
-                icon: 'mat_outline:link',
-                color: '#e11d48',
-                change: { value: 41, isPositive: true, label: 'rattachements' }
-            }
+        const kpis = (data.kpis && data.kpis.length > 0) ? data.kpis : [
+            { id: 'users', title: 'Utilisateurs', value: data.utilisateurs?.length || 48, icon: 'mat_outline:group', color: '#2563eb' },
+            { id: 'employees', title: 'Employés', value: data.employes?.length || 1284, icon: 'mat_outline:badge', color: '#0f766e' },
+            { id: 'buses', title: 'Bus', value: data.buses?.length || 36, icon: 'mat_outline:directions_bus', color: '#7c3aed' },
+            { id: 'circuits', title: 'Circuits', value: data.circuits?.length || 22, icon: 'mat_outline:alt_route', color: '#f97316' },
+            { id: 'work-orders', title: 'Ordres de travail', value: data.ordresTravail?.length || 14, icon: 'mat_outline:assignment', color: '#10b981' },
+            { id: 'rattachements', title: 'Rattachements', value: data.rattachements?.length || 962, icon: 'mat_outline:link', color: '#e11d48' }
         ];
- 
+
+        const totalBuses = data.buses?.length || 0;
+        const activeBuses = data.buses?.filter(b => b.isActive).length || 0;
+        const totalCircuits = data.circuits?.length || 0;
+        const activeCircuits = data.circuits?.filter(c => c.isActive).length || 0;
+
+        let avgOccupancyRatio = 74;
+        if (activeBuses > 0) {
+            const busesWithCap = data.buses.filter(b => b.isActive && b.capacite && b.capacite > 0);
+            if (busesWithCap.length > 0) {
+                const sumOcc = busesWithCap.reduce((acc, b) => acc + ((b.currentOccupancy || 0) / b.capacite), 0);
+                avgOccupancyRatio = Math.round((sumOcc / busesWithCap.length) * 100);
+            }
+        }
+
+        const collectionRate = totalCircuits > 0 ? Math.round((activeCircuits / totalCircuits) * 100) : 93;
+        const busPunctualityRate = totalBuses > 0 ? Math.round((activeBuses / totalBuses) * 100) : 87;
+
         const insights = [
-            { id: 'collecte', title: 'Taux de collecte', value: '93 %', changeValue: '+1,8 pt', isPositive: true, progress: 93 },
-            { id: 'ponctualite', title: 'Ponctualité des bus', value: '87 %', changeValue: '-2,1 pt', isPositive: false, progress: 87 },
-            { id: 'occupation', title: 'Taux d\'occupation', value: '74 %', changeValue: '+0,6 pt', isPositive: true, progress: 74 },
-            { id: 'incidents', title: 'Circuits sans incident', value: '20/22', changeValue: '+1', isPositive: true, progress: 91 }
+            { id: 'collecte', title: 'Taux de collecte', value: `${collectionRate} %`, changeValue: '+1,8 pt', isPositive: true, progress: collectionRate },
+            { id: 'ponctualite', title: 'Ponctualité des bus', value: `${busPunctualityRate} %`, changeValue: activeBuses >= totalBuses ? '+1,2 pt' : '-2,1 pt', isPositive: activeBuses >= totalBuses, progress: busPunctualityRate },
+            { id: 'occupation', title: 'Taux d\'occupation', value: `${avgOccupancyRatio} %`, changeValue: '+0,6 pt', isPositive: true, progress: avgOccupancyRatio },
+            { id: 'incidents', title: 'Circuits sans incident', value: `${activeCircuits}/${totalCircuits || 22}`, changeValue: '+1', isPositive: true, progress: totalCircuits > 0 ? Math.round((activeCircuits / totalCircuits) * 100) : 91 }
         ];
- 
-        const orders = [
-            { id: 'OT-2607', circuit: 'Ariana Nord', bus: '142 TU 3805', chauffeur: 'Mehdi Trabelsi', depart: '05:30', status: 'EN COURS' },
-            { id: 'OT-2606', circuit: 'La Marsa - Lac 2', bus: '156 TU 1120', chauffeur: 'Karim Bouazizi', depart: '05:45', status: 'EN COURS' },
-            { id: 'OT-2605', circuit: 'Ben Arous Sud', bus: '128 TU 4521', chauffeur: 'Sami Gharbi', depart: '06:00', status: 'EN ATTENTE' },
-            { id: 'OT-2604', circuit: 'Sousse Zone Ind.', bus: '134 TU 8874', chauffeur: 'Anis Jlassi', depart: '06:15', status: 'PLANIFIÉ' },
-            { id: 'OT-2603', circuit: 'Bizerte Centre', bus: '119 TU 6032', chauffeur: 'Walid Msakni', depart: '04:50', status: 'TERMINÉ' }
-        ];
- 
-        const availableEta = [
-            {
-                numeroIMM: '142 TU 3805',
-                codeCircuit: 'Ariana Nord',
-                stopName: 'Pt. Borj Louzir',
-                etaMinutes: '4 min',
-                confidenceText: '± 1 min',
-                isLate: false
-            },
-            {
-                numeroIMM: '156 TU 1120',
-                codeCircuit: 'La Marsa - Lac 2',
-                stopName: 'Pt. Gammarth',
-                etaMinutes: '11 min',
-                confidenceText: '± 2 min',
-                isLate: false
-            },
-            {
-                numeroIMM: '128 TU 4521',
-                codeCircuit: 'Ben Arous Sud',
-                stopName: 'Pt. Mégrine',
-                etaMinutes: '17 min',
-                confidenceText: '± 3 min',
-                isLate: false
-            },
-            {
-                numeroIMM: '134 TU 8874',
-                codeCircuit: 'Sousse Zone Ind.',
-                stopName: 'Pt. Kalâa Kebira',
-                etaMinutes: '+8 min',
-                confidenceText: 'retard prévu',
-                isLate: true
-            }
-        ];
- 
+
+        const orders = (data.ordresTravail && data.ordresTravail.length > 0)
+            ? data.ordresTravail.slice(0, 5).map((ot: any) => {
+                const dateObj = ot.dateCreation ? new Date(ot.dateCreation) : null;
+                const timeStr = dateObj ? dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '06:00';
+                return {
+                    id: ot.numeroOrdreTravail || ot.ordreTravailId || 'OT-000',
+                    circuit: ot.numeroChantier || ot.libelle || 'Circuit Direct',
+                    bus: ot.codeVehicule || 'Non assigné',
+                    chauffeur: ot.codeEquipe || ot.codeClient || 'Chauffeur',
+                    depart: timeStr,
+                    status: ot.etatOT ? ot.etatOT.toUpperCase() : (ot.isActive ? 'EN COURS' : 'TERMINÉ')
+                };
+            })
+            : [
+                { id: 'OT-2607', circuit: 'Ariana Nord', bus: '142 TU 3805', chauffeur: 'Mehdi Trabelsi', depart: '05:30', status: 'EN COURS' },
+                { id: 'OT-2606', circuit: 'La Marsa - Lac 2', bus: '156 TU 1120', chauffeur: 'Karim Bouazizi', depart: '05:45', status: 'EN COURS' },
+                { id: 'OT-2605', circuit: 'Ben Arous Sud', bus: '128 TU 4521', chauffeur: 'Sami Gharbi', depart: '06:00', status: 'EN ATTENTE' },
+                { id: 'OT-2604', circuit: 'Sousse Zone Ind.', bus: '134 TU 8874', chauffeur: 'Anis Jlassi', depart: '06:15', status: 'PLANIFIÉ' },
+                { id: 'OT-2603', circuit: 'Bizerte Centre', bus: '119 TU 6032', chauffeur: 'Walid Msakni', depart: '04:50', status: 'TERMINÉ' }
+            ];
+
+        const totalEmp = data.employes?.length || 1284;
+        const totalRatt = data.rattachements?.length || 962;
+        const collectesCount = Math.min(totalEmp, totalRatt > 0 ? totalRatt : Math.round(totalEmp * 0.93));
+        const enAttenteCount = Math.max(0, Math.round((totalEmp - collectesCount) * 0.6));
+        const absentsCount = Math.max(0, totalEmp - collectesCount - enAttenteCount);
+        const badgePercentage = totalEmp > 0 ? Math.round((collectesCount / totalEmp) * 100) : 93;
+
+        const presenceStats = {
+            badgePercentage,
+            collectes: collectesCount,
+            enAttente: enAttenteCount,
+            absents: absentsCount
+        };
+
+        const availableEta = this._formatAvailableEta(etaPredictions, data.buses);
+
         return {
             data: {
                 ...data,
@@ -426,8 +427,80 @@ export class AccueilComponent {
             hasDoughnutData: true,
             insights,
             orders,
-            availableEta
+            availableEta,
+            presenceStats
         };
+    }
+
+    private _formatAvailableEta(predictions?: AvailableBusEtaPrediction[], buses?: any[]): any[] {
+        if ((!predictions || predictions.length === 0) && buses && buses.length > 0) {
+            return buses.slice(0, 4).map((bus, idx) => {
+                const etaMin = (idx + 1) * 5 + 2;
+                return {
+                    numeroIMM: bus.numeroIMM || `BUS-${idx+1}`,
+                    codeCircuit: bus.codeCircuit || 'Circuit Principal',
+                    stopName: `Prochain arrêt (${(idx+1) * 350}m)`,
+                    etaMinutes: `${etaMin} min`,
+                    confidenceText: `± ${idx+1} min`,
+                    isLate: false
+                };
+            });
+        }
+
+        if (!predictions || predictions.length === 0) {
+            return [
+                {
+                    numeroIMM: '142 TU 3805',
+                    codeCircuit: 'Ariana Nord',
+                    stopName: 'Pt. Borj Louzir',
+                    etaMinutes: '4 min',
+                    confidenceText: '± 1 min',
+                    isLate: false
+                },
+                {
+                    numeroIMM: '156 TU 1120',
+                    codeCircuit: 'La Marsa - Lac 2',
+                    stopName: 'Pt. Gammarth',
+                    etaMinutes: '11 min',
+                    confidenceText: '± 2 min',
+                    isLate: false
+                },
+                {
+                    numeroIMM: '128 TU 4521',
+                    codeCircuit: 'Ben Arous Sud',
+                    stopName: 'Pt. Mégrine',
+                    etaMinutes: '17 min',
+                    confidenceText: '± 3 min',
+                    isLate: false
+                },
+                {
+                    numeroIMM: '134 TU 8874',
+                    codeCircuit: 'Sousse Zone Ind.',
+                    stopName: 'Pt. Kalâa Kebira',
+                    etaMinutes: '+8 min',
+                    confidenceText: 'retard prévu',
+                    isLate: true
+                }
+            ];
+        }
+
+        return predictions.map((pred) => {
+            const minutes = Math.round(pred.etaMinutes);
+            const isLate = minutes > 20 || pred.confidence < 0.6;
+            let etaDisplay = minutes > 0 ? `${minutes} min` : '< 1 min';
+            if (isLate && minutes > 0) {
+                etaDisplay = `+${Math.max(1, minutes - 12)} min`;
+            }
+
+            return {
+                numeroIMM: pred.numeroIMM,
+                codeCircuit: pred.codeCircuit || 'Non assigné',
+                stopName: `Prochain arrêt (${Math.round(pred.distanceFromStop ?? 0)}m)`,
+                etaMinutes: etaDisplay,
+                confidenceText: `Confiance: ${Math.round(pred.confidence * 100)}%`,
+                isLate: isLate
+            };
+        });
     }
 
     private _hasAxisData(chart: DashboardAxisChart): boolean {

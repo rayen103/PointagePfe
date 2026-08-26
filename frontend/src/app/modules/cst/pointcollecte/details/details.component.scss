@@ -76,9 +76,9 @@ app-details {
         line-height: 1;
     }
 
-    // Remove overflow scrolling
+    // Allow vertical scrolling when content exceeds height
     .flex-1.lg\:w-\[45\%\] {
-        overflow: hidden !important; // No scroll
+        overflow-y: auto !important;
     }
 
     // Ensure content fits

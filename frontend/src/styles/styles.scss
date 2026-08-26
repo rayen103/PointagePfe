@@ -97,6 +97,14 @@ dx-license{
 .cst-toggle__track::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(18, 18, 66, 0.25); transition: transform 0.2s ease; }
 .cst-toggle input:checked + .cst-toggle__track { background: var(--cst-ok); }
 .cst-toggle input:checked + .cst-toggle__track::after { transform: translateX(20px); }
+
+/* Multi-select checkbox grid (e.g. sites autorisés on the utilisateur form) */
+.cst-check-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px 16px; }
+/* Inline text button used under a field (e.g. cancel password change) */
+.cst-linkbtn { align-self: flex-start; margin-top: 6px; background: none; border: none; padding: 0; font-family: inherit; font-size: 12px; font-weight: 600; color: var(--cst-text-muted); cursor: pointer; &:hover { color: var(--cst-red); text-decoration: underline; } }
+/* Save-button inline spinner (shared, global fallback) */
+.cc-spin { display: inline-block; width: 14px; height: 14px; margin-right: 6px; border: 2px solid rgba(255, 255, 255, 0.5); border-top-color: #fff; border-radius: 50%; vertical-align: -2px; animation: cc-spin 0.7s linear infinite; }
+@keyframes cc-spin { to { transform: rotate(360deg); } }
 .cst-toggle__on { color: var(--cst-ok); } .cst-toggle__off { color: var(--cst-text-muted); }
 
 /* Input error state */
@@ -506,6 +514,42 @@ modern-layout {
         color: var(--cst-ok);
         background: var(--cst-ok-bg);
         border-color: #bfe8d6;
+    }
+}
+
+.cst-auth-home-btn {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    z-index: 50;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: #ffffff;
+    border: 1.5px solid var(--cst-border-strong, #d7e3ef);
+    color: var(--cst-text-2, #3d4c66);
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(18, 18, 66, 0.03);
+
+    svg {
+        width: 14px;
+        height: 14px;
+        transition: transform 0.2s ease;
+    }
+
+    &:hover {
+        border-color: var(--cst-blue);
+        color: var(--cst-blue-strong);
+        box-shadow: 0 4px 10px rgba(66, 171, 224, 0.15);
+
+        svg {
+            transform: translateX(-3px);
+        }
     }
 }
 

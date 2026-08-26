@@ -1,374 +1,216 @@
-<div class="absolute inset-0 flex flex-col min-w-0 overflow-hidden" *transloco="let t">
-
-    <!-- Header -->
-    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
-        <!-- Title -->
-        <div class="text-4xl font-extrabold tracking-tight">
-            {{isNewRattachement ? t('Add-Rattachement') : t('Edit-Rattachement')}}
+<div class="cst-form-page" *transloco="let t">
+    <form class="cst-form-wrap" [formGroup]="rattachementForm" #rattachementFormDirective="ngForm">
+        <!-- Breadcrumb -->
+        <div class="cst-crumb">
+            <a routerLink="/fichier/bus">Gestion</a><span>/</span><a (click)="onBackdropClicked()" class="cursor-pointer">Rattachements</a><span>/</span>
+            <b>{{ isNewRattachement ? t('Add-Rattachement') : t('Edit-Rattachement') }}</b>
         </div>
-        <!-- Actions -->
-        <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
-            <!-- Back button -->
-            <button
-                class="ml-4"
-                mat-flat-button
-                (click)="onBackdropClicked()">
-                <mat-icon [svgIcon]="'heroicons_outline:arrow-left'"></mat-icon>
-                <span class="ml-2">{{ t('Back') }}</span>
-            </button>
-        </div>
-    </div>
 
-    <!-- Main -->
-    <div class="flex flex-auto overflow-y-auto">
-        <div class="flex flex-col flex-auto p-6 md:p-8">
-
-            <!-- Flash message -->
-            @if(flashMessage){
-                <div class="mb-6" *transloco="let t">
-                    @if(flashMessage === 'success'){
-                        <div class="p-4 bg-green-100 dark:bg-green-800 rounded text-green-800 dark:text-green-100">
-                            {{t('Success-message')}}
-                        </div>
-                    }
-                    @if(flashMessage === 'error'){
-                        <div class="p-4 bg-red-100 dark:bg-red-800 rounded text-red-800 dark:text-red-100">
-                            {{t('Error-message')}}
-                        </div>
-                    }
+        <!-- Header line -->
+        <div class="cst-form-topline">
+            <div class="cst-form-id">
+                <a class="cst-round" (click)="onBackdropClicked()">
+                    <mat-icon [svgIcon]="'heroicons_outline:arrow-left'"></mat-icon>
+                </a>
+                <div>
+                    <div class="cst-form-id__title">
+                        <span>{{ isNewRattachement ? t('Add-Rattachement') : t('Edit-Rattachement') }}</span>
+                    </div>
                 </div>
-            }
+            </div>
+            <div class="cst-head__actions">
+                <button class="cst-btn cst-btn--ghost" type="button" (click)="onBackdropClicked()">{{ t('Cancel') || 'Annuler' }}</button>
+                <button class="cst-btn cst-btn--primary" type="button" [disabled]="rattachementForm.invalid" (click)="saveRattachement()">{{ t('Save') || 'Enregistrer' }}</button>
+            </div>
+        </div>
 
-            <!-- Form -->
-            <form
-                class="flex flex-col"
-                [formGroup]="rattachementForm"
-                #rattachementFormDirective="ngForm">
+        @if (flashMessage) {
+            <div class="cst-form-flash" [class.is-ok]="flashMessage === 'success'" [class.is-err]="flashMessage === 'error'">
+                {{ flashMessage === 'success' ? t('Success-message') : t('Error-message') }}
+            </div>
+        }
 
-                <!-- Basic Information Section -->
-                <mat-expansion-panel class="mb-6" [expanded]="true">
-                    <mat-expansion-panel-header>
-                        <mat-panel-title>
-                            <mat-icon class="mr-2" [svgIcon]="'heroicons_outline:information-circle'"></mat-icon>
-                            {{ t('Basic-Information') }}
-                        </mat-panel-title>
-                    </mat-expansion-panel-header>
+        <div class="cst-form-card">
+            <!-- Section 1: Basic Information -->
+            <div>
+                <div class="cst-form-sec__title">{{ t('Basic-Information') || 'Basic Information' }}</div>
+                <div class="cst-form-sec__sub">Renseigner les informations générales du rattachement</div>
+                <div class="cst-form-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                    <!-- Numero Rattachement -->
+                    <div class="cst-field">
+                        <label>{{ t('Numero-Rattachement') }} <span style="color:var(--cst-red)">*</span></label>
+                        <input class="cst-input" [class.is-err]="rattachementForm.get('numeroRattachement')?.invalid && (rattachementForm.get('numeroRattachement')?.touched || rattachementFormDirective.submitted)"
+                               formControlName="numeroRattachement" [placeholder]="t('Enter-numero-rattachement')" />
+                        @if(rattachementForm.get('numeroRattachement').hasError('required') && (rattachementForm.get('numeroRattachement')?.touched || rattachementFormDirective.submitted)){
+                            <div class="cst-field__err">
+                                <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                {{ t('Numero-required') }}
+                            </div>
+                        }
+                    </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-4">
-                        <!-- Numero Rattachement -->
-                        <mat-form-field class="w-full">
-                            <mat-label>{{ t('Numero-Rattachement') }}</mat-label>
-                            <mat-icon
-                                class="icon-size-5"
-                                matPrefix
-                                [svgIcon]="'heroicons_solid:identification'"></mat-icon>
-                            <input
-                                matInput
-                                formControlName="numeroRattachement"
-                                [placeholder]="t('Enter-numero-rattachement')">
-                            @if(rattachementForm.get('numeroRattachement').hasError('required')){
-                                <mat-error>{{ t('Numero-required') }}</mat-error>
-                            }
-                        </mat-form-field>
+                    <!-- Exercice -->
+                    <div class="cst-field">
+                        <label>{{ t('Exercice') }}</label>
+                        <input class="cst-input" formControlName="exercice" [placeholder]="t('Enter-exercice')" />
+                    </div>
 
-                        <!-- Exercice -->
-                        <mat-form-field class="w-full">
-                            <mat-label>{{ t('Exercice') }}</mat-label>
-                            <mat-icon
-                                class="icon-size-5"
-                                matPrefix
-                                [svgIcon]="'heroicons_solid:calendar'"></mat-icon>
-                            <input
-                                matInput
-                                formControlName="exercice"
-                                [placeholder]="t('Enter-exercice')">
-                        </mat-form-field>
+                    <!-- Status -->
+                    <div class="cst-field">
+                        <label>{{ t('Status-Field') }}</label>
+                        <input class="cst-input" formControlName="status" [placeholder]="t('Enter-status')" />
+                    </div>
 
-                        <!-- Date Rattachement -->
-                        <mat-form-field class="w-full">
-                            <mat-label>{{ t('Date-Rattachement') }}</mat-label>
-                            <mat-icon
-                                class="icon-size-5"
-                                matPrefix
-                                [svgIcon]="'heroicons_solid:calendar-days'"></mat-icon>
-                            <input
-                                matInput
-                                [matDatepicker]="dateRattachementPicker"
-                                formControlName="dateRattachement"
-                                [placeholder]="t('Select-date')">
+                    <!-- Reference -->
+                    <div class="cst-field">
+                        <label>{{ t('Reference') }}</label>
+                        <input class="cst-input" formControlName="reference" [placeholder]="t('Enter-reference')" />
+                    </div>
+
+                    <!-- Date Rattachement -->
+                    <div class="cst-field">
+                        <label>{{ t('Date-Rattachement') }} <span style="color:var(--cst-red)">*</span></label>
+                        <div class="cst-input--group cst-input">
+                            <input [matDatepicker]="dateRattachementPicker" formControlName="dateRattachement" [placeholder]="t('Select-date')" />
                             <mat-datepicker-toggle matSuffix [for]="dateRattachementPicker"></mat-datepicker-toggle>
                             <mat-datepicker #dateRattachementPicker></mat-datepicker>
-                            @if(rattachementForm.get('dateRattachement').hasError('required')){
-                                <mat-error>{{ t('Date-required') }}</mat-error>
-                            }
-                        </mat-form-field>
+                        </div>
+                        @if(rattachementForm.get('dateRattachement').hasError('required') && (rattachementForm.get('dateRattachement')?.touched || rattachementFormDirective.submitted)){
+                            <div class="cst-field__err">
+                                <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                {{ t('Date-required') }}
+                            </div>
+                        }
+                    </div>
 
-                        <!-- Date Cloture -->
-                        <mat-form-field class="w-full">
-                            <mat-label>{{ t('Date-Cloture') }}</mat-label>
-                            <mat-icon
-                                class="icon-size-5"
-                                matPrefix
-                                [svgIcon]="'heroicons_solid:calendar-days'"></mat-icon>
-                            <input
-                                matInput
-                                [matDatepicker]="dateCloturePicker"
-                                formControlName="dateCloture"
-                                [placeholder]="t('Select-date')">
+                    <!-- Date Cloture -->
+                    <div class="cst-field">
+                        <label>{{ t('Date-Cloture') }}</label>
+                        <div class="cst-input--group cst-input">
+                            <input [matDatepicker]="dateCloturePicker" formControlName="dateCloture" [placeholder]="t('Select-date')" />
                             <mat-datepicker-toggle matSuffix [for]="dateCloturePicker"></mat-datepicker-toggle>
                             <mat-datepicker #dateCloturePicker></mat-datepicker>
-                        </mat-form-field>
-
-                        <!-- Status -->
-                        <mat-form-field class="w-full">
-                            <mat-label>{{ t('Status-Field') }}</mat-label>
-                            <mat-icon
-                                class="icon-size-5"
-                                matPrefix
-                                [svgIcon]="'heroicons_solid:tag'"></mat-icon>
-                            <input
-                                matInput
-                                formControlName="status"
-                                [placeholder]="t('Enter-status')">
-                        </mat-form-field>
-
-                        <!-- Reference -->
-                        <mat-form-field class="w-full">
-                            <mat-label>{{ t('Reference') }}</mat-label>
-                            <mat-icon
-                                class="icon-size-5"
-                                matPrefix
-                                [svgIcon]="'heroicons_solid:hashtag'"></mat-icon>
-                            <input
-                                matInput
-                                formControlName="reference"
-                                [placeholder]="t('Enter-reference')">
-                        </mat-form-field>
-                    </div>
-                </mat-expansion-panel>
-
-                <!-- Project Information Section -->
-                <mat-expansion-panel class="mb-6">
-                    <mat-expansion-panel-header>
-                        <mat-panel-title>
-                            <mat-icon class="mr-2" [svgIcon]="'heroicons_outline:building-office'"></mat-icon>
-                            {{ t('Project-Information') }}
-                        </mat-panel-title>
-                    </mat-expansion-panel-header>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-4">
-                        <!-- Numero Chantier -->
-                        <mat-form-field class="w-full">
-                            <mat-label>{{ t('Numero-Chantier') }}</mat-label>
-                            <mat-icon
-                                class="icon-size-5"
-                                matPrefix
-                                [svgIcon]="'heroicons_solid:building-office-2'"></mat-icon>
-                            <input
-                                matInput
-                                formControlName="numeroChantier"
-                                [placeholder]="t('Enter-numero-chantier')">
-                        </mat-form-field>
-
-                        <!-- Code Client -->
-                        <mat-form-field class="w-full">
-                            <mat-label>{{ t('Code-Client') }}</mat-label>
-                            <mat-icon
-                                class="icon-size-5"
-                                matPrefix
-                                [svgIcon]="'heroicons_solid:user-group'"></mat-icon>
-                            <input
-                                matInput
-                                formControlName="codeClient"
-                                [placeholder]="t('Enter-code-client')">
-                        </mat-form-field>
-
-                        <!-- Type -->
-                        <mat-form-field class="w-full">
-                            <mat-label>{{ t('Type') }}</mat-label>
-                            <mat-icon
-                                class="icon-size-5"
-                                matPrefix
-                                [svgIcon]="'heroicons_solid:squares-2x2'"></mat-icon>
-                            <input
-                                matInput
-                                formControlName="type"
-                                [placeholder]="t('Enter-type')">
-                        </mat-form-field>
-
-                        <!-- Nature -->
-                        <mat-form-field class="w-full">
-                            <mat-label>{{ t('Nature') }}</mat-label>
-                            <mat-icon
-                                class="icon-size-5"
-                                matPrefix
-                                [svgIcon]="'heroicons_solid:document-text'"></mat-icon>
-                            <input
-                                matInput
-                                formControlName="nature"
-                                [placeholder]="t('Enter-nature')">
-                        </mat-form-field>
-
-                        <!-- Emplacement -->
-                        <mat-form-field class="w-full">
-                            <mat-label>{{ t('Emplacement') }}</mat-label>
-                            <mat-icon
-                                class="icon-size-5"
-                                matPrefix
-                                [svgIcon]="'heroicons_solid:map-pin'"></mat-icon>
-                            <input
-                                matInput
-                                formControlName="emplacement"
-                                [placeholder]="t('Enter-emplacement')">
-                        </mat-form-field>
-
-                        <!-- Responsable -->
-                        <mat-form-field class="w-full">
-                            <mat-label>{{ t('Responsable') }}</mat-label>
-                            <mat-icon
-                                class="icon-size-5"
-                                matPrefix
-                                [svgIcon]="'heroicons_solid:user'"></mat-icon>
-                            <input
-                                matInput
-                                formControlName="responsable"
-                                [placeholder]="t('Enter-responsable')">
-                        </mat-form-field>
-                    </div>
-                </mat-expansion-panel>
-
-                <!-- Time & Cost Section -->
-                <mat-expansion-panel class="mb-6">
-                    <mat-expansion-panel-header>
-                        <mat-panel-title>
-                            <mat-icon class="mr-2" [svgIcon]="'heroicons_outline:clock'"></mat-icon>
-                            {{ t('Time-Cost-Information') }}
-                        </mat-panel-title>
-                    </mat-expansion-panel-header>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 p-4">
-                        <!-- Heure Debut -->
-                        <mat-form-field class="w-full">
-                            <mat-label>{{ t('Heure-Debut') }}</mat-label>
-                            <input
-                                matInput
-                                [ngxMatTimepicker]="heureDebutPicker"
-                                formControlName="heureDebut"
-                                [format]="24"
-                                [placeholder]="t('Enter-heure-debut')"
-                                readonly>
-                            <mat-icon
-                                class="icon-size-5 cursor-pointer"
-                                matSuffix
-                                (click)="heureDebutPicker.open()">schedule</mat-icon>
-                            <ngx-mat-timepicker #heureDebutPicker></ngx-mat-timepicker>
-                        </mat-form-field>
-
-                        <!-- Heure Fin -->
-                        <mat-form-field class="w-full">
-                            <mat-label>{{ t('Heure-Fin') }}</mat-label>
-                            <input
-                                matInput
-                                [ngxMatTimepicker]="heureFinPicker"
-                                formControlName="heureFin"
-                                [format]="24"
-                                [placeholder]="t('Enter-heure-fin')"
-                                readonly>
-                            <mat-icon
-                                class="icon-size-5 cursor-pointer"
-                                matSuffix
-                                (click)="heureFinPicker.open()">schedule</mat-icon>
-                            <ngx-mat-timepicker #heureFinPicker></ngx-mat-timepicker>
-                        </mat-form-field>
-
-                        <!-- Cout -->
-                        <mat-form-field class="w-full">
-                            <mat-label>{{ t('Cout') }}</mat-label>
-                            <mat-icon
-                                class="icon-size-5"
-                                matPrefix
-                                [svgIcon]="'heroicons_solid:currency-dollar'"></mat-icon>
-                            <input
-                                matInput
-                                type="number"
-                                step="0.01"
-                                formControlName="cout"
-                                [placeholder]="t('Enter-cout')">
-                        </mat-form-field>
-                    </div>
-                </mat-expansion-panel>
-
-                <!-- Additional Information Section -->
-                <mat-expansion-panel class="mb-6">
-                    <mat-expansion-panel-header>
-                        <mat-panel-title>
-                            <mat-icon class="mr-2" [svgIcon]="'heroicons_outline:document-text'"></mat-icon>
-                            {{ t('Additional-Information') }}
-                        </mat-panel-title>
-                    </mat-expansion-panel-header>
-
-                    <div class="grid grid-cols-1 gap-6 p-4">
-                        <!-- Remarque -->
-                        <mat-form-field class="w-full">
-                            <mat-label>{{ t('Remarque') }}</mat-label>
-                            <mat-icon
-                                class="icon-size-5"
-                                matPrefix
-                                [svgIcon]="'heroicons_solid:chat-bubble-left-ellipsis'"></mat-icon>
-                            <textarea
-                                matInput
-                                formControlName="remarque"
-                                rows="4"
-                                [placeholder]="t('Enter-remarque')"></textarea>
-                        </mat-form-field>
-
-                        <!-- Societe ID (hidden, populated from user context) -->
-                        <input type="hidden" formControlName="societeId">
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <!-- Is Internal -->
-                            <div class="flex items-center">
-                                <mat-slide-toggle
-                                    formControlName="isInternal"
-                                    [color]="'primary'">
-                                    {{ t('Internal') }}
-                                </mat-slide-toggle>
-                            </div>
-
-                            <!-- Is Active -->
-                            <div class="flex items-center">
-                                <mat-slide-toggle
-                                    formControlName="isActive"
-                                    [color]="'primary'">
-                                    {{ t('Active') }}
-                                </mat-slide-toggle>
-                            </div>
                         </div>
                     </div>
-                </mat-expansion-panel>
-
-                <!-- Actions -->
-                <div class="flex items-center justify-end mt-6 gap-4">
-                    <button
-                        mat-button
-                        type="button"
-                        (click)="onBackdropClicked()">
-                        {{ t('Cancel') }}
-                    </button>
-                    <button
-                        mat-flat-button
-                        type="button"
-                        [color]="'primary'"
-                        [disabled]="rattachementForm.invalid"
-                        (click)="saveRattachement()">
-                        <mat-icon [svgIcon]="'heroicons_outline:check'"></mat-icon>
-                        <span class="ml-2">{{ t('Save') }}</span>
-                    </button>
                 </div>
+            </div>
 
-            </form>
+            <div class="cst-divider"></div>
 
+            <!-- Section 2: Project Information -->
+            <div>
+                <div class="cst-form-sec__title">{{ t('Project-Information') || 'Project Information' }}</div>
+                <div class="cst-form-sec__sub">Détails et localisation du chantier rattaché</div>
+                <div class="cst-form-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                    <!-- Numero Chantier -->
+                    <div class="cst-field">
+                        <label>{{ t('Numero-Chantier') }}</label>
+                        <input class="cst-input" formControlName="numeroChantier" [placeholder]="t('Enter-numero-chantier')" />
+                    </div>
+
+                    <!-- Code Client -->
+                    <div class="cst-field">
+                        <label>{{ t('Code-Client') }}</label>
+                        <input class="cst-input" formControlName="codeClient" [placeholder]="t('Enter-code-client')" />
+                    </div>
+
+                    <!-- Type -->
+                    <div class="cst-field">
+                        <label>{{ t('Type') }}</label>
+                        <input class="cst-input" formControlName="type" [placeholder]="t('Enter-type')" />
+                    </div>
+
+                    <!-- Nature -->
+                    <div class="cst-field">
+                        <label>{{ t('Nature') }}</label>
+                        <input class="cst-input" formControlName="nature" [placeholder]="t('Enter-nature')" />
+                    </div>
+
+                    <!-- Emplacement -->
+                    <div class="cst-field">
+                        <label>{{ t('Emplacement') }}</label>
+                        <input class="cst-input" formControlName="emplacement" [placeholder]="t('Enter-emplacement')" />
+                    </div>
+
+                    <!-- Responsable -->
+                    <div class="cst-field">
+                        <label>{{ t('Responsable') }}</label>
+                        <input class="cst-input" formControlName="responsable" [placeholder]="t('Enter-responsable')" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="cst-divider"></div>
+
+            <!-- Section 3: Time & Cost Information -->
+            <div>
+                <div class="cst-form-sec__title">{{ t('Time-Cost-Information') || 'Time & Cost Information' }}</div>
+                <div class="cst-form-sec__sub">Horaires de début/fin et coûts associés</div>
+                <div class="cst-form-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                    <!-- Heure Debut -->
+                    <div class="cst-field">
+                        <label>{{ t('Heure-Debut') }}</label>
+                        <div class="cst-input--group cst-input">
+                            <input [ngxMatTimepicker]="heureDebutPicker" formControlName="heureDebut" [format]="24" [placeholder]="t('Enter-heure-debut')" readonly />
+                            <button type="button" class="cst-input__eye" (click)="heureDebutPicker.open()">
+                                <mat-icon style="width:16px;height:16px;" [svgIcon]="'heroicons_solid:clock'"></mat-icon>
+                            </button>
+                            <ngx-mat-timepicker #heureDebutPicker></ngx-mat-timepicker>
+                        </div>
+                    </div>
+
+                    <!-- Heure Fin -->
+                    <div class="cst-field">
+                        <label>{{ t('Heure-Fin') }}</label>
+                        <div class="cst-input--group cst-input">
+                            <input [ngxMatTimepicker]="heureFinPicker" formControlName="heureFin" [format]="24" [placeholder]="t('Enter-heure-fin')" readonly />
+                            <button type="button" class="cst-input__eye" (click)="heureFinPicker.open()">
+                                <mat-icon style="width:16px;height:16px;" [svgIcon]="'heroicons_solid:clock'"></mat-icon>
+                            </button>
+                            <ngx-mat-timepicker #heureFinPicker></ngx-mat-timepicker>
+                        </div>
+                    </div>
+
+                    <!-- Cout -->
+                    <div class="cst-field">
+                        <label>{{ t('Cout') }}</label>
+                        <input class="cst-input" type="number" step="0.01" formControlName="cout" [placeholder]="t('Enter-cout')" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="cst-divider"></div>
+
+            <!-- Section 4: Remarks & Settings -->
+            <div>
+                <div class="cst-form-sec__title">{{ t('Additional-Information') || 'Additional Information' }}</div>
+                <div class="cst-form-sec__sub">Commentaires et statuts d'activité</div>
+                <div class="cst-field mt-3">
+                    <label>{{ t('Remarque') }}</label>
+                    <textarea class="cst-input" formControlName="remarque" rows="3" [placeholder]="t('Enter-remarque')"></textarea>
+                </div>
+                
+                <div class="cst-form-grid mt-4" style="grid-template-columns: 1fr 1fr;">
+                    <!-- Is Internal -->
+                    <div class="flex items-center">
+                        <label class="cst-toggle">
+                            <span [ngClass]="rattachementForm.get('isInternal')?.value ? 'cst-toggle__on' : 'cst-toggle__off'">Interne</span>
+                            <input type="checkbox" formControlName="isInternal" />
+                            <span class="cst-toggle__track"></span>
+                        </label>
+                    </div>
+
+                    <!-- Is Active -->
+                    <div class="flex items-center">
+                        <label class="cst-toggle">
+                            <span [ngClass]="rattachementForm.get('isActive')?.value ? 'cst-toggle__on' : 'cst-toggle__off'">Actif</span>
+                            <input type="checkbox" formControlName="isActive" />
+                            <span class="cst-toggle__track"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" formControlName="societeId">
         </div>
-    </div>
-
+    </form>
 </div>
