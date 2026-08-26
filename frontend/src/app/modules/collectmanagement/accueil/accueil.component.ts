@@ -433,7 +433,31 @@ export class AccueilComponent {
     }
 
     private _formatAvailableEta(predictions?: AvailableBusEtaPrediction[], buses?: any[]): any[] {
-        if ((!predictions || predictions.length === 0) && buses && buses.length > 0) {
+        if (predictions && predictions.length > 0) {
+            return predictions.map((pred, idx) => {
+                const minutes = Math.round(pred.etaMinutes);
+                const isLate = minutes > 20 || pred.confidence < 0.6;
+                let etaDisplay = minutes > 0 ? `${minutes} min` : '< 1 min';
+                let confidenceText = `± ${Math.max(1, Math.round((1 - (pred.confidence || 0.9)) * 5))} min`;
+                if (isLate && minutes > 0) {
+                    etaDisplay = `+${Math.max(1, minutes - 12)} min`;
+                    confidenceText = `retard prévu`;
+                }
+
+                const stop = pred.stopName || `Prochain arrêt (${Math.round(pred.distanceFromStop ?? 350)}m)`;
+
+                return {
+                    numeroIMM: pred.numeroIMM,
+                    codeCircuit: pred.codeCircuit || 'Circuit Principal',
+                    stopName: stop,
+                    etaMinutes: etaDisplay,
+                    confidenceText: confidenceText,
+                    isLate: isLate
+                };
+            });
+        }
+
+        if (buses && buses.length > 0) {
             return buses.slice(0, 4).map((bus, idx) => {
                 const etaMin = (idx + 1) * 5 + 2;
                 return {
@@ -441,66 +465,13 @@ export class AccueilComponent {
                     codeCircuit: bus.codeCircuit || 'Circuit Principal',
                     stopName: `Prochain arrêt (${(idx+1) * 350}m)`,
                     etaMinutes: `${etaMin} min`,
-                    confidenceText: `± ${idx+1} min`,
+                    confidenceText: `± 1 min`,
                     isLate: false
                 };
             });
         }
 
-        if (!predictions || predictions.length === 0) {
-            return [
-                {
-                    numeroIMM: '142 TU 3805',
-                    codeCircuit: 'Ariana Nord',
-                    stopName: 'Pt. Borj Louzir',
-                    etaMinutes: '4 min',
-                    confidenceText: '± 1 min',
-                    isLate: false
-                },
-                {
-                    numeroIMM: '156 TU 1120',
-                    codeCircuit: 'La Marsa - Lac 2',
-                    stopName: 'Pt. Gammarth',
-                    etaMinutes: '11 min',
-                    confidenceText: '± 2 min',
-                    isLate: false
-                },
-                {
-                    numeroIMM: '128 TU 4521',
-                    codeCircuit: 'Ben Arous Sud',
-                    stopName: 'Pt. Mégrine',
-                    etaMinutes: '17 min',
-                    confidenceText: '± 3 min',
-                    isLate: false
-                },
-                {
-                    numeroIMM: '134 TU 8874',
-                    codeCircuit: 'Sousse Zone Ind.',
-                    stopName: 'Pt. Kalâa Kebira',
-                    etaMinutes: '+8 min',
-                    confidenceText: 'retard prévu',
-                    isLate: true
-                }
-            ];
-        }
-
-        return predictions.map((pred) => {
-            const minutes = Math.round(pred.etaMinutes);
-            const isLate = minutes > 20 || pred.confidence < 0.6;
-            let etaDisplay = minutes > 0 ? `${minutes} min` : '< 1 min';
-            if (isLate && minutes > 0) {
-                etaDisplay = `+${Math.max(1, minutes - 12)} min`;
-            }
-
-            return {
-                numeroIMM: pred.numeroIMM,
-                codeCircuit: pred.codeCircuit || 'Non assigné',
-                stopName: `Prochain arrêt (${Math.round(pred.distanceFromStop ?? 0)}m)`,
-                etaMinutes: etaDisplay,
-                confidenceText: `Confiance: ${Math.round(pred.confidence * 100)}%`,
-                isLate: isLate
-            };
-        });
+        return [];
     }
 
     private _hasAxisData(chart: DashboardAxisChart): boolean {

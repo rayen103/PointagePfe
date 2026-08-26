@@ -127,7 +127,8 @@ public sealed record AvailableBusEtaPredictionDto(
     string? CodeCircuit,
     double DistanceFromStop,
     double EtaMinutes,
-    double Confidence);
+    double Confidence,
+    string? StopName = null);
 
 public sealed record AvailableBusEtaPredictionResponse(
     IReadOnlyList<AvailableBusEtaPredictionDto> Predictions);

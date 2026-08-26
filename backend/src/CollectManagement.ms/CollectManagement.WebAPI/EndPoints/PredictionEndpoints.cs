@@ -211,13 +211,15 @@ public sealed class PredictionEndpoints : ICarterModule
                 "Bus {NumeroIMM} prediction: EtaMinutes={EtaMinutes}, EtaSeconds={EtaSeconds}, Confidence={Confidence}",
                 bus.NumeroIMM, prediction.EtaMinutes, prediction.EtaSeconds, prediction.Confidence);
 
+            var stopName = ResolveDestinationPointName(circuit, circuitPoints);
             return new AvailableBusEtaPredictionDto(
                 bus.BusId.Value.ToString(),
                 bus.NumeroIMM,
                 bus.CodeCircuit,
                 Math.Round(distanceFromStop, 2),
                 prediction.EtaMinutes,
-                prediction.Confidence);
+                prediction.Confidence,
+                stopName);
         });
 
         var predictions = await Task.WhenAll(predictionTasks).ConfigureAwait(false);
@@ -363,6 +365,48 @@ public sealed class PredictionEndpoints : ICarterModule
                 Math.Pow(Math.Sin(dLon / 2), 2);
         var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
         return earthRadiusMeters * c;
+    }
+
+    private static string ResolveDestinationPointName(
+        Circuit? circuit,
+        IReadOnlyList<CircuitPointCollecte>? circuitPoints)
+    {
+        if (circuitPoints is { Count: > 0 })
+        {
+            CircuitPointCollecte? destination = null;
+            if (!string.IsNullOrWhiteSpace(circuit?.CodePCArrivee))
+            {
+                var codePCArriveeTrimmed = circuit.CodePCArrivee.Trim();
+                destination = circuitPoints.FirstOrDefault(x =>
+                    string.Equals(x.CodePointCollecte.Trim(), codePCArriveeTrimmed, StringComparison.OrdinalIgnoreCase));
+            }
+
+            destination ??= circuitPoints
+                .OrderByDescending(x => x.Ordre ?? int.MinValue)
+                .FirstOrDefault();
+
+            if (destination is not null)
+            {
+                var name = !string.IsNullOrWhiteSpace(destination.LibellePointCollecte)
+                    ? destination.LibellePointCollecte.Trim()
+                    : destination.CodePointCollecte.Trim();
+                return name.StartsWith("Pt.", StringComparison.OrdinalIgnoreCase) ? name : $"Pt. {name}";
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(circuit?.CodePCArrivee))
+        {
+            var code = circuit.CodePCArrivee.Trim();
+            return code.StartsWith("Pt.", StringComparison.OrdinalIgnoreCase) ? code : $"Pt. {code}";
+        }
+
+        if (!string.IsNullOrWhiteSpace(circuit?.LibelleCircuit))
+        {
+            var lib = circuit.LibelleCircuit.Trim();
+            return lib.StartsWith("Pt.", StringComparison.OrdinalIgnoreCase) ? lib : $"Pt. {lib}";
+        }
+
+        return "Pt. Terminus";
     }
 
     private static double DegreesToRadians(double value)
