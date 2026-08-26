@@ -16,6 +16,7 @@
                 <div class="cst-greet__title">Bonjour, {{ (user$ | async)?.prenom || (user$ | async)?.name || (user$ | async)?.nomUtilisateur || 'Utilisateur' }}&nbsp;👋</div>
                 <div class="cst-greet__sub">{{ todayFormatted }} · {{ vm.data.buses?.length || 28 }} bus en circulation</div>
             </div>
+            <div class="cst-greet__actions">
                 <a class="cst-btn cst-btn--ghost" [routerLink]="['/home']">
                     <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:home'"></mat-icon>
                     Retour au site
