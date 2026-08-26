@@ -312,17 +312,17 @@ public class AuthenticationEndpoints : ICarterModule
 
         if (utilisateur is null)
         {
-            return Results.Ok(new ApiResponse<object>(new { success = false, message = "Utilisateur non trouvé." }));
+            return Results.Ok(new ApiResponse<VerifyEmailResponse>("Utilisateur non trouvé.", false, 400));
         }
 
         if (!utilisateur.IsActive)
         {
-            return Results.Ok(new ApiResponse<object>(new { success = false, message = "Votre compte n'a pas encore été activé par l'administrateur." }));
+            return Results.Ok(new ApiResponse<VerifyEmailResponse>("Votre compte n'a pas encore été activé par l'administrateur.", false, 400));
         }
 
         if (string.IsNullOrEmpty(utilisateur.VerificationCode) || utilisateur.VerificationCode != request.Code)
         {
-            return Results.Ok(new ApiResponse<object>(new { success = false, message = "Code de vérification incorrect." }));
+            return Results.Ok(new ApiResponse<VerifyEmailResponse>("Code de vérification incorrect.", false, 400));
         }
 
         // Code matches and account is active!
@@ -368,12 +368,12 @@ public class AuthenticationEndpoints : ICarterModule
 
         if (utilisateur is null)
         {
-            return Results.Ok(new ApiResponse<object>(new { success = false, message = "Utilisateur non trouvé." }));
+            return Results.Ok(new ApiResponse<object>("Utilisateur non trouvé.", false, 400));
         }
 
         if (!utilisateur.IsActive)
         {
-            return Results.Ok(new ApiResponse<object>(new { success = false, message = "Votre demande d'inscription est toujours en attente d'approbation." }));
+            return Results.Ok(new ApiResponse<object>("Votre demande d'inscription est toujours en attente d'approbation.", false, 400));
         }
 
         // Generate new 6-digit code
