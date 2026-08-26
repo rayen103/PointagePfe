@@ -159,6 +159,9 @@ public class BusEndpoints : ICarterModule
             request.Latitude,
             request.Longitude,
             request.Occupancy,
+            request.TimestampUtc,
+            request.BatteryPercentage,
+            request.BatteryVoltage,
             occurredAtUtc);
 
         await busRepository
@@ -519,7 +522,9 @@ public class BusEndpoints : ICarterModule
         double? Longitude,
         int? Occupancy,
         DateTime? TimestampUtc,
-        string? RFIDChauffeur);
+        string? RFIDChauffeur,
+        int? BatteryPercentage = null,
+        double? BatteryVoltage = null);
 
     public record BusRuntimeStateDto(
         Ulid BusId,
