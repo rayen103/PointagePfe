@@ -144,13 +144,23 @@ public class AuthenticationEndpoints : ICarterModule
         await societeRepository.AddAsync(societe, cancellationToken).ConfigureAwait(false);
 
         // 2. Create inactive Utilisateur
+        var emailPrefix = request.Email.Split('@')[0].Replace(" ", "").ToLower();
+        var nomUtilisateur = emailPrefix.Length > 20 ? emailPrefix.Substring(0, 20) : emailPrefix;
+
+        var existingUser = await utilisateurRepository.GetAsync(u => u.NomUtilisateur == nomUtilisateur, cancellationToken).ConfigureAwait(false);
+        if (existingUser is not null)
+        {
+            var suffix = Random.Shared.Next(10, 99).ToString();
+            nomUtilisateur = nomUtilisateur.Length > 18 ? nomUtilisateur.Substring(0, 18) + suffix : nomUtilisateur + suffix;
+        }
+
         var utilisateurId = new UtilisateurId(Ulid.NewUlid());
         var approvalToken = Guid.NewGuid().ToString("N");
         var hashedPassword = passwordService.HashPassword(utilisateurId, request.Password);
 
         var utilisateur = Utilisateur.Create(
             utilisateurId: utilisateurId,
-            nomUtilisateur: request.Email,
+            nomUtilisateur: nomUtilisateur,
             nom: request.Nom,
             prenom: request.Prenom,
             email: request.Email,
