@@ -61,4 +61,4 @@ flowchart TB
     AppTier -->|"Executes Use Cases On"| DomainTier
     AppTier -.->|"Implements Contracts Via"| InfraTier
     InfraTier -->|"Persistence Mapping"| DomainTier
-    InfraTier -->|"HTTP RPC (Port 8001)"| MLTier
+    InfraTier -->|"Prediction Request"| MLTier

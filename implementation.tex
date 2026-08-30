@@ -186,21 +186,13 @@ The **Bus Tracking Board** (\texttt{frontend/src/app/modules/collectmanagement/m
 \end{itemize}
 
 \subsubsection{FastAPI Machine Learning Inference Execution}
-In \texttt{PredictionEndpoints.cs}, backend requests trigger predictions via the Python FastAPI microservice:
-\begin{verbatim}
-// Backend API invocation of FastAPI ML engine
-var prediction = await externalPredictionService
-    .PredictBusEtaAsync(request, cancellationToken);
-\end{verbatim}
+The FastAPI microservice provides a focused inference boundary between the application backend and the trained ETA model. At startup, it loads the model and its associated scaler once into memory, while its health endpoint exposes artifact readiness so that deployment monitoring can distinguish a running service from one that is ready to generate estimates.
 
-The Python FastAPI microservice (\texttt{ml-service/main.py}) processes the input feature vector:
-\begin{verbatim}
-BASE_FEATURE_NAMES = [
-    "DistanceToNextStop", "log_distance", "distance_over_300",
-    "hour", "hour_sin", "hour_cos", "is_rush_hour", "day_of_week",
-    "occupancy_ratio", "route_encoded", "model_encoded"
-]
-\end{verbatim}
+For each prediction request, FastAPI interprets and normalizes the incoming payload. The service supports both the established feature-based contract and the operational telemetry contract used by the platform. When telemetry is supplied, it derives the model inputs from the remaining distance, route and vehicle characteristics, current occupancy, and the timestamp of the last recorded position. This keeps feature preparation centralized and gives the backend a stable prediction interface as data collection evolves.
+
+Before inference, the service selects an input order compatible with the loaded scaler, allowing the deployed endpoint to remain compatible with supported legacy and extended model artifacts. It applies the required transformations, executes the model, and then converts the result into a consistent ETA response. Invalid negative estimates are constrained to a usable value, and the response includes both minutes and seconds, a confidence indicator, and an explicit flag showing whether a fallback stop distance was used.
+
+Unexpected feature-processing or model-execution failures are returned as service errors, enabling the backend resilience policy to apply its deterministic fallback without blocking the fleet-tracking experience. Diagnostic logs record the received payload, selected feature order, transformed inputs, and model output to support operational troubleshooting.
 
 \subsubsection{Fault-Tolerance Fallback Engine}
 If the Python FastAPI container becomes unreachable or times out, the backend automatically falls back to deterministic distance/speed heuristics ($40\text{ km/h}$ average transit velocity). The client interface renders the calculated duration alongside a non-blocking supervisory notification.

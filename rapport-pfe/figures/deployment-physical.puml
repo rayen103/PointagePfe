@@ -22,7 +22,7 @@ node "IoT Vehicle Fleet" as iot {
 }
 
 node "Docker Compose Infrastructure\n(Linux Server Host)" as docker #F9FAFB {
-  component "Nginx Reverse Proxy\n(Port 80/443)" as nginx #E0F2FE
+  component "Nginx Reverse Proxy\n(Public Web Ingress)" as nginx #E0F2FE
   component ".NET 8 WebAPI Container\n(CollectManagement.WebAPI)" as webapi #D1FAE5
   component "FastAPI Python ML Container\n(ml-service)" as mlservice #EDE9FE
   database "SQL Server Container\n(Database Volume)" as sqlserver #FEE2E2
@@ -32,7 +32,7 @@ browser --> nginx : HTTP / WebSocket Protocol
 modems --> nginx : HTTP POST Telemetry Packets
 
 nginx --> webapi : Reverse Proxy Routing (/cm/*)
-webapi --> sqlserver : Entity Framework Core (Port 1433)
-webapi --> mlservice : HTTP Request (Port 8001 / predictions)
+webapi --> sqlserver : Entity Framework Core
+webapi --> mlservice : Prediction Request
 
 @enduml
