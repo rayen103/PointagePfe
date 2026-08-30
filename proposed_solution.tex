@@ -65,7 +65,7 @@ The four architectural tiers operate as follows:
 \section{Physical Deployment Architecture}
 \label{sec:deployment_architecture}
 
-To ensure environment parity between development, staging, and production environments, the entire platform is containerized and orchestrated through a dedicated container platform. Each service executes within an isolated container environment on a shared internal virtual network, exposing only the necessary ingress ports to the host system while isolating database and internal services from direct external exposure.
+To ensure environment parity between development, staging, and production environments, the entire platform is containerized and orchestrated through a dedicated container platform. Each service executes within an isolated container environment on a shared internal virtual network, exposing only the public ingress path while isolating database and internal services from direct external access.
 
 Figure~\ref{fig:physical_deployment} illustrates the container topology, network routing, and storage volume bindings.
 

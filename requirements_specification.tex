@@ -229,7 +229,7 @@ This section details the primary use cases developed in the project, providing t
     \item The client application requests the current telemetry values of the bus.
     \item The backend API receives the query and aggregates current bus variables (coordinates, speed, occupancy, capacity, and circuit ID).
     \item The API generates an HTTP prediction request payload.
-    \item The backend HttpClient calls the FastAPI ML microservice endpoint on port 8001.
+    \item The backend calls the machine learning microservice prediction endpoint.
     \item The FastAPI microservice loads the trained model artifacts, runs the prediction logic, and calculates the ETA in minutes along with a confidence metric.
     \item The FastAPI service returns the prediction results over HTTP.
     \item The backend WebAPI receives the response and wraps it in a standard API contract.
