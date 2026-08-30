@@ -1,0 +1,31 @@
+\chapter*{General Conclusion}
+\addcontentsline{toc}{chapter}{General Conclusion}
+\markboth{General Conclusion}{General Conclusion}
+
+\section*{Summary of Contributions}
+This final-year project successfully designed, implemented, and validated a comprehensive corporate transport and workforce attendance tracking solution centered on the \textbf{CST LePoint} platform. All core technical and operational objectives established during the requirements elicitation phase were fully achieved:
+\begin{itemize}
+  \item \textbf{Clean Architecture Backend}: Developed a robust .NET 8 WebAPI utilizing Clean Architecture and CQRS patterns with MediatR. This structure decoupled business rules from external database frameworks and HTTP interfaces.
+  \item \textbf{Encapsulated Domain Model}: Applied Domain-Driven Design (DDD) principles. Implemented private property setters, custom factory construction methods, and strongly-typed ULID value objects to maintain state consistency and type-safety.
+  \item \textbf{Real-Time Telemetry and Geofencing}: Built an ingestion pipeline to parse vehicle coordinates, validate timestamps to prevent replay attacks, and execute distance calculations (Haversine formula) to trigger automatic geofenced deviation alerts.
+  \item \textbf{Responsive Frontend Client}: Developed an Angular 19 Single Page Application (SPA) integrating DevExtreme data grids, Leaflet mapping controls, and Transloco translation services, protected by a custom navigation-level route guard.
+  \item \textbf{Predictive ML Microservice}: Loaded trained model artifacts into an external Python FastAPI container, calculating estimated vehicle arrival times (ETA) and evaluating employee absence-risk metrics.
+\end{itemize}
+
+\section*{Operational and Technical Insights}
+The development process highlighted several critical software engineering principles. Separating write actions (Commands) from read actions (Queries) using MediatR resolved database concurrency issues during bulk telemetry uploads. 
+
+Packaging the platform into isolated Docker containers (SQL Server, ASP.NET Core, Nginx Angular client, and Python FastAPI) proved essential for environment parity. By running staging and development environments under identical container configurations, we eliminated local setup errors and validated deployment configurations early in the lifecycle.
+
+Furthermore, implementing cross-cutting behaviors—such as Serilog daily rolling JSON logs, the Rin timeline request inspector, and automated xUnit unit and integration tests—provided the team with the diagnostics needed to optimize the database query filters and telemetry parsing endpoints to execute in under 200ms.
+
+\section*{Future Work and Perspectives}
+While the current version of the platform solves CST's core requirements, several extensions are proposed for future development:
+\begin{enumerate}
+  \item \textbf{GPS Anomaly and Fraud Detection}: Develop ML models in the FastAPI service to analyze historical traces, flagging telemetry anomalies such as GPS spoofing, driver detours, or fraudulent RFID badge scans.
+  \item \textbf{Dynamic Route Optimization}: Integrate Vehicle Routing Problem (VRP) algorithms to calculate optimized paths dynamically based on shift employee addresses, reducing fuel consumption and mileage costs.
+  \item \textbf{Predictive Fleet Maintenance}: Leverage telemetry diagnostics (battery levels, voltage fluctuations, speed profiles) to forecast engine failures, alerting fleet managers before a bus breakdown occurs on route.
+  \item \textbf{Demand-Driven Fleet Sizing}: Analyze historical passenger occupancy traces to forecast seating demand at specific pickup points, allowing coordinators to dynamically allocate smaller vans or larger buses to minimize operational costs.
+\end{enumerate}
+
+In conclusion, this final-year project provided a valuable pair-programming and full-stack development experience, demonstrating the importance of software craftsmanship, Clean Architecture, and AI-assisted engineering in building reliable, enterprise-grade business systems.

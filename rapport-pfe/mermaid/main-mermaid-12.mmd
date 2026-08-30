@@ -1,0 +1,20 @@
+%%{init: { "theme": "redux", "themeVariables": { "fontSize": "28px", "actorFontSize": "28px", "noteFontSize": "28px", "messageFontSize": "28px", "fontFamily": "Arial, sans-serif" }, "sequence": { "actorWidth": 150, "actorHeight": 52, "boxWidth": 150, "messageMargin": 36 } }}%%
+sequenceDiagram
+    autonumber
+    actor U as User / Admin
+    participant SPA as Angular Client SPA
+    participant API as AuthenticationEndpoints (.NET 8)
+    participant H as LoginQueryHandler / BCrypt
+    participant DB as SQL Server 2019
+
+    U->>SPA: 1. Input Credentials & SocieteId
+    SPA->>API: 2. POST /cm/auth/login {NomUtilisateur, Password, SocieteId}
+    API->>H: 3. Dispatch LoginQuery
+    H->>DB: 4. Query Utilisateur & RoleUtilisateur Entities
+    DB-->>H: 5. Return User Record & Navigations JSON
+    H->>H: 6. Verify BCrypt Password Hash
+    H->>H: 7. Generate Signed JWT Bearer Token
+    H-->>API: 8. Return LoginResult (Token, Claims, Navigations)
+    API-->>SPA: 9. HTTP 200 OK (JWT Token + Profile)
+    SPA->>SPA: 10. Store Token in Session & Filter Navigation Menu
+    SPA-->>U: 11. Render Authorized Dashboard

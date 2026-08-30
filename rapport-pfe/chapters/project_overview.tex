@@ -1,0 +1,97 @@
+\chapter{Project Overview}
+\label{chap:project_overview}
+
+\section{Introduction}
+
+In modern industrial and logistics-intensive organizations, employee transportation has evolved from a simple secondary service into a core operational dependency. For enterprises operating with multiple work shifts, distributed factories, or extensive call center networks, the coordination of staff transit directly impacts productivity, labor satisfaction, and operational budgets. Meeting these demands requires real-time visibility, automated attendance tracking, route compliance auditing, and intelligent planning tools.
+
+The \textbf{CST LePoint} platform was initiated to address these challenges by centralizing vehicle fleet management, employee pickup routing, real-time geofenced trace supervision, and introducing an artificial intelligence layer to predict bus Estimated Time of Arrival (ETA) and assess employee absenteeism risks. This chapter establishes the project's background, detailing the host company, the operational problem statement, target user personas, technical objectives, and scope boundaries.
+
+\newpage
+\section{Host Company}
+
+The host company for this project is \textbf{Canadian System Technology (CST)}, a pioneering enterprise specializing in Information Technology services, systems integration, and software development. Founded in Montréal, Canada, in 1989 by Mr. Samir Gara, Canadian System Technology established its primary subsidiary in Tunisia in 1997. Over the past three decades, the company has built its reputation on engineering enterprise-grade solutions, consolidating its capabilities through the fusion of four specialized technology entities:
+
+\begin{itemize}
+  \item \textbf{GIC}: The developer and publisher of the \emph{Le Point} Enterprise Resource Planning (ERP) suite. The ERP comprises several specialized modules, including:
+  \begin{itemize}
+    \item \emph{Le Point-GPAO}: Computer-Aided Production Management (Gestion de Production Assistée par Ordinateur), optimizing industrial manufacturing flows.
+    \item \emph{Le Point-GPM}: Maintenance Management (Gestion des Processus de Maintenance), tracking equipment lifecycles and interventions.
+    \item \emph{Le Point-GESTCOM}: Commercial Management (Gestion Commerciale), automating purchasing, sales, and inventory operations.
+    \item \emph{Le Point-FICO}: Financial and Accounting Management (Gestion Financière et Comptable), handling general ledger, tax filing, and cash flow.
+    \item \emph{Le Point-GRH}: Human Resources Management (Gestion des Ressources Humaines), managing personnel records, biometric pointage, payroll, and shifts.
+  \end{itemize}
+
+  \item \textbf{GIC-Distribution}: An infrastructure systems integrator focusing on high-availability and security solutions. Its key areas of expertise include:
+  \begin{itemize}
+    \item Corporate cybersecurity and network access control.
+    \item Systems consolidation, server virtualization, and high-performance computing clusters.
+    \item Enterprise storage, backup strategies, and disaster recovery planning.
+  \end{itemize}
+
+  \item \textbf{Bs4m}: A specialized publisher of mobile business solutions. Bs4m focuses on bridging physical field activities with centralized enterprise logic, offering technologies in:
+  \begin{itemize}
+    \item Mobile Point of Sale (POS) and retail management.
+    \item Mobile field service intervention and ticketing.
+    \item Fleet tracking, telemetry, and geolocation services.
+  \end{itemize}
+
+  \item \textbf{Canadian Software Technology}: A software development and management consulting firm leveraging cutting-edge web and system frameworks to design custom systems for production planning, integrated ERPs, and mobile banking.
+\end{itemize}
+
+The \textbf{CST LePoint} platform represents a strategic integration within GIC's software ecosystem. By combining the human resource and scheduling principles of GIC-GRH with the real-time telemetry and geofencing capabilities developed by Bs4m, the platform delivers a unified system to manage both personnel attendance and fleet geolocation.
+
+\section{Project Context and Existing System}
+
+\subsection{Industrial Transport Logistics in Tunisia}
+Many Tunisian industrial enterprises (such as automotive wire-harness factories, textile plants, and call centers) operate 24/7 across three consecutive 8-hour shifts. Because these factories are often located in industrial zones far from residential districts, companies must organize transport networks to pick up thousands of employees from various pickup points daily. This requires managing dozens of rented or corporate buses, planning optimized paths, and verifying that employees board their designated vehicles.
+
+\subsection{The Traceability Challenge}
+Before the initiation of CST LePoint, coordination between dispatchers, drivers, and corporate HR departments relied almost entirely on manual processes, leading to critical inefficiencies. There was no real-time geolocation of buses, attendance checks were performed using manual paper logs, and drivers' routes could not be verified for compliance.
+
+\subsection{CST LePoint Legacy Platform (Existing Solution)}
+\label{subsec:legacy_solution}
+Before the implementation of the new web-based and intelligent CST LePoint platform, the host company deployed a legacy desktop application to manage transit scheduling. This existing solution suffered from significant limitations:
+\begin{itemize}
+  \item \textbf{Desktop-Only Access}: The application was a fat-client desktop installation, restricting access to designated office workstations. Dispatchers could not monitor operations on the field or from home, and employees had no visibility into bus locations or schedules.
+  \item \textbf{Barebone Operations}: The platform served primarily as a static registry for bus circuits and driver contacts. Geolocation and route compliance were handled retrospectively, with no real-time tracking or automatic alert systems.
+  \item \textbf{No Predictive Analytics}: There was no capability to forecast arrival times (ETA) or identify potential worker absenteeism. It was entirely reactive, depending on phone calls to determine bus delays.
+  \item \textbf{Simple Business Intelligence}: Reporting was basic and static, showing only simple aggregate figures without interactive dashboards, custom layouts, or multi-dimensional analytics.
+\end{itemize}
+
+\subsection{Development Environment and Deployment Stack}
+\label{subsec:dev_and_deployment}
+To resolve these inefficiencies, our internship project introduces a modernized web-based architecture. A high-level overview of the technological stacks for both systems includes:
+\begin{itemize}
+  \item \textbf{Legacy System}: A fat-client desktop application directly connected to a centralized database server. Deployment was restricted to local office terminals, and data collection from the field was manually transcribed from paper sheets.
+  \item \textbf{New Web Platform}: An Angular 19 frontend Single Page Application (SPA) utilizing Tailwind CSS and Leaflet maps, communicating with a .NET 8 (ASP.NET Core) backend Web API.
+  \item \textbf{Machine Learning Service}: A FastAPI Python microservice running alongside the backend to provide predictive analytics (ETA and absenteeism risks).
+  \item \textbf{Deployment Stack}: Containerized using Docker Compose to host the frontend (via Nginx), backend API, SQL Server database, and the FastAPI ML service in isolated environments. IoT modems onboard the buses send real-time coordinates and attendance data via the SMQTT protocol.
+\end{itemize}
+
+\section{Project Description}
+The primary goal of our internship project is to replace the legacy desktop platform with this intelligent, web-based transport and attendance management system. The platform will automate tracking, verify route compliance, and leverage machine learning to provide predictive metrics for dispatchers and commuters.
+
+\subsection{Target User Personas}
+The simplified system boundaries involve four core user roles:
+\begin{itemize}
+  \item \textbf{Administrators}: Manage global configurations, tenant settings, and security roles.
+  \item \textbf{Operators}: Monitor active routes, driver assignments, and receive real-time geofence alerts.
+  \item \textbf{Analysts}: Generate business intelligence reports, audit telemetry traces, and customize reporting layouts.
+  \item \textbf{Commuters (Employees)}: Access the web client to view their shift schedules, routes, and live bus positions.
+\end{itemize}
+
+\subsection{Operational Problems and Risk Boundaries}
+Developing and deploying a real-time, telemetry-intensive platform introduces key technical and operational risks:
+\begin{itemize}
+  \item \textbf{GPRS Connection Dropouts}: Loss of cellular coverage in rural zones, requiring local caching and timestamp audits to ensure data integrity.
+  \item \textbf{Machine Learning Service Latency}: Delay in predicting ETA, resolved by using asynchronous parallel calls with deterministic fallback rules.
+  \item \textbf{Data Ingestion Volume}: Large volume of telemetry coordinates causing database bottlenecks, mitigated by EF Core query splitting and indexing.
+  \item \textbf{Multi-Tenancy Security}: Risks of cross-company data leakage, mitigated by enforcing database-level global tenant filters.
+\end{itemize}
+
+\section{Conclusion}
+This chapter presented the host company context, the legacy CST LePoint desktop application, the development stack, the deployment architectures for both the legacy and new systems, and the overall objectives of the new project.
+
+However, the legacy system still poses several unresolved operational difficulties. The next chapter, \emph{Study of the Existing}, will further discover the existing solution in detail, analyzing its limitations, the financial and operational impact of those limitations, and the identified rooms for improvement.
+

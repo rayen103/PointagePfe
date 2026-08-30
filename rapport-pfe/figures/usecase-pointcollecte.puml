@@ -1,0 +1,39 @@
+@startuml
+!theme plain
+left to right direction
+skinparam dpi 300
+skinparam defaultFontName "Helvetica"
+skinparam defaultFontSize 12
+
+actor "Operator / Dispatcher" as operator
+
+rectangle "Real-Time Tracking & Telemetry Sub-System" {
+  together {
+    usecase "UC-1: Authenticate User" as UC_auth
+    usecase "Supervise Live Bus\nPositions on Map (UC-2)" as UC_live
+    usecase "Receive Geofence\nRoute Alerts" as UC_alerts
+    usecase "Consult Telemetry\nEvent Timeline" as UC_events
+    usecase "Predict Bus Arrival\nTimes (UC-3)" as UC_eta
+    usecase "Transmit GPS &\nOccupancy Stream" as UC_stream
+  }
+}
+
+actor "IoT Telemetry Modem\n<<External System>>" as modem
+actor "ML Prediction Service\n<<External System>>" as ml
+
+operator --> UC_auth
+operator --> UC_live
+operator --> UC_alerts
+operator --> UC_events
+operator --> UC_eta
+
+UC_stream <-- modem
+UC_alerts <-- modem
+UC_eta --> ml
+
+UC_live ..> UC_auth : <<include>>
+UC_alerts ..> UC_auth : <<include>>
+UC_events ..> UC_auth : <<include>>
+UC_eta ..> UC_auth : <<include>>
+
+@enduml

@@ -1,0 +1,127 @@
+% Encoding and language
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[numbers]{natbib}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+\usepackage{csquotes}
+\usepackage{amsmath}
+
+% Layout and typography
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{microtype}
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{ragged2e}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{colortbl}
+\usepackage{multirow}
+\usepackage{pdflscape}
+\usepackage[Renderer=/home/smile/dev/PointagePfe/rapport-pfe/run-mmdc.sh]{mermaid}
+\MermaidAdjustBoxOpts{max width=1.0\textwidth,center}
+
+% Code et liens
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{bookmark}
+\usepackage{url}
+
+\newcommand{\UniversityName}{University Name}
+\newcommand{\SchoolName}{School Name}
+\newcommand{\DepartmentName}{Program / Department}
+\newcommand{\StudentName}{Student Full Name}
+\newcommand{\SupervisorName}{Supervisor Name}
+\newcommand{\AcademicYear}{2025--2026}
+\newcommand{\ReportTitle}{Final-Year Project Report}
+\newcommand{\ProjectSubtitle}{CST LePoint System}
+\newcommand{\ProjectTagline}{An intelligent platform for transport management, attendance tracking, and real-time monitoring}
+
+\definecolor{CSTBlue}{HTML}{0B3B66}
+\definecolor{CSTGold}{HTML}{C59B3A}
+\definecolor{CSTLight}{HTML}{F4F7FB}
+\definecolor{CSTGray}{HTML}{4B5563}
+\definecolor{CSTCodeBg}{HTML}{F7F7F8}
+\definecolor{CSTCodeBorder}{HTML}{D1D5DB}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=CSTBlue,
+  citecolor=CSTBlue,
+  urlcolor=CSTBlue,
+  pdftitle={CST LePoint Final-Year Project Report},
+  pdfauthor={\StudentName}
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.7em}
+\setlist[itemize]{topsep=0.4em,itemsep=0.2em,leftmargin=1.4em}
+\setlist[enumerate]{topsep=0.4em,itemsep=0.2em,leftmargin=1.8em}
+
+\lstdefinestyle{cstcode}{
+  backgroundcolor=\color{CSTCodeBg},
+  basicstyle=\ttfamily\small,
+  frame=single,
+  rulecolor=\color{CSTCodeBorder},
+  frameround=tttt,
+  breaklines=true,
+  showstringspaces=false,
+  tabsize=2,
+  keywordstyle=\color{CSTBlue}\bfseries,
+  commentstyle=\color{CSTGray},
+  stringstyle=\color{CSTGold},
+  numbers=left,
+  numberstyle=\tiny\color{CSTGray},
+  numbersep=8pt
+}
+
+\lstdefinelanguage{CSharp}{
+  morekeywords={abstract,as,base,bool,break,byte,case,catch,char,checked,class,const,continue,decimal,default,delegate,do,double,else,enums,event,explicit,extern,false,finally,fixed,float,for,foreach,goto,if,implicit,in,int,interface,internal,is,lock,long,namespace,new,null,object,operator,out,override,params,private,protected,public,readonly,record,ref,return,sbyte,sealed,short,sizeof,stackalloc,static,string,struct,switch,this,throw,true,try,typevar,typeof,uint,ulong,unchecked,unsafe,ushort,using,virtual,void,volatile,var,async,await,Task,record,class,interface},
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]"
+}
+
+\lstset{style=cstcode,language=CSharp}
+
+\newcommand{\FigurePlaceholder}[2]{%
+  \begin{figure}[H]
+    \centering
+    \fbox{\begin{minipage}[c][0.34\textheight][c]{0.9\textwidth}
+      \centering
+      \textbf{#1}\\[0.8em]
+      #2
+    \end{minipage}}
+    \caption{#1}
+    \label{fig:#2}
+  \end{figure}
+}
+
+\newcommand{\Tech}[1]{\textsf{#1}}
+\newcommand{\Todo}[1]{\textbf{TODO:} #1}
+
+\titleformat{\chapter}[hang]{\Huge\bfseries\color{CSTBlue}}{\thechapter}{1em}{}
+\titleformat{\section}[hang]{\Large\bfseries\color{CSTBlue}}{\thesection}{0.8em}{}
+\titleformat{\subsection}[hang]{\large\bfseries\color{CSTGray}}{\thesubsection}{0.7em}{}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\ProjectSubtitle}
+\fancyhead[R]{\small\leftmark}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{14.5pt}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+

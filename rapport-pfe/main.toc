@@ -1,0 +1,137 @@
+\babel@toc {english}{}\relax 
+\contentsline {chapter}{Acknowledgments}{i}{chapter*.1}%
+\contentsline {chapter}{Abstract}{ii}{chapter*.2}%
+\contentsline {chapter}{List of Acronyms}{xi}{chapter*.6}%
+\contentsline {chapter}{General Introduction}{1}{chapter*.7}%
+\contentsline {chapter}{\numberline {1}Project Overview}{3}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Introduction}{3}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Host Company}{4}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Project Context and Existing System}{5}{section.1.3}%
+\contentsline {subsection}{\numberline {1.3.1}Industrial Transport Logistics in Tunisia}{5}{subsection.1.3.1}%
+\contentsline {subsection}{\numberline {1.3.2}The Traceability Challenge}{5}{subsection.1.3.2}%
+\contentsline {subsection}{\numberline {1.3.3}CST LePoint Legacy Platform (Existing Solution)}{5}{subsection.1.3.3}%
+\contentsline {subsection}{\numberline {1.3.4}Development Environment and Deployment Stack}{6}{subsection.1.3.4}%
+\contentsline {section}{\numberline {1.4}Project Description}{6}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}Target User Personas}{7}{subsection.1.4.1}%
+\contentsline {subsection}{\numberline {1.4.2}Operational Problems and Risk Boundaries}{7}{subsection.1.4.2}%
+\contentsline {section}{\numberline {1.5}Conclusion}{7}{section.1.5}%
+\contentsline {chapter}{\numberline {2}Study of Existing Solutions}{8}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Introduction}{8}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Analysis of Commercial Solutions}{8}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Dedicated Fleet Geolocation Systems (Wialon \& GPSGate)}{8}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Biometric Gate Terminals (ZKTime \& stationary scanners)}{9}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}Manual Coordination and Communication}{9}{subsection.2.2.3}%
+\contentsline {section}{\numberline {2.3}Current Dependency Tracking Process}{9}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Legacy Deployment Architecture}{11}{subsection.2.3.1}%
+\contentsline {section}{\numberline {2.4}Financial and Operational Impact of Transport Delays}{12}{section.2.4}%
+\contentsline {subsection}{\numberline {2.4.1}The Assembly Line Vacancy Problem}{12}{subsection.2.4.1}%
+\contentsline {subsection}{\numberline {2.4.2}Concrete Delay Calculation}{12}{subsection.2.4.2}%
+\contentsline {section}{\numberline {2.5}Detailed Operational Scenario}{13}{section.2.5}%
+\contentsline {section}{\numberline {2.6}Limitations and Their Impact}{14}{section.2.6}%
+\contentsline {subsection}{\numberline {2.6.1}Detailed Technical and Operational Limitations}{14}{subsection.2.6.1}%
+\contentsline {subsection}{\numberline {2.6.2}Business and Financial Impact on Logistics}{15}{subsection.2.6.2}%
+\contentsline {section}{\numberline {2.7}Identified Rooms for Improvement and Transition}{16}{section.2.7}%
+\contentsline {section}{\numberline {2.8}Conclusion}{17}{section.2.8}%
+\contentsline {chapter}{\numberline {3}Requirements Specification}{18}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Introduction}{18}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Functional Requirements}{18}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Authentication and Authorization}{18}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Fleet Management}{19}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}Pickup Planning}{19}{subsection.3.2.3}%
+\contentsline {subsection}{\numberline {3.2.4}Passenger and Shift Management}{19}{subsection.3.2.4}%
+\contentsline {subsection}{\numberline {3.2.5}IoT Telemetry Ingestion}{20}{subsection.3.2.5}%
+\contentsline {subsection}{\numberline {3.2.6}Real-Time Supervision}{20}{subsection.3.2.6}%
+\contentsline {subsection}{\numberline {3.2.7}Predictive Analytics}{20}{subsection.3.2.7}%
+\contentsline {subsection}{\numberline {3.2.8}Business Intelligence Reporting}{20}{subsection.3.2.8}%
+\contentsline {section}{\numberline {3.3}Non-Functional Requirements}{21}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Performance and Ingestion Latency}{21}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Scalability and Containerization Boundary}{21}{subsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.3.3}Data Integrity and CQRS Transactional Boundaries}{22}{subsection.3.3.3}%
+\contentsline {subsection}{\numberline {3.3.4}Security, Cryptography, and Privacy Standards}{22}{subsection.3.3.4}%
+\contentsline {subsection}{\numberline {3.3.5}System Maintainability and DDD Architectural Styles}{22}{subsection.3.3.5}%
+\contentsline {subsection}{\numberline {3.3.6}Robustness and Fault Tolerance}{23}{subsection.3.3.6}%
+\contentsline {section}{\numberline {3.4}Use Case Model}{23}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Identification of Actors and External Systems}{23}{subsection.3.4.1}%
+\contentsline {subsubsection}{Human Actors}{23}{subsubsection*.12}%
+\contentsline {subsubsection}{External Systems}{24}{subsubsection*.13}%
+\contentsline {subsection}{\numberline {3.4.2}Global Use Case Diagram}{24}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.3}Sub-System Use Case Models}{25}{subsection.3.4.3}%
+\contentsline {subsubsection}{Fleet and Route Logistics Sub-System}{25}{subsubsection*.15}%
+\contentsline {subsubsection}{Real-Time Supervision and Telemetry Sub-System}{26}{subsubsection*.17}%
+\contentsline {subsubsection}{Operations and Workforce Logistics Sub-System}{27}{subsubsection*.19}%
+\contentsline {subsubsection}{System Administration and Access Governance Sub-System}{28}{subsubsection*.21}%
+\contentsline {subsection}{\numberline {3.4.4}Detailed Use Case Specifications}{29}{subsection.3.4.4}%
+\contentsline {subsubsection}{UC-1: Authenticate User}{29}{subsubsection*.23}%
+\contentsline {subsubsection}{UC-2: Ingest and Track Fleet Telemetry}{30}{subsubsection*.24}%
+\contentsline {subsubsection}{UC-3: Predict Bus Arrival Time (ETA)}{30}{subsubsection*.25}%
+\contentsline {subsubsection}{UC-4: Configure Role Permissions Matrix}{31}{subsubsection*.26}%
+\contentsline {subsubsection}{UC-5: Assign Employee to Pickup Point and Route}{32}{subsubsection*.27}%
+\contentsline {subsubsection}{UC-6: Save Custom BI Report Layout}{33}{subsubsection*.28}%
+\contentsline {section}{\numberline {3.5}Input Validation Constraints}{33}{section.3.5}%
+\contentsline {section}{\numberline {3.6}Requirements Traceability Summary}{34}{section.3.6}%
+\contentsline {section}{\numberline {3.7}Conclusion}{35}{section.3.7}%
+\contentsline {chapter}{\numberline {4}Proposed Solution}{36}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Introduction}{36}{section.4.1}%
+\contentsline {section}{\numberline {4.2}High-Level System Architecture and Operational Design}{37}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Global Multi-Tier Ecosystem}{37}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Logical System Architecture}{39}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}Physical System Architecture}{43}{subsection.4.2.3}%
+\contentsline {subsection}{\numberline {4.2.4}End-to-End Operational Lifecycle}{48}{subsection.4.2.4}%
+\contentsline {subsection}{\numberline {4.2.5}Inter-Tier Communication and Fault-Tolerance Protocols}{49}{subsection.4.2.5}%
+\contentsline {section}{\numberline {4.3}Multi-Tenant Identity and Access Governance}{49}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Multi-Organization Partitioning}{49}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Dynamic Role-Based Access Control}{50}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Secure Session and Authentication Management}{52}{subsection.4.3.3}%
+\contentsline {section}{\numberline {4.4}Fleet and Transit Logistics Planning Subsystem}{52}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Fleet Assets and IoT Unit Management}{52}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}Circuit and Geolocation Pickup Route Planning}{53}{subsection.4.4.2}%
+\contentsline {subsection}{\numberline {4.4.3}Workforce Shift and Bus Roster Scheduling}{53}{subsection.4.4.3}%
+\contentsline {subsection}{\numberline {4.4.4}Conceptual Domain Information Model}{53}{subsection.4.4.4}%
+\contentsline {section}{\numberline {4.5}Real-Time Telemetry Processing and Automated Supervision}{54}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}High-Throughput Telemetry Ingestion Pipeline}{54}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}Live Cartographic Supervision}{54}{subsection.4.5.2}%
+\contentsline {subsection}{\numberline {4.5.3}Automated Geofencing and Stop Detection Engine}{55}{subsection.4.5.3}%
+\contentsline {section}{\numberline {4.6}Predictive Intelligence and Transit Forecasting}{56}{section.4.6}%
+\contentsline {subsection}{\numberline {4.6.1}Real-Time Estimated Time of Arrival (ETA) Forecasting}{56}{subsection.4.6.1}%
+\contentsline {subsection}{\numberline {4.6.2}Passenger and Driver Roster Consultation}{57}{subsection.4.6.2}%
+\contentsline {subsection}{\numberline {4.6.3}Fault-Tolerant Fallback Strategy}{57}{subsection.4.6.3}%
+\contentsline {section}{\numberline {4.7}Operational Analytics and Business Intelligence Subsystem}{57}{section.4.7}%
+\contentsline {subsection}{\numberline {4.7.1}Operational Key Performance Indicators (KPIs)}{57}{subsection.4.7.1}%
+\contentsline {subsection}{\numberline {4.7.2}Dynamic Reporting Perspectives and Layout Customization}{58}{subsection.4.7.2}%
+\contentsline {subsection}{\numberline {4.7.3}Data Export and Logistics Reconciliation}{58}{subsection.4.7.3}%
+\contentsline {section}{\numberline {4.8}Architectural Cohesion and System Integrity}{58}{section.4.8}%
+\contentsline {subsection}{\numberline {4.8.1}Separation of Concerns and Modular Design}{59}{subsection.4.8.1}%
+\contentsline {subsection}{\numberline {4.8.2}Data Consistency and Transactional Auditability}{59}{subsection.4.8.2}%
+\contentsline {section}{\numberline {4.9}Conclusion}{59}{section.4.9}%
+\contentsline {chapter}{\numberline {5}Implementation and Realization}{62}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Introduction}{62}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Technological Environment and Stack Selection}{62}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Core Application Frameworks and Persistence}{62}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}DevOps, Cloud, and API Documentation Infrastructure}{63}{subsection.5.2.2}%
+\contentsline {subsection}{\numberline {5.2.3}Development Environments and Version Control Tooling}{64}{subsection.5.2.3}%
+\contentsline {section}{\numberline {5.3}Module Implementations}{64}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}Module 1: Authentication and Access Governance}{65}{subsection.5.3.1}%
+\contentsline {subsubsection}{User Interface Realization}{65}{subsubsection*.42}%
+\contentsline {subsubsection}{Sequence Execution Flow}{66}{subsubsection*.44}%
+\contentsline {subsubsection}{Technical Implementation Highlights}{66}{subsubsection*.46}%
+\contentsline {subsection}{\numberline {5.3.2}Module 2: Operations Management and Master Data Logistics}{67}{subsection.5.3.2}%
+\contentsline {subsubsection}{Operational Overview and Central Dashboard}{67}{subsubsection*.47}%
+\contentsline {subsubsection}{Fleet and Driver Logistics Management}{68}{subsubsection*.49}%
+\contentsline {subsubsection}{Transit Circuits and Geocoded Pickup Points}{69}{subsubsection*.51}%
+\contentsline {subsubsection}{Workforce Directory, Shifts, and Roster Assignments}{71}{subsubsection*.53}%
+\contentsline {subsubsection}{Input Validation Constraints}{72}{subsubsection*.56}%
+\contentsline {subsection}{\numberline {5.3.3}Module 3: IoT Telemetry Ingestion and Automated Geofencing}{73}{subsection.5.3.3}%
+\contentsline {subsubsection}{Sequence Execution Flow}{73}{subsubsection*.57}%
+\contentsline {subsubsection}{Technical Implementation Highlights}{73}{subsubsection*.59}%
+\contentsline {subsection}{\numberline {5.3.4}Module 4: Real-Time Cartographic Supervision and AI ETA Prediction}{74}{subsection.5.3.4}%
+\contentsline {subsubsection}{User Interface Realization}{74}{subsubsection*.60}%
+\contentsline {subsubsection}{FastAPI Machine Learning Inference Execution}{75}{subsubsection*.62}%
+\contentsline {subsubsection}{Fault-Tolerance Fallback Engine}{75}{subsubsection*.63}%
+\contentsline {subsection}{\numberline {5.3.5}Module 5: Business Intelligence and Dynamic Report Designer}{75}{subsection.5.3.5}%
+\contentsline {subsubsection}{User Interface Realization}{75}{subsubsection*.64}%
+\contentsline {subsubsection}{Technical Implementation of Layout Persistence}{76}{subsubsection*.66}%
+\contentsline {section}{\numberline {5.4}Testing, Validation, and Performance Evaluation}{77}{section.5.4}%
+\contentsline {subsection}{\numberline {5.4.1}Automated Unit and Integration Testing}{77}{subsection.5.4.1}%
+\contentsline {subsection}{\numberline {5.4.2}Performance and Ingestion Latency Benchmarks}{77}{subsection.5.4.2}%
+\contentsline {section}{\numberline {5.5}Conclusion}{77}{section.5.5}%
+\contentsline {chapter}{General Conclusion}{79}{chapter*.67}%

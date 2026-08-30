@@ -1,0 +1,45 @@
+\documentclass[12pt,a4paper,oneside]{report}
+
+\input{preambule}
+
+\renewcommand{\UniversityName}{ESPRIT}
+\renewcommand{\SchoolName}{}
+\renewcommand{\DepartmentName}{Field: IT}
+\renewcommand{\StudentName}{Farhani Rayen}
+\renewcommand{\SupervisorName}{Mr Bouslahi Hamdi}
+\renewcommand{\AcademicYear}{2025--2026}
+\renewcommand{\ReportTitle}{Final-Year Project Report}
+\renewcommand{\ProjectSubtitle}{CST LePoint System}
+\renewcommand{\ProjectTagline}{An intelligent platform for transport management, attendance tracking, and real-time monitoring}
+
+\input{config/style}
+
+\begin{document}
+\MakeTitlePage
+
+\pagenumbering{roman}
+\input{acknowledgments}
+\input{abstract}
+\tableofcontents
+\listoffigures
+\listoftables
+\input{acronyms}
+\clearpage
+
+\pagenumbering{arabic}
+\input{general_introduction}
+
+\input{chapters/project_overview}
+\input{chapters/existing_solutions}
+\input{chapters/requirements_specification}
+\input{chapters/proposed_solution}
+\input{chapters/implementation}
+
+\input{general_conclusion}
+% \input{annexes}
+
+\nocite{*}
+\bibliographystyle{plainnat}
+\bibliography{biblio}
+
+\end{document}

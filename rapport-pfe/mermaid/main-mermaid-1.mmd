@@ -1,0 +1,21 @@
+%%{init: { "theme": "redux", "themeVariables": { "fontSize": "28px", "actorFontSize": "28px", "noteFontSize": "26px", "messageFontSize": "26px", "fontFamily": "Arial, sans-serif" }, "sequence": { "actorWidth": 140, "actorHeight": 52, "boxWidth": 140, "messageMargin": 35 } }}%%
+sequenceDiagram
+    autonumber
+    actor Driver as Driver
+    actor Coord as Dispatcher
+    actor Line as Manager
+    actor Backup as Backup Driver
+
+    Note over Driver: 06:15 AM: Bus breakdown
+    Driver->>Coord: Call (No signal/Busy)
+    Note over Driver, Coord: Delay: 25 mins
+    Driver->>Coord: Report breakdown (06:40)
+    Coord->>Driver: Ask coordinates
+    Driver->>Coord: Verbal landmarks (imprecise)
+    Coord->>Backup: Dispatch backup bus
+    Note over Backup: Search delay: Locate bus
+    Backup->>Driver: Reach breakdown (07:20)
+    Note over Backup: Board employees
+    Backup->>Line: Deliver workers (07:50)
+    Line->>Line: Assembly line halted
+    Note over Line: Loss: 25,000 TND

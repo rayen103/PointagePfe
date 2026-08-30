@@ -1,0 +1,72 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 10
+autonumber
+
+skinparam actor {
+  BorderColor #0B3B66
+  BackgroundColor #F4F7FB
+}
+skinparam participant {
+  BorderColor #0B3B66
+  BackgroundColor #F4F7FB
+}
+skinparam database {
+  BorderColor #4B5563
+  BackgroundColor #FFFFFF
+}
+
+actor "Onboard IoT Modem" as modem
+participant "Nginx Reverse Proxy" as nginx
+participant "BusEndpoints\n(Carter Minimal API)" as api
+participant "MediatR\n(Pipeline & Dispatcher)" as mediator
+participant "UpdateBusPosition\nCommandHandler" as handler
+database "SQL Server\n(Database)" as db
+participant "WebSocket Gateway\n(Real-Time Hub)" as ws
+actor "Angular Frontend Map\n(Dispatcher Board)" as ui
+
+modem -> nginx : HTTP POST /cm/bus/runtime/position\n(Coordinates & Occupancy)
+activate nginx
+nginx -> api : Forward Request
+activate api
+api -> mediator : Send(UpdateBusPositionCommand)
+activate mediator
+mediator -> handler : Handle(Command)
+activate handler
+
+' Domain Logic
+handler -> db : Fetch Bus Entity by IMEI/Id
+activate db
+db --> handler : Bus Entity
+deactivate db
+
+handler -> handler : Update Bus State\n(Coordinates, Occupancy, Timestamps)
+
+alt Geofence Route Deviation Detected
+  handler -> handler : Instantiate BusRuntimeEvent\n(Type: DeviationAlert)
+end
+
+handler -> db : Persist State & Events (SaveChangesAsync)
+activate db
+db --> handler : Commit Transaction
+deactivate db
+
+handler --> mediator : Return CommandResult
+deactivate handler
+mediator --> api : Return Response
+deactivate mediator
+api --> nginx : HTTP 200 OK
+deactivate api
+nginx --> modem : HTTP 200 OK
+deactivate nginx
+
+' Asynchronous Broadcast
+handler -[dashed]-> ws : Publish TelemetryUpdate Event
+activate ws
+ws -> ui : Broadcast Position & Occupancy via WebSockets
+activate ui
+ui -> ui : Render Markers\non ngx-leaflet Map
+deactivate ui
+deactivate ws
+
+@enduml

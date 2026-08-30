@@ -1,0 +1,22 @@
+\chapter*{General Introduction}
+\addcontentsline{toc}{chapter}{General Introduction}
+\markboth{General Introduction}{General Introduction}
+
+Over the past decade, the rapid advancement of the Internet of Things (IoT), cloud computing, and artificial intelligence has revolutionized traditional industrial management workflows. In the domain of corporate logistics, transportation systems have transitioned from passive support services into highly integrated, data-driven operations. For large enterprises operating in industrial zones—such as manufacturing plants, automotive assembly facilities, and call centers—organizing the daily transit of thousands of workers across multiple shifts is a complex operational challenge.
+
+Ensuring that employees arrive on time directly impacts production line efficiency, labor relations, and organizational cost control. Traditionally, companies managed these services using fragmented, manual workflows. Roster scheduling was planned on paper or spreadsheets, attendance checks were conducted manually by drivers, and real-time fleet positions were completely invisible. This lack of integration created significant operational bottlenecks: delayed routes went unnoticed, driver identity could not be verified in real time, and invoicing subcontractor fleets was prone to accounting discrepancies.
+
+\newpage
+
+\section*{Report Plan}
+This thesis documents the complete engineering process of the CST LePoint platform, from requirements analysis to architectural design, implementation, and deployment. The report is structured into five core chapters:
+
+\begin{enumerate}
+  \item \textbf{Chapter 1: Project Overview} introduces the host company, Canadian System Technology (CST), details the operational problems, outlines the target user personas, and defines the technical scope and activities of the project.
+  \item \textbf{Chapter 2: Study of Existing Solutions} critiques legacy fleet tracking and biometric gate solutions, evaluates the baseline manual workflows, and presents a concrete operational scenario illustrating the financial impact of transport delays.
+  \item \textbf{Chapter 3: Requirements Specification} defines the functional and non-functional requirements of the platform, presents the use case models (UC-1 through UC-6), and summarizes functional traceability.
+  \item \textbf{Chapter 4: Proposed Solution} details the system design, highlighting Clean Architecture layers, Domain-Driven Design (DDD) concepts, strongly-typed ULID identifiers, database schemas, and MediatR pipeline behaviors.
+  \item \textbf{Chapter 5: Implementation} presents the technology stack, agile Scrum sprint achievements, detailed C\# and TypeScript code listings, Docker Compose configuration scripts, and quality assurance testing routines.
+\end{enumerate}
+
+Finally, a General Conclusion summarizes the contributions of the project and outlines future extensions for AI-assisted logistics in corporate transport networks.

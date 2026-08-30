@@ -1,0 +1,48 @@
+@startuml
+!theme plain
+left to right direction
+skinparam dpi 300
+skinparam defaultFontName "Helvetica"
+skinparam defaultFontSize 12
+
+actor "Administrator" as admin
+actor "Operator / Dispatcher" as operator
+
+rectangle "CST LePoint Platform" {
+  together {
+    usecase "UC-1: Authenticate User" as UC_auth
+    usecase "UC-4: Manage Users\n& Dynamic Permissions" as UC_users
+    usecase "Manage Fleet\n& Route Logistics" as UC_fleet
+    usecase "UC-5: Assign Shifts\n& Employees" as UC_shifts
+    usecase "UC-2: Ingest & Track\nFleet Telemetry" as UC_track
+    usecase "UC-3: Predict Bus\nArrival Times (ETA)" as UC_eta
+    usecase "UC-6: Generate BI\n& Audit Reports" as UC_bi
+  }
+}
+
+actor "IoT Telemetry Modem\n<<External System>>" as modem
+actor "ML Prediction Engine\n<<External System>>" as ml
+
+admin --> UC_auth
+admin --> UC_users
+admin --> UC_fleet
+admin --> UC_bi
+
+operator --> UC_auth
+operator --> UC_fleet
+operator --> UC_shifts
+operator --> UC_track
+operator --> UC_eta
+operator --> UC_bi
+
+UC_track <-- modem
+UC_eta --> ml
+
+UC_users ..> UC_auth : <<include>>
+UC_fleet ..> UC_auth : <<include>>
+UC_shifts ..> UC_auth : <<include>>
+UC_track ..> UC_auth : <<include>>
+UC_eta ..> UC_auth : <<include>>
+UC_bi ..> UC_auth : <<include>>
+
+@enduml

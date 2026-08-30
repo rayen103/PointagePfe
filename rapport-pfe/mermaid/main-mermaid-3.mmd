@@ -1,0 +1,64 @@
+%%{init: { "theme": "redux", "themeVariables": { "fontSize": "22px", "fontFamily": "Arial, sans-serif" } }}%%
+flowchart TB
+    subgraph ClientTier["1. Presentation Tier (Angular 19 SPA)"]
+        direction LR
+        UI_Comp["UI Modules & Views<br/>(Dashboard, Map, BI, Admin)"]
+        UI_GIS["GIS Mapping Engine<br/>(Leaflet.js + OSM)"]
+        UI_Grid["Virtualized DataGrid<br/>(DevExtreme dx-data-grid)"]
+        UI_State["State & Reactive Streams<br/>(RxJS & Observables)"]
+        UI_Http["HTTP Interceptors<br/>(JWT Bearer & Error Handler)"]
+    end
+
+    subgraph ApiTier["2. API Gateway & Routing Tier (ASP.NET Core WebAPI)"]
+        direction LR
+        API_Carter["Carter Minimal APIs<br/>(Modular Route Slices)"]
+        API_Auth["Authentication Middleware<br/>(JWT Token Validation)"]
+        API_RBAC["Dynamic Authorization<br/>(NavigationPermissionHandler)"]
+        API_Ex["Global Exception Handler<br/>(RFC 7807 Problem Details)"]
+    end
+
+    subgraph AppTier["3. Application & Orchestration Tier (MediatR CQRS)"]
+        direction TB
+        subgraph Pipeline["MediatR Request Pipeline Behaviors"]
+            direction LR
+            Beh_Log["LoggingBehavior"] --> Beh_Val["ValidationBehavior<br/>(FluentValidation)"] --> Beh_UoW["UnitOfWorkBehavior<br/>(Auto SaveChanges)"]
+        end
+        subgraph Handlers["CQRS Command & Query Slices"]
+            direction LR
+            Cmds["Command Handlers<br/>(Write Operations)"]
+            Qrys["Query Handlers<br/>(Read AsNoTracking)"]
+            Maps["Mapster Profiles<br/>(DTO Mappings)"]
+        end
+        Pipeline --> Handlers
+    end
+
+    subgraph DomainTier["4. Domain Core Tier (Pure Enterprise Logic)"]
+        direction LR
+        Dom_Ent["Aggregates & Entities<br/>(Bus, Circuit, Stop, Shift, User)"]
+        Dom_VO["Strongly-Typed Value Objects<br/>(ULID Identifiers)"]
+        Dom_Rules["Domain Policies & Invariants<br/>(Haversine Geofencing, Skew Window)"]
+        Dom_Audit["AuditableEntity Base<br/>(Timestamp & User Audit)"]
+    end
+
+    subgraph InfraTier["5. Infrastructure & Persistence Tier"]
+        direction LR
+        Inf_EF["EF Core DbContext<br/>(Fluent Configurations)"]
+        Inf_Repo["Repositories & UnitOfWork<br/>(RepositoryBase & Slices)"]
+        Inf_Sec["Security Services<br/>(BCrypt & JWT Generator)"]
+        Inf_Doc["Document Generation<br/>(Puppeteer Sharp PDF)"]
+        Inf_ML["AI Prediction Connector<br/>(ExternalPredictionService)"]
+    end
+
+    subgraph MLTier["6. Machine Learning & Predictive Tier (FastAPI)"]
+        direction LR
+        ML_Api["Asynchronous Endpoints<br/>(/predict_eta, /batch_predict)"]
+        ML_Scaler["Feature Scaler & Preprocessor<br/>(bus_eta_scaler.pkl)"]
+        ML_Model["Trained Regressor Model<br/>(bus_eta_model.pkl)"]
+    end
+
+    ClientTier -->|"HTTPS / REST (JWT)"| ApiTier
+    ApiTier -->|"In-Process Invocation"| AppTier
+    AppTier -->|"Executes Use Cases On"| DomainTier
+    AppTier -.->|"Implements Contracts Via"| InfraTier
+    InfraTier -->|"Persistence Mapping"| DomainTier
+    InfraTier -->|"HTTP RPC (Port 8001)"| MLTier

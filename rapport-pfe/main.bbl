@@ -1,0 +1,49 @@
+\begin{thebibliography}{10}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[ang()]{angular-docs}
+Angular documentation.
+\newblock URL \url{https://angular.dev/}.
+
+\bibitem[fas()]{fastapi-docs}
+Fastapi documentation.
+\newblock URL \url{https://fastapi.tiangolo.com/}.
+
+\bibitem[lea()]{leaflet-docs}
+Leaflet documentation.
+\newblock URL \url{https://leafletjs.com/}.
+
+\bibitem[mic({\natexlab{a}})]{microsoft-aspnetcore-docs}
+Asp.net core documentation, {\natexlab{a}}.
+\newblock URL \url{https://learn.microsoft.com/aspnet/core/}.
+
+\bibitem[mic({\natexlab{b}})]{microsoft-dotnet-docs}
+Documentation officielle .net, {\natexlab{b}}.
+\newblock URL \url{https://learn.microsoft.com/dotnet/}.
+
+\bibitem[sci()]{scikit-learn-docs}
+scikit-learn user guide.
+\newblock URL \url{https://scikit-learn.org/stable/}.
+
+\bibitem[cst(2026{\natexlab{a}})]{cstlepoint-backend-readme}
+Cst lepoint --- backend readme.
+\newblock Documentation interne du dépôt, 2026{\natexlab{a}}.
+
+\bibitem[cst(2026{\natexlab{b}})]{cstlepoint-frontend-readme}
+Cst lepoint --- frontend readme.
+\newblock Documentation interne du dépôt, 2026{\natexlab{b}}.
+
+\bibitem[cst(2026{\natexlab{c}})]{cstlepoint-ml-readme}
+Cst lepoint --- ml service readme.
+\newblock Documentation interne du dépôt, 2026{\natexlab{c}}.
+
+\bibitem[cst(2026{\natexlab{d}})]{cstlepoint-root-readme}
+Cst lepoint --- readme principal.
+\newblock Documentation interne du dépôt, 2026{\natexlab{d}}.
+\newblock Source principale des informations techniques.
+
+\end{thebibliography}

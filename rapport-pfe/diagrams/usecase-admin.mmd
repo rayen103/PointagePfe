@@ -1,0 +1,26 @@
+%%{init: { "theme": "redux", "flowchart": { "curve": "linear", "nodeSpacing": 35, "rankSpacing": 70 }, "themeVariables": { "fontSize": "18px", "actorFontSize": "18px", "noteFontSize": "16px", "fontFamily": "Arial, sans-serif" } }}%%
+flowchart LR
+    Admin["fa:fa-user-shield Administrator"]
+
+    subgraph System ["System Administration & Governance"]
+        direction TB
+        UC1(["Authenticate & Restore Session"])
+        UC2(["Manage Company Profiles & Scopes"])
+        UC3(["Manage User Accounts & Status"])
+        UC4(["Configure Dynamic Role Permissions Matrix"])
+        UC5(["Maintain Reference Catalogs (Sites, Shifts)"])
+        UC6(["Audit System Health & Ingestion"])
+
+        UC1 ~~~ UC2
+        UC2 ~~~ UC3
+        UC3 ~~~ UC4
+        UC4 ~~~ UC5
+        UC5 ~~~ UC6
+    end
+
+    Admin --- UC1
+    Admin --- UC2
+    Admin --- UC3
+    Admin --- UC4
+    Admin --- UC5
+    Admin --- UC6

@@ -1,0 +1,94 @@
+@startuml
+skinparam class {
+  BorderColor #0B3B66
+  BackgroundColor #F4F7FB
+  HeaderBackgroundColor #E2F0FD
+}
+skinparam shadowing false
+skinparam roundcorner 10
+hide circle
+
+class Circuit {
+  + CircuitId : CircuitId
+  + CodeCircuit : string
+  + LibelleCircuit : string
+  + Description : string
+  + Latitude : double
+  + Longitude : double
+  + CodePCDepart : string
+  + CodePCArrivee : string
+  + DistanceKm : double
+  + DureeMinutes : int
+  + Couleur : string
+  + IsActive : bool
+  + SocieteId : SocieteId
+}
+
+class PointCollecte {
+  + PointCollecteId : PointCollecteId
+  + CodePointCollecte : string
+  + LibellePointCollecte : string
+  + Latitude : double
+  + Longitude : double
+  + CodeGouvernorat : string
+  + CodeRegion : string
+  + IsActive : bool
+  + SocieteId : SocieteId
+}
+
+class CircuitPointCollecte {
+  + CircuitId : CircuitId
+  + CodePointCollecte : string
+  + Latitude : double
+  + Longitude : double
+  + Ordre : int
+}
+
+class Employe {
+  + EmployeId : EmployeId
+  + Matricule : string
+  + RFID : string
+  + Nom : string
+  + Prenom : string
+  + CodeCircuit : string
+  + CodePointCollecte : string
+  + CodeBus : string
+  + CodeShift : string
+  + Latitude : double
+  + Longitude : double
+  + Adresse : string
+  + SocieteId : SocieteId
+}
+
+class Shift {
+  + ShiftId : ShiftId
+  + CodeShift : string
+  + LibelleShift : string
+  + HeureDebut : TimeSpan
+  + HeureFin : TimeSpan
+  + SocieteId : SocieteId
+}
+
+class Region {
+  + RegionId : RegionId
+  + CodeRegion : string
+  + LibelleRegion : string
+  + CodeGouvernorat : string
+  + IsActive : bool
+}
+
+class Gouvernorat {
+  + GouvernoratId : GouvernoratId
+  + CodeGouvernorat : string
+  + LibelleGouvernorat : string
+  + IsActive : bool
+}
+
+Circuit "1" *-- "0..*" CircuitPointCollecte : contains
+CircuitPointCollecte "0..*" --> "1" PointCollecte : references
+PointCollecte "0..*" --> "1" Region : located in
+Region "0..*" --> "1" Gouvernorat : belongs to
+Employe "0..*" --> "0..1" Circuit : assigned route
+Employe "0..*" --> "0..1" PointCollecte : pickup stop
+Employe "0..*" --> "0..1" Shift : work shift
+@enduml

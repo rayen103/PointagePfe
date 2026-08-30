@@ -1,0 +1,27 @@
+%%{init: { "theme": "redux", "flowchart": { "curve": "linear", "nodeSpacing": 35, "rankSpacing": 70 }, "themeVariables": { "fontSize": "18px", "actorFontSize": "18px", "noteFontSize": "16px", "fontFamily": "Arial, sans-serif" } }}%%
+flowchart LR
+    Operator["fa:fa-user Operator / Dispatcher"]
+
+    subgraph System ["Fleet & Route Logistics"]
+        direction TB
+        UC1(["Configure Circuits & Transit Paths"])
+        UC2(["Sequence Ordered Pickup Points"])
+        UC3(["Assign Drivers & Buses to Routes"])
+        UC4(["Manage Bus Fleet Assets"])
+        UC5(["Pair IoT Modems with Vehicles"])
+
+        UC1 ~~~ UC2
+        UC2 ~~~ UC3
+        UC3 ~~~ UC4
+        UC4 ~~~ UC5
+    end
+
+    Admin["fa:fa-user-shield Administrator"]
+
+    Operator --- UC1
+    Operator --- UC2
+    Operator --- UC3
+
+    UC3 --- Admin
+    UC4 --- Admin
+    UC5 --- Admin

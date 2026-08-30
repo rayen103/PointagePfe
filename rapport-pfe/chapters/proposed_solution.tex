@@ -1,0 +1,724 @@
+\chapter{Proposed Solution}
+\label{chap:proposed_solution}
+
+\section{Introduction}
+\label{sec:solution_intro}
+
+Following the comprehensive analysis of existing transit workflows and the detailed operational requirements established in the preceding chapters, this chapter presents the architectural and conceptual design of the \Tech{CST LePoint} platform. 
+
+The primary objective of the proposed solution is to transform traditional, fragmented employee transportation and attendance tracking into an integrated, real-time, automated, and intelligent supervision platform. The system is designed to provide end-to-end operational visibility: from master planning and workforce assignment to real-time telemetry streaming, automated route deviation detection, predictive arrival forecasting, and customizable business intelligence reporting.
+
+In this chapter, we focus on the high-level architecture, functional subsystems, information models, and operational workflows that together fulfill the platform's core mission. The detailed technology stack, source code implementations, and concrete user interface realizations will be presented in Chapter~\ref{chap:implementation}.
+
+The chapter is organized around the following key dimensions:
+\begin{itemize}
+  \item \textbf{High-Level System Architecture and Operational Lifecycle}: The global multi-tier ecosystem, detailed logical Clean Architecture layers, physical containerized deployment topology, end-to-end operational journey, and inter-service communication protocols;
+  \item \textbf{Multi-Tenant Identity and Access Governance}: Organizational data isolation and dynamic role-based access control;
+  \item \textbf{Fleet and Transit Logistics Planning Subsystem}: Vehicle catalogs, circuit definitions, workforce shift scheduling, and the conceptual domain model;
+  \item \textbf{Real-Time Telemetry Processing and Automated Supervision}: High-throughput coordinate ingestion, live cartographic monitoring, and automatic geofence detection;
+  \item \textbf{Predictive Intelligence and Transit Forecasting}: Real-time arrival estimation, passenger consultation, and fault-tolerant fallback strategies;
+  \item \textbf{Operational Analytics and Business Intelligence Subsystem}: Performance metrics, custom reporting layouts, and data reconciliation;
+  \item \textbf{Architectural Cohesion and System Integrity}: High-level architectural foundations ensuring maintainability, separation of concerns, and auditability.
+\end{itemize}
+
+\section{High-Level System Architecture and Operational Design}
+\label{sec:global_architecture}
+
+\subsection{Global Multi-Tier Ecosystem}
+To satisfy the demanding requirements of real-time transit supervision, multi-tenant enterprise usage, and predictive analytics, the \Tech{CST LePoint} platform is architected as a decoupled, multi-tier distributed ecosystem. Each tier addresses a distinct operational and technical concern, communicating over standardized network protocols to ensure loose coupling, high responsiveness, and independent horizontal scalability.
+
+Figure~\ref{fig:global_architecture} illustrates the global multi-tier ecosystem and the primary interaction pathways between its constituent layers.
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=0.95\textwidth]
+%%{init: { "theme": "redux", "themeVariables": { "fontSize": "26px", "fontFamily": "Arial, sans-serif" } }}%%
+flowchart TB
+    subgraph Field["1. Field & IoT Tier (Vehicular Operations)"]
+        direction LR
+        Modem["Onboard IoT Modems<br/>(GPS Coordinates)"]
+        Scanner["RFID Badge Scanners<br/>(Passenger Boardings)"]
+    end
+
+    subgraph Client["2. User Portal Tier (Role-Adapted Web Interface)"]
+        direction LR
+        AdminUI["Administration & Security"]
+        FleetUI["Fleet & Route Planning"]
+        LiveUI["Live Cartographic Map"]
+        BiUI["BI Analytics & Reports"]
+    end
+
+    subgraph Core["3. Central Business Orchestration Tier"]
+        direction TB
+        Ingest["Telemetry & Event Ingestion"]
+        Plan["Fleet & Roster Logistics"]
+        Sec["Multi-Tenant RBAC Security"]
+        Analytics["Analytics & Reporting Engine"]
+    end
+
+    subgraph StorageAI["4. Data & Intelligence Tier"]
+        direction LR
+        DB[("Multi-Tenant Database<br/>(Transactional Store)")]
+        ML["Predictive AI Engine<br/>(Real-Time ETA Forecasting)"]
+    end
+
+    Modem -->|"HTTP GPS Streams"| Ingest
+    Scanner -->|"HTTP RFID Events"| Ingest
+    Client <-->|"REST APIs & Security Tokens"| Core
+    Ingest -->|"Save Telemetry & Events"| DB
+    Plan <-->|"Read & Write Master Data"| DB
+    Sec <-->|"Validate Tenant & Permissions"| DB
+    Analytics <-->|"Aggregate Metrics & Layouts"| DB
+    LiveUI -.->|"Request ETA"| Ingest
+    Ingest <-->|"Predict Arrival Time"| ML
+  \end{mermaid}
+  \caption{Global System Architecture -- Multi-Tier Functional Ecosystem}
+  \label{fig:global_architecture}
+\end{figure}
+
+The four architectural tiers operate collaboratively as follows:
+\begin{enumerate}
+  \item \textbf{Field and IoT Tier}: Comprises embedded hardware units deployed across the transit fleet, including GPS modems and RFID badge scanners. These units capture and transmit high-frequency location vectors, speed metrics, and passenger boarding events directly from active vehicles over cellular networks.
+  \item \textbf{User Portal Tier}: Delivers a responsive Single Page Application (\Tech{SPA}) accessible through modern web browsers. Tailored to distinct enterprise user profiles (system administrators, fleet dispatchers, operations supervisors, and commuters), it delivers interactive cartographic tracking, master data planning interfaces, and dynamic analytical dashboards.
+  \item \textbf{Central Business Orchestration Tier}: Serves as the operational brain of the platform. It executes business workflows, validates domain invariants, enforces multi-tenant security boundaries, performs real-time geofence calculations, coordinates transactional persistence, and delegates machine learning inferences.
+  \item \textbf{Data and Intelligence Tier}: Combines a centralized relational database ensuring strict ACID compliance, auditability, and multi-tenant partitioning, alongside a specialized Python artificial intelligence microservice dedicated to real-time bus arrival forecasting.
+\end{enumerate}
+
+\subsection{Logical System Architecture}
+\label{subsec:logical_architecture}
+The internal design of the \Tech{CST LePoint} platform is governed by the principles of \Tech{Clean Architecture}, \Tech{Domain-Driven Design (DDD)}, and \Tech{Command Query Responsibility Segregation (CQRS)}. Dependencies flow strictly inwards, ensuring that enterprise business rules and core domain logic remain completely decoupled from database frameworks, web presentation layers, and external microservice protocols.
+
+Figure~\ref{fig:logical_architecture} depicts the logical layered architecture of the platform, detailing the functional components and dependency relationships across all tiers.
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=0.98\textwidth]
+%%{init: { "theme": "redux", "themeVariables": { "fontSize": "22px", "fontFamily": "Arial, sans-serif" } }}%%
+flowchart TB
+    subgraph ClientTier["1. Presentation Tier (Angular 19 SPA)"]
+        direction LR
+        UI_Comp["UI Modules & Views<br/>(Dashboard, Map, BI, Admin)"]
+        UI_GIS["GIS Mapping Engine<br/>(Leaflet.js + OSM)"]
+        UI_Grid["Virtualized DataGrid<br/>(DevExtreme dx-data-grid)"]
+        UI_State["State & Reactive Streams<br/>(RxJS & Observables)"]
+        UI_Http["HTTP Interceptors<br/>(JWT Bearer & Error Handler)"]
+    end
+
+    subgraph ApiTier["2. API Gateway & Routing Tier (ASP.NET Core WebAPI)"]
+        direction LR
+        API_Carter["Carter Minimal APIs<br/>(Modular Route Slices)"]
+        API_Auth["Authentication Middleware<br/>(JWT Token Validation)"]
+        API_RBAC["Dynamic Authorization<br/>(NavigationPermissionHandler)"]
+        API_Ex["Global Exception Handler<br/>(RFC 7807 Problem Details)"]
+    end
+
+    subgraph AppTier["3. Application & Orchestration Tier (MediatR CQRS)"]
+        direction TB
+        subgraph Pipeline["MediatR Request Pipeline Behaviors"]
+            direction LR
+            Beh_Log["LoggingBehavior"] --> Beh_Val["ValidationBehavior<br/>(FluentValidation)"] --> Beh_UoW["UnitOfWorkBehavior<br/>(Auto SaveChanges)"]
+        end
+        subgraph Handlers["CQRS Command & Query Slices"]
+            direction LR
+            Cmds["Command Handlers<br/>(Write Operations)"]
+            Qrys["Query Handlers<br/>(Read AsNoTracking)"]
+            Maps["Mapster Profiles<br/>(DTO Mappings)"]
+        end
+        Pipeline --> Handlers
+    end
+
+    subgraph DomainTier["4. Domain Core Tier (Pure Enterprise Logic)"]
+        direction LR
+        Dom_Ent["Aggregates & Entities<br/>(Bus, Circuit, Stop, Shift, User)"]
+        Dom_VO["Strongly-Typed Value Objects<br/>(ULID Identifiers)"]
+        Dom_Rules["Domain Policies & Invariants<br/>(Haversine Geofencing, Skew Window)"]
+        Dom_Audit["AuditableEntity Base<br/>(Timestamp & User Audit)"]
+    end
+
+    subgraph InfraTier["5. Infrastructure & Persistence Tier"]
+        direction LR
+        Inf_EF["EF Core DbContext<br/>(Fluent Configurations)"]
+        Inf_Repo["Repositories & UnitOfWork<br/>(RepositoryBase & Slices)"]
+        Inf_Sec["Security Services<br/>(BCrypt & JWT Generator)"]
+        Inf_Doc["Document Generation<br/>(Puppeteer Sharp PDF)"]
+        Inf_ML["AI Prediction Connector<br/>(ExternalPredictionService)"]
+    end
+
+    subgraph MLTier["6. Machine Learning & Predictive Tier (FastAPI)"]
+        direction LR
+        ML_Api["Asynchronous Endpoints<br/>(/predict_eta, /batch_predict)"]
+        ML_Scaler["Feature Scaler & Preprocessor<br/>(bus_eta_scaler.pkl)"]
+        ML_Model["Trained Regressor Model<br/>(bus_eta_model.pkl)"]
+    end
+
+    ClientTier -->|"HTTPS / REST (JWT)"| ApiTier
+    ApiTier -->|"In-Process Invocation"| AppTier
+    AppTier -->|"Executes Use Cases On"| DomainTier
+    AppTier -.->|"Implements Contracts Via"| InfraTier
+    InfraTier -->|"Persistence Mapping"| DomainTier
+    InfraTier -->|"HTTP RPC (Port 8001)"| MLTier
+  \end{mermaid}
+  \caption{Logical System Architecture -- Layered Clean Architecture and Component Topology}
+  \label{fig:logical_architecture}
+\end{figure}
+
+The logical system architecture comprises six cohesive tiers:
+\begin{enumerate}
+  \item \textbf{Presentation Tier (Angular Single Page Application)}:
+  \begin{itemize}
+    \item \emph{User Interface Modules}: Encapsulates functional views for system administration, fleet master data, transit route planning, live cartographic tracking, and dynamic business intelligence dashboards.
+    \item \emph{GIS Cartographic Engine}: Built on \Tech{Leaflet.js} and OpenStreetMap tile layers, rendering dynamic vehicle markers, circuit polylines, geofenced collection perimeters, and live directional heading vectors.
+    \item \emph{Virtualized Data Grids}: Integrates \Tech{DevExtreme dx-data-grid} components to enable high-throughput tabular rendering, multi-column sorting, grouping, client-side filtering, and instant Excel/CSV data exports.
+    \item \emph{Reactive State and Interceptors}: Utilizes \Tech{RxJS} streams and custom HTTP interceptors to manage asynchronous event handling, automatic JWT Bearer token attachment, centralized error notifications, and global activity spinners.
+  \end{itemize}
+
+  \item \textbf{API Gateway and Routing Tier (.NET 8 Web API)}:
+  \begin{itemize}
+    \item \emph{Carter Minimal API Modules}: Employs modular endpoint slices (\texttt{ICarterModule}) that define RESTful routes with minimal memory footprint and zero controller boilerplate.
+    \item \emph{Authentication and Authorization}: Validates cryptographically signed JWT security tokens on incoming requests and evaluates dynamic navigation permissions via custom authorization handlers (\texttt{NavigationPermissionHandler}).
+    \item \emph{Global Exception Filter}: Intercepts application and domain exceptions, standardizing error responses into RFC~7807 Problem Details payloads with appropriate HTTP status codes.
+  \end{itemize}
+
+  \item \textbf{Application and Use-Case Orchestration Tier (.NET 8 Application)}:
+  \begin{itemize}
+    \item \emph{MediatR CQRS Pipeline}: Decouples request dispatchers from business handlers, dividing operations into explicit \emph{Commands} (state mutations) and \emph{Queries} (read-only data retrieval).
+    \item \emph{Pipeline Behaviors}: Executes a cross-cutting behavior chain comprising \texttt{LoggingBehavior} (structured request tracing), \texttt{ValidationBehavior} (fail-fast input schema validation via FluentValidation), and \texttt{UnitOfWorkBehavior} (atomic database commits for successful commands).
+    \item \emph{Data Transfer Mappings}: Uses compile-time \Tech{Mapster} mapping configurations to transform internal domain aggregates into lightweight, typed DTOs.
+  \end{itemize}
+
+  \item \textbf{Domain Core Tier (.NET 8 Domain)}:
+  \begin{itemize}
+    \item \emph{Pure Domain Aggregates}: Defines core business entities (\texttt{Bus}, \texttt{Modem}, \texttt{Chauffeur}, \texttt{Circuit}, \texttt{PointCollecte}, \texttt{Employe}, \texttt{Shift}, \texttt{OrdreMission}, \texttt{Rattachement}, \texttt{Societe}, \texttt{Utilisateur}, \texttt{RoleUtilisateur}) with private property setters and factory methods enforcing domain consistency.
+    \item \emph{Strongly-Typed Identifiers}: Implements \Tech{ULID} (Universally Unique Lexicographically Sortable Identifier) value objects, combining chronological sorting capabilities with URL-safe 128-bit uniqueness.
+    \item \emph{Domain Policies and Invariants}: Encapsulates pure business rules including Haversine great-circle distance calculations for stop geofencing, 15-minute telemetry freshness sliding windows, and vehicle seating capacity restrictions.
+    \item \emph{Universal Audit Contract}: Standardizes entity auditability through \texttt{AuditableEntity}, capturing creation and modification timestamps alongside actor identities.
+  \end{itemize}
+
+  \item \textbf{Infrastructure and Persistence Tier (.NET 8 Infrastructure)}:
+  \begin{itemize}
+    \item \emph{Entity Framework Core ORM}: Implements \texttt{ApplicationDbContext} with automated assembly scanning, fluent entity mappings, and database schema migrations.
+    \item \emph{Repository and Unit of Work}: Provides a generic \texttt{RepositoryBase<T>} and specialized domain repositories abstracting transactional data queries and batch updates.
+    \item \emph{Security and Cryptography}: Manages BCrypt password hashing (\texttt{PasswordService}) and HMAC-SHA256 token issuance (\texttt{JwtTokenGenerator}).
+    \item \emph{Document Generation Engine}: Employs \Tech{Puppeteer Sharp} to orchestrate a headless Chromium browser instance for rendering high-fidelity PDF work orders and operational reports.
+    \item \emph{External AI Connector}: Provides a resilient \texttt{HttpClient} client invoking the predictive machine learning microservice with automated timeout handling and fallback triggers.
+  \end{itemize}
+
+  \item \textbf{Predictive Intelligence Tier (Python FastAPI Microservice)}:
+  \begin{itemize}
+    \item \emph{Asynchronous REST Endpoints}: Exposes high-performance asynchronous prediction routes (\texttt{/predict\_eta}, \texttt{/batch\_predict}) powered by Python 3.11 and the Uvicorn ASGI server.
+    \item \emph{Feature Preprocessing Engine}: Loads pre-trained scikit-learn standard scalers (\texttt{bus\_eta\_scaler.pkl}) to normalize spatial coordinates, speed vectors, temporal cyclical features, and occupancy ratios.
+    \item \emph{Predictive Regression Models}: Executes pre-trained regression models (\texttt{bus\_eta\_model.pkl}) to infer real-time arrival durations in minutes with sub-second inference latency.
+  \end{itemize}
+\end{enumerate}
+
+\subsection{Physical System Architecture}
+\label{subsec:physical_architecture}
+To guarantee seamless deployment, isolated runtime environments, and deterministic environment parity between local development, testing, and production servers, the entire \Tech{CST LePoint} ecosystem is containerized and orchestrated using \Tech{Docker} and \Tech{Docker Compose}.
+
+Figure~\ref{fig:physical_architecture} illustrates the physical deployment topology, containerized service boundaries, virtual bridge networking, external port exposures, and persistent storage volume bindings.
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=0.98\textwidth]
+%%{init: { "theme": "redux", "themeVariables": { "fontSize": "22px", "fontFamily": "Arial, sans-serif" } }}%%
+flowchart TB
+    subgraph EdgeTier["Edge & Field Hardware Tier"]
+        direction LR
+        Modem["Onboard IoT GPS Modems<br/>(Teltonika / Telemetry)"]
+        RFID["RFID Card Scanners<br/>(Passenger Attendance)"]
+        ClientDevices["User Client Terminals<br/>(Workstations, Tablets, Phones)"]
+    end
+
+    subgraph HostServer["Host Server / Cloud VM (Docker Orchestration)"]
+        subgraph IngressLayer["Ingress & Web Server"]
+            Nginx["Nginx Reverse Proxy & Web Server<br/>(Port 80 / 443 / 4200)"]
+        end
+
+        subgraph DockerNet["Isolated Virtual Bridge Network (cst-network)"]
+            subgraph ContFE["Frontend Container (cst-frontend)"]
+                SPA_Prod["Angular 19 SPA Bundle<br/>(Static HTML/JS/CSS Assets)"]
+            end
+
+            subgraph ContBE["Backend API Container (cst-backend)"]
+                Kestrel[".NET 8 Kestrel Web Server<br/>(ASP.NET Core / Carter API)<br/>Port 6064"]
+            end
+
+            subgraph ContML["AI Service Container (cst-ml-service)"]
+                Uvicorn["Python 3.11 / Uvicorn ASGI Server<br/>(FastAPI ML Inference Engine)<br/>Port 8001"]
+            end
+
+            subgraph ContDB["Database Container (cst-database)"]
+                MSSQL["Microsoft SQL Server 2019<br/>(Relational ACID Engine)<br/>Port 1433"]
+            end
+        end
+
+        subgraph StorageTier["Persistent Host Storage Volumes"]
+            VolDB[("cst_db_data<br/>(SQL Server Database Files & Logs)")]
+            VolML[("cst_ml_models<br/>(Serialized ML Weights & Pickles)")]
+        end
+    end
+
+    Modem -->|"Cellular 4G/GPRS (HTTPS POST)"| Kestrel
+    RFID -->|"Serial / IoT Gateway Stream"| Modem
+    ClientDevices -->|"HTTPS (Port 4200/443)"| Nginx
+    Nginx -->|"Static Asset Serving"| SPA_Prod
+    SPA_Prod -.->|"XHR / REST API Requests (Port 6064)"| Kestrel
+
+    Kestrel -->|"Internal TCP TDS (Port 1433)"| MSSQL
+    Kestrel -->|"Internal HTTP RPC (Port 8001)"| Uvicorn
+    MSSQL --- VolDB
+    Uvicorn --- VolML
+  \end{mermaid}
+  \caption{Physical System Architecture -- Containerized Microservice Topology and Hardware Nodes}
+  \label{fig:physical_architecture}
+\end{figure}
+
+The physical deployment infrastructure is structured across three hardware and containerized tiers:
+\begin{enumerate}
+  \item \textbf{Edge and Field Hardware Tier}:
+  \begin{itemize}
+    \item \emph{Vehicular IoT Modems}: Embedded telematics units (e.g., Teltonika devices) equipped with cellular SIM cards installed on buses. They capture GPS coordinates, velocity, and heading, transmitting HTTP/HTTPS POST payloads directly to the backend API ingestion endpoint over 4G/GPRS networks.
+    \item \emph{RFID Attendance Scanners}: Onboard badge scanners connected via serial or IoT gateway interfaces that register employee card taps during boarding and bundle them into real-time telemetry packets.
+    \item \emph{Client Terminals}: Desktop workstations, field tablets, and employee mobile devices executing standard web browsers to access the management portal over secure TLS connections (HTTPS).
+  \end{itemize}
+
+  \item \textbf{Host Server and Container Orchestration Tier}:
+  \begin{itemize}
+    \item \emph{Virtual Bridge Network (\texttt{cst-network})}: An isolated software-defined bridge network created by Docker Compose. Containers communicate internally using domain service names without exposing sensitive services (such as the database or ML engine) to the public internet.
+    \item \emph{Frontend Container (\texttt{cst-frontend})}: Packages an \Tech{Nginx 1.25} Alpine web server serving the optimized Angular production bundle. It listens on container port 80, mapped to host port 4200 for user web traffic.
+    \item \emph{Backend API Container (\texttt{cst-backend})}: Packages the pre-compiled .NET 8 Web API runtime executing on the high-performance \Tech{Kestrel} web server on host port 6064. It executes automatic schema migrations at startup and orchestrates business operations.
+    \item \emph{Database Container (\texttt{cst-database})}: Runs \Tech{Microsoft SQL Server 2019 Standard} on internal port 1433, enforcing transactional integrity, row-level locking, and multi-tenant partitioning.
+    \item \emph{AI Microservice Container (\texttt{cst-ml-service})}: Runs a Python 3.11 environment with \Tech{Uvicorn} and \Tech{FastAPI} on internal port 8001, executing real-time machine learning inference routines.
+  \end{itemize}
+
+  \item \textbf{Persistent Storage and Volume Tier}:
+  \begin{itemize}
+    \item \emph{Database Storage Volume (\texttt{cst\_db\_data})}: A dedicated host volume binding SQL Server data files (\texttt{.mdf}), transaction log files (\texttt{.ldf}), and indexes, ensuring absolute data durability across container restarts, migrations, or host reboots.
+    \item \emph{Model Artifacts Volume (\texttt{cst\_ml\_models})}: A persistent directory volume mounting serialized machine learning models (\texttt{.pkl} files), enabling seamless model retraining, hot-swapping, and version updates without requiring container rebuilds.
+  \end{itemize}
+\end{enumerate}
+
+Table~\ref{tab:physical_services_spec} summarizes the physical deployment specifications, network port mappings, and communication protocols across all containerized services.
+
+\begin{table}[H]
+  \small
+  \centering
+  \begin{tabularx}{\textwidth}{llllX}
+    \toprule
+    \textbf{Container Service} & \textbf{Base Image / Runtime} & \textbf{Port (Host:Cont)} & \textbf{Protocol} & \textbf{Operational Role} \\
+    \midrule
+    \texttt{cst-frontend} & \texttt{nginx:1.25-alpine} & 4200:80 & HTTP / HTTPS & Static SPA bundle delivery \& asset caching \\
+    \texttt{cst-backend} & \texttt{mcr.microsoft.com/dotnet/aspnet:8.0} & 6064:6064 & REST / HTTPS & Core API, CQRS orchestration, telemetry ingestion \\
+    \texttt{cst-database} & \texttt{mcr.microsoft.com/mssql/server:2019} & 1433:1433 & TCP (TDS) & Transactional store \& multi-tenant data \\
+    \texttt{cst-ml-service} & \texttt{python:3.11-slim} & 8001:8001 & HTTP (JSON) & Real-time ETA prediction \& feature scaling \\
+    \bottomrule
+  \end{tabularx}
+  \caption{Containerized Services Deployment Specification and Port Mappings}
+  \label{tab:physical_services_spec}
+\end{table}
+
+\subsection{End-to-End Operational Lifecycle}
+\label{subsec:operational_lifecycle}
+The functional strength of the platform lies in unifying the entire lifecycle of enterprise transit into an automated, continuous operational pipeline. 
+
+Figure~\ref{fig:operational_lifecycle} outlines the five distinct operational stages that govern daily transit workflows.
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=0.98\textwidth]
+%%{init: { "theme": "redux", "themeVariables": { "fontSize": "26px", "fontFamily": "Arial, sans-serif" } }}%%
+flowchart LR
+    subgraph S1["1. Pre-Trip Planning"]
+        P1["Define Circuits & Stops"] --> P2["Assign Buses & Drivers"]
+        P2 --> P3["Schedule Shift Rosters"]
+    end
+
+    subgraph S2["2. Trip Execution"]
+        E1["Vehicle Departure"] --> E2["Stream GPS Telemetry"]
+        E2 --> E3["Passenger Badge Scans"]
+    end
+
+    subgraph S3["3. Real-Time Processing"]
+        R1["Temporal Validation"] --> R2["Geofence Proximity Check"]
+        R2 --> R3["Auto-Detect Stops"]
+    end
+
+    subgraph S4["4. Live Supervision"]
+        L1["Update Live Map"] --> L2["Generate AI ETA"]
+        L2 --> L3["Dispatch Route Alerts"]
+    end
+
+    subgraph S5["5. Post-Trip Analytics"]
+        A1["Validate Trip Logs"] --> A2["Punctuality & Occupancy"]
+        A2 --> A3["Custom BI Reports"]
+    end
+
+    S1 --> S2 --> S3 --> S4 --> S5
+  \end{mermaid}
+  \caption{End-to-End Operational Transit Lifecycle}
+  \label{fig:operational_lifecycle}
+\end{figure}
+
+This lifecycle unfolds across five consecutive phases:
+\begin{enumerate}
+  \item \textbf{Pre-Trip Planning}: Operational coordinators define circuits, map pickup stations, assign dedicated vehicles and qualified drivers, and match employee shifts to designated bus routes.
+  \item \textbf{Trip Execution}: As the vehicle commences its scheduled circuit, onboard IoT devices stream real-time GPS coordinates and register passenger RFID badge taps during boarding.
+  \item \textbf{Real-Time Processing}: Ingested data packets undergo immediate temporal verification, spatial proximity calculation against scheduled geofences, and automated stop identification.
+  \item \textbf{Live Supervision}: Dispatchers monitor fleet progress on an interactive cartographic map, while passengers consult dynamically updated estimated arrival times and receive notifications for deviations.
+  \item \textbf{Post-Trip Analytics}: Upon trip completion, operational data is aggregated to compute key performance metrics, vehicle occupancy rates, driver punctuality, and exportable financial reconciliation reports.
+\end{enumerate}
+
+\subsection{Inter-Tier Communication and Fault-Tolerance Protocols}
+\label{subsec:inter_tier_protocols}
+To maintain operational continuity across fluctuating cellular connectivity and high concurrency spikes, the architecture implements robust communication and resilience protocols:
+\begin{itemize}
+  \item \textbf{Stateless REST and Cryptographic Bearer Tokens}: All communication between the Angular web client and the backend API occurs over stateless HTTPS RESTful requests carrying signed JSON Web Tokens (\Tech{JWT}). User identity, tenant context (\texttt{SocieteId}), and authorization privileges are cryptographically validated per request without server-side session overhead.
+  \item \textbf{Sliding-Window Telemetry Replay Defense}: Incoming telemetry packets from IoT modems are validated against a sliding temporal window of 15 minutes. Stale packets resulting from cellular network retransmissions are acknowledged but flagged, preventing historical packet replays from corrupting live cartographic state.
+  \item \textbf{Predictive Inference Timeout and Resilient Fallback}: When invoking the machine learning microservice for ETA forecasts, the backend enforces an asynchronous 2-second timeout threshold. If the AI service experiences latency or temporary unavailability, the system triggers a graceful fallback calculating arrival duration via a deterministic Haversine distance heuristic ($v_{\text{avg}} = 40\text{ km/h}$). This guarantees that user interfaces always display actionable transit timing without hanging.
+  \item \textbf{Transactional Unit-of-Work Consistency}: State mutations involving multiple relational entities (e.g., dispatching work orders, assigning employee attachments, or logging geofenced stop arrivals) execute within atomic database transactions via the Unit of Work pattern, ensuring full ACID consistency and zero partial data corruption.
+\end{itemize}
+
+\section{Multi-Tenant Identity and Access Governance}
+\label{sec:identity_access_governance}
+
+\subsection{Multi-Organization Partitioning}
+Enterprise transit management frequently involves multiple subsidiaries, partner companies, or client organizations operating under a shared software infrastructure. To guarantee strict data privacy, operational independence, and administrative isolation, the platform incorporates a shared-schema multi-tenancy model.
+
+Every operational entity---including vehicles, IoT modems, employee records, transit circuits, work orders, and historical telemetry logs---is intrinsically scoped to an organization identifier. This structural partition guarantees that:
+\begin{itemize}
+  \item Users belonging to a specific company are restricted strictly to their organization's assets and transit schedules;
+  \item Corporate managers have full autonomous control over their fleet, workforce rosters, and role assignments without risking cross-tenant data leaks;
+  \item Central administrators maintain cross-organization visibility for global system maintenance and infrastructure health monitoring.
+\end{itemize}
+
+\subsection{Dynamic Role-Based Access Control}
+To accommodate the diverse hierarchy of transit personnel, the system implements a dynamic Role-Based Access Control (\Tech{RBAC}) architecture. Rather than relying on hardcoded permissions, the system models permissions as a dynamic matrix mapping functional navigation modules to granular action capabilities: \emph{Read}, \emph{Add}, \emph{Edit}, and \emph{Delete}.
+
+Figure~\ref{fig:rbac_governance} illustrates the access governance workflow from initial request to dynamic UI presentation.
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=0.85\textwidth,height=0.8\textheight,keepaspectratio]
+%%{init: { "theme": "redux", "themeVariables": { "fontSize": "28px", "fontFamily": "Arial, sans-serif" } }}%%
+flowchart TD
+    Req["Incoming User Action / API Request"] --> Auth["1. Token & Session Authentication"]
+    Auth --> Tenant["2. Multi-Tenant Boundary Check<br/>(Enforce Company Context)"]
+    
+    Tenant --> Perm{"3. Dynamic RBAC Evaluation<br/>(Module & Action Privilege)"}
+    
+    Perm -->|"Granted"| Execute["4. Execute Business Operation<br/>(Read / Add / Edit / Delete)"]
+    Perm -->|"Denied"| Block["4. Reject Request (403 Forbidden)<br/>& Log Security Violation"]
+    
+    Execute --> UIUpdate["5. Dynamic UI Presentation<br/>(Render Authorized Views & Action Controls)"]
+  \end{mermaid}
+  \caption{Multi-Tenant \& Dynamic RBAC Governance Flow}
+  \label{fig:rbac_governance}
+\end{figure}
+
+The access governance mechanism enforces security at both user interface and backend tiers:
+\begin{itemize}
+  \item \textbf{Dynamic Interface Filtering}: Upon user sign-in, the client interface inspects the serialized permission matrix associated with the user's role. Navigation menus, action buttons, and route views are dynamically filtered to display only authorized features.
+  \item \textbf{Inviolable Backend Validation}: Every operational request is independently verified at the application boundary. If an incoming command requests an unauthorized action or accesses resources outside the authenticated company context, the request is terminated immediately with an HTTP 403 Forbidden response.
+\end{itemize}
+
+\subsection{Secure Session and Authentication Management}
+Authentication is established through a stateless token-based architecture:
+\begin{itemize}
+  \item \textbf{Credential Verification}: User passwords undergo adaptive cryptographic hashing, preventing plain-text exposure and defending against dictionary attacks.
+  \item \textbf{Stateless Signed Tokens}: Upon successful authentication, the system generates a cryptographically signed security token containing user claims (user identity, organizational context, and assigned role permissions).
+  \item \textbf{Seamless Session Restoration}: When a user opens or refreshes the application, a lightweight validation probe verifies token validity and retrieves the latest role permissions, restoring the user session smoothly without requiring repeated credential inputs.
+\end{itemize}
+
+\section{Fleet and Transit Logistics Planning Subsystem}
+\label{sec:fleet_logistics_planning}
+
+\subsection{Fleet Assets and IoT Unit Management}
+The foundation of effective transit logistics rests upon maintaining a synchronized catalog of physical and operational assets:
+\begin{itemize}
+  \item \textbf{Vehicular Fleet Management}: Captures vehicle profiles, seating capacities, registration identifiers, and operational statuses (active, in-maintenance, decommissioned).
+  \item \textbf{Hardware Modem Pairing}: Manages onboard IoT units by pairing unique hardware identifiers (such as 15-digit International Mobile Equipment Identity numbers) to specific vehicles, ensuring that all incoming telemetry is mapped to the correct bus.
+  \item \textbf{Driver Registry and Qualifications}: Records driver profiles, contact details, assigned companies, and driving credentials to ensure that only authorized personnel are scheduled for transit execution.
+\end{itemize}
+
+\subsection{Circuit and Geolocation Pickup Route Planning}
+Circuit design models the spatial and temporal paths that vehicles follow during daily transit:
+\begin{itemize}
+  \item \textbf{Circuit Modeling}: Defines named transit routes, departure origins, destination sites, estimated roundtrip durations, and operating schedules.
+  \item \textbf{Pickup Station Mapping}: Each circuit is composed of an ordered sequence of designated pickup stops. Every stop is defined by geographical coordinates (latitude and longitude) and assigned a configurable geofence radius (typically 250 meters).
+  \item \textbf{Route Sequence Enforcement}: Ordered sequence indexes ensure that transit progress and arrival countdowns can be computed deterministically as the vehicle navigates from the first stop to the destination terminus.
+\end{itemize}
+
+\subsection{Workforce Shift and Bus Roster Scheduling}
+To ensure balanced vehicle capacity and punctuality, the platform coordinates workforce transit rosters:
+\begin{itemize}
+  \item \textbf{Shift Alignment}: Work shifts (e.g., morning shift, afternoon shift, night shift) define standard working hours and operational transit windows.
+  \item \textbf{Employee Pickup Assignment}: Employees are assigned to a designated circuit and a specific pickup station based on geographical proximity to their residence.
+  \item \textbf{Work Order Execution Plans}: Dispatchers generate work orders that bind a designated bus, an assigned driver, and a scheduled circuit to a specific operating date and shift, creating an actionable schedule for daily execution.
+\end{itemize}
+
+\subsection{Conceptual Domain Information Model}
+Figure~\ref{fig:conceptual_domain_model} depicts the unified conceptual domain information model, illustrating the core business entities and their relational dependencies across the entire transit platform.
+
+
+\begin{figure}[p]
+  \centering
+  \begin{mermaid}[width=1.35\linewidth]
+%%{init: { "theme": "redux", "themeVariables": { "fontSize": "30px", "fontFamily": "Arial, sans-serif" } }}%%
+flowchart LR
+    subgraph Org["1. Organization & Identity"]
+        direction TB
+        Societe["<b>Societe</b><br/>(Tenant Root)"]
+        User["<b>Utilisateur</b><br/>(User Account)"]
+        Role["<b>RoleUtilisateur</b><br/>(RBAC Permissions)"]
+        Societe -->|"employs [1..*]"| User
+        Societe -->|"defines [1..*]"| Role
+        User -.->|"assigned [1]"| Role
+    end
+
+    subgraph Fleet["2. Fleet & Equipment"]
+        direction TB
+        Bus["<b>Bus</b><br/>(Vehicle Asset)"]
+        Modem["<b>Modem</b><br/>(IoT GPS Device)"]
+        Driver["<b>Chauffeur</b><br/>(Fleet Driver)"]
+        Societe -->|"owns [0..*]"| Bus
+        Societe -->|"operates [0..*]"| Modem
+        Societe -->|"contracts [0..*]"| Driver
+        Bus <-->|"equipped with [0..1]"| Modem
+    end
+
+    subgraph Logistics["3. Circuits & Stops"]
+        direction TB
+        Circuit["<b>Circuit</b><br/>(Transit Line)"]
+        Stop["<b>PointCollecte</b><br/>(Geofenced Stop)"]
+        Societe -->|"configures [0..*]"| Circuit
+        Circuit -->|"contains [1..*]"| Stop
+    end
+
+    subgraph Operations["4. Planning & Scheduling"]
+        direction TB
+        Shift["<b>Shift</b><br/>(Work Schedule)"]
+        Emp["<b>Employe</b><br/>(Passenger)"]
+        Order["<b>OrdreMission</b><br/>(Daily Dispatch)"]
+        Roster["<b>RattachementEmploye</b><br/>(Passenger Assignment)"]
+        Societe -->|"schedules [0..*]"| Shift
+        Societe -->|"manages [0..*]"| Emp
+        
+        Order -->|"assigned [1]"| Bus
+        Order -->|"driven by [1]"| Driver
+        Order -->|"executes [1]"| Circuit
+        Order -->|"timed by [1]"| Shift
+        
+        Roster -->|"assigns [1]"| Emp
+        Roster -->|"picks up at [1]"| Stop
+        Roster -->|"travels on [1]"| Circuit
+    end
+
+    subgraph Telemetry["5. Telemetry & Tracking"]
+        direction TB
+        Pos["<b>PositionBus</b><br/>(Live GPS Telemetry)"]
+        Event["<b>PointageEvenement</b><br/>(Attendance / RFID Scan)"]
+        
+        Pos -->|"transmitted by [1]"| Bus
+        Event -->|"recorded on [1]"| Bus
+        Event -.->|"occurred at [0..1]"| Stop
+        Event -.->|"identifies [0..1]"| Emp
+    end
+
+    Org ==> Fleet
+    Fleet ==> Operations
+    Logistics ==> Operations
+    Operations ==> Telemetry
+  \end{mermaid}
+  \caption{Unified Conceptual Domain Information Model}
+  \label{fig:conceptual_domain_model}
+\end{figure}
+
+This conceptual information model highlights the key structural relationships:
+\begin{itemize}
+  \item \textbf{Organization Root}: The \texttt{Societe} entity acts as the organizational boundary for all users, roles, fleet assets, circuits, employees, and shifts.
+  \item \textbf{Operational Synthesis (\texttt{OrdreMission})}: Unifies the operational execution triangle---combining a specific vehicle, driver, circuit, and shift for a designated calendar date.
+  \item \textbf{Workforce Attachment (\texttt{RattachementEmploye})}: Links individual employees to their designated pickup stops and transit circuits.
+  \item \textbf{Telemetry and Event Tracking}: Captures real-time GPS locations (\texttt{PositionBus}) and passenger attendance scans (\texttt{PointageEvenement}) referencing both vehicles and stops.
+\end{itemize}
+
+\section{Real-Time Telemetry Processing and Automated Supervision}
+\label{sec:telemetry_supervision}
+
+\subsection{High-Throughput Telemetry Ingestion Pipeline}
+The telemetry processing engine is engineered to ingest, validate, and persist high-frequency data packets transmitted by vehicle modems across the entire fleet:
+\begin{itemize}
+  \item \textbf{Data Ingestion Protocol}: Onboard modems periodically transmit HTTP POST packets containing hardware identifiers, geographical coordinates, passenger occupancy counters, and UTC timestamps.
+  \item \textbf{Temporal Skew Protection}: To prevent replay attacks and reject stale data caused by transient cellular connectivity drops, incoming packets are checked against a sliding temporal window (rejecting data with timestamp deviations exceeding 15 minutes).
+  \item \textbf{Modem-to-Fleet Resolution}: The system resolves the hardware identifier to its corresponding active vehicle and retrieves the circuit associated with the active work order.
+\end{itemize}
+
+\subsection{Live Cartographic Supervision}
+The supervision portal provides fleet dispatchers and operations managers with an interactive, live-updating cartographic command center:
+\begin{itemize}
+  \item \textbf{Dynamic Map Rendering}: Renders geographical base maps overlaid with active vehicle markers, color-coded circuit polylines, pickup stations, and company destination sites.
+  \item \textbf{Vehicle State Visualization}: Bus markers visually reflect operational status (in transit, idling, stopped, out of radius) and display real-time passenger capacity badges.
+  \item \textbf{Continuous Position Synchronization}: The client interface receives streamed position updates, smoothly repositioning vehicle markers on the map without full page reloads.
+\end{itemize}
+
+\subsection{Automated Geofencing and Stop Detection Engine}
+A core innovation of the platform is the elimination of manual stop recording through automated spatial geofencing.
+
+Figure~\ref{fig:telemetry_geofence_seq} illustrates the sequence execution flow from telemetry transmission to automated geofence evaluation and map broadcasting.
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=0.98\textwidth]
+%%{init: { "theme": "redux", "themeVariables": { "fontSize": "28px", "actorFontSize": "28px", "noteFontSize": "26px", "messageFontSize": "26px", "fontFamily": "Arial, sans-serif" }, "sequence": { "actorWidth": 150, "actorHeight": 52, "boxWidth": 150, "messageMargin": 36 } }}%%
+sequenceDiagram
+    autonumber
+    actor Modem as Onboard IoT Modem
+    participant API as Telemetry Ingestion Service
+    participant Geo as Geofencing Calculator
+    participant DB as Transactional Store
+    participant UI as Dispatcher Live Map
+
+    Modem->>API: 1. Transmit GPS & Telemetry Packet
+    API->>API: 2. Validate Temporal Freshness (Skew Window)
+    API->>DB: 3. Fetch Active Circuit & Pickup Coordinates
+    DB-->>API: 4. Return Authorized Route Stops
+    API->>Geo: 5. Calculate Proximity Distance (Haversine)
+    
+    alt Proximity <= 250m of Scheduled Stop
+        Geo-->>API: 6a. Scheduled Stop Arrival Detected
+        API->>DB: 7a. Log Normal Stop Arrival & Passenger Events
+    else Proximity > 250m from all Scheduled Stops
+        Geo-->>API: 6b. Out-of-Radius Stop Detected
+        API->>DB: 7b. Create Auto-Stop Audit Record & Alert Event
+    end
+
+    API->>DB: 8. Persist Latest Bus Coordinate Vector
+    API-->>UI: 9. Broadcast Updated Position & Status
+    UI->>UI: 10. Update Bus Marker, Route Path & Alerts
+  \end{mermaid}
+  \caption{Real-Time Telemetry Ingestion \& Automated Geofence Detection Pipeline}
+  \label{fig:telemetry_geofence_seq}
+\end{figure}
+
+The automated geofencing logic proceeds as follows:
+\begin{enumerate}
+  \item \textbf{Haversine Distance Calculation}: When a telemetry packet is received, the engine computes the great-circle distance between the vehicle's current coordinates and all pickup stops assigned to its active circuit.
+  \item \textbf{Normal Stop Detection}: If the bus is within the authorized 250-meter radius of a scheduled stop, the system logs a verified stop arrival and associates any concurrent passenger badge scans with that station.
+  \item \textbf{Unscheduled Stop Identification}: If passenger boarding scans or sustained stops occur while the vehicle is located more than 250 meters away from all scheduled stations, the engine automatically creates an audit record (e.g., \texttt{PC-AUTO}) and flags the event as an out-of-radius deviation on the dispatcher's live map.
+\end{enumerate}
+
+\section{Predictive Intelligence and Transit Forecasting}
+\label{sec:predictive_intelligence}
+
+\subsection{Real-Time Estimated Time of Arrival (ETA) Forecasting}
+Uncertainty regarding vehicle arrival times is a major source of employee dissatisfaction and productivity loss in corporate transportation. To address this challenge, the platform incorporates a dedicated machine learning microservice that calculates real-time Estimated Time of Arrival (\Tech{ETA}) predictions for every upcoming pickup stop.
+
+Figure~\ref{fig:predictive_eta_seq} depicts the end-to-end forecasting pipeline connecting the client portal, business orchestrator, and predictive machine learning engine.
+
+\begin{figure}[H]
+  \centering
+  \begin{mermaid}[width=0.98\textwidth]
+%%{init: { "theme": "redux", "themeVariables": { "fontSize": "28px", "actorFontSize": "28px", "noteFontSize": "26px", "messageFontSize": "26px", "fontFamily": "Arial, sans-serif" }, "sequence": { "actorWidth": 150, "actorHeight": 52, "boxWidth": 150, "messageMargin": 36 } }}%%
+sequenceDiagram
+    autonumber
+    actor User as Employee / Supervisor
+    participant UI as Client Web Portal
+    participant API as Business API Orchestrator
+    participant ML as Predictive AI Service
+    participant DB as Transactional Store
+
+    User->>UI: 1. Request Assigned Bus Status & Arrival Time
+    UI->>API: 2. Query Live Transit Details (Circuit, Stop)
+    API->>DB: 3. Retrieve Latest Bus Location & Route Progress
+    DB-->>API: 4. Return Vehicle Position, Stop Index & Speed
+    
+    alt Predictive AI Engine Available
+        API->>ML: 5a. Request ETA Inference (Spatial & Temporal Features)
+        ML-->>API: 6a. Return Predicted ETA (Minutes) & Confidence
+    else AI Service Timeout / Fallback
+        API->>API: 5b. Compute Deterministic Distance/Velocity Heuristic
+    end
+
+    API-->>UI: 7. Deliver Arrival Forecast & Vehicle Status
+    UI-->>User: 8. Render Real-Time Countdown Card & Map Marker
+  \end{mermaid}
+  \caption{Predictive ETA Forecasting \& Supervision Intelligence Flow}
+  \label{fig:predictive_eta_seq}
+\end{figure}
+
+The forecasting engine evaluates a rich set of operational and environmental features:
+\begin{itemize}
+  \item \textbf{Spatial Metrics}: Remaining great-circle distance to the target pickup station, remaining number of intermediate stops, and current vehicle transit speed;
+  \item \textbf{Temporal Dynamics}: Hour of the day, cyclical time encodings (sine and cosine transforms to capture continuous daily cycles), day of the week, and rush-hour indicator flags;
+  \item \textbf{Transit Variables}: Current bus passenger occupancy ratio and historical route completion durations.
+\end{itemize}
+
+\subsection{Passenger and Driver Roster Consultation}
+The predicted arrival values directly feed user-facing interfaces:
+\begin{itemize}
+  \item \textbf{Employee Commute Card}: Employees can view their assigned bus route, current vehicle location on the map, and a live countdown showing the expected arrival time at their personal pickup stop.
+  \item \textbf{Driver Schedule View}: Drivers receive a sequence of upcoming stops with target arrival times, assisting them in maintaining optimal transit pacing.
+\end{itemize}
+
+\subsection{Fault-Tolerant Fallback Strategy}
+To guarantee uninterrupted service availability during network degradation or AI service maintenance, the platform implements a dual-tier resilience model:
+\begin{itemize}
+  \item If the machine learning microservice does not respond within a configured timeout window (e.g., 2 seconds), the backend automatically falls back to a deterministic calculation based on spatial route distance and historical average velocity ($40\text{ km/h}$).
+  \item The client interface seamlessly displays the estimated duration alongside a subtle indicator, ensuring that supervisors and passengers always receive actionable arrival guidance without encountering application errors.
+\end{itemize}
+
+\section{Operational Analytics and Business Intelligence Subsystem}
+\label{sec:analytics_bi_subsystem}
+
+\subsection{Operational Key Performance Indicators (KPIs)}
+To enable continuous process improvement and data-driven decision-making, the platform aggregates historical transit and attendance logs into key operational indicators:
+\begin{itemize}
+  \item \textbf{Fleet Punctuality and Schedule Adherence}: Evaluates planned versus actual arrival times across all pickup stops and terminal destinations, highlighting chronic bottleneck routes.
+  \item \textbf{Vehicle Occupancy and Capacity Utilization}: Analyzes passenger boarding counts against vehicle seating capacities, identifying under-utilized buses or overcrowded circuits requiring fleet rebalancing.
+  \item \textbf{Attendance and Boarding Compliance}: Cross-references scheduled employee shift rosters with recorded RFID badge scans, summarizing presence rates, unboarded passengers, and unauthorized pickups.
+  \item \textbf{Operational Route Costs}: Computes total distance traveled, transit durations, and vehicle operational hours for logistics cost optimization.
+\end{itemize}
+
+\subsection{Dynamic Reporting Perspectives and Layout Customization}
+To accommodate the diverse analytical needs of executive directors, HR managers, and logistics dispatchers, the Business Intelligence (\Tech{BI}) subsystem provides dynamic data exploration tools:
+\begin{itemize}
+  \item \textbf{Interactive Tabular Exploration}: Users can perform multi-level grouping (e.g., grouping by company, then by shift, then by circuit), multi-column sorting, and multi-criteria date filtering across massive operational datasets.
+  \item \textbf{Layout State Persistence}: Analysts can customize their data grid view---arranging column orderings, applying custom filters, and defining visibility preferences---and save these configurations as named personal or organizational layouts. Saved layouts are persisted in the database and restored automatically upon subsequent visits.
+\end{itemize}
+
+\subsection{Data Export and Logistics Reconciliation}
+To integrate transit intelligence into broader enterprise workflows, the analytics subsystem provides robust data export capabilities:
+\begin{itemize}
+  \item \textbf{Multi-Format Reports}: Operational summaries and detailed attendance records can be exported directly to standard document formats including PDF, Excel, and CSV.
+  \item \textbf{Billing and Provider Reconciliation}: Exported reports serve as authoritative audit logs for validating third-party transport provider invoices against actual trips and kilometers executed.
+\end{itemize}
+
+\section{Architectural Cohesion and System Integrity}
+\label{sec:architectural_cohesion}
+
+\subsection{Separation of Concerns and Modular Design}
+To guarantee that the platform remains maintainable, extensible, and robust over its lifecycle, the system is designed around strict separation of architectural concerns:
+\begin{itemize}
+  \item \textbf{Decoupled Domain Core}: Core business logic, validation rules, and domain policies are completely isolated from user interface libraries, external frameworks, and database persistence mechanisms.
+  \item \textbf{Segregation of Read and Write Operations}: By separating write-heavy transactional operations (such as high-throughput telemetry ingestion and vehicle updates) from read-heavy analytical queries (such as live map streaming and BI reporting), the system prevents database contention and maintains high responsiveness under heavy operational loads.
+\end{itemize}
+
+\subsection{Data Consistency and Transactional Auditability}
+Enterprise transit data demands absolute consistency and complete traceability:
+\begin{itemize}
+  \item \textbf{Transactional Unit-of-Work}: All modifications involving multiple related entities (such as updating a work order and reassigning a driver) are executed within atomic transactional boundaries, guaranteeing that operations either succeed entirely or roll back safely.
+  \item \textbf{Universal Audit Trail}: Every domain entity inherits standardized audit tracking (recording creation timestamps, creator identities, modification timestamps, and modifier identities). This provides an immutable operational audit log for administrative oversight and security compliance.
+\end{itemize}
+
+\section{Conclusion}
+\label{sec:solution_conclusion}
+
+This chapter established the comprehensive architectural and conceptual design of the \Tech{CST LePoint} platform. By architecting a multi-tier distributed ecosystem, the proposed solution directly addresses the operational bottlenecks identified in the legacy system analysis:
+\begin{itemize}
+  \item Multi-tenant identity governance and dynamic role permissions ensure secure, segregated enterprise access;
+  \item Integrated logistics planning structures fleet assets, circuits, and workforce rosters;
+  \item High-throughput telemetry ingestion and automated geofencing eliminate manual stop logging and provide live cartographic fleet visibility;
+  \item Predictive machine learning microservices deliver accurate real-time arrival forecasts;
+  \item The Business Intelligence subsystem transforms raw operational logs into actionable KPIs and customizable analytics.
+\end{itemize}
+
+With the functional architecture and conceptual models defined, Chapter~\ref{chap:implementation} transitions from abstract design to concrete technical realization, detailing the development stacks, client-side modules, server-side handlers, container deployment topologies, and empirical performance evaluations.

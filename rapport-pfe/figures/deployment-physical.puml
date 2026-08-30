@@ -1,0 +1,38 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 10
+left to right direction
+
+skinparam node {
+  BorderColor #4B5563
+  BackgroundColor #FFFFFF
+}
+
+skinparam component {
+  BorderColor #0B3B66
+  BackgroundColor #F4F7FB
+}
+
+node "User Client Device" as client {
+  component "Web Browser\n(Angular 19 UI)" as browser
+}
+
+node "IoT Vehicle Fleet" as iot {
+  component "Onboard GPRS Modems\n(GPS & Passenger Telemetry)" as modems
+}
+
+node "Docker Compose Infrastructure\n(Linux Server Host)" as docker #F9FAFB {
+  component "Nginx Reverse Proxy\n(Port 80/443)" as nginx #E0F2FE
+  component ".NET 8 WebAPI Container\n(CollectManagement.WebAPI)" as webapi #D1FAE5
+  component "FastAPI Python ML Container\n(ml-service)" as mlservice #EDE9FE
+  database "SQL Server Container\n(Database Volume)" as sqlserver #FEE2E2
+}
+
+browser --> nginx : HTTP / WebSocket Protocol
+modems --> nginx : HTTP POST Telemetry Packets
+
+nginx --> webapi : Reverse Proxy Routing (/cm/*)
+webapi --> sqlserver : Entity Framework Core (Port 1433)
+webapi --> mlservice : HTTP Request (Port 8001 / predictions)
+
+@enduml
