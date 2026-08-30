@@ -298,25 +298,6 @@ The physical deployment infrastructure is structured across three hardware and c
   \end{itemize}
 \end{enumerate}
 
-Table~\ref{tab:physical_services_spec} summarizes the physical deployment specifications, network port mappings, and communication protocols across all containerized services.
-
-\begin{table}[H]
-  \small
-  \centering
-  \begin{tabularx}{\textwidth}{llllX}
-    \toprule
-    \textbf{Container Service} & \textbf{Base Image / Runtime} & \textbf{Port (Host:Cont)} & \textbf{Protocol} & \textbf{Operational Role} \\
-    \midrule
-    \texttt{cst-frontend} & \texttt{nginx:1.25-alpine} & 4200:80 & HTTP / HTTPS & Static SPA bundle delivery \& asset caching \\
-    \texttt{cst-backend} & \texttt{mcr.microsoft.com/dotnet/aspnet:8.0} & 6064:6064 & REST / HTTPS & Core API, CQRS orchestration, telemetry ingestion \\
-    \texttt{cst-database} & \texttt{mcr.microsoft.com/mssql/server:2019} & 1433:1433 & TCP (TDS) & Transactional store \& multi-tenant data \\
-    \texttt{cst-ml-service} & \texttt{python:3.11-slim} & 8001:8001 & HTTP (JSON) & Real-time ETA prediction \& feature scaling \\
-    \bottomrule
-  \end{tabularx}
-  \caption{Containerized Services Deployment Specification and Port Mappings}
-  \label{tab:physical_services_spec}
-\end{table}
-
 \subsection{End-to-End Operational Lifecycle}
 \label{subsec:operational_lifecycle}
 The functional strength of the platform lies in unifying the entire lifecycle of enterprise transit into an automated, continuous operational pipeline. 
