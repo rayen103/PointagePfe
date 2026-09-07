@@ -8,7 +8,7 @@ using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Domain.Chauffeurs;
 
-public class Chauffeur : AuditableEntity
+public class Chauffeur : AuditableEntity, ITenantEntity
 {
     public ChauffeurId ChauffeurId { get; private set; }
 

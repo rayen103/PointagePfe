@@ -1,0 +1,65 @@
+@startuml
+skinparam class {
+  BorderColor #0B3B66
+  BackgroundColor #F4F7FB
+  HeaderBackgroundColor #E2F0FD
+}
+skinparam shadowing false
+skinparam roundcorner 10
+hide circle
+
+class Bus {
+  + BusId : BusId
+  + NumeroIMM : string
+  + ModelBus : string
+  + IMEI : string
+  + Capacite : int
+  + CodeCircuit : string
+  + CodeChauffeur : string
+  + IsActive : bool
+  + Latitude : double
+  + Longitude : double
+  + CurrentOccupancy : int
+  + LastPositionAt : DateTime
+  + DeviceRecordedAtUtc : DateTime
+  + BatteryPercentage : int
+  + BatteryVoltage : double
+  + SocieteId : SocieteId
+}
+
+class Chauffeur {
+  + ChauffeurId : ChauffeurId
+  + CodeChauffeur : string
+  + Nom : string
+  + Prenom : string
+  + RFIDChauffeur : string
+  + IsActive : bool
+  + SocieteId : SocieteId
+}
+
+class Modem {
+  + ModemId : ModemId
+  + CodeModem : string
+  + IMEI : string
+  + NumeroSim : string
+  + ModelModem : string
+  + IsActive : bool
+  + SocieteId : SocieteId
+}
+
+class BusRuntimeEvent {
+  + BusRuntimeEventId : BusRuntimeEventId
+  + BusId : BusId
+  + EventType : string
+  + Description : string
+  + IMEI : string
+  + Latitude : double
+  + Longitude : double
+  + Occupancy : int
+  + OccurredAtUtc : DateTime
+}
+
+Bus "1" *-- "0..*" BusRuntimeEvent : logs
+Bus "1" --> "0..1" Chauffeur : driven by
+Bus "1" --> "0..1" Modem : monitored via
+@enduml

@@ -5,7 +5,7 @@ using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Domain.Bus;
 
-public class Bus : AuditableEntity
+public class Bus : AuditableEntity, ITenantEntity
 {
     public BusId BusId { get; private set; }
 

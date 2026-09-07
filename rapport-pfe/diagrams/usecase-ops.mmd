@@ -1,0 +1,28 @@
+%%{init: { "theme": "redux", "flowchart": { "curve": "linear", "nodeSpacing": 35, "rankSpacing": 70 }, "themeVariables": { "fontSize": "18px", "actorFontSize": "18px", "noteFontSize": "16px", "fontFamily": "Arial, sans-serif" } }}%%
+flowchart LR
+    Operator["fa:fa-user Operator / Dispatcher"]
+
+    subgraph System ["Operations & Workforce Logistics"]
+        direction TB
+        UC1(["Manage Employee Records & RFID"])
+        UC2(["Assign Employees to Pickup Points"])
+        UC3(["Schedule Daily Work Orders"])
+        UC4(["Generate Attendance Reports"])
+        UC5(["Save Custom BI Grid Layouts"])
+
+        UC1 ~~~ UC2
+        UC2 ~~~ UC3
+        UC3 ~~~ UC4
+        UC4 ~~~ UC5
+    end
+
+    Admin["fa:fa-user-shield Administrator"]
+
+    Operator --- UC1
+    Operator --- UC2
+    Operator --- UC3
+    Operator --- UC4
+    Operator --- UC5
+
+    UC1 --- Admin
+    UC4 --- Admin

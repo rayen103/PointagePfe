@@ -1,0 +1,43 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 10
+left to right direction
+
+skinparam rectangle {
+  BorderColor #0B3B66
+  BackgroundColor #F4F7FB
+}
+
+rectangle "Presentation Layer\n(Angular 19 UI & Carter Minimal APIs)" as presentation #E2F0FD {
+  component "Angular 19 SPA\n(Leaflet Map, DevExtreme Grid)" as UI
+  component "WebAPI Endpoints\n(Carter Route Modules)" as WebAPI
+}
+
+rectangle "Infrastructure Layer\n(Persistence & Core Services)" as infra #D1FAE5 {
+  component "Entity Framework Core\n(SQL Server DbContext)" as EF
+  component "Identity & Security\n(JWT Token Service)" as Security
+}
+
+rectangle "Application Layer\n(CQRS & Use Case Execution)" as app #EDE9FE {
+  component "MediatR Handlers\n(Commands & Queries)" as MediatR
+  component "Validation Pipeline\n(FluentValidation & MediatR Behaviors)" as Pipeline
+}
+
+rectangle "Domain Layer\n(Enterprise Business Rules)" as domain #FEE2E2 {
+  component "Entities & Aggregates\n(Bus, Employe, Rattachement)" as Entities
+  component "Value Objects\n(BusId, ShiftId, Coordinates)" as ValueObjects
+}
+
+UI --> WebAPI : HTTP REST / WebSockets
+WebAPI --> MediatR : Dispatches Command/Query
+MediatR --> Pipeline : Runs through
+Pipeline --> Entities : Enforces invariants
+
+EF -up-> MediatR : Implements Repository Interfaces
+Security -up-> WebAPI : Evaluates Claims & Permissions
+
+EF --> Entities : Persists
+app --> domain : Core Dependency (Depends Inward)
+infra --> app : Implements Abstractions
+presentation --> app : Depends on
+@enduml

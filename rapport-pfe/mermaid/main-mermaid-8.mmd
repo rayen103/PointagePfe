@@ -1,0 +1,26 @@
+%%{init: { "theme": "redux", "themeVariables": { "fontSize": "28px", "actorFontSize": "28px", "noteFontSize": "26px", "messageFontSize": "26px", "fontFamily": "Arial, sans-serif" }, "sequence": { "actorWidth": 150, "actorHeight": 52, "boxWidth": 150, "messageMargin": 36 } }}%%
+sequenceDiagram
+    autonumber
+    actor Modem as Onboard IoT Modem
+    participant API as Telemetry Ingestion Service
+    participant Geo as Geofencing Calculator
+    participant DB as Transactional Store
+    participant UI as Dispatcher Live Map
+
+    Modem->>API: 1. Transmit GPS & Telemetry Packet
+    API->>API: 2. Validate Temporal Freshness (Skew Window)
+    API->>DB: 3. Fetch Active Circuit & Pickup Coordinates
+    DB-->>API: 4. Return Authorized Route Stops
+    API->>Geo: 5. Calculate Proximity Distance (Haversine)
+
+    alt Proximity <= 250m of Scheduled Stop
+        Geo-->>API: 6a. Scheduled Stop Arrival Detected
+        API->>DB: 7a. Log Normal Stop Arrival & Passenger Events
+    else Proximity > 250m from all Scheduled Stops
+        Geo-->>API: 6b. Out-of-Radius Stop Detected
+        API->>DB: 7b. Create Auto-Stop Audit Record & Alert Event
+    end
+
+    API->>DB: 8. Persist Latest Bus Coordinate Vector
+    API-->>UI: 9. Broadcast Updated Position & Status
+    UI->>UI: 10. Update Bus Marker, Route Path & Alerts

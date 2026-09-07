@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using CollectManagement.Application.Interfaces.Authentification;
 using CollectManagement.Application.Interfaces.Services;
@@ -34,7 +34,8 @@ public sealed class JwtTokenGenerator : IJwtTokenGenerator
             new Claim(JwtRegisteredClaimNames.UniqueName, utilisateur.NomUtilisateur),
             new Claim(JwtRegisteredClaimNames.Email, utilisateur.Email),
             new Claim(JwtRegisteredClaimNames.Jti, Ulid.NewUlid().ToString()),
-            new Claim(ClaimTypes.Role, utilisateur.RoleUtilisateurId?.Value.ToString()??"")
+            new Claim(ClaimTypes.Role, utilisateur.RoleUtilisateurId?.Value.ToString()??""),
+            new Claim("societe_id", utilisateur.SocieteId.Value.ToString()),
         };
 
         var securityToken = new JwtSecurityToken(

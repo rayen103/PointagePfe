@@ -1,0 +1,65 @@
+%%{init: { "theme": "redux", "themeVariables": { "fontSize": "30px", "fontFamily": "Arial, sans-serif" } }}%%
+flowchart LR
+    subgraph Org["1. Organization & Identity"]
+        direction TB
+        Societe["<b>Societe</b><br/>(Tenant Root)"]
+        User["<b>Utilisateur</b><br/>(User Account)"]
+        Role["<b>RoleUtilisateur</b><br/>(RBAC Permissions)"]
+        Societe -->|"employs [1..*]"| User
+        Societe -->|"defines [1..*]"| Role
+        User -.->|"assigned [1]"| Role
+    end
+
+    subgraph Fleet["2. Fleet & Equipment"]
+        direction TB
+        Bus["<b>Bus</b><br/>(Vehicle Asset)"]
+        Modem["<b>Modem</b><br/>(IoT GPS Device)"]
+        Driver["<b>Chauffeur</b><br/>(Fleet Driver)"]
+        Societe -->|"owns [0..*]"| Bus
+        Societe -->|"operates [0..*]"| Modem
+        Societe -->|"contracts [0..*]"| Driver
+        Bus <-->|"equipped with [0..1]"| Modem
+    end
+
+    subgraph Logistics["3. Circuits & Stops"]
+        direction TB
+        Circuit["<b>Circuit</b><br/>(Transit Line)"]
+        Stop["<b>PointCollecte</b><br/>(Geofenced Stop)"]
+        Societe -->|"configures [0..*]"| Circuit
+        Circuit -->|"contains [1..*]"| Stop
+    end
+
+    subgraph Operations["4. Planning & Scheduling"]
+        direction TB
+        Shift["<b>Shift</b><br/>(Work Schedule)"]
+        Emp["<b>Employe</b><br/>(Passenger)"]
+        Order["<b>OrdreMission</b><br/>(Daily Dispatch)"]
+        Roster["<b>RattachementEmploye</b><br/>(Passenger Assignment)"]
+        Societe -->|"schedules [0..*]"| Shift
+        Societe -->|"manages [0..*]"| Emp
+
+        Order -->|"assigned [1]"| Bus
+        Order -->|"driven by [1]"| Driver
+        Order -->|"executes [1]"| Circuit
+        Order -->|"timed by [1]"| Shift
+
+        Roster -->|"assigns [1]"| Emp
+        Roster -->|"picks up at [1]"| Stop
+        Roster -->|"travels on [1]"| Circuit
+    end
+
+    subgraph Telemetry["5. Telemetry & Tracking"]
+        direction TB
+        Pos["<b>PositionBus</b><br/>(Live GPS Telemetry)"]
+        Event["<b>PointageEvenement</b><br/>(Attendance / RFID Scan)"]
+
+        Pos -->|"transmitted by [1]"| Bus
+        Event -->|"recorded on [1]"| Bus
+        Event -.->|"occurred at [0..1]"| Stop
+        Event -.->|"identifies [0..1]"| Emp
+    end
+
+    Org ==> Fleet
+    Fleet ==> Operations
+    Logistics ==> Operations
+    Operations ==> Telemetry

@@ -1,0 +1,34 @@
+@startuml
+!theme plain
+left to right direction
+skinparam dpi 300
+skinparam defaultFontName "Helvetica"
+skinparam defaultFontSize 12
+
+actor "Administrator" as admin
+
+rectangle "System Administration & Governance Sub-System" {
+  together {
+    usecase "UC-1: Authenticate User" as UC_auth
+    usecase "Manage Company Profiles\n& Tenant Scopes" as UC_societe
+    usecase "Manage User Accounts\n& Status" as UC_users
+    usecase "UC-4: Configure Dynamic\nRole Permissions" as UC_roles
+    usecase "Maintain Reference Catalogs\n(Sites, Shifts, Chantiers)" as UC_catalogs
+    usecase "Audit System Health\n& Ingestion Logs" as UC_audit
+  }
+}
+
+admin --> UC_auth
+admin --> UC_societe
+admin --> UC_users
+admin --> UC_roles
+admin --> UC_catalogs
+admin --> UC_audit
+
+UC_societe ..> UC_auth : <<include>>
+UC_users ..> UC_auth : <<include>>
+UC_roles ..> UC_auth : <<include>>
+UC_catalogs ..> UC_auth : <<include>>
+UC_audit ..> UC_auth : <<include>>
+
+@enduml

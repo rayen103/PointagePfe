@@ -66,18 +66,14 @@ public class UtilisateurRepository : RepositoryBase<Utilisateur>, IUtilisateurRe
 
     public Task<Utilisateur?> TryToLogin(
         string login, 
-        Ulid societeId,
         CancellationToken cancellationToken)
     {
-        var query = _dbSet.Where(u =>
-            (u.Email == login || u.NomUtilisateur == login) &&
-            u.IsActive
-        );
-
-        if (societeId != Ulid.Empty)
-        {
-            query = query.Where(u => u.SocieteId == new SocieteId(societeId));
-        }
+        var query = _dbSet
+            .IgnoreQueryFilters()
+            .Where(u =>
+                (u.Email == login || u.NomUtilisateur == login) &&
+                u.IsActive
+            );
 
         return query
             .Include(i => i.RoleUtilisateur)
@@ -87,7 +83,9 @@ public class UtilisateurRepository : RepositoryBase<Utilisateur>, IUtilisateurRe
 
     public Task<Utilisateur?> GetOneAsync(UtilisateurId utilisateurId, CancellationToken cancellationToken)
     {
-        return _dbSet.Where(w=>w.UtilisateurId.Equals(utilisateurId))
+        return _dbSet
+            .IgnoreQueryFilters()
+            .Where(w=>w.UtilisateurId.Equals(utilisateurId))
             .Include(i=>i.RoleUtilisateur)
             .Include(i=>i.Sites)
             .FirstOrDefaultAsync(cancellationToken);

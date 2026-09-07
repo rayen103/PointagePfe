@@ -1,0 +1,28 @@
+%%{init: { "theme": "redux", "themeVariables": { "fontSize": "26px", "fontFamily": "Arial, sans-serif" } }}%%
+flowchart LR
+    subgraph S1["1. Pre-Trip Planning"]
+        P1["Define Circuits & Stops"] --> P2["Assign Buses & Drivers"]
+        P2 --> P3["Schedule Shift Rosters"]
+    end
+
+    subgraph S2["2. Trip Execution"]
+        E1["Vehicle Departure"] --> E2["Stream GPS Telemetry"]
+        E2 --> E3["Passenger Badge Scans"]
+    end
+
+    subgraph S3["3. Real-Time Processing"]
+        R1["Temporal Validation"] --> R2["Geofence Proximity Check"]
+        R2 --> R3["Auto-Detect Stops"]
+    end
+
+    subgraph S4["4. Live Supervision"]
+        L1["Update Live Map"] --> L2["Generate AI ETA"]
+        L2 --> L3["Dispatch Route Alerts"]
+    end
+
+    subgraph S5["5. Post-Trip Analytics"]
+        A1["Validate Trip Logs"] --> A2["Punctuality & Occupancy"]
+        A2 --> A3["Custom BI Reports"]
+    end
+
+    S1 --> S2 --> S3 --> S4 --> S5

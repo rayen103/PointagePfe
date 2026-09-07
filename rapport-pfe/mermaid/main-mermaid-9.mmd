@@ -1,0 +1,23 @@
+%%{init: { "theme": "redux", "themeVariables": { "fontSize": "28px", "actorFontSize": "28px", "noteFontSize": "26px", "messageFontSize": "26px", "fontFamily": "Arial, sans-serif" }, "sequence": { "actorWidth": 150, "actorHeight": 52, "boxWidth": 150, "messageMargin": 36 } }}%%
+sequenceDiagram
+    autonumber
+    actor User as Employee / Supervisor
+    participant UI as Client Web Portal
+    participant API as Business API Orchestrator
+    participant ML as Predictive AI Service
+    participant DB as Transactional Store
+
+    User->>UI: 1. Request Assigned Bus Status & Arrival Time
+    UI->>API: 2. Query Live Transit Details (Circuit, Stop)
+    API->>DB: 3. Retrieve Latest Bus Location & Route Progress
+    DB-->>API: 4. Return Vehicle Position, Stop Index & Speed
+
+    alt Predictive AI Engine Available
+        API->>ML: 5a. Request ETA Inference (Spatial & Temporal Features)
+        ML-->>API: 6a. Return Predicted ETA (Minutes) & Confidence
+    else AI Service Timeout / Fallback
+        API->>API: 5b. Compute Deterministic Distance/Velocity Heuristic
+    end
+
+    API-->>UI: 7. Deliver Arrival Forecast & Vehicle Status
+    UI-->>User: 8. Render Real-Time Countdown Card & Map Marker

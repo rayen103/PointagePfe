@@ -1,0 +1,234 @@
+\appendix
+\chapter{Technical Appendix}
+
+\section{Summary of Main Endpoints}
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{6.5cm}p{8cm}}
+\toprule
+\textbf{Route} & \textbf{Role} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Route} & \textbf{Role} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{2}{r}{Continued on the next page} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{/cm/authentication/v1/login} & Authentication of a standard user \\
+\texttt{/cm/authentication/v1/login-check} & Session revalidation after page reload \\
+\texttt{/cm/circuit/list} & Paginated circuit list \\
+\texttt{/cm/circuit/add} & Route creation \\
+\texttt{/cm/circuit/update} & Route update \\
+\texttt{/cm/circuit/\{id\}/one} & Fetch one circuit by identifier \\
+\texttt{/cm/circuit/\{id\}/delete} & Delete a circuit \\
+\texttt{/cm/pointcollecte/list} & Paginated pickup-point list \\
+\texttt{/cm/bus/list} & Paginated bus list \\
+\texttt{/cm/bus/add} & Create a bus record \\
+\texttt{/cm/bus/runtime/position} & Reception of a bus runtime position \\
+\texttt{/cm/bus/runtime/positions/stream} & Snapshot stream for live positions \\
+\texttt{/cm/bus/\{id\}/events} & Retrieve runtime events for one bus \\
+\texttt{/cm/bus/\{id\}/vider} & Reset bus occupancy \\
+\texttt{/cm/prediction/bus-eta} & ETA prediction for a bus \\
+\texttt{/cm/prediction/bus-eta/available} & ETA prediction for all active buses \\
+\texttt{/cm/prediction/metadata} & Prediction model metadata \\
+\texttt{/cm/prediction/absence-risk} & Absence-risk prediction \\
+\texttt{/cm/prediction/duration} & Duration prediction for an operation \\
+\texttt{/cm/analyse/bus/query} & Execution of an analytical query \\
+\texttt{/cm/analyse/bus/layouts} & Saved BI layouts for bus analysis \\
+\texttt{/cm/analyse/employe/query} & Analytical query for employee data \\
+\texttt{/cm/analyse/trace/query} & Analytical query for GPS traces \\
+\end{longtable}
+
+All diagrams and sequence illustrations referenced in this report have been fully compiled from their PlantUML sources and integrated directly into the text.
+
+\normalsize
+
+\section{Core Entity Catalogue}
+
+\small
+\begin{longtable}{p{3.5cm}p{4.6cm}p{5.4cm}}
+\toprule
+\textbf{Entity} & \textbf{Business Role} & \textbf{Representative Fields} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Entity} & \textbf{Business Role} & \textbf{Representative Fields} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Circuit & Defines a pickup route and its geometry & Code, label, coordinates, distance, duration, color, active status \\
+PointCollecte & Represents a pickup point for employees & Code, label, coordinates, region, governorate, status \\
+CircuitPointCollecte & Orders pickup points within a route & Route reference, pickup-point reference, display order \\
+Bus & Represents a physical vehicle in the fleet & IMM number, model, IMEI, capacity, occupancy, runtime state \\
+Employe & Represents a staff member to transport & Matricule, RFID, identity, route, pickup point, shift \\
+Chauffeur & Represents a driver assigned to a bus & Code, identity, CIN, RFID, internal/external status \\
+Utilisateur & Represents an authenticated application user & Identity, password hash, company, roles, allowed navigations \\
+RoleUtilisateur & Defines access privileges for users & Role name, navigation permissions, action flags \\
+Navigation & Represents a protected UI or API entry point & Navigation code, label, allowed actions \\
+Site & Groups users and operational scope & Site code, label, company reference \\
+Societe & Root business ownership entity & Company code, label, identifiers \\
+Modem & Emits bus runtime telemetry & Device code, IMEI, bus reference, connection state \\
+Shift & Defines a working period for employees & Shift code, start time, end time, type \\
+Chantier & Represents a work site or project location & Code, label, region, operational context \\
+OrdreTravail & Tracks a work order or operational task & Reference, description, status, site, dates \\
+Rattachement & Connects a worker to a site or mission & Employee, site, dates, duration \\
+RattachementEmploye & Links staff members to work assignments with cost tracking & RattachementId, Matricule, NomPrenom, DateDebut, HeureDebut, Cout \\
+RattachementArticle & Links equipment or articles to work assignments & RattachementId, ArticleId, Quantity, Cost \\
+Reseau & Represents a transit network routing catalog & ReseauId, Label, ActiveStatus \\
+ReportLayout & Stores user-customized BI dashboard configurations & ReportLayoutId, ReportType, Name, ConfigJson, IsDefault \\
+BusRuntimeEvent & Records real-time GPS telemetry, passenger occupancy, and geofence alerts & BusId, EventType, Latitude, Longitude, Occupancy, OccurredAtUtc \\
+Region & Geographic classification used by the business & Region name, code, governorate reference \\
+Gouvernorat & Administrative classification for locations & Governorate name, code, region references \\
+\end{longtable}
+\normalsize
+
+\section{Service and Module Matrix}
+
+\small
+\begin{longtable}{p{4.2cm}p{4.6cm}p{4.6cm}}
+\toprule
+\textbf{Service or Module} & \textbf{Responsibility} & \textbf{Typical Collaboration} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Service or Module} & \textbf{Responsibility} & \textbf{Typical Collaboration} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Carter route modules & Define HTTP endpoints per business area & MediatR and authorization pipeline \\
+Application handlers & Execute commands and queries & Repositories, validators, and unit of work \\
+EF Core context & Persist the domain model & Migration scripts and repositories \\
+JWT service & Issue and validate tokens & Login endpoints and frontend interceptor \\
+Permission service & Check navigation-based actions & User roles and protected routes \\
+External prediction service & Call the ML microservice & Bus runtime data and ETA model \\
+Map viewer component & Render route locations on the map & Circuit list and geolocation data \\
+Dashboard module & Present aggregated operational data & BI queries and charts \\
+Transloco service & Provide multilingual texts & Navigation labels and form screens \\
+Docker Compose stack & Orchestrate all runtime services & Database, backend, frontend, and ML service \\
+Migration workflow & Evolve schema safely & EF Core and runtime validation \\
+Logging pipeline & Capture diagnostics and execution traces & API requests, errors, and runtime events \\
+PDF generation service & Produce printable outputs & Reporting endpoints and business summaries \\
+\end{longtable}
+\normalsize
+
+\section{Glossary}
+
+\small
+\begin{longtable}{p{3.2cm}p{10.3cm}}
+\toprule
+\textbf{Term} & \textbf{Meaning in This Project} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Term} & \textbf{Meaning in This Project} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+ULID & Sortable unique identifier used across the domain and persistence layer. \\
+CQRS & Split between commands that change state and queries that read state. \\
+Carter & Lightweight module-based routing library used in the backend. \\
+MediatR & In-process mediator used to dispatch commands and queries to handlers. \\
+EF Core & ORM used for data persistence and schema migration. \\
+JWT & Token standard used for stateless authentication. \\
+BCrypt & Password hashing algorithm used in the authentication stack. \\
+RBAC & Role-based access control extended here with navigation permissions. \\
+Geofencing & Runtime check used to detect route deviations or unexpected positions. \\
+Runtime event & Operational event reported by a bus modem or backend process. \\
+ETA & Estimated time of arrival for a bus at its next stop. \\
+BI & Business intelligence dashboards and queries for operational analysis. \\
+Transloco & Angular library used for multilingual user interface support. \\
+Leaflet & Open-source mapping library used for route visualization. \\
+Docker Compose & Orchestration file used to start the database, backend, frontend, and ML service. \\
+FastAPI & Python web framework used to expose the prediction service. \\
+Joblib & Serialization tool used for model and scaler artifacts. \\
+Confidence score & Number indicating how reliable a prediction appears to be. \\
+Runtime occupancy & Number of passengers or employees currently reported by the bus. \\
+Navigation & UI or API entry point protected by permissions. \\
+Site & Operational boundary used to scope users and business data. \\
+Shift & Work period used in personnel management and predictions. \\
+\end{longtable}
+\normalsize
+
+\section{Database Table Creation Scripts (DDL)}
+Below is the SQL DDL script defining the core tables in the SQL Server database schema, illustrating indices and multi-tenant keys:
+
+\begin{lstlisting}[language=SQL, caption={SQL Server DDL Database Schema definition}]
+-- Create the main schema
+CREATE SCHEMA F3SManagement;
+GO
+
+-- Create the Societes Table
+CREATE TABLE F3SManagement.Societes (
+    SocieteId VARCHAR(26) NOT NULL PRIMARY KEY,
+    Nom VARCHAR(100) NOT NULL,
+    CodeSociete VARCHAR(20) NOT NULL UNIQUE,
+    MatriculeFiscal VARCHAR(50) NULL,
+    LogoPath VARCHAR(255) NULL,
+    InsererPar VARCHAR(50) NULL,
+    DateInsertion DATETIME NULL,
+    ModifierPar VARCHAR(50) NULL,
+    DateModification DATETIME NULL
+);
+
+-- Create the Buses Table
+CREATE TABLE F3SManagement.Buses (
+    BusId VARCHAR(26) NOT NULL PRIMARY KEY,
+    NumeroIMM VARCHAR(50) NOT NULL,
+    ModelBus VARCHAR(100) NULL,
+    IMEI VARCHAR(15) NULL,
+    Capacite INT NULL,
+    CodeCircuit VARCHAR(50) NULL,
+    CodeChauffeur VARCHAR(50) NULL,
+    IsActive BIT NOT NULL DEFAULT 1,
+    Latitude DECIMAL(9,6) NULL,
+    Longitude DECIMAL(9,6) NULL,
+    CurrentOccupancy INT NOT NULL DEFAULT 0,
+    LastPositionAt DATETIME NULL,
+    LastOccupancyUpdateAt DATETIME NULL,
+    SocieteId VARCHAR(26) NOT NULL,
+    CONSTRAINT FK_Buses_Societes FOREIGN KEY (SocieteId) 
+        REFERENCES F3SManagement.Societes(SocieteId)
+);
+
+-- Create the Employes Table
+CREATE TABLE F3SManagement.Employes (
+    EmployeId VARCHAR(26) NOT NULL PRIMARY KEY,
+    Matricule VARCHAR(20) NOT NULL,
+    RFID VARCHAR(50) NULL,
+    Nom VARCHAR(50) NOT NULL,
+    Prenom VARCHAR(50) NOT NULL,
+    CodeCircuit VARCHAR(20) NULL,
+    CodePointCollecte VARCHAR(20) NULL,
+    CodeShift VARCHAR(20) NULL,
+    SocieteId VARCHAR(26) NOT NULL,
+    CONSTRAINT FK_Employes_Societes FOREIGN KEY (SocieteId) 
+        REFERENCES F3SManagement.Societes(SocieteId)
+);
+
+-- Create the BusRuntimeEvents Table
+CREATE TABLE F3SManagement.BusRuntimeEvents (
+    BusRuntimeEventId VARCHAR(26) NOT NULL PRIMARY KEY,
+    BusId VARCHAR(26) NOT NULL,
+    EventType VARCHAR(50) NOT NULL,
+    Description VARCHAR(255) NOT NULL,
+    Latitude DECIMAL(9,6) NULL,
+    Longitude DECIMAL(9,6) NULL,
+    Occupancy INT NOT NULL,
+    OccurredAtUtc DATETIME NOT NULL,
+    CONSTRAINT FK_BusRuntimeEvents_Buses FOREIGN KEY (BusId) 
+        REFERENCES F3SManagement.Buses(BusId)
+);
+
+-- Create indices for multi-tenant query optimizations
+CREATE INDEX IX_Buses_SocieteId ON F3SManagement.Buses(SocieteId);
+CREATE INDEX IX_Employes_SocieteId ON F3SManagement.Employes(SocieteId);
+CREATE INDEX IX_BusRuntimeEvents_BusId ON F3SManagement.BusRuntimeEvents(BusId);
+\end{lstlisting}
+
+\normalsize

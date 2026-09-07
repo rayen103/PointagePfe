@@ -36,7 +36,6 @@ public sealed class LoginQueryHandler
 
         var utilisateur = await _utilisateurRepository.TryToLogin(
             request.Login,
-            request.SocieteId,
             cancellationToken).ConfigureAwait(false);
 
         var hasActiveSite = string.IsNullOrWhiteSpace(request.NumeroChantier) ||

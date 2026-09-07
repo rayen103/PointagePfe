@@ -5,7 +5,7 @@ using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Domain.Sites;
 
-public class Site : AuditableEntity
+public class Site : AuditableEntity, ITenantEntity
 {
     public SiteId SiteId { get; private set; }
     public string Code { get; private set; }

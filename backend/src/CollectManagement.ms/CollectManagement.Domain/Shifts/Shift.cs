@@ -5,7 +5,7 @@ using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Domain.Shifts;
 
-public class Shift : AuditableEntity
+public class Shift : AuditableEntity, ITenantEntity
 {
     public ShiftId ShiftId { get; private set; }
 

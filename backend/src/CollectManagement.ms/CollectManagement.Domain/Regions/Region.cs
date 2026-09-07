@@ -5,7 +5,7 @@ using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Domain.Regions;
 
-public class Region : AuditableEntity
+public class Region : AuditableEntity, ITenantEntity
 {
     public RegionId RegionId { get; private set; }
 

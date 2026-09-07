@@ -1,0 +1,11 @@
+%%{init: { "theme": "redux", "themeVariables": { "fontSize": "28px", "fontFamily": "Arial, sans-serif" } }}%%
+flowchart TD
+    Req["Incoming User Action / API Request"] --> Auth["1. Token & Session Authentication"]
+    Auth --> Tenant["2. Multi-Tenant Boundary Check<br/>(Enforce Company Context)"]
+
+    Tenant --> Perm{"3. Dynamic RBAC Evaluation<br/>(Module & Action Privilege)"}
+
+    Perm -->|"Granted"| Execute["4. Execute Business Operation<br/>(Read / Add / Edit / Delete)"]
+    Perm -->|"Denied"| Block["4. Reject Request (403 Forbidden)<br/>& Log Security Violation"]
+
+    Execute --> UIUpdate["5. Dynamic UI Presentation<br/>(Render Authorized Views & Action Controls)"]

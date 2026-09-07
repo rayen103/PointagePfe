@@ -70,6 +70,7 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         services.AddScoped<ILoggedInUserService, LoggedInUserService>();
+        services.AddScoped<ITenantProvider, TenantProvider>();
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         services.Configure<PuppeteerOptions>(configuration.GetSection(PuppeteerOptions.SectionName));
         services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.SectionName));

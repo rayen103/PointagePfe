@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using CollectManagement.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
 
@@ -29,6 +29,14 @@ public class LoggedInUserService : ILoggedInUserService
                          ?? _context.HttpContext?.User.FindFirst("sub")?.Value;
 
             return userId;
+        }
+    }
+
+    public string? SocieteId
+    {
+        get
+        {
+            return _context.HttpContext?.User.FindFirst("societe_id")?.Value;
         }
     }
 

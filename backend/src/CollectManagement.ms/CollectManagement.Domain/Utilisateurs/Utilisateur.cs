@@ -8,7 +8,7 @@ using CollectManagement.Domain.Utilisateurs.ValueObjects;
 
 namespace CollectManagement.Domain.Utilisateurs;
 
-public sealed class Utilisateur : AuditableEntity
+public sealed class Utilisateur : AuditableEntity, ITenantEntity
 {
     private readonly List<UtilisateurSite> _sites = [];
 

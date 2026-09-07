@@ -7,7 +7,7 @@ using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Domain.PointsCollecte;
 
-public class PointCollecte : AuditableEntity
+public class PointCollecte : AuditableEntity, ITenantEntity
 {
     public PointCollecteId PointCollecteId { get; private set; }
     

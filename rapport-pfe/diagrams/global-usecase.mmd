@@ -1,0 +1,35 @@
+%%{init: { "theme": "redux", "flowchart": { "curve": "linear", "nodeSpacing": 40, "rankSpacing": 90 }, "themeVariables": { "fontSize": "18px", "actorFontSize": "18px", "noteFontSize": "16px", "fontFamily": "Arial, sans-serif" } }}%%
+flowchart LR
+    Operator["fa:fa-user Operator / Dispatcher"]
+
+    subgraph System ["CST LePoint Platform"]
+        direction TB
+        UC1(["Authenticate User"])
+        UC2(["Manage Fleet and Circuits"])
+        UC3(["Assign Shifts and Employees"])
+        UC4(["Track Buses on Live Map"])
+        UC5(["Predict Arrival Times (ETA)"])
+        UC6(["Generate BI and Audit Reports"])
+        UC7(["Manage Users and Permissions"])
+
+        UC1 ~~~ UC2
+        UC2 ~~~ UC3
+        UC3 ~~~ UC4
+        UC4 ~~~ UC5
+        UC5 ~~~ UC6
+        UC6 ~~~ UC7
+    end
+
+    Admin["fa:fa-user-shield Administrator"]
+
+    Operator --- UC1
+    Operator --- UC2
+    Operator --- UC3
+    Operator --- UC4
+    Operator --- UC5
+    Operator --- UC6
+
+    UC1 --- Admin
+    UC2 --- Admin
+    UC6 --- Admin
+    UC7 --- Admin
