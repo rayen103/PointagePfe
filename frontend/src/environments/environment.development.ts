@@ -1,5 +1,4 @@
 export const environment = {
-    //BaseApi:'http://localhost:6066/cm/',
-    BaseApi:'http://localhost:6064/cm/',
+    BaseApi: 'https://api-pointage-rayen-hecmhghxerf7cdgp.germanywestcentral-01.azurewebsites.net/cm/',
     mapGeocodingApi: 'https://nominatim.openstreetmap.org/search',
 };
