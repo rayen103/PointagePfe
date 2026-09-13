@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using CollectManagement.Application.Common;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
@@ -12,14 +12,14 @@ public class GlobalExceptionHandling : IExceptionHandler
         Exception exception, 
         CancellationToken cancellationToken)
     {
-        var exceptionMessage = exception.Message;
+        var exceptionDetails = exception.ToString();
 
         await httpContext.Response.WriteAsJsonAsync(
             new ApiResponse<string>()
         {
             Success = false,
             StatusCode = (int)HttpStatusCode.InternalServerError,
-            Message = exceptionMessage,
+            Message = exceptionDetails,
             Data = "",
             ValidationErrors = []
         }, cancellationToken)
