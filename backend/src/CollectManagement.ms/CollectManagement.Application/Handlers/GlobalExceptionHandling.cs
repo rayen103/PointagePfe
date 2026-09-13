@@ -12,7 +12,7 @@ public class GlobalExceptionHandling : IExceptionHandler
         Exception exception, 
         CancellationToken cancellationToken)
     {
-        var exceptionDetails = exception.ToString();
+        var exceptionDetails = exception.Message;
 
         await httpContext.Response.WriteAsJsonAsync(
             new ApiResponse<string>()
