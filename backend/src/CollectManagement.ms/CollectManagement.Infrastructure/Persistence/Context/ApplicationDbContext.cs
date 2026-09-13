@@ -47,33 +47,24 @@ public class ApplicationDbContext: DbContext
     
     /// <summary>
     /// Builds a lambda expression for the given entity type:
-    ///   entity => _tenantProvider.SocieteId == null || entity.SocieteId == _tenantProvider.SocieteId
-    /// 
-    /// EF Core evaluates _tenantProvider.SocieteId on each query execution (not at model build time),
-    /// because the expression captures the field reference, not its current value.
-    /// </summary>
+    public SocieteId? CurrentTenantId => _tenantProvider.SocieteId;
+
     private LambdaExpression BuildTenantFilter(Type entityType)
     {
         // Parameter: e (the entity)
         var parameter = Expression.Parameter(entityType, "e");
-        
-        // Access: this._tenantProvider.SocieteId
-        var tenantProviderField = Expression.Field(Expression.Constant(this), nameof(_tenantProvider));
-        var currentTenantId = Expression.Property(tenantProviderField, nameof(ITenantProvider.SocieteId));
-        
-        // Condition 1: _tenantProvider.SocieteId == null (bypass for unauthenticated requests)
-        var nullCheck = Expression.Equal(
-            currentTenantId, 
-            Expression.Constant(null, typeof(SocieteId)));
-        
-        // Access: e.SocieteId
         var entitySocieteId = Expression.Property(parameter, nameof(ITenantEntity.SocieteId));
         
-        // Condition 2: e.SocieteId == _tenantProvider.SocieteId
-        var tenantMatch = Expression.Equal(entitySocieteId, 
-            Expression.Convert(currentTenantId, typeof(SocieteId)));
+        // Property on DbContext: CurrentTenantId
+        var currentTenantProp = Expression.Property(Expression.Constant(this), nameof(CurrentTenantId));
         
-        // Combined: null check OR tenant match
+        // Condition 1: CurrentTenantId == null (bypass for unauthenticated requests)
+        var nullCheck = Expression.Equal(currentTenantProp, Expression.Constant(null, typeof(SocieteId)));
+        
+        // Condition 2: e.SocieteId == CurrentTenantId
+        var tenantMatch = Expression.Equal(entitySocieteId, currentTenantProp);
+        
+        // Combined: CurrentTenantId == null || e.SocieteId == CurrentTenantId
         var body = Expression.OrElse(nullCheck, tenantMatch);
         
         return Expression.Lambda(body, parameter);
