@@ -1,0 +1,76 @@
+name: Deploy Frontend to Azure App Service
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/deploy-frontend.yml'
+  workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_NAME: 'cst-pointage-web'
+  NODE_VERSION: '20.x'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+
+      - name: Build Angular Application (Production)
+        working-directory: frontend
+        run: npm run build -- --configuration production
+
+      - name: Prepare Node / Express Static Server for Azure Linux Web App
+        working-directory: frontend/dist/collectmanagement/browser
+        run: |
+          cat << 'EOF' > package.json
+          {
+            "name": "cst-web-server",
+            "version": "1.0.0",
+            "main": "server.js",
+            "scripts": {
+              "start": "node server.js"
+            },
+            "dependencies": {
+              "express": "^4.19.2"
+            }
+          }
+          EOF
+          cat << 'EOF' > server.js
+          const express = require('express');
+          const path = require('path');
+          const app = express();
+          const port = process.env.PORT || 8080;
+
+          app.use(express.static(__dirname));
+
+          app.get('*', (req, res) => {
+            res.sendFile(path.join(__dirname, 'index.html'));
+          });
+
+          app.listen(port, () => {
+            console.log(`Server listening on port ${port}`);
+          });
+          EOF
+          npm install --production
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_FRONTEND }}
+          package: frontend/dist/collectmanagement/browser
