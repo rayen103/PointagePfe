@@ -20,12 +20,15 @@ public sealed class JwtTokenGenerator : IJwtTokenGenerator
         _dateTimeProvider = dateTimeProvider;
         _jwtOptions = jwtOptions.Value;
     }
-    
     public string GenerateToken(Utilisateur utilisateur)
     {
+        var secret = !string.IsNullOrWhiteSpace(_jwtOptions.Secret)
+            ? _jwtOptions.Secret
+            : "01HBBRZ5CY308W01M2FQVXB0Z5@yelzem-May3ref-3lih-7ad";
+
         var signingCredentials = new SigningCredentials(
             new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_jwtOptions.Secret)),
+                Encoding.UTF8.GetBytes(secret)),
             SecurityAlgorithms.HmacSha256);
 
         var claims = new[]
