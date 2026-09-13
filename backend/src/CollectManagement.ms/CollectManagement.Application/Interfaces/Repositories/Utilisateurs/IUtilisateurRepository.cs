@@ -20,4 +20,20 @@ public interface IUtilisateurRepository : IRepositoryBase<Utilisateur>
     Task<Utilisateur?> GetOneAsync(
         UtilisateurId utilisateurId,
         CancellationToken cancellationToken);
+
+    Task<Utilisateur?> GetByEmailAsync(
+        string email,
+        CancellationToken cancellationToken);
+
+    Task<Utilisateur?> GetByNomUtilisateurAsync(
+        string nomUtilisateur,
+        CancellationToken cancellationToken);
+
+    Task<Utilisateur?> GetByApprovalTokenAsync(
+        string token,
+        CancellationToken cancellationToken);
+
+    Task<Utilisateur?> GetByEmailWithDetailsAsync(
+        string email,
+        CancellationToken cancellationToken);
 }

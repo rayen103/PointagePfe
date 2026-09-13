@@ -91,6 +91,36 @@ public class UtilisateurRepository : RepositoryBase<Utilisateur>, IUtilisateurRe
             .FirstOrDefaultAsync(cancellationToken);
     }
 
+    public Task<Utilisateur?> GetByEmailAsync(string email, CancellationToken cancellationToken)
+    {
+        return _dbSet
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+    }
+
+    public Task<Utilisateur?> GetByNomUtilisateurAsync(string nomUtilisateur, CancellationToken cancellationToken)
+    {
+        return _dbSet
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.NomUtilisateur == nomUtilisateur, cancellationToken);
+    }
+
+    public Task<Utilisateur?> GetByApprovalTokenAsync(string token, CancellationToken cancellationToken)
+    {
+        return _dbSet
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.ApprovalToken == token, cancellationToken);
+    }
+
+    public Task<Utilisateur?> GetByEmailWithDetailsAsync(string email, CancellationToken cancellationToken)
+    {
+        return _dbSet
+            .IgnoreQueryFilters()
+            .Include(i => i.RoleUtilisateur)
+                .ThenInclude(r => r.Navigations)
+            .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+    }
+
     public UtilisateurRepository(ApplicationDbContext dbContext) : base(dbContext)
     {
     }

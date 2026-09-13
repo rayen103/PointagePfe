@@ -115,121 +115,155 @@ public class AuthenticationEndpoints : ICarterModule
         HttpContext httpContext,
         CancellationToken cancellationToken)
     {
-        // 0. Check duplicate email
-        var existingEmailUser = await utilisateurRepository.GetAsync(u => u.Email == request.Email, cancellationToken).ConfigureAwait(false);
-        if (existingEmailUser is not null)
+        try
         {
+            var email = request.Email?.Trim() ?? "";
+            var nomSociete = request.NomSociete?.Trim() ?? "";
+            var nom = request.Nom?.Trim() ?? "";
+            var prenom = request.Prenom?.Trim() ?? "";
+            var password = request.Password ?? "";
+
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(nomSociete))
+            {
+                return Results.Ok(new ApiResponse<object>(new
+                {
+                    success = false,
+                    message = "L'adresse email et le nom de la société sont obligatoires."
+                }));
+            }
+
+            // 0. Check duplicate email (without tenant filter)
+            var existingEmailUser = await utilisateurRepository.GetByEmailAsync(email, cancellationToken).ConfigureAwait(false);
+            if (existingEmailUser is not null)
+            {
+                return Results.Ok(new ApiResponse<object>(new
+                {
+                    success = false,
+                    message = "Un compte avec cette adresse e-mail existe déjà."
+                }));
+            }
+
+            // 1. Create Societe
+            var societeId = new SocieteId(Ulid.NewUlid());
+            var societe = Societe.Create(
+                societeId: societeId,
+                logoPath: null,
+                nom: nomSociete,
+                initiales: null,
+                tva: null,
+                rc: null,
+                matriculeFiscal: "PENDING",
+                rne: null,
+                capital: 0m,
+                dateOverture: DateTime.UtcNow,
+                telephone1: null,
+                telephone2: null,
+                fax1: null,
+                fax2: null,
+                email: email.Length > 30 ? email.Substring(0, 30) : email,
+                adresse: null,
+                codePostal: null,
+                ville: null,
+                pays: null,
+                codeSociete: null
+            );
+            await societeRepository.AddAsync(societe, cancellationToken).ConfigureAwait(false);
+
+            // 2. Create inactive Utilisateur
+            var emailPrefix = email.Contains('@') ? email.Split('@')[0].Replace(" ", "").ToLower() : "user";
+            var nomUtilisateur = emailPrefix.Length > 20 ? emailPrefix.Substring(0, 20) : emailPrefix;
+
+            var existingUser = await utilisateurRepository.GetByNomUtilisateurAsync(nomUtilisateur, cancellationToken).ConfigureAwait(false);
+            if (existingUser is not null)
+            {
+                var suffix = Random.Shared.Next(10, 99).ToString();
+                nomUtilisateur = nomUtilisateur.Length > 18 ? nomUtilisateur.Substring(0, 18) + suffix : nomUtilisateur + suffix;
+            }
+
+            var utilisateurId = new UtilisateurId(Ulid.NewUlid());
+            var approvalToken = Guid.NewGuid().ToString("N");
+            var hashedPassword = passwordService.HashPassword(utilisateurId, password);
+
+            var utilisateur = Utilisateur.Create(
+                utilisateurId: utilisateurId,
+                nomUtilisateur: nomUtilisateur,
+                nom: nom,
+                prenom: prenom,
+                email: email,
+                password: hashedPassword,
+                roleUtilisateurId: null,
+                isActive: false, // Must be approved by Admin
+                societeId: societeId
+            );
+            utilisateur.SetApprovalToken(approvalToken);
+
+            await utilisateurRepository.AddAsync(utilisateur, cancellationToken).ConfigureAwait(false);
+
+            // Save changes
+            await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+            // 3. Send email to admin with approval link
+            var requestScheme = httpContext.Request.Scheme;
+            var requestHost = httpContext.Request.Host;
+            var approveUrl = $"{requestScheme}://{requestHost}/cm/authentication/v1/approve?token={approvalToken}";
+
+            var subject = $"[PointagePfe] Demande d'inscription: {nomSociete}";
+            var body = $"""
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                    <h2 style="color: #1e3a8a; border-bottom: 2px solid #3b82f6; padding-bottom: 10px;">Nouvelle Demande d'Inscription</h2>
+                    <p>Une nouvelle demande d'inscription d'entreprise a été reçue et nécessite votre approbation.</p>
+                    
+                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                        <tr>
+                            <td style="padding: 8px; font-weight: bold; border-bottom: 1px solid #f0f0f0; width: 35%;">Société:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #f0f0f0;">{nomSociete}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; font-weight: bold; border-bottom: 1px solid #f0f0f0;">Nom:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #f0f0f0;">{nom}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; font-weight: bold; border-bottom: 1px solid #f0f0f0;">Prénom:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #f0f0f0;">{prenom}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; font-weight: bold; border-bottom: 1px solid #f0f0f0;">Email:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #f0f0f0;">{email}</td>
+                        </tr>
+                    </table>
+                    
+                    <div style="text-align: center; margin-top: 30px;">
+                        <a href="{approveUrl}" style="background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block;">
+                            Accepter cette inscription
+                        </a>
+                    </div>
+                </div>
+                """;
+
+            try
+            {
+                await emailService.SendAdminNotificationAsync(subject, body, cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception emailEx)
+            {
+                Console.WriteLine($"[EMAIL WARNING] Failed to send admin notification: {emailEx.Message}");
+            }
+
+            return Results.Ok(new ApiResponse<object>(new
+            {
+                success = true,
+                message = "Demande d'inscription enregistrée. Un e-mail de notification a été envoyé à l'administrateur."
+            }));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[REGISTER ERROR] {ex}");
             return Results.Ok(new ApiResponse<object>(new
             {
                 success = false,
-                message = "Un compte avec cette adresse e-mail existe déjà."
+                message = $"Erreur lors de l'inscription : {ex.Message}"
             }));
         }
-
-        // 1. Create Societe
-        var societeId = new SocieteId(Ulid.NewUlid());
-        var societe = Societe.Create(
-            societeId: societeId,
-            logoPath: null,
-            nom: request.NomSociete,
-            initiales: null,
-            tva: null,
-            rc: null,
-            matriculeFiscal: "PENDING",
-            rne: null,
-            capital: null,
-            dateOverture: DateTime.UtcNow,
-            telephone1: null,
-            telephone2: null,
-            fax1: null,
-            fax2: null,
-            email: request.Email.Length > 30 ? request.Email.Substring(0, 30) : request.Email,
-            adresse: null,
-            codePostal: null,
-            ville: null,
-            pays: null,
-            codeSociete: null
-        );
-        await societeRepository.AddAsync(societe, cancellationToken).ConfigureAwait(false);
-
-        // 2. Create inactive Utilisateur
-        var emailPrefix = request.Email.Split('@')[0].Replace(" ", "").ToLower();
-        var nomUtilisateur = emailPrefix.Length > 20 ? emailPrefix.Substring(0, 20) : emailPrefix;
-
-        var existingUser = await utilisateurRepository.GetAsync(u => u.NomUtilisateur == nomUtilisateur, cancellationToken).ConfigureAwait(false);
-        if (existingUser is not null)
-        {
-            var suffix = Random.Shared.Next(10, 99).ToString();
-            nomUtilisateur = nomUtilisateur.Length > 18 ? nomUtilisateur.Substring(0, 18) + suffix : nomUtilisateur + suffix;
-        }
-
-        var utilisateurId = new UtilisateurId(Ulid.NewUlid());
-        var approvalToken = Guid.NewGuid().ToString("N");
-        var hashedPassword = passwordService.HashPassword(utilisateurId, request.Password);
-
-        var utilisateur = Utilisateur.Create(
-            utilisateurId: utilisateurId,
-            nomUtilisateur: nomUtilisateur,
-            nom: request.Nom,
-            prenom: request.Prenom,
-            email: request.Email,
-            password: hashedPassword,
-            roleUtilisateurId: null,
-            isActive: false, // Must be approved by Admin
-            societeId: societeId
-        );
-        utilisateur.SetApprovalToken(approvalToken);
-
-        await utilisateurRepository.AddAsync(utilisateur, cancellationToken).ConfigureAwait(false);
-
-        // Save changes
-        await unitOfWork.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-
-        // 3. Send email to admin with approval link
-        var requestScheme = httpContext.Request.Scheme;
-        var requestHost = httpContext.Request.Host;
-        var approveUrl = $"{requestScheme}://{requestHost}/cm/authentication/v1/approve?token={approvalToken}";
-
-        var subject = $"[PointagePfe] Demande d'inscription: {request.NomSociete}";
-        var body = $"""
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
-                <h2 style="color: #1e3a8a; border-bottom: 2px solid #3b82f6; padding-bottom: 10px;">Nouvelle Demande d'Inscription</h2>
-                <p>Une nouvelle demande d'inscription d'entreprise a été reçue et nécessite votre approbation.</p>
-                
-                <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-                    <tr>
-                        <td style="padding: 8px; font-weight: bold; border-bottom: 1px solid #f0f0f0; width: 35%;">Société:</td>
-                        <td style="padding: 8px; border-bottom: 1px solid #f0f0f0;">{request.NomSociete}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px; font-weight: bold; border-bottom: 1px solid #f0f0f0;">Nom:</td>
-                        <td style="padding: 8px; border-bottom: 1px solid #f0f0f0;">{request.Nom}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px; font-weight: bold; border-bottom: 1px solid #f0f0f0;">Prénom:</td>
-                        <td style="padding: 8px; border-bottom: 1px solid #f0f0f0;">{request.Prenom}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px; font-weight: bold; border-bottom: 1px solid #f0f0f0;">Email:</td>
-                        <td style="padding: 8px; border-bottom: 1px solid #f0f0f0;">{request.Email}</td>
-                    </tr>
-                </table>
-                
-                <div style="text-align: center; margin-top: 30px;">
-                    <a href="{approveUrl}" style="background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block;">
-                        Accepter cette inscription
-                    </a>
-                </div>
-            </div>
-            """;
-
-        await emailService.SendAdminNotificationAsync(subject, body, cancellationToken).ConfigureAwait(false);
-
-        return Results.Ok(new ApiResponse<object>(new
-        {
-            success = true,
-            message = "Demande d'inscription enregistrée. Un e-mail de notification a été envoyé à l'administrateur."
-        }));
     }
 
     public static async Task<IResult> Approve(
@@ -244,8 +278,8 @@ public class AuthenticationEndpoints : ICarterModule
             return Results.Content(GetHtmlResponse("Erreur", "Le jeton d'approbation est manquant.", false), "text/html");
         }
 
-        var utilisateur = await utilisateurRepository.GetAsync(
-            u => u.ApprovalToken == token, 
+        var utilisateur = await utilisateurRepository.GetByApprovalTokenAsync(
+            token, 
             cancellationToken).ConfigureAwait(false);
 
         if (utilisateur is null)
@@ -294,7 +328,14 @@ public class AuthenticationEndpoints : ICarterModule
             </div>
             """;
 
-        await emailService.SendEmailAsync(utilisateur.Email, userSubject, userBody, cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await emailService.SendEmailAsync(utilisateur.Email, userSubject, userBody, cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception emailEx)
+        {
+            Console.WriteLine($"[EMAIL WARNING] Failed to send user code email: {emailEx.Message}");
+        }
 
         return Results.Content(GetHtmlResponse("Succès", $"L'inscription pour <strong>{utilisateur.Email}</strong> a été approuvée avec succès. Un e-mail contenant le code d'accès lui a été envoyé.", true), "text/html");
     }
@@ -306,8 +347,8 @@ public class AuthenticationEndpoints : ICarterModule
         IUnitOfWork unitOfWork,
         CancellationToken cancellationToken)
     {
-        var utilisateur = await utilisateurRepository.GetAsync(
-            u => u.Email == request.Email, 
+        var utilisateur = await utilisateurRepository.GetByEmailWithDetailsAsync(
+            request.Email, 
             cancellationToken).ConfigureAwait(false);
 
         if (utilisateur is null)
@@ -363,8 +404,8 @@ public class AuthenticationEndpoints : ICarterModule
         IUnitOfWork unitOfWork,
         CancellationToken cancellationToken)
     {
-        var utilisateur = await utilisateurRepository.GetAsync(
-            u => u.Email == request.Email, 
+        var utilisateur = await utilisateurRepository.GetByEmailAsync(
+            request.Email, 
             cancellationToken).ConfigureAwait(false);
 
         if (utilisateur is null)
@@ -402,7 +443,14 @@ public class AuthenticationEndpoints : ICarterModule
             </div>
             """;
 
-        await emailService.SendEmailAsync(utilisateur.Email, userSubject, userBody, cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await emailService.SendEmailAsync(utilisateur.Email, userSubject, userBody, cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception emailEx)
+        {
+            Console.WriteLine($"[EMAIL WARNING] Failed to send resend-code email: {emailEx.Message}");
+        }
 
         return Results.Ok(new ApiResponse<object>(new { success = true, message = "Un nouveau code vous a été envoyé par email." }));
     }
