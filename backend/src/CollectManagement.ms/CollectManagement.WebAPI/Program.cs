@@ -111,12 +111,12 @@ END;
 //Handle exceptions priority it's important
 app.UseExceptionHandler((_) => { });
 
-// Configure the HTTP request pipeline.
+app.UseSwagger();
+app.UseSwaggerUI();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseRin();
-    app.UseSwagger();
-    app.UseSwaggerUI();
     app.UseRinDiagnosticsHandler();
 }
 
@@ -124,13 +124,13 @@ app.UseHttpsRedirection();
 
 app.UseSerilogRequestLogging();
 
-var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
-app.UseCors(policyBuilder  =>
+app.UseCors(policyBuilder =>
 {
     policyBuilder
-        .WithOrigins(allowedOrigins)
-        .WithMethods("GET","POST","PUT","PATCH","DELETE")
-        .WithHeaders("Authorization", "Content-Type");
+        .SetIsOriginAllowed(origin => true)
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
 });
 
 app.UseAuthentication()
