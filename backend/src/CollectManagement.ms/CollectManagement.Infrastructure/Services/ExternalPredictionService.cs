@@ -12,7 +12,8 @@ public sealed class ExternalPredictionService : IExternalPredictionService
     private const string ModelVersion = "external-cold-start-v1";
     private const string DurationDatasetFileName = "duration_external_dataset.json";
     private const string AbsenceDatasetFileName = "absence_external_dataset.json";
-    private const string BusEtaApiUrl = "http://localhost:8000/predict";
+    private const string DefaultBusEtaApiUrl = "http://localhost:8000/predict";
+    private readonly string _busEtaApiUrl;
     private readonly object _syncLock = new();
     private readonly string _datasetDirectory;
     private readonly string _artifactDirectory;
@@ -29,10 +30,12 @@ public sealed class ExternalPredictionService : IExternalPredictionService
     public ExternalPredictionService(
         IWebHostEnvironment environment,
         ILogger<ExternalPredictionService> logger,
-        IHttpClientFactory httpClientFactory)
+        IHttpClientFactory httpClientFactory,
+        Microsoft.Extensions.Configuration.IConfiguration configuration)
     {
         _logger = logger;
         _httpClient = httpClientFactory.CreateClient();
+        _busEtaApiUrl = configuration["MlService:BusEtaUrl"] ?? configuration["BusEtaApiUrl"] ?? DefaultBusEtaApiUrl;
         _datasetDirectory = Path.Combine(environment.ContentRootPath, "Public", "ml", "datasets");
         _artifactDirectory = Path.Combine(environment.ContentRootPath, "Public", "ml", "artifacts");
     }
@@ -161,7 +164,7 @@ public sealed class ExternalPredictionService : IExternalPredictionService
             _logger.LogInformation("Sending to ML service: {Json}", json);
 
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync(BusEtaApiUrl, content, cancellationToken).ConfigureAwait(false);
+            var response = await _httpClient.PostAsync(_busEtaApiUrl, content, cancellationToken).ConfigureAwait(false);
             
             _logger.LogInformation("ML service response status: {StatusCode}", response.StatusCode);
             
@@ -169,10 +172,9 @@ public sealed class ExternalPredictionService : IExternalPredictionService
             
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError("ML service responded with error: {StatusCode} - {Body}", response.StatusCode, responseJson);
+                _logger.LogWarning("ML service responded with error {StatusCode}, falling back to distance heuristic. Body: {Body}", response.StatusCode, responseJson);
+                return ComputeBusEtaFallback(request);
             }
-            
-            response.EnsureSuccessStatusCode();
             
             _logger.LogInformation("ML service response body: {Json}", responseJson);
             
@@ -180,13 +182,54 @@ public sealed class ExternalPredictionService : IExternalPredictionService
             
             _logger.LogInformation("Deserialized result: {@Result}", result);
             
-            return result ?? new BusEtaPredictionResponse(0, 0, 0.3, false);
+            return result ?? ComputeBusEtaFallback(request);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error calling Bus ETA API");
-            throw; // Re-throw the exception instead of returning default
+            _logger.LogWarning(ex, "ML ETA service unreachable or failed. Using fallback ETA calculation.");
+            return ComputeBusEtaFallback(request);
         }
+    }
+
+    private static BusEtaPredictionResponse ComputeBusEtaFallback(BusEtaPredictionRequest request)
+    {
+        var distanceMeters = request.DistanceToNextStop ?? request.DistanceFromStop ?? 500.0;
+        if (distanceMeters < 1.0)
+        {
+            distanceMeters = 1.0;
+        }
+
+        var now = request.LastPositionAt ?? DateTime.Now;
+        var hour = request.Hour ?? now.Hour;
+        var isRushHour = request.IsRushHour.HasValue
+            ? request.IsRushHour.Value == 1
+            : (hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 19);
+
+        // Average city speed: ~20 km/h in rush hour, ~32 km/h in normal conditions
+        var speedKmH = isRushHour ? 20.0 : 32.0;
+
+        // occupancy factor (if bus is near capacity, slightly slower boarding)
+        var occupancyRatio = 0.0;
+        if (request.Capacite is > 0 && request.CurrentOccupancy.HasValue)
+        {
+            occupancyRatio = Math.Clamp(request.CurrentOccupancy.Value / request.Capacite.Value, 0.0, 1.5);
+            if (occupancyRatio > 0.8)
+            {
+                speedKmH *= 0.9;
+            }
+        }
+
+        var distanceKm = distanceMeters / 1000.0;
+        var etaHours = distanceKm / speedKmH;
+        var etaMinutes = Math.Max(1.0, Math.Round(etaHours * 60.0, 1));
+        var etaSeconds = (int)Math.Round(etaMinutes * 60.0);
+
+        return new BusEtaPredictionResponse(
+            EtaMinutes: etaMinutes,
+            EtaSeconds: etaSeconds,
+            Confidence: 0.65,
+            UsedFallbackStop: true
+        );
     }
 
     private void EnsureInitialized()
