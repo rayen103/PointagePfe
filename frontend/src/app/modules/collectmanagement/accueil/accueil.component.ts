@@ -343,12 +343,12 @@ export class AccueilComponent {
             this.CHART_COLORS.doughnut
         );
         const kpis = (data.kpis && data.kpis.length > 0) ? data.kpis : [
-            { id: 'users', title: 'Utilisateurs', value: data.utilisateurs?.length || 48, icon: 'mat_outline:group', color: '#2563eb' },
-            { id: 'employees', title: 'Employés', value: data.employes?.length || 1284, icon: 'mat_outline:badge', color: '#0f766e' },
-            { id: 'buses', title: 'Bus', value: data.buses?.length || 36, icon: 'mat_outline:directions_bus', color: '#7c3aed' },
-            { id: 'circuits', title: 'Circuits', value: data.circuits?.length || 22, icon: 'mat_outline:alt_route', color: '#f97316' },
-            { id: 'work-orders', title: 'Ordres de travail', value: data.ordresTravail?.length || 14, icon: 'mat_outline:assignment', color: '#10b981' },
-            { id: 'rattachements', title: 'Rattachements', value: data.rattachements?.length || 962, icon: 'mat_outline:link', color: '#e11d48' }
+            { id: 'users', title: 'Utilisateurs', value: data.utilisateurs?.length || 0, icon: 'mat_outline:group', color: '#2563eb' },
+            { id: 'employees', title: 'Employés', value: data.employes?.length || 0, icon: 'mat_outline:badge', color: '#0f766e' },
+            { id: 'buses', title: 'Bus', value: data.buses?.length || 0, icon: 'mat_outline:directions_bus', color: '#7c3aed' },
+            { id: 'circuits', title: 'Circuits', value: data.circuits?.length || 0, icon: 'mat_outline:alt_route', color: '#f97316' },
+            { id: 'work-orders', title: 'Ordres de travail', value: data.ordresTravail?.length || 0, icon: 'mat_outline:assignment', color: '#10b981' },
+            { id: 'rattachements', title: 'Rattachements', value: data.rattachements?.length || 0, icon: 'mat_outline:link', color: '#e11d48' }
         ];
 
         const totalBuses = data.buses?.length || 0;
@@ -356,7 +356,7 @@ export class AccueilComponent {
         const totalCircuits = data.circuits?.length || 0;
         const activeCircuits = data.circuits?.filter(c => c.isActive).length || 0;
 
-        let avgOccupancyRatio = 74;
+        let avgOccupancyRatio = 0;
         if (activeBuses > 0) {
             const busesWithCap = data.buses.filter(b => b.isActive && b.capacite && b.capacite > 0);
             if (busesWithCap.length > 0) {
@@ -365,20 +365,20 @@ export class AccueilComponent {
             }
         }
 
-        const collectionRate = totalCircuits > 0 ? Math.round((activeCircuits / totalCircuits) * 100) : 93;
-        const busPunctualityRate = totalBuses > 0 ? Math.round((activeBuses / totalBuses) * 100) : 87;
+        const collectionRate = totalCircuits > 0 ? Math.round((activeCircuits / totalCircuits) * 100) : 0;
+        const busPunctualityRate = totalBuses > 0 ? Math.round((activeBuses / totalBuses) * 100) : 0;
 
         const insights = [
-            { id: 'collecte', title: 'Taux de collecte', value: `${collectionRate} %`, changeValue: '+1,8 pt', isPositive: true, progress: collectionRate },
-            { id: 'ponctualite', title: 'Ponctualité des bus', value: `${busPunctualityRate} %`, changeValue: activeBuses >= totalBuses ? '+1,2 pt' : '-2,1 pt', isPositive: activeBuses >= totalBuses, progress: busPunctualityRate },
-            { id: 'occupation', title: 'Taux d\'occupation', value: `${avgOccupancyRatio} %`, changeValue: '+0,6 pt', isPositive: true, progress: avgOccupancyRatio },
-            { id: 'incidents', title: 'Circuits sans incident', value: `${activeCircuits}/${totalCircuits || 22}`, changeValue: '+1', isPositive: true, progress: totalCircuits > 0 ? Math.round((activeCircuits / totalCircuits) * 100) : 91 }
+            { id: 'collecte', title: 'Taux de collecte', value: `${collectionRate} %`, changeValue: '-', isPositive: true, progress: collectionRate },
+            { id: 'ponctualite', title: 'Ponctualité des bus', value: `${busPunctualityRate} %`, changeValue: '-', isPositive: true, progress: busPunctualityRate },
+            { id: 'occupation', title: 'Taux d\'occupation', value: `${avgOccupancyRatio} %`, changeValue: '-', isPositive: true, progress: avgOccupancyRatio },
+            { id: 'incidents', title: 'Circuits sans incident', value: `${activeCircuits}/${totalCircuits}`, changeValue: '-', isPositive: true, progress: totalCircuits > 0 ? Math.round((activeCircuits / totalCircuits) * 100) : 0 }
         ];
 
         const orders = (data.ordresTravail && data.ordresTravail.length > 0)
             ? data.ordresTravail.slice(0, 5).map((ot: any) => {
                 const dateObj = ot.dateCreation ? new Date(ot.dateCreation) : null;
-                const timeStr = dateObj ? dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '06:00';
+                const timeStr = dateObj ? dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
                 return {
                     id: ot.numeroOrdreTravail || ot.ordreTravailId || 'OT-000',
                     circuit: ot.numeroChantier || ot.libelle || 'Circuit Direct',
@@ -388,26 +388,22 @@ export class AccueilComponent {
                     status: ot.etatOT ? ot.etatOT.toUpperCase() : (ot.isActive ? 'EN COURS' : 'TERMINÉ')
                 };
             })
-            : [
-                { id: 'OT-2607', circuit: 'Ariana Nord', bus: '142 TU 3805', chauffeur: 'Mehdi Trabelsi', depart: '05:30', status: 'EN COURS' },
-                { id: 'OT-2606', circuit: 'La Marsa - Lac 2', bus: '156 TU 1120', chauffeur: 'Karim Bouazizi', depart: '05:45', status: 'EN COURS' },
-                { id: 'OT-2605', circuit: 'Ben Arous Sud', bus: '128 TU 4521', chauffeur: 'Sami Gharbi', depart: '06:00', status: 'EN ATTENTE' },
-                { id: 'OT-2604', circuit: 'Sousse Zone Ind.', bus: '134 TU 8874', chauffeur: 'Anis Jlassi', depart: '06:15', status: 'PLANIFIÉ' },
-                { id: 'OT-2603', circuit: 'Bizerte Centre', bus: '119 TU 6032', chauffeur: 'Walid Msakni', depart: '04:50', status: 'TERMINÉ' }
-            ];
+            : [];
 
-        const totalEmp = data.employes?.length || 1284;
-        const totalRatt = data.rattachements?.length || 962;
-        const collectesCount = Math.min(totalEmp, totalRatt > 0 ? totalRatt : Math.round(totalEmp * 0.93));
-        const enAttenteCount = Math.max(0, Math.round((totalEmp - collectesCount) * 0.6));
-        const absentsCount = Math.max(0, totalEmp - collectesCount - enAttenteCount);
-        const badgePercentage = totalEmp > 0 ? Math.round((collectesCount / totalEmp) * 100) : 93;
+        const totalEmp = data.employes?.length || 0;
+        const totalRatt = data.rattachements?.length || 0;
+        const collectesCount = Math.min(totalEmp, totalRatt);
+        const enAttenteCount = Math.max(0, totalEmp - collectesCount);
+        const absentsCount = 0;
+        const badgePercentage = totalEmp > 0 ? Math.round((collectesCount / totalEmp) * 100) : 0;
+        const dashArray = `${(badgePercentage * 2.3876).toFixed(2)} 238.76`;
 
         const presenceStats = {
             badgePercentage,
             collectes: collectesCount,
             enAttente: enAttenteCount,
-            absents: absentsCount
+            absents: absentsCount,
+            dashArray
         };
 
         const availableEta = this._formatAvailableEta(etaPredictions, data.buses);
@@ -453,20 +449,6 @@ export class AccueilComponent {
                     etaMinutes: etaDisplay,
                     confidenceText: confidenceText,
                     isLate: isLate
-                };
-            });
-        }
-
-        if (buses && buses.length > 0) {
-            return buses.slice(0, 4).map((bus, idx) => {
-                const etaMin = (idx + 1) * 5 + 2;
-                return {
-                    numeroIMM: bus.numeroIMM || `BUS-${idx+1}`,
-                    codeCircuit: bus.codeCircuit || 'Circuit Principal',
-                    stopName: `Prochain arrêt (${(idx+1) * 350}m)`,
-                    etaMinutes: `${etaMin} min`,
-                    confidenceText: `± 1 min`,
-                    isLate: false
                 };
             });
         }

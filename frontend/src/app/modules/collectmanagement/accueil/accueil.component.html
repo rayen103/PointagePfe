@@ -14,7 +14,7 @@
         <div class="cst-greet">
             <div>
                 <div class="cst-greet__title">Bonjour, {{ (user$ | async)?.prenom || (user$ | async)?.name || (user$ | async)?.nomUtilisateur || 'Utilisateur' }}&nbsp;👋</div>
-                <div class="cst-greet__sub">{{ todayFormatted }} · {{ vm.data.buses?.length || 28 }} bus en circulation</div>
+                <div class="cst-greet__sub">{{ todayFormatted }} · {{ vm.data.buses?.length || 0 }} bus en circulation</div>
             </div>
             <div class="cst-greet__actions">
                 <a class="cst-btn cst-btn--ghost" [routerLink]="['/home']">
@@ -96,30 +96,36 @@
                         <div class="cst-table__head">
                             <div>N° OT</div><div>Circuit</div><div>Bus</div><div>Chauffeur</div><div>Départ</div><div>Statut</div><div></div>
                         </div>
-                        @for (o of vm.orders; track o.id) {
-                            <div class="cst-table__row">
-                                <div class="cst-td-ref">{{ o.id }}</div>
-                                <div class="cst-td-strong">{{ o.circuit }}</div>
-                                <div class="cst-td-strong text-gray-500">{{ o.bus }}</div>
-                                <div class="cst-td-strong">{{ o.chauffeur }}</div>
-                                <div class="cst-td-mut font-semibold">{{ o.depart }}</div>
-                                <div>
-                                    <span class="cst-pill text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase"
-                                          [ngClass]="{
-                                              'bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400': o.status === 'EN COURS',
-                                              'bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400': o.status === 'EN ATTENTE',
-                                              'bg-blue-50 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400': o.status === 'PLANIFIÉ',
-                                              'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400': o.status === 'TERMINÉ'
-                                          }">
-                                        {{ o.status === 'EN COURS' ? 'En cours' : o.status === 'EN ATTENTE' ? 'En attente' : o.status === 'PLANIFIÉ' ? 'Planifié' : 'Terminé' }}
-                                    </span>
-                                </div>
-                                <div class="cst-td-act">
-                                    <button class="cst-round" type="button" aria-label="Ouvrir">
-                                        <mat-icon [svgIcon]="'heroicons_outline:chevron-right'"></mat-icon>
-                                    </button>
-                                </div>
+                        @if (vm.orders.length === 0) {
+                            <div class="cst-empty cst-empty--row py-8 text-center text-gray-500">
+                                Aucun ordre de travail récent.
                             </div>
+                        } @else {
+                            @for (o of vm.orders; track o.id) {
+                                <div class="cst-table__row">
+                                    <div class="cst-td-ref">{{ o.id }}</div>
+                                    <div class="cst-td-strong">{{ o.circuit }}</div>
+                                    <div class="cst-td-strong text-gray-500">{{ o.bus }}</div>
+                                    <div class="cst-td-strong">{{ o.chauffeur }}</div>
+                                    <div class="cst-td-mut font-semibold">{{ o.depart }}</div>
+                                    <div>
+                                        <span class="cst-pill text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase"
+                                              [ngClass]="{
+                                                  'bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400': o.status === 'EN COURS',
+                                                  'bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400': o.status === 'EN ATTENTE',
+                                                  'bg-blue-50 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400': o.status === 'PLANIFIÉ',
+                                                  'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400': o.status === 'TERMINÉ'
+                                              }">
+                                            {{ o.status === 'EN COURS' ? 'En cours' : o.status === 'EN ATTENTE' ? 'En attente' : o.status === 'PLANIFIÉ' ? 'Planifié' : 'Terminé' }}
+                                        </span>
+                                    </div>
+                                    <div class="cst-td-act">
+                                        <button class="cst-round" type="button" aria-label="Ouvrir">
+                                            <mat-icon [svgIcon]="'heroicons_outline:chevron-right'"></mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
                         }
                     </div>
                 </div>
@@ -135,23 +141,29 @@
                         <span class="cst-live"><span class="cst-live__dot"></span>EN DIRECT</span>
                     </div>
                     <div class="cst-eta__list">
-                        @for (e of vm.availableEta; track e.numeroIMM) {
-                            <div class="cst-eta__row">
-                                <div class="cst-eta__ic"><mat-icon [svgIcon]="'mat_outline:directions_bus'"></mat-icon></div>
-                                <div class="cst-eta__mid">
-                                    <div class="cst-eta__bus">{{ e.numeroIMM }} · {{ e.codeCircuit }}</div>
-                                    <div class="cst-eta__stop text-gray-400">{{ e.stopName }}</div>
-                                </div>
-                                <div class="cst-eta__val">
-                                    <div class="cst-eta__min" [style.color]="e.isLate ? '#f2b33d' : '#7fd6a4'">{{ e.etaMinutes }}</div>
-                                    <div class="cst-eta__conf" [style.color]="e.isLate ? '#f2b33d' : '#9aa6d8'">{{ e.confidenceText }}</div>
-                                </div>
+                        @if (vm.availableEta.length === 0) {
+                            <div class="cst-eta__empty">
+                                <span class="cst-eta__empty--text">Aucune arrivée de bus en direct.</span>
                             </div>
+                        } @else {
+                            @for (e of vm.availableEta; track e.numeroIMM) {
+                                <div class="cst-eta__row">
+                                    <div class="cst-eta__ic"><mat-icon [svgIcon]="'mat_outline:directions_bus'"></mat-icon></div>
+                                    <div class="cst-eta__mid">
+                                        <div class="cst-eta__bus">{{ e.numeroIMM }} · {{ e.codeCircuit }}</div>
+                                        <div class="cst-eta__stop text-gray-400">{{ e.stopName }}</div>
+                                    </div>
+                                    <div class="cst-eta__val">
+                                        <div class="cst-eta__min" [style.color]="e.isLate ? '#f2b33d' : '#7fd6a4'">{{ e.etaMinutes }}</div>
+                                        <div class="cst-eta__conf" [style.color]="e.isLate ? '#f2b33d' : '#9aa6d8'">{{ e.confidenceText }}</div>
+                                    </div>
+                                </div>
+                            }
                         }
                     </div>
-                    <div class="cst-eta__foot">Prédictions ML · actualisé il y a 12 s</div>
+                    <div class="cst-eta__foot">Prédictions ML · actualisé en direct</div>
                 </div>
- 
+
                 <!-- Présences du matin -->
                 <div class="cst-card cst-card--pad">
                     <div class="cst-card__title" style="margin-bottom:16px">Présences du matin</div>
@@ -159,8 +171,8 @@
                         <svg width="92" height="92" viewBox="0 0 92 92">
                             <circle cx="46" cy="46" r="38" fill="none" stroke="#EAF3FB" stroke-width="10"></circle>
                             <circle cx="46" cy="46" r="38" fill="none" stroke="#42ABE0" stroke-width="10" stroke-linecap="round"
-                                    stroke-dasharray="222.05 238.76" transform="rotate(-90 46 46)"></circle>
-                            <text x="46" y="44" text-anchor="middle" font-family="Sora,sans-serif" font-size="19" font-weight="700" fill="#121242">{{ vm.presenceStats?.badgePercentage ?? 93 }}%</text>
+                                    [attr.stroke-dasharray]="vm.presenceStats?.dashArray || '0 238.76'" transform="rotate(-90 46 46)"></circle>
+                            <text x="46" y="44" text-anchor="middle" font-family="Sora,sans-serif" font-size="19" font-weight="700" fill="#121242">{{ vm.presenceStats?.badgePercentage || 0 }}%</text>
                             <text x="46" y="60" text-anchor="middle" font-size="9" fill="#8CA2BD">badgés</text>
                         </svg>
                         <div class="cst-donut__legend">
