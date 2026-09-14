@@ -1,3 +1,6 @@
+import { PdfExportService } from '../../../../core/common/pdf-export.service';
+import { CsvExportService } from '../../../../core/common/csv-export.service';
+import { take } from 'rxjs';
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
@@ -64,6 +67,10 @@ export class ListComponent implements OnInit, OnDestroy {
     isViewMode: boolean = false;
 
     constructor(
+        private _pdfExportService: PdfExportService,
+
+        private _csvExportService: CsvExportService,
+
         private _ordreTravailService: OrdreTravailService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseConfirmationService: FuseConfirmationService
@@ -227,4 +234,27 @@ export class ListComponent implements OnInit, OnDestroy {
     }
 
     protected readonly FuseNavigationAction = FuseNavigationAction;
+
+    exportData(): void {
+        if (this._ordreTravailService) {
+            const obs$ = (this as any).ordresTravail$ || this._ordreTravailService.ordresTravail$ || this._ordreTravailService.ordresTravail$;
+            if (obs$) {
+                obs$.pipe(take(1)).subscribe((data: any) => {
+                    const items = Array.isArray(data) ? data : (data?.items || data?.ordresTravail || data?.ordresTravail || []);
+                    if (items && items.length > 0) {
+                        const columns = [
+            { header: 'N° OT', dataKey: 'numeroOrdreTravail' },
+            { header: 'Chantier', dataKey: 'numeroChantier' },
+            { header: 'Véhicule', dataKey: 'codeVehicule' },
+            { header: 'Équipe', dataKey: 'codeEquipe' },
+            { header: 'État OT', dataKey: 'etatOT' }
+        ];
+                        this._pdfExportService.exportToPdf('Rapport Ordres de Travail', columns, items, 'OrdresTravail_Export.pdf');
+                    } else {
+                        console.warn('No data available to export to PDF');
+                    }
+                });
+            }
+        }
+    }
 }

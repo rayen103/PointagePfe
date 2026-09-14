@@ -1,0 +1,59 @@
+@startuml
+skinparam class {
+  BorderColor #0B3B66
+  BackgroundColor #F4F7FB
+  HeaderBackgroundColor #E2F0FD
+}
+skinparam shadowing false
+skinparam roundcorner 10
+hide circle
+
+class Societe {
+  + SocieteId : SocieteId
+  + Nom : string
+  + CodeSociete : string
+  + MatriculeFiscal : string
+  + LogoPath : string
+  + DateOverture : DateTime
+}
+
+class Site {
+  + SiteId : SiteId
+  + CodeSite : string
+  + LibelleSite : string
+  + SocieteId : SocieteId
+}
+
+class Reseau {
+  + ReseauId : ReseauId
+  + CodeReseau : string
+  + LibelleReseau : string
+  + IsActive : bool
+  + SocieteId : SocieteId
+}
+
+class Utilisateur {
+  + UtilisateurId : UtilisateurId
+  + NomUtilisateur : string
+  + Nom : string
+  + Prenom : string
+  + Email : string
+  + Password : string
+  + RoleUtilisateurId : RoleUtilisateurId
+  + SocieteId : SocieteId
+  + IsActive : bool
+}
+
+class RoleUtilisateur {
+  + RoleUtilisateurId : RoleUtilisateurId
+  + NomRole : string
+  + Navigations : string
+  + SocieteId : SocieteId
+}
+
+Societe "1" *-- "0..*" Site : contains
+Societe "1" *-- "0..*" Reseau : contains
+Societe "1" *-- "0..*" Utilisateur : contains
+Utilisateur "0..*" --> "1" RoleUtilisateur : assigned
+Site "1" *-- "0..*" Utilisateur : scopes
+@enduml

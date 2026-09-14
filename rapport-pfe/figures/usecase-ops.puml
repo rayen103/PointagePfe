@@ -1,0 +1,39 @@
+@startuml
+!theme plain
+left to right direction
+skinparam dpi 300
+skinparam defaultFontName "Helvetica"
+skinparam defaultFontSize 12
+
+actor "Operator / Dispatcher" as operator
+actor "Administrator" as admin
+
+rectangle "Operations & Workforce Logistics Sub-System" {
+  together {
+    usecase "UC-1: Authenticate User" as UC_auth
+    usecase "Manage Employee Records\n& RFID Badges" as UC_emp
+    usecase "Assign Employees to\nPickup Points (UC-5)" as UC_assign
+    usecase "Schedule Daily Work Orders\n(Ordres de Travail)" as UC_orders
+    usecase "Generate Attendance\n& Analytics Reports" as UC_reports
+    usecase "Save Custom BI\nGrid Layouts (UC-6)" as UC_bi
+  }
+}
+
+operator --> UC_auth
+operator --> UC_emp
+operator --> UC_assign
+operator --> UC_orders
+operator --> UC_reports
+operator --> UC_bi
+
+admin --> UC_auth
+admin --> UC_emp
+admin --> UC_reports
+
+UC_emp ..> UC_auth : <<include>>
+UC_assign ..> UC_auth : <<include>>
+UC_orders ..> UC_auth : <<include>>
+UC_reports ..> UC_auth : <<include>>
+UC_bi ..> UC_auth : <<include>>
+
+@enduml

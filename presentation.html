@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CST LePoint — PFE Graduation Defense Presentation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #070B14;
+      color: #F8FAFC;
+      user-select: none;
+      overflow: hidden;
+    }
+    h1, h2, h3, .heading-font {
+      font-family: 'Montserrat', sans-serif;
+    }
+    .code-font {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .slide {
+      display: none;
+      width: 100vw;
+      height: 100vh;
+      opacity: 0;
+      transition: opacity 0.35s ease-in-out;
+    }
+    .slide.active {
+      display: flex;
+      opacity: 1;
+    }
+    .glass-card {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(51, 65, 85, 0.6);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+    }
+    .glow-cyan {
+      box-shadow: 0 0 30px -5px rgba(14, 165, 233, 0.25);
+    }
+    .glow-green {
+      box-shadow: 0 0 30px -5px rgba(16, 185, 129, 0.25);
+    }
+  </style>
+</head>
+<body class="flex flex-col h-screen justify-between relative bg-gradient-to-br from-[#060913] via-[#0B1120] to-[#0A0F1D]">
+
+  <!-- TOP APP BAR -->
+  <header class="px-8 py-4 flex justify-between items-center z-50 border-b border-slate-800/80 bg-slate-950/40 backdrop-blur-md">
+    <div class="flex items-center space-x-3">
+      <div class="w-3.5 h-3.5 rounded-full bg-sky-400 animate-pulse"></div>
+      <span class="font-black tracking-wider text-xl text-sky-400 heading-font">CST <span class="text-white">LePoint</span></span>
+      <span class="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">PFE Defense 2025-2026</span>
+    </div>
+    <div class="flex items-center space-x-4">
+      <div id="sectionBadge" class="text-xs font-semibold px-3 py-1 rounded-full bg-sky-950/80 text-sky-300 border border-sky-800/60 uppercase tracking-wider">
+        01 | GENERAL CONTEXT
+      </div>
+      <span id="slideCounter" class="text-sm font-medium text-slate-400 code-font">01 / 20</span>
+    </div>
+  </header>
+
+  <!-- SLIDES VIEWPORT CONTAINER -->
+  <main class="flex-1 flex items-center justify-center p-6 relative overflow-hidden">
+
+    <!-- SLIDE 1: Title Slide -->
+    <div class="slide active flex-col justify-center max-w-6xl w-full mx-auto" data-section="TITLE & COVER" data-notes="Mr. President, distinguished members of the jury, supervisors, and colleagues. Welcome to my graduation project defense. Today, I am proud to present CST LePoint, a full-stack enterprise IoT fleet telemetry, RFID attendance tracking, and AI-driven arrival forecasting platform developed in collaboration with CST.">
+      <div class="grid grid-cols-12 gap-8 items-center">
+        <div class="col-span-7 space-y-6">
+          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+            <span>●</span> Graduation Project Defense (PFE)
+          </div>
+          <h1 class="text-5xl font-black tracking-tight text-white leading-tight">
+            CST <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-cyan-300 to-emerald-400">LePoint</span>
+          </h1>
+          <p class="text-lg text-slate-300 font-normal leading-relaxed">
+            Full-Stack IoT Fleet Telemetry, RFID Attendance Supervision & AI-Driven ETA Forecasting Platform
+          </p>
+          <div class="pt-6 border-t border-slate-800 grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p class="text-slate-500 text-xs uppercase font-semibold">Candidate</p>
+              <p class="font-bold text-slate-200">Rayen</p>
+            </div>
+            <div>
+              <p class="text-slate-500 text-xs uppercase font-semibold">Host Organization</p>
+              <p class="font-bold text-sky-400">CST (Compagnie de Services et Tech)</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-span-5">
+          <div class="glass-card rounded-2xl p-6 glow-cyan border border-sky-500/30 space-y-4">
+            <h3 class="text-sm font-bold tracking-wider text-sky-400 uppercase">Core Product Capabilities</h3>
+            <div class="space-y-3 text-sm">
+              <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-start space-x-3">
+                <span class="text-sky-400 text-lg">📡</span>
+                <div>
+                  <p class="font-bold text-white">Real-Time Telemetry</p>
+                  <p class="text-xs text-slate-400">Sub-second GPS coordinate ingestion & live map.</p>
+                </div>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-start space-x-3">
+                <span class="text-emerald-400 text-lg">🏷️</span>
+                <div>
+                  <p class="font-bold text-white">RFID Pointage Ingestion</p>
+                  <p class="text-xs text-slate-400">Mobile passenger boarding verification & roster sync.</p>
+                </div>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-start space-x-3">
+                <span class="text-amber-400 text-lg">🤖</span>
+                <div>
+                  <p class="font-bold text-white">Predictive AI ETA Model</p>
+                  <p class="text-xs text-slate-400">Machine learning stop arrival forecasting via FastAPI.</p>
+                </div>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 flex items-start space-x-3">
+                <span class="text-purple-400 text-lg">🏢</span>
+                <div>
+                  <p class="font-bold text-white">Multi-Tenant SaaS Suite</p>
+                  <p class="text-xs text-slate-400">Strict data isolation (SocieteId) for commercial clients.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: Agenda -->
+    <div class="slide flex-col justify-center max-w-6xl w-full mx-auto" data-section="PRESENTATION AGENDA" data-notes="Our defense follows seven core sections: starting with the corporate context and existing workflow analysis, moving through our agile specifications and multi-tier Clean Architecture, detailing our technical implementation, showcasing the working platform modules, and concluding with project impact and future roadmap.">
+      <h2 class="text-3xl font-black text-white mb-6">Presentation Agenda</h2>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="glass-card rounded-xl p-4 flex items-center space-x-4 border-l-4 border-l-sky-500">
+          <span class="w-10 h-10 rounded-lg bg-sky-500/20 text-sky-400 font-bold flex items-center justify-center code-font text-lg">01</span>
+          <div>
+            <h3 class="font-bold text-white">General Context & Host Company</h3>
+            <p class="text-xs text-slate-400">CST profile, SaaS vision, and target commercial market.</p>
+          </div>
+        </div>
+        <div class="glass-card rounded-xl p-4 flex items-center space-x-4 border-l-4 border-l-amber-500">
+          <span class="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center code-font text-lg">02</span>
+          <div>
+            <h3 class="font-bold text-white">Study of the Existing & Problematic</h3>
+            <p class="text-xs text-slate-400">As-Is manual workflows, market benchmark, and core pain points.</p>
+          </div>
+        </div>
+        <div class="glass-card rounded-xl p-4 flex items-center space-x-4 border-l-4 border-l-emerald-500">
+          <span class="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center code-font text-lg">03</span>
+          <div>
+            <h3 class="font-bold text-white">Requirements & Agile Methodology</h3>
+            <p class="text-xs text-slate-400">21 User Stories, Non-functional criteria & 5 Scrum Sprints.</p>
+          </div>
+        </div>
+        <div class="glass-card rounded-xl p-4 flex items-center space-x-4 border-l-4 border-l-purple-500">
+          <span class="w-10 h-10 rounded-lg bg-purple-500/20 text-purple-400 font-bold flex items-center justify-center code-font text-lg">04</span>
+          <div>
+            <h3 class="font-bold text-white">Proposed Solution & Architecture</h3>
+            <p class="text-xs text-slate-400">4-Tier Clean Architecture, CQRS, 250m Geofence, and AI design.</p>
+          </div>
+        </div>
+        <div class="glass-card rounded-xl p-4 flex items-center space-x-4 border-l-4 border-l-cyan-500">
+          <span class="w-10 h-10 rounded-lg bg-cyan-500/20 text-cyan-400 font-bold flex items-center justify-center code-font text-lg">05</span>
+          <div>
+            <h3 class="font-bold text-white">Implementation & Realization</h3>
+            <p class="text-xs text-slate-400">.NET 8, Angular 18, FastAPI Python & Multi-Tenant Data Models.</p>
+          </div>
+        </div>
+        <div class="glass-card rounded-xl p-4 flex items-center space-x-4 border-l-4 border-l-rose-500">
+          <span class="w-10 h-10 rounded-lg bg-rose-500/20 text-rose-400 font-bold flex items-center justify-center code-font text-lg">06</span>
+          <div>
+            <h3 class="font-bold text-white">Showcase & Live System Demo</h3>
+            <p class="text-xs text-slate-400">Live Cartography, RFID pointage, AI ETA forecasting & BI grids.</p>
+          </div>
+        </div>
+      </div>
+      <div class="mt-4 glass-card rounded-xl p-3 flex items-center space-x-4 border-l-4 border-l-teal-500">
+        <span class="w-10 h-10 rounded-lg bg-teal-500/20 text-teal-400 font-bold flex items-center justify-center code-font text-lg">07</span>
+        <div>
+          <h3 class="font-bold text-white">Conclusion, Business Impact & Perspectives</h3>
+          <p class="text-xs text-slate-400">Measurable ROI, value delivered, Driver Tablet App & Passenger Mobile App roadmap.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: Host Company & Product Vision -->
+    <div class="slide flex-col justify-center max-w-6xl w-full mx-auto" data-section="01 | GENERAL CONTEXT" data-notes="CST is an IT and IoT software engineering company based in Tunisia. Observing an urgent demand in the industrial and transit sectors to modernize employee transportation, CST initiated the commercial development of CST LePoint. As a multi-tenant B2B SaaS product, it unifies vehicle telemetry, worker RFID pointage, and machine learning ETA prediction.">
+      <h2 class="text-3xl font-black text-white mb-6">Host Organization & SaaS Product Vision</h2>
+      <div class="grid grid-cols-2 gap-6 mb-6">
+        <div class="glass-card rounded-2xl p-6 border-t-2 border-t-sky-500 space-y-4">
+          <div class="flex items-center space-x-3">
+            <span class="text-2xl">🏢</span>
+            <h3 class="text-xl font-bold text-white">Host Entity: CST Tunisia</h3>
+          </div>
+          <ul class="space-y-3 text-sm text-slate-300">
+            <li class="flex items-start space-x-2"><span class="text-sky-400 font-bold">•</span><span><strong>IT & IoT Technology Provider:</strong> Specialized in smart enterprise software engineering.</span></li>
+            <li class="flex items-start space-x-2"><span class="text-sky-400 font-bold">•</span><span><strong>Commercial Software Publisher:</strong> Creates and sells proprietary B2B SaaS solutions.</span></li>
+            <li class="flex items-start space-x-2"><span class="text-sky-400 font-bold">•</span><span><strong>Market Opportunity:</strong> Digitalizing corporate employee transit and attendance in Tunisia.</span></li>
+          </ul>
+        </div>
+        <div class="glass-card rounded-2xl p-6 border-t-2 border-t-emerald-500 space-y-4">
+          <div class="flex items-center space-x-3">
+            <span class="text-2xl">💼</span>
+            <h3 class="text-xl font-bold text-white">The CST LePoint Solution</h3>
+          </div>
+          <ul class="space-y-3 text-sm text-slate-300">
+            <li class="flex items-start space-x-2"><span class="text-emerald-400 font-bold">•</span><span><strong>Multi-Tenant B2B SaaS:</strong> Dedicated tenant isolation (<code class="code-font text-xs text-sky-300">SocieteId</code>) for commercial clients.</span></li>
+            <li class="flex items-start space-x-2"><span class="text-emerald-400 font-bold">•</span><span><strong>All-in-One Mobility Suite:</strong> Unifies fleet tracking, worker RFID pointage, and predictive AI.</span></li>
+            <li class="flex items-start space-x-2"><span class="text-emerald-400 font-bold">•</span><span><strong>Target Clients:</strong> Private transit subcontractors, manufacturing plants & factory operations.</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="grid grid-cols-3 gap-4">
+        <div class="glass-card rounded-xl p-4 text-center border border-sky-500/20">
+          <p class="text-sky-400 font-bold text-lg">🏢 Multi-Tenancy</p>
+          <p class="text-xs text-slate-400 mt-1">Strict data & role partitioning by client enterprise</p>
+        </div>
+        <div class="glass-card rounded-xl p-4 text-center border border-emerald-500/20">
+          <p class="text-emerald-400 font-bold text-lg">📡 Hardware Agnostic</p>
+          <p class="text-xs text-slate-400 mt-1">Universal REST ingestion for any GPS & RFID modem</p>
+        </div>
+        <div class="glass-card rounded-xl p-4 text-center border border-amber-500/20">
+          <p class="text-amber-400 font-bold text-lg">🤖 Machine Learning ETA</p>
+          <p class="text-xs text-slate-400 mt-1">Real-time arrival forecasts for factory bus stops</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: Section Divider - Study of the Existing -->
+    <div class="slide flex-col justify-center max-w-6xl w-full mx-auto" data-section="02 | STUDY OF THE EXISTING" data-notes="We now examine the study of the existing. We will trace the traditional paper-based transit workflows, benchmark existing market telematics tools, and highlight the critical pain points that motivated this project.">
+      <div class="grid grid-cols-12 gap-8 items-center">
+        <div class="col-span-4 glass-card rounded-3xl p-8 text-center border border-sky-500/40 glow-cyan">
+          <p class="text-6xl font-black text-sky-400 code-font">02</p>
+          <h2 class="text-2xl font-black text-white mt-4">STUDY OF THE EXISTING</h2>
+        </div>
+        <div class="col-span-8 space-y-4">
+          <div class="glass-card rounded-2xl p-5 border-l-4 border-l-sky-400">
+            <h3 class="text-lg font-bold text-white">1. The Traditional "As-Is" Operational Workflow</h3>
+            <p class="text-sm text-slate-400 mt-1">Manual bus dispatching, paper attendance rosters, and unmonitored transit routes.</p>
+          </div>
+          <div class="glass-card rounded-2xl p-5 border-l-4 border-l-amber-400">
+            <h3 class="text-lg font-bold text-white">2. Competitive Benchmark & Market Alternatives</h3>
+            <p class="text-sm text-slate-400 mt-1">Comparing generic GPS trackers, static factory timeclocks, and CST LePoint.</p>
+          </div>
+          <div class="glass-card rounded-2xl p-5 border-l-4 border-l-rose-400">
+            <h3 class="text-lg font-bold text-white">3. Problem Statement & Critical Pain Points</h3>
+            <p class="text-sm text-slate-400 mt-1">Quantifying operational blindness, unauthorized detours, fraud, and ETA uncertainty.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: As-Is Workflow -->
+    <div class="slide flex-col justify-center max-w-6xl w-full mx-auto" data-section="02 | STUDY OF THE EXISTING" data-notes="In the traditional workflow, transit operations suffer from extreme fragmentation. Dispatch is handled manually, drivers struggle to check names on paper sheets while driving, and dispatchers are completely blind during transit. Reconciling paper rosters into Excel takes days, leading to frequent invoicing disputes.">
+      <h2 class="text-3xl font-black text-white mb-6">The Traditional "As-Is" Transit & Attendance Workflow</h2>
+      <div class="grid grid-cols-4 gap-4 mb-6">
+        <div class="glass-card rounded-2xl p-5 border-t-2 border-t-sky-400 space-y-3">
+          <span class="text-xs font-bold px-2 py-1 rounded bg-sky-500/20 text-sky-300">STEP 1</span>
+          <h3 class="font-bold text-white text-base">Manual Dispatch</h3>
+          <p class="text-xs text-slate-300">Supervisors assign drivers and vehicles verbally or using paper whiteboards without central scheduling.</p>
+        </div>
+        <div class="glass-card rounded-2xl p-5 border-t-2 border-t-amber-400 space-y-3">
+          <span class="text-xs font-bold px-2 py-1 rounded bg-amber-500/20 text-amber-300">STEP 2</span>
+          <h3 class="font-bold text-white text-base">Paper Boarding</h3>
+          <p class="text-xs text-slate-300">Drivers manually tick employee names on paper sheets while driving at pickup checkpoints.</p>
+        </div>
+        <div class="glass-card rounded-2xl p-5 border-t-2 border-t-rose-400 space-y-3">
+          <span class="text-xs font-bold px-2 py-1 rounded bg-rose-500/20 text-rose-300">STEP 3</span>
+          <h3 class="font-bold text-white text-base">Blind Transit</h3>
+          <p class="text-xs text-slate-300">Dispatchers have zero live location visibility. Detours, delays, and breakdowns rely on phone calls.</p>
+        </div>
+        <div class="glass-card rounded-2xl p-5 border-t-2 border-t-purple-400 space-y-3">
+          <span class="text-xs font-bold px-2 py-1 rounded bg-purple-500/20 text-purple-300">STEP 4</span>
+          <h3 class="font-bold text-white text-base">Manual Audit</h3>
+          <p class="text-xs text-slate-300">Paper rosters are gathered weekly, manually typed into Excel, leading to billing disputes with factories.</p>
+        </div>
+      </div>
+      <div class="glass-card rounded-2xl p-5 border border-rose-500/40 bg-rose-950/20">
+        <h4 class="text-sm font-bold text-rose-400 uppercase tracking-wider mb-2">⚠️ Critical Operational Inefficiencies</h4>
+        <div class="grid grid-cols-3 gap-4 text-xs text-slate-300">
+          <div><strong class="text-white">• 48-Hour Data Latency:</strong> Significant lag before attendance anomalies or missed stops are reported.</div>
+          <div><strong class="text-white">• Human Error & Fraud:</strong> Lost paper registers, forged driver signatures, and untracked absentees.</div>
+          <div><strong class="text-white">• Operational Blindness:</strong> Inability to notify factories of delayed worker shifts in advance.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: Comparative Benchmark -->
+    <div class="slide flex-col justify-center max-w-6xl w-full mx-auto" data-section="02 | STUDY OF THE EXISTING" data-notes="Evaluating existing market alternatives revealed a critical divide: generic GPS trackers offer location dots on a map with zero awareness of worker identities or factory shifts. Conversely, standard HR biometric clocks only record attendance once workers arrive at factory turnstiles. CST LePoint bridges this gap.">
+      <h2 class="text-3xl font-black text-white mb-6">Market Benchmark: Generic Telematics vs. CST LePoint</h2>
+      <div class="glass-card rounded-2xl overflow-hidden border border-slate-700 mb-4">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="bg-slate-900/90 text-sky-400 border-b border-slate-700">
+              <th class="p-3.5 font-bold">Feature / Capability</th>
+              <th class="p-3.5 font-bold text-center">Generic GPS Trackers</th>
+              <th class="p-3.5 font-bold text-center">Factory Gate Timeclocks</th>
+              <th class="p-3.5 font-bold text-center bg-sky-950/50 text-white">CST LePoint (Our Platform)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800 text-slate-300">
+            <tr>
+              <td class="p-3 font-semibold text-white">Live Vehicular GPS Tracking</td>
+              <td class="p-3 text-center text-emerald-400 font-bold">✅ Yes</td>
+              <td class="p-3 text-center text-rose-400 font-bold">❌ No</td>
+              <td class="p-3 text-center text-emerald-400 font-bold bg-slate-900/40">✅ Sub-Second Telemetry Ingest</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-white">Onboard Mobile RFID Pointage</td>
+              <td class="p-3 text-center text-rose-400 font-bold">❌ No</td>
+              <td class="p-3 text-center text-amber-400 font-bold">⚠️ Factory Turnstile Only</td>
+              <td class="p-3 text-center text-emerald-400 font-bold bg-slate-900/40">✅ Boarding Stop Validation</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-white">Multi-Tenant SaaS Data Isolation</td>
+              <td class="p-3 text-center text-amber-400 font-bold">⚠️ Basic / Single-Tenant</td>
+              <td class="p-3 text-center text-rose-400 font-bold">❌ Internal On-Premise</td>
+              <td class="p-3 text-center text-emerald-400 font-bold bg-slate-900/40">✅ Native (SocieteId Global Filter)</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-white">250m Route Detour Detection</td>
+              <td class="p-3 text-center text-rose-400 font-bold">❌ No Route Awareness</td>
+              <td class="p-3 text-center text-rose-400 font-bold">❌ No</td>
+              <td class="p-3 text-center text-emerald-400 font-bold bg-slate-900/40">✅ Automated Geofence Alert</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-white">Predictive AI Arrival Forecasting</td>
+              <td class="p-3 text-center text-rose-400 font-bold">❌ Static Distance Only</td>
+              <td class="p-3 text-center text-rose-400 font-bold">❌ No</td>
+              <td class="p-3 text-center text-emerald-400 font-bold bg-slate-900/40">✅ LightGBM ML Microservice</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="p-4 rounded-xl bg-sky-950/40 border border-sky-500/30 text-xs text-sky-200">
+        💡 <strong>Key Finding:</strong> Traditional market solutions operate in silos; CST LePoint is the first unified SaaS suite merging high-frequency GPS telemetry, mobile RFID attendance, and predictive AI into a single architecture.
+      </div>
+    </div>
+
+    <!-- SLIDE 7: Problem Statement -->
+    <div class="slide flex-col justify-center max-w-6xl w-full mx-auto" data-section="02 | STUDY OF THE EXISTING" data-notes="We synthesize the operational problem statement into four critical challenges: First, Zero Real-Time Visibility, leaving supervisors blind. Second, Unmonitored Route Deviations, driving up fuel costs. Third, Arrival Time Uncertainty, stranding workers. And fourth, Data Silos and Fraud Risk. Solving these four challenges defined the functional scope of CST LePoint.">
+      <h2 class="text-3xl font-black text-white mb-6">Problem Statement: Four Critical Operational Challenges</h2>
+      <div class="grid grid-cols-2 gap-6">
+        <div class="glass-card rounded-2xl p-6 border-l-4 border-l-sky-500 space-y-2">
+          <h3 class="font-bold text-white text-lg flex items-center space-x-2"><span>1.</span><span>Zero Real-Time Visibility</span></h3>
+          <p class="text-xs text-slate-400">• Supervisors have no live tracking of vehicle location or capacity.</p>
+          <p class="text-xs text-slate-400">• Delayed response during vehicle breakdowns and traffic jams.</p>
+        </div>
+        <div class="glass-card rounded-2xl p-6 border-l-4 border-l-rose-500 space-y-2">
+          <h3 class="font-bold text-white text-lg flex items-center space-x-2"><span>2.</span><span>Unmonitored Route Detours</span></h3>
+          <p class="text-xs text-slate-400">• Drivers make unauthorized route diversions resulting in wasted fuel.</p>
+          <p class="text-xs text-slate-400">• Missed designated worker stops cause severe factory delays.</p>
+        </div>
+        <div class="glass-card rounded-2xl p-6 border-l-4 border-l-amber-500 space-y-2">
+          <h3 class="font-bold text-white text-lg flex items-center space-x-2"><span>3.</span><span>Passenger ETA Uncertainty</span></h3>
+          <p class="text-xs text-slate-400">• Factory workers wait blindly at stops without arrival visibility.</p>
+          <p class="text-xs text-slate-400">• Late bus arrivals halt entire factory assembly production lines.</p>
+        </div>
+        <div class="glass-card rounded-2xl p-6 border-l-4 border-l-emerald-500 space-y-2">
+          <h3 class="font-bold text-white text-lg flex items-center space-x-2"><span>4.</span><span>Attendance Fraud & Data Silos</span></h3>
+          <p class="text-xs text-slate-400">• Paper attendance sheets are easily forged, damaged, or lost.</p>
+          <p class="text-xs text-slate-400">• Manual Excel auditing causes friction in client invoicing disputes.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: Methodology & Sprints -->
+    <div class="slide flex-col justify-center max-w-6xl w-full mx-auto" data-section="03 | METHODOLOGY & REQUIREMENTS" data-notes="To ensure agile adaptability and continuous delivery, we adopted the Agile Scrum framework across five two-week sprints: establishing multi-tenant foundations in Sprint 1, master logistics in Sprint 2, live cartography in Sprint 3, IoT telemetry and AI predictions in Sprint 4, and BI reporting and internationalization in Sprint 5.">
+      <h2 class="text-3xl font-black text-white mb-6">Development Methodology: Agile Scrum (5 Sprints)</h2>
+      <div class="grid grid-cols-5 gap-3">
+        <div class="glass-card rounded-2xl p-4 border-t-2 border-t-sky-400 flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-bold text-sky-400 code-font">SPRINT 1</span>
+            <h4 class="font-bold text-white text-sm mt-1">Foundation & Auth</h4>
+            <p class="text-xs text-slate-300 mt-2">Clean Architecture, JWT authentication & multi-tenant SocieteId isolation.</p>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 mt-4 text-center">2 Weeks</span>
+        </div>
+        <div class="glass-card rounded-2xl p-4 border-t-2 border-t-sky-400 flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-bold text-sky-400 code-font">SPRINT 2</span>
+            <h4 class="font-bold text-white text-sm mt-1">Master Logistics</h4>
+            <p class="text-xs text-slate-300 mt-2">Bus fleet, drivers, circuits, ordered pickup points, shifts & granular RBAC.</p>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 mt-4 text-center">2 Weeks</span>
+        </div>
+        <div class="glass-card rounded-2xl p-4 border-t-2 border-t-amber-400 flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-bold text-amber-400 code-font">SPRINT 3</span>
+            <h4 class="font-bold text-white text-sm mt-1">Live Supervision</h4>
+            <p class="text-xs text-slate-300 mt-2">Interactive Leaflet map, real-time SVG markers & telemetry timeline.</p>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 mt-4 text-center">2 Weeks</span>
+        </div>
+        <div class="glass-card rounded-2xl p-4 border-t-2 border-t-rose-400 flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-bold text-rose-400 code-font">SPRINT 4</span>
+            <h4 class="font-bold text-white text-sm mt-1">IoT Telemetry & AI</h4>
+            <p class="text-xs text-slate-300 mt-2">High-frequency GPS/RFID ingestion API, 250m geofence & FastAPI ML ETA model.</p>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 mt-4 text-center">2 Weeks</span>
+        </div>
+        <div class="glass-card rounded-2xl p-4 border-t-2 border-t-emerald-400 flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-bold text-emerald-400 code-font">SPRINT 5</span>
+            <h4 class="font-bold text-white text-sm mt-1">Analytics & i18n</h4>
+            <p class="text-xs text-slate-300 mt-2">DevExtreme BI grids, custom layout builder & 6-language i18n with Arabic RTL.</p>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 mt-4 text-center">2 Weeks</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: Requirements -->
+    <div class="slide flex-col justify-center max-w-6xl w-full mx-auto" data-section="03 | METHODOLOGY & REQUIREMENTS" data-notes="The system fulfills 21 functional user stories across five operational modules. On the non-functional side, we established sub-200ms ingestion latency, support for 50+ concurrent modems, strict multi-tenant data partitioning, and 6-language internationalization including Arabic RTL.">
+      <h2 class="text-3xl font-black text-white mb-6">System Requirements Specification</h2>
+      <div class="grid grid-cols-2 gap-6">
+        <div class="glass-card rounded-2xl p-6 border-t-2 border-t-sky-400 space-y-4">
+          <h3 class="text-lg font-bold text-white flex items-center space-x-2"><span>📋</span><span>Functional Requirements (21 User Stories)</span></h3>
+          <ul class="space-y-2.5 text-xs text-slate-300">
+            <li><strong class="text-sky-300">• Security & Multi-Tenancy:</strong> JWT stateless tokens, granular screen/action RBAC.</li>
+            <li><strong class="text-sky-300">• Fleet & Circuit Logistics:</strong> Bus catalog, driver pairing, ordered pickup route sequencer.</li>
+            <li><strong class="text-sky-300">• IoT Ingestion API:</strong> Sub-second GPS & RFID occupancy stream with 15-min replay defense.</li>
+            <li><strong class="text-sky-300">• Machine Learning ETA:</strong> Real-time stop arrival forecasts via Python FastAPI microservice.</li>
+            <li><strong class="text-sky-300">• BI Analytics & Export:</strong> Dynamic grouping, custom layout presets, instant PDF & Excel export.</li>
+          </ul>
+        </div>
+        <div class="glass-card rounded-2xl p-6 border-t-2 border-t-emerald-400 space-y-4">
+          <h3 class="text-lg font-bold text-white flex items-center space-x-2"><span>⚙️</span><span>Non-Functional Engineering Constraints</span></h3>
+          <ul class="space-y-2.5 text-xs text-slate-300">
+            <li><strong class="text-emerald-300">• Ingestion Latency:</strong> Telemetry ingestion API requests resolve in &lt; 200ms.</li>
+            <li><strong class="text-emerald-300">• Concurrent Scalability:</strong> Supports 50+ concurrent modems broadcasting every 30 seconds.</li>
+            <li><strong class="text-emerald-300">• Multi-Tenant Isolation:</strong> Global EF Core query filters enforce SocieteId boundaries on all queries.</li>
+            <li><strong class="text-emerald-300">• Multi-Language & RTL:</strong> ngx-translate supporting 6 languages with native Arabic RTL support.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: Global Multi-Tier Architecture -->
+    <div class="slide flex-col justify-center max-w-6xl w-full mx-auto" data-section="04 | PROPOSED SOLUTION" data-notes="Our architecture is structured into four decoupled tiers: The Field IoT tier captures raw vehicular telemetry; the Angular SPA delivers real-time cartography; the .NET 8 central backend orchestrates business logic via CQRS; and the Data & Intelligence tier pairs SQL Server with a dedicated Python FastAPI ML microservice.">
+      <h2 class="text-3xl font-black text-white mb-6">Proposed Solution: Global Multi-Tier Architecture</h2>
+      <div class="space-y-3">
+        <div class="glass-card rounded-xl p-4 border-l-4 border-l-rose-500 flex justify-between items-center">
+          <div>
+            <span class="text-xs font-bold text-rose-400 code-font">TIER 1: FIELD & IoT VEHICULAR TIER</span>
+            <p class="text-sm font-bold text-white mt-0.5">Onboard IoT Modems (GPS Telemetry) & RFID Badge Scanners (Passenger Pointage)</p>
+          </div>
+          <span class="text-xs px-3 py-1 rounded bg-slate-800 text-slate-400">HTTP / Cellular REST</span>
+        </div>
+        <div class="glass-card rounded-xl p-4 border-l-4 border-l-sky-500 flex justify-between items-center">
+          <div>
+            <span class="text-xs font-bold text-sky-400 code-font">TIER 2: CLIENT USER PORTAL TIER</span>
+            <p class="text-sm font-bold text-white mt-0.5">Angular 18 SPA • Leaflet Cartography • DevExtreme Grids • Tailwind CSS (Nginx)</p>
+          </div>
+          <span class="text-xs px-3 py-1 rounded bg-slate-800 text-slate-400">HTTPS / JWT Bearer</span>
+        </div>
+        <div class="glass-card rounded-xl p-4 border-l-4 border-l-amber-500 flex justify-between items-center">
+          <div>
+            <span class="text-xs font-bold text-amber-400 code-font">TIER 3: CENTRAL BUSINESS ORCHESTRATION TIER</span>
+            <p class="text-sm font-bold text-white mt-0.5">.NET 8 WebAPI • Carter Minimal APIs • MediatR CQRS Pipeline • EF Core 8 ORM</p>
+          </div>
+          <span class="text-xs px-3 py-1 rounded bg-slate-800 text-slate-400">In-Process MediatR</span>
+        </div>
+        <div class="glass-card rounded-xl p-4 border-l-4 border-l-emerald-500 flex justify-between items-center">
+          <div>
+            <span class="text-xs font-bold text-emerald-400 code-font">TIER 4: DATA PERSISTENCE & PREDICTIVE AI TIER</span>
+            <p class="text-sm font-bold text-white mt-0.5">Microsoft SQL Server 2019 (ACID DB) • FastAPI Python 3.11 ML Microservice (ETA Inference)</p>
+          </div>
+          <span class="text-xs px-3 py-1 rounded bg-slate-800 text-slate-400">SQL / HTTP REST</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 11: Backend Clean Architecture & CQRS -->
+    <div class="slide flex-col justify-center max-w-6xl w-full mx-auto" data-section="04 | PROPOSED SOLUTION" data-notes="Our backend strictly follows Clean Architecture across four decoupled assemblies. By implementing CQRS with MediatR, write commands and read queries are isolated. Every command executes through an automated pipeline handling validation and transactional Unit-of-Work.">
+      <h2 class="text-3xl font-black text-white mb-6">Backend Design: Clean Architecture & CQRS Pipeline</h2>
+      <div class="grid grid-cols-2 gap-6">
+        <div class="glass-card rounded-2xl p-6 border-t-2 border-t-sky-400 space-y-3">
+          <h3 class="text-lg font-bold text-white">🏛️ Clean Architecture (4 C# Projects)</h3>
+          <ul class="space-y-2 text-xs text-slate-300">
+            <li><strong class="text-sky-300">• Domain Layer:</strong> Pure business entities, value objects & domain rules (Zero external dependencies).</li>
+            <li><strong class="text-sky-300">• Application Layer:</strong> CQRS Commands & Queries, MediatR Handlers, Validation pipelines, DTO interfaces.</li>
+            <li><strong class="text-sky-300">• Infrastructure Layer:</strong> EF Core DbContext, JWT authentication, ML HTTP client, PDF rendering engines.</li>
+            <li><strong class="text-sky-300">• WebAPI Layer:</strong> Carter Minimal API routing modules, middleware, dependency injection configuration.</li>
+          </ul>
+        </div>
+        <div class="glass-card rounded-2xl p-6 border-t-2 border-t-emerald-400 space-y-3">
+          <h3 class="text-lg font-bold text-white">🔄 CQRS Pattern with MediatR</h3>
+          <ul class="space-y-2 text-xs text-slate-300">
+            <li><strong class="text-emerald-300">• Commands (Write Operations):</strong> Encapsulate state mutations (CreateBus, IngestTelemetry) with fail-fast FluentValidation.</li>
+            <li><strong class="text-emerald-300">• Queries (Read-Only Data):</strong> Optimized data projection queries (GetLiveFleet, RunAnalyseQuery) with zero side effects.</li>
+            <li><strong class="text-emerald-300">• MediatR Pipeline Behaviors:</strong> Automatic cross-cutting concerns: Logging, Validation, and Unit-of-Work.</li>
+            <li><strong class="text-emerald-300">• Atomic Unit of Work:</strong> Guarantees transactional consistency across multi-entity operations.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 12: Geofencing & Machine Learning ETA -->
+    <div class="slide flex-col justify-center max-w-6xl w-full mx-auto" data-section="04 | PROPOSED SOLUTION" data-notes="CST LePoint incorporates two automated engines: Our 250-meter Geofencing Engine computes Haversine spatial offsets to flag detours instantly, while our FastAPI Machine Learning Microservice utilizes LightGBM to predict arrival timestamps at downstream pickup stops.">
+      <h2 class="text-3xl font-black text-white mb-6">Automated 250m Geofencing & Machine Learning ETA</h2>
+      <div class="grid grid-cols-2 gap-6">
+        <div class="glass-card rounded-2xl p-6 border-t-2 border-t-rose-500 space-y-3">
+          <h3 class="text-lg font-bold text-white">📍 250m Geofencing Detour Engine</h3>
+          <ul class="space-y-2 text-xs text-slate-300">
+            <li><strong class="text-rose-400">• Haversine Spatial Computation:</strong> Calculates great-circle distance between live GPS coordinates and the nearest route polyline.</li>
+            <li><strong class="text-rose-400">• 250-Meter Detour Threshold:</strong> If offset exceeds 250m, vehicle status is immediately flagged as 'Detour Alert' in real-time.</li>
+            <li><strong class="text-rose-400">• Replay Attack Defense:</strong> Rejects any telemetry payload with a timestamp older than 15 minutes.</li>
+            <li><strong class="text-rose-400">• Business Value:</strong> Stops unauthorized detours immediately, saving fuel and preventing missed stops.</li>
+          </ul>
+        </div>
+        <div class="glass-card rounded-2xl p-6 border-t-2 border-t-emerald-500 space-y-3">
+          <h3 class="text-lg font-bold text-white">🤖 Machine Learning ETA Forecasting</h3>
+          <ul class="space-y-2 text-xs text-slate-300">
+            <li><strong class="text-emerald-400">• Python 3.11 FastAPI Microservice:</strong> Asynchronous microservice serving trained LightGBM models (bus_eta_model.pkl).</li>
+            <li><strong class="text-emerald-400">• Feature Vector:</strong> Input metrics include GPS coords, speed, remaining stop distance, stop index, time-of-day traffic.</li>
+            <li><strong class="text-emerald-400">• Sub-50ms Inference Latency:</strong> Computes batch arrival predictions across all downstream pickup stops instantaneously.</li>
+            <li><strong class="text-emerald-400">• Fault-Tolerant Fallback:</strong> Reverts to kinematic distance/speed calculation if ML microservice is unreachable.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 13: Full-Stack Tech Stack -->
+    <div class="slide flex-col justify-center max-w-6xl w-full mx-auto" data-section="05 | IMPLEMENTATION & REALIZATION" data-notes="Our technical stack combines .NET 8 on the backend, Angular 18 on the frontend, Python 3.11 with FastAPI for machine learning, SQL Server 2019 for enterprise relational data, and Docker Compose for containerized deployment.">
+      <h2 class="text-3xl font-black text-white mb-6">Full-Stack Technological Stack Selection</h2>
+      <div class="grid grid-cols-4 gap-4">
+        <div class="glass-card rounded-2xl p-5 border-t-2 border-t-sky-400 space-y-3">
+          <h3 class="font-bold text-white text-base">Backend Tier</h3>
+          <ul class="space-y-1 text-xs text-slate-300">
+            <li>• .NET 8 C#</li>
+            <li>• Carter Minimal APIs</li>
+            <li>• MediatR (CQRS)</li>
+            <li>• Entity Framework Core 8</li>
+            <li>• FluentValidation</li>
+            <li>• JWT Bearer Security</li>
+          </ul>
+        </div>
+        <div class="glass-card rounded-2xl p-5 border-t-2 border-t-cyan-400 space-y-3">
+          <h3 class="font-bold text-white text-base">Frontend Tier</h3>
+          <ul class="space-y-1 text-xs text-slate-300">
+            <li>• Angular 18 SPA</li>
+            <li>• TypeScript</li>
+            <li>• Tailwind CSS</li>
+            <li>• Leaflet.js Cartography</li>
+            <li>• DevExtreme DataGrids</li>
+            <li>• ngx-translate (6 Langs + RTL)</li>
+          </ul>
+        </div>
+        <div class="glass-card rounded-2xl p-5 border-t-2 border-t-emerald-400 space-y-3">
+          <h3 class="font-bold text-white text-base">AI & Data Science</h3>
+          <ul class="space-y-1 text-xs text-slate-300">
+            <li>• Python 3.11</li>
+            <li>• FastAPI / Uvicorn</li>
+            <li>• LightGBM & Scikit-Learn</li>
+            <li>• Pandas & NumPy</li>
+            <li>• Joblib Serializer</li>
+            <li>• Haversine Spatial Lib</li>
+          </ul>
+        </div>
+        <div class="glass-card rounded-2xl p-5 border-t-2 border-t-amber-400 space-y-3">
+          <h3 class="font-bold text-white text-base">Database & DevOps</h3>
+          <ul class="space-y-1 text-xs text-slate-300">
+            <li>• Microsoft SQL Server 2019</li>
+            <li>• Docker & Docker Compose</li>
+            <li>• Nginx Reverse Proxy</li>
+            <li>• Git / GitHub Actions</li>
+            <li>• QuestPDF & DinkToPdf</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 14: Relational Domain Model -->
+    <div class="slide flex-col justify-center max-w-6xl w-full mx-auto" data-section="05 | IMPLEMENTATION & REALIZATION" data-notes="Our relational schema is partitioned into five distinct clusters: Tenant Identity, Fleet Hardware, Logistics Routing, Workforce Shifts, and Custom Analytics. Global query filters enforce SocieteId tenant separation on every database access.">
+      <h2 class="text-3xl font-black text-white mb-6">Relational Domain Model & Multi-Tenant Data Schema</h2>
+      <div class="space-y-3">
+        <div class="glass-card rounded-xl p-3 border-l-4 border-l-purple-500">
+          <p class="font-bold text-white text-sm">🏢 Tenant & Identity Cluster</p>
+          <p class="text-xs text-slate-400">Entities: Societe, AppUser, Role, ScreenPermission, ActionPermission. Guarantees multi-tenant boundaries via foreign key SocieteId.</p>
+        </div>
+        <div class="glass-card rounded-xl p-3 border-l-4 border-l-sky-500">
+          <p class="font-bold text-white text-sm">🚌 Fleet & Hardware Cluster</p>
+          <p class="text-xs text-slate-400">Entities: Bus, Chauffeur, Modem (IMEI pairing), DeviceTelemetry, GpsCoordinate. Records vehicle metadata and telemetry streams.</p>
+        </div>
+        <div class="glass-card rounded-xl p-3 border-l-4 border-l-amber-500">
+          <p class="font-bold text-white text-sm">🗺️ Logistics & Routing Cluster</p>
+          <p class="text-xs text-slate-400">Entities: Circuit, PointCollecte (Geocoded & Ordered), Trajet. Maintains pickup sequences, target distances, and expected stop durations.</p>
+        </div>
+        <div class="glass-card rounded-xl p-3 border-l-4 border-l-emerald-500">
+          <p class="font-bold text-white text-sm">👥 Workforce & Shift Cluster</p>
+          <p class="text-xs text-slate-400">Entities: Employe, BadgeRFID, Shift, Equipe, Chantier (Work Order). Maps factory workers to shifts, pickup points, and scheduled work orders.</p>
+        </div>
+        <div class="glass-card rounded-xl p-3 border-l-4 border-l-rose-500">
+          <p class="font-bold text-white text-sm">📊 Analytics & Layouts Cluster</p>
+          <p class="text-xs text-slate-400">Entities: ReportLayout, AnalyseQuery. Stores user-customized datagrid layouts, column grouping, and export preferences.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 15: Showcase - Live Cartography -->
+    <div class="slide flex-col justify-center max-w-6xl w-full mx-auto" data-section="06 | SHOWCASE & LIVE DEMO" data-notes="Here is the Live Cartographic Supervision interface. Operators monitor active vehicles in real-time with SVG markers reflecting live heading. The planned circuit polyline and geofenced stops are rendered on screen, with immediate detour alerts if a bus strays beyond 250 meters.">
+      <h2 class="text-3xl font-black text-white mb-6">Showcase: Real-Time Cartographic Fleet Supervision</h2>
+      <div class="grid grid-cols-12 gap-6">
+        <div class="col-span-7 glass-card rounded-2xl p-6 border border-sky-500/40 glow-cyan flex flex-col justify-center">
+          <div class="p-6 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+              <span class="text-sm font-bold text-sky-400">🗺️ LIVE MAP INTERFACE (Leaflet.js)</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold">● Active Fleet Stream</span>
+            </div>
+            <p class="text-xs text-slate-300">• Rotating SVG bus markers reflecting live vehicle heading.</p>
+            <p class="text-xs text-slate-300">• Visual route polyline with ordered geofenced pickup stops.</p>
+            <p class="text-xs text-slate-300">• Live vehicle status cards: 'En Route', 'Stopped', 'Offline'.</p>
+            <p class="text-xs text-rose-400 font-semibold">• Automated visual alert banner when detour offset &gt; 250m.</p>
+          </div>
+        </div>
+        <div class="col-span-5 space-y-4">
+          <div class="glass-card rounded-xl p-4 border-l-4 border-l-sky-400">
+            <h4 class="font-bold text-white text-sm">📡 Sub-Second GPS Updates</h4>
+            <p class="text-xs text-slate-400 mt-1">Telemetry packets ingested & mapped with zero UI stuttering.</p>
+          </div>
+          <div class="glass-card rounded-xl p-4 border-l-4 border-l-rose-400">
+            <h4 class="font-bold text-white text-sm">⚠️ Instant 250m Detour Banner</h4>
+            <p class="text-xs text-slate-400 mt-1">Automated alert highlighting unauthorized route deviations.</p>
+          </div>
+          <div class="glass-card rounded-xl p-4 border-l-4 border-l-emerald-400">
+            <h4 class="font-bold text-white text-sm">📜 Real-Time Event Timeline</h4>
+            <p class="text-xs text-slate-400 mt-1">Chronological drawer logging stops, boardings & device health.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 16: Showcase - Logistics & Pointage -->
+    <div class="slide flex-col justify-center max-w-6xl w-full mx-auto" data-section="06 | SHOWCASE & LIVE DEMO" data-notes="This screen demonstrates Master Planning and Attendance Management. On the left, operators sequence pickup circuits with drag-and-drop checkpoints. On the right, employees are assigned to pickup stops and RFID badges, allowing instant presence registration against factory work orders.">
+      <h2 class="text-3xl font-black text-white mb-6">Showcase: Circuit Planning & RFID Worker Pointage</h2>
+      <div class="grid grid-cols-2 gap-6">
+        <div class="glass-card rounded-2xl p-6 border-t-2 border-t-sky-400 space-y-4">
+          <h3 class="text-lg font-bold text-white">🗺️ Circuit & Stop Logistics Planner</h3>
+          <ul class="space-y-3 text-xs text-slate-300">
+            <li><strong class="text-sky-300">• Visual Route Builder:</strong> Interactive map route plotting with waypoint geocoding and total distance calculation.</li>
+            <li><strong class="text-sky-300">• Ordered Stop Sequencing:</strong> Drag-and-drop sequencing of pickup checkpoints with scheduled arrival target windows.</li>
+            <li><strong class="text-sky-300">• Shift & Resource Assignment:</strong> Assigns specific vehicles, certified drivers, and work shifts to logistical circuits.</li>
+          </ul>
+        </div>
+        <div class="glass-card rounded-2xl p-6 border-t-2 border-t-emerald-400 space-y-4">
+          <h3 class="text-lg font-bold text-white">🏷️ Workforce Roster & RFID Attendance</h3>
+          <ul class="space-y-3 text-xs text-slate-300">
+            <li><strong class="text-emerald-300">• Employee Directory & RFID Allocation:</strong> Associates worker profiles with unique RFID card UIDs, residential stops, and factory shifts.</li>
+            <li><strong class="text-emerald-300">• Live Mobile Pointage Validation:</strong> Modem scans RFID badge upon bus boarding and verifies authorization against scheduled work order.</li>
+            <li><strong class="text-emerald-300">• Real-Time Headcount & Capacity:</strong> Updates live onboard passenger count, preventing vehicle overloading.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 17: Showcase - AI ETA & BI Reporting -->
+    <div class="slide flex-col justify-center max-w-6xl w-full mx-auto" data-section="06 | SHOWCASE & LIVE DEMO" data-notes="Here we showcase our Predictive AI and BI modules. The ETA module queries FastAPI to calculate arrival forecasts for upcoming stops. On the reporting side, DevExtreme datagrids allow analysts to group and filter records, and export comprehensive audit reports to Excel and PDF.">
+      <h2 class="text-3xl font-black text-white mb-6">Showcase: Machine Learning ETA & Enterprise BI Reports</h2>
+      <div class="grid grid-cols-2 gap-6">
+        <div class="glass-card rounded-2xl p-6 border-t-2 border-t-emerald-400 space-y-4">
+          <h3 class="text-lg font-bold text-white">🤖 AI-Powered Stop ETA Predictions</h3>
+          <ul class="space-y-3 text-xs text-slate-300">
+            <li><strong class="text-emerald-300">• Real-Time ETA Grid:</strong> Displays predicted arrival time windows for all downstream stops along active transit circuits.</li>
+            <li><strong class="text-emerald-300">• FastAPI Microservice Ingestion:</strong> Queries pre-trained LightGBM model with current vehicle velocity and remaining distance.</li>
+            <li><strong class="text-emerald-300">• Early Delay Notification:</strong> Automatically flags predicted delays exceeding 5 minutes, allowing dispatchers to notify plants.</li>
+          </ul>
+        </div>
+        <div class="glass-card rounded-2xl p-6 border-t-2 border-t-sky-400 space-y-4">
+          <h3 class="text-lg font-bold text-white">📊 Dynamic Business Intelligence & Exports</h3>
+          <ul class="space-y-3 text-xs text-slate-300">
+            <li><strong class="text-sky-300">• DevExtreme Dynamic Datagrids:</strong> Multi-column grouping, server-side sorting, summary aggregations, and virtual scrolling.</li>
+            <li><strong class="text-sky-300">• Saved User Layout Presets:</strong> Users can customize column arrangements and save configurations for one-click reload.</li>
+            <li><strong class="text-sky-300">• One-Click Multi-Format Export:</strong> Generates styled PDF and Excel audit reports ready for corporate invoicing.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 18: Conclusion & Impact -->
+    <div class="slide flex-col justify-center max-w-6xl w-full mx-auto" data-section="07 | CONCLUSION & PERSPECTIVES" data-notes="In conclusion, this graduation project delivered the CST LePoint platform, achieving 100% of our planned user stories. The solution transforms traditional, error-prone transportation into an automated, real-time, and predictive SaaS product, eliminating paper rosters and providing complete operational visibility.">
+      <h2 class="text-3xl font-black text-white mb-6">Conclusion: Project Synthesis & Measurable Impact</h2>
+      <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="glass-card rounded-xl p-4 text-center border-t-2 border-t-emerald-400">
+          <p class="text-2xl font-black text-emerald-400 code-font">100%</p>
+          <p class="text-xs font-bold text-white mt-1">Sprint Delivery</p>
+          <p class="text-[11px] text-slate-400 mt-1">Delivered all 21 User Stories across 5 Agile Sprints</p>
+        </div>
+        <div class="glass-card rounded-xl p-4 text-center border-t-2 border-t-sky-400">
+          <p class="text-2xl font-black text-sky-400 code-font">&lt; 200ms</p>
+          <p class="text-xs font-bold text-white mt-1">Ingestion Latency</p>
+          <p class="text-[11px] text-slate-400 mt-1">High-throughput processing for concurrent IoT modems</p>
+        </div>
+        <div class="glass-card rounded-xl p-4 text-center border-t-2 border-t-purple-400">
+          <p class="text-2xl font-black text-purple-400 code-font">SaaS</p>
+          <p class="text-xs font-bold text-white mt-1">Multi-Tenancy</p>
+          <p class="text-[11px] text-slate-400 mt-1">Secure architecture ready for commercial client onboarding</p>
+        </div>
+      </div>
+      <div class="glass-card rounded-2xl p-5 border border-sky-500/30">
+        <h4 class="text-sm font-bold text-sky-400 uppercase tracking-wider mb-2">💎 Transformational Business Value Delivered</h4>
+        <div class="grid grid-cols-2 gap-4 text-xs text-slate-300">
+          <div><strong class="text-white">• 100% Paper Elimination:</strong> Replaced error-prone paper rosters with automated RFID badge scans.</div>
+          <div><strong class="text-white">• Real-Time Operational Visibility:</strong> Supervisors track active vehicles, passenger headcounts, and route compliance live.</div>
+          <div><strong class="text-white">• Zero Arrival Uncertainty:</strong> Machine learning ETA models keep factories informed, preventing production downtime.</div>
+          <div><strong class="text-white">• Automated Invoicing & Auditability:</strong> Dynamic BI reporting reduces administrative dispute resolution time by 90%.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 19: Future Roadmap -->
+    <div class="slide flex-col justify-center max-w-6xl w-full mx-auto" data-section="07 | CONCLUSION & PERSPECTIVES" data-notes="Looking ahead, CST has a clear commercial roadmap: In the short term, a dedicated Driver Tablet App for navigation; in the medium term, a Passenger Mobile App for live arrival alerts; and in the long term, AI-driven dynamic route optimization based on daily attendance.">
+      <h2 class="text-3xl font-black text-white mb-6">Product Evolution Roadmap & Perspectives</h2>
+      <div class="grid grid-cols-3 gap-6">
+        <div class="glass-card rounded-2xl p-6 border-t-2 border-t-sky-400 space-y-4">
+          <span class="text-xs font-bold text-sky-400 code-font">PHASE 1: SHORT-TERM</span>
+          <h3 class="font-bold text-white text-base">Driver In-Cab Tablet App</h3>
+          <ul class="space-y-2 text-xs text-slate-300">
+            <li>• Dedicated Android tablet app for drivers.</li>
+            <li>• Turn-by-turn circuit navigation.</li>
+            <li>• Onboard passenger list & offline caching.</li>
+          </ul>
+        </div>
+        <div class="glass-card rounded-2xl p-6 border-t-2 border-t-emerald-400 space-y-4">
+          <span class="text-xs font-bold text-emerald-400 code-font">PHASE 2: MEDIUM-TERM</span>
+          <h3 class="font-bold text-white text-base">Passenger Mobile App</h3>
+          <ul class="space-y-2 text-xs text-slate-300">
+            <li>• Cross-platform app for factory workers.</li>
+            <li>• Live bus tracking on interactive map.</li>
+            <li>• Personalized stop ETA push notifications.</li>
+          </ul>
+        </div>
+        <div class="glass-card rounded-2xl p-6 border-t-2 border-t-amber-400 space-y-4">
+          <span class="text-xs font-bold text-amber-400 code-font">PHASE 3: LONG-TERM</span>
+          <h3 class="font-bold text-white text-base">AI Route Optimization</h3>
+          <ul class="space-y-2 text-xs text-slate-300">
+            <li>• Genetic routing algorithms.</li>
+            <li>• Dynamic circuit re-planning based on daily attendance.</li>
+            <li>• Automated fuel & carbon emission reductions.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 20: Thank You & Q&A -->
+    <div class="slide flex-col justify-center max-w-6xl w-full mx-auto" data-section="CONCLUSION & Q&A" data-notes="Thank you, Mr. President, and esteemed members of the jury, for your kind attention. I am now ready to answer your questions.">
+      <div class="glass-card rounded-3xl p-12 text-center border border-sky-500/40 glow-cyan space-y-6">
+        <h1 class="text-5xl font-black text-white">THANK YOU FOR YOUR ATTENTION</h1>
+        <p class="text-2xl font-bold text-emerald-400">Questions & Discussion</p>
+        <div class="pt-6 border-t border-slate-800 max-w-xl mx-auto text-sm text-slate-400 space-y-1">
+          <p class="font-bold text-slate-200">CST LePoint — Smart Fleet Telemetry, RFID Attendance & AI Prediction Platform</p>
+          <p>Candidate: <strong class="text-white">Rayen</strong> | Host Company: <strong class="text-sky-400">CST (Compagnie de Services et Tech)</strong></p>
+          <p class="text-xs text-slate-500 pt-2 code-font">Tech Stack: .NET 8 • Angular 18 • Python FastAPI • SQL Server 2019 • Docker</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- SPEAKER NOTES DRAWER (Toggle with 'N') -->
+  <div id="notesDrawer" class="hidden fixed bottom-16 left-8 right-8 max-h-48 overflow-y-auto glass-card rounded-2xl p-5 border border-amber-500/50 bg-slate-950/95 z-50 shadow-2xl">
+    <div class="flex justify-between items-center pb-2 mb-2 border-b border-slate-800">
+      <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center space-x-1.5">
+        <span>🎙️</span><span>Speaker Notes (What to say to the jury)</span>
+      </span>
+      <span class="text-[10px] text-slate-400">Press <code class="px-1.5 py-0.5 rounded bg-slate-800 text-amber-300">N</code> to hide</span>
+    </div>
+    <p id="notesContent" class="text-sm text-slate-200 leading-relaxed"></p>
+  </div>
+
+  <!-- BOTTOM CONTROL BAR -->
+  <footer class="px-8 py-3.5 flex justify-between items-center z-50 border-t border-slate-800/80 bg-slate-950/40 backdrop-blur-md">
+    <div class="flex items-center space-x-3 text-xs text-slate-400">
+      <span>Keys:</span>
+      <kbd class="px-2 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300 code-font">←</kbd>
+      <kbd class="px-2 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300 code-font">→</kbd>
+      <kbd class="px-2 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300 code-font">F (Fullscreen)</kbd>
+      <kbd class="px-2 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300 code-font">N (Notes)</kbd>
+    </div>
+    <div class="flex items-center space-x-3">
+      <button onclick="toggleNotes()" class="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-700 transition">
+        🎙️ Speaker Notes
+      </button>
+      <button onclick="prevSlide()" class="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold border border-slate-700 transition">
+        ◀ Previous
+      </button>
+      <button onclick="nextSlide()" class="px-4 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold transition shadow-lg shadow-sky-900/30">
+        Next ▶
+      </button>
+    </div>
+  </footer>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    let currentSlide = 0;
+
+    function updateSlide() {
+      slides.forEach((slide, idx) => {
+        if (idx === currentSlide) {
+          slide.classList.add('active');
+        } else {
+          slide.classList.remove('active');
+        }
+      });
+      const activeSlide = slides[currentSlide];
+      document.getElementById('slideCounter').textContent = `${String(currentSlide + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
+      document.getElementById('sectionBadge').textContent = activeSlide.getAttribute('data-section') || 'CST LePoint';
+      document.getElementById('notesContent').textContent = activeSlide.getAttribute('data-notes') || 'No notes for this slide.';
+    }
+
+    function nextSlide() {
+      if (currentSlide < slides.length - 1) {
+        currentSlide++;
+        updateSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlide();
+      }
+    }
+
+    function toggleNotes() {
+      const drawer = document.getElementById('notesDrawer');
+      drawer.classList.toggle('hidden');
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => alert(err.message));
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') nextSlide();
+      if (e.key === 'ArrowLeft' || e.key === 'PageUp') prevSlide();
+      if (e.key === 'n' || e.key === 'N') toggleNotes();
+      if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+    });
+
+    updateSlide();
+  </script>
+</body>
+</html>

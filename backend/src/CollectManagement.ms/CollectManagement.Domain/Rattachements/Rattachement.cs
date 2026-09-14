@@ -5,7 +5,7 @@ using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Domain.Rattachements;
 
-public class Rattachement : AuditableEntity
+public class Rattachement : AuditableEntity, ITenantEntity
 {
     public RattachementId RattachementId { get; private set; }
     

@@ -6,7 +6,7 @@ using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Domain.Analyse;
 
-public class ReportLayout : AuditableEntity
+public class ReportLayout : AuditableEntity, ITenantEntity
 {
     public ReportLayoutId ReportLayoutId { get; private set; }
     public AnalyseReportType ReportType { get; private set; }

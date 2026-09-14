@@ -8,7 +8,7 @@ using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Domain.Chauffeurs;
 
-public class Chauffeur : AuditableEntity
+public class Chauffeur : AuditableEntity, ITenantEntity
 {
     public ChauffeurId ChauffeurId { get; private set; }
 
@@ -100,6 +100,11 @@ public class Chauffeur : AuditableEntity
         RFIDChauffeur = rfidChauffeur;
         Externe = externe;
         IsActive = isActive;
+        BusId = busId;
+    }
+
+    public void AssignBus(BusId? busId)
+    {
         BusId = busId;
     }
 

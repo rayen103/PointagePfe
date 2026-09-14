@@ -1,13 +1,8 @@
-import {
-    ChangeDetectionStrategy,
-    ChangeDetectorRef,
-    Component,
-    OnDestroy,
-    OnInit,
-    ViewChild,
-    ViewEncapsulation,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { take } from 'rxjs';
 import { TranslocoModule } from '@ngneat/transloco';
+import { PdfExportService } from '../../../../core/common/pdf-export.service';
+import { CsvExportService } from '../../../../core/common/csv-export.service';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
@@ -63,6 +58,8 @@ export class ListComponent implements OnInit, OnDestroy {
     sortDirection: 'asc' | 'desc' = 'asc';
 
     constructor(
+        private _csvExportService: CsvExportService,
+        private _pdfExportService: PdfExportService,
         private _busService: BusService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseConfirmationService: FuseConfirmationService
@@ -201,4 +198,28 @@ export class ListComponent implements OnInit, OnDestroy {
     }
 
     protected readonly FuseNavigationAction = FuseNavigationAction;
+
+    exportData(): void {
+        if (this._busService) {
+            const obs$ = (this as any).buses$ || this._busService.buses$ || this._busService.bus$;
+            if (obs$) {
+                obs$.pipe(take(1)).subscribe((data: any) => {
+                    const items = Array.isArray(data) ? data : (data?.items || data?.buses || data?.bus || []);
+                    if (items && items.length > 0) {
+                        const columns = [
+            { header: 'Immatriculation', dataKey: 'numeroIMM' },
+            { header: 'Modèle', dataKey: 'modelBus' },
+            { header: 'Capacité', dataKey: 'capacite' },
+            { header: 'Occupants', dataKey: 'currentOccupancy' },
+            { header: 'Code Circuit', dataKey: 'codeCircuit' },
+            { header: 'Statut Actif', dataKey: 'isActive' }
+        ];
+                        this._pdfExportService.exportToPdf('Rapport Flotte des Bus', columns, items, 'Bus_Export.pdf');
+                    } else {
+                        console.warn('No data available to export to PDF');
+                    }
+                });
+            }
+        }
+    }
 }

@@ -1,0 +1,48 @@
+%%{init: { "theme": "redux", "themeVariables": { "fontSize": "22px", "fontFamily": "Arial, sans-serif" } }}%%
+flowchart TB
+    subgraph EdgeTier["Edge & Field Hardware Tier"]
+        direction LR
+        Modem["Onboard IoT GPS Modems<br/>(Teltonika / Telemetry)"]
+        RFID["RFID Card Scanners<br/>(Passenger Attendance)"]
+        ClientDevices["User Client Terminals<br/>(Workstations, Tablets, Phones)"]
+    end
+
+    subgraph HostServer["Host Server / Cloud VM (Docker Orchestration)"]
+        subgraph IngressLayer["Ingress & Web Server"]
+            Nginx["Nginx Reverse Proxy & Web Server<br/>(Port 80 / 443 / 4200)"]
+        end
+
+        subgraph DockerNet["Isolated Virtual Bridge Network (cst-network)"]
+            subgraph ContFE["Frontend Container (cst-frontend)"]
+                SPA_Prod["Angular 19 SPA Bundle<br/>(Static HTML/JS/CSS Assets)"]
+            end
+
+            subgraph ContBE["Backend API Container (cst-backend)"]
+                Kestrel[".NET 8 Kestrel Web Server<br/>(ASP.NET Core / Carter API)<br/>Port 6064"]
+            end
+
+            subgraph ContML["AI Service Container (cst-ml-service)"]
+                Uvicorn["Python 3.11 / Uvicorn ASGI Server<br/>(FastAPI ML Inference Engine)<br/>Port 8001"]
+            end
+
+            subgraph ContDB["Database Container (cst-database)"]
+                MSSQL["Microsoft SQL Server 2019<br/>(Relational ACID Engine)<br/>Port 1433"]
+            end
+        end
+
+        subgraph StorageTier["Persistent Host Storage Volumes"]
+            VolDB[("cst_db_data<br/>(SQL Server Database Files & Logs)")]
+            VolML[("cst_ml_models<br/>(Serialized ML Weights & Pickles)")]
+        end
+    end
+
+    Modem -->|"Cellular 4G/GPRS (HTTPS POST)"| Kestrel
+    RFID -->|"Serial / IoT Gateway Stream"| Modem
+    ClientDevices -->|"HTTPS (Port 4200/443)"| Nginx
+    Nginx -->|"Static Asset Serving"| SPA_Prod
+    SPA_Prod -.->|"XHR / REST API Requests (Port 6064)"| Kestrel
+
+    Kestrel -->|"Internal TCP TDS (Port 1433)"| MSSQL
+    Kestrel -->|"Internal HTTP RPC (Port 8001)"| Uvicorn
+    MSSQL --- VolDB
+    Uvicorn --- VolML

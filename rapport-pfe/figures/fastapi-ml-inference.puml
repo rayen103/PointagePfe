@@ -1,0 +1,19 @@
+@startuml
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam sequence {
+  ParticipantBackgroundColor #F4F7FB
+  ParticipantBorderColor #0B3B66
+  ArrowColor #0B3B66
+  LifeLineBorderColor #64748B
+}
+
+actor "Operator" as operator
+participant "Application Backend" as backend
+participant "FastAPI ML Service" as service
+
+operator -> backend : Request fleet ETA
+backend -> service : Submit bus telemetry
+service --> backend : ETA, confidence, fallback status
+backend --> operator : Display arrival estimate
+@enduml

@@ -5,7 +5,7 @@ using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Domain.Circuits;
 
-public class Circuit : AuditableEntity
+public class Circuit : AuditableEntity, ITenantEntity
 {
     public CircuitId CircuitId { get; private set; }
     

@@ -1,0 +1,27 @@
+%%{init: { "theme": "redux", "themeVariables": { "fontSize": "30px", "actorFontSize": "28px", "noteFontSize": "30px", "messageFontSize": "30px", "fontFamily": "Arial, sans-serif" }, "sequence": { "actorWidth": 150, "actorHeight": 52, "boxWidth": 150, "messageMargin": 36 } }}%%
+sequenceDiagram
+    autonumber
+    participant M as Onboard IoT Modem
+    participant API as BusEndpoints (.NET 8)
+    participant GF as Geofence Calculator
+    participant DB as SQL Server 2019
+    participant SPA as Angular Leaflet Map
+
+    M->>API: 1. POST /cm/bus/runtime/position {IMEI, Lat, Lng, Occupancy, TimestampUtc}
+    API->>API: 2. Validate Timestamp Skew (15-min tolerance)
+    API->>DB: 3. Resolve Bus Entity by IMEI
+    DB-->>API: 4. Return Bus & Circuit Pickup Points
+    API->>GF: 5. Compute Haversine Distance to Stops
+
+    alt Distance > 250 Meters for all Stops
+        GF-->>API: Proximity Alert (Out of Radius)
+        API->>DB: 6a. Instantiate Auto-Stop PC-AUTO-{Timestamp}
+    else Within 250m Radius
+        GF-->>API: Normal Route Compliance
+    end
+
+    API->>DB: 7. Save Position & Log BusRuntimeEvent
+    API-->>M: 8. HTTP 200 OK Acknowledgement
+    SPA->>API: 9. Stream StreamLivePositions (Polling/SSE)
+    API-->>SPA: 10. Active Bus Coordinate Vectors
+    SPA->>SPA: 11. Smooth Marker Repositioning on Map

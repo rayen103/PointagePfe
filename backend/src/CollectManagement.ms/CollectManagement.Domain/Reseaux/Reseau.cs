@@ -5,7 +5,7 @@ using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Domain.Reseaux;
 
-public class Reseau : AuditableEntity
+public class Reseau : AuditableEntity, ITenantEntity
 {
     public ReseauId ReseauId { get; private set; }
     public string IpAddress { get; private set; }

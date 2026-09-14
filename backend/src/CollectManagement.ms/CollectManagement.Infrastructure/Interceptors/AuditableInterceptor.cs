@@ -1,4 +1,4 @@
-﻿using CollectManagement.Application.Interfaces.Services;
+using CollectManagement.Application.Interfaces.Services;
 using CollectManagement.Domain.Common;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -35,7 +35,7 @@ public class AuditableInterceptor : SaveChangesInterceptor
                 .ChangeTracker
                 .Entries<AuditableEntity>();
 
-        string userId = "";
+        string? userId = null;
         if (Ulid.TryParse(_loggedInUserService.UserId, out var ulidUserId))
         {
             userId = ulidUserId.ToGuid().ToString();
@@ -46,11 +46,17 @@ public class AuditableInterceptor : SaveChangesInterceptor
             switch (entityEntry.State)
             {
                 case EntityState.Added:
-                    entityEntry.Entity.InsererPar = userId;
+                    if (!string.IsNullOrEmpty(userId))
+                    {
+                        entityEntry.Entity.InsererPar = userId;
+                    }
                     entityEntry.Entity.DateInsertion = _dateTimeProvider.Now;
                     break;
                 case EntityState.Modified:
-                    entityEntry.Entity.ModifierPar = userId;
+                    if (!string.IsNullOrEmpty(userId))
+                    {
+                        entityEntry.Entity.ModifierPar = userId;
+                    }
                     entityEntry.Entity.DateModification = _dateTimeProvider.Now;
                     break;
             }

@@ -66,25 +66,59 @@ public class UtilisateurRepository : RepositoryBase<Utilisateur>, IUtilisateurRe
 
     public Task<Utilisateur?> TryToLogin(
         string login, 
-        Ulid societeId,
         CancellationToken cancellationToken)
     {
-        return _dbSet.Where(u=>
-                (u.Email==login || u.NomUtilisateur == login) &&
-                u.SocieteId == new SocieteId(societeId) &&
+        var query = _dbSet
+            .IgnoreQueryFilters()
+            .Where(u =>
+                (u.Email == login || u.NomUtilisateur == login) &&
                 u.IsActive
-            )
-            .Include(i=>i.RoleUtilisateur)
-            .Include(i=>i.Societe)
+            );
+
+        return query
+            .Include(i => i.RoleUtilisateur)
+            .Include(i => i.Societe)
             .FirstOrDefaultAsync(cancellationToken);
     }
 
     public Task<Utilisateur?> GetOneAsync(UtilisateurId utilisateurId, CancellationToken cancellationToken)
     {
-        return _dbSet.Where(w=>w.UtilisateurId.Equals(utilisateurId))
+        return _dbSet
+            .IgnoreQueryFilters()
+            .Where(w=>w.UtilisateurId.Equals(utilisateurId))
             .Include(i=>i.RoleUtilisateur)
             .Include(i=>i.Sites)
             .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public Task<Utilisateur?> GetByEmailAsync(string email, CancellationToken cancellationToken)
+    {
+        return _dbSet
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+    }
+
+    public Task<Utilisateur?> GetByNomUtilisateurAsync(string nomUtilisateur, CancellationToken cancellationToken)
+    {
+        return _dbSet
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.NomUtilisateur == nomUtilisateur, cancellationToken);
+    }
+
+    public Task<Utilisateur?> GetByApprovalTokenAsync(string token, CancellationToken cancellationToken)
+    {
+        return _dbSet
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.ApprovalToken == token, cancellationToken);
+    }
+
+    public Task<Utilisateur?> GetByEmailWithDetailsAsync(string email, CancellationToken cancellationToken)
+    {
+        return _dbSet
+            .IgnoreQueryFilters()
+            .Include(i => i.RoleUtilisateur)
+                .ThenInclude(r => r.Navigations)
+            .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
     }
 
     public UtilisateurRepository(ApplicationDbContext dbContext) : base(dbContext)

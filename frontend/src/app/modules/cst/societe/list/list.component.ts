@@ -1,3 +1,6 @@
+import { PdfExportService } from '../../../../core/common/pdf-export.service';
+import { CsvExportService } from '../../../../core/common/csv-export.service';
+import { take } from 'rxjs';
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
@@ -69,6 +72,10 @@ export class ListComponent implements OnInit, OnDestroy{
     sortDirection: 'asc' | 'desc' = 'asc';
 
     constructor(
+        private _pdfExportService: PdfExportService,
+
+        private _csvExportService: CsvExportService,
+
         private _societeService: SocieteService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseConfirmationService: FuseConfirmationService
@@ -255,4 +262,26 @@ export class ListComponent implements OnInit, OnDestroy{
     }
 
     protected readonly FuseNavigationAction = FuseNavigationAction;
+
+    exportData(): void {
+        if (this._societeService) {
+            const obs$ = (this as any).societes$ || this._societeService.societes$ || this._societeService.societes$;
+            if (obs$) {
+                obs$.pipe(take(1)).subscribe((data: any) => {
+                    const items = Array.isArray(data) ? data : (data?.items || data?.societes || data?.societes || []);
+                    if (items && items.length > 0) {
+                        const columns = [
+            { header: 'Code Société', dataKey: 'codeSociete' },
+            { header: 'Raison Sociale', dataKey: 'raisonSociale' },
+            { header: 'Adresse', dataKey: 'adresse' },
+            { header: 'Téléphone', dataKey: 'telephone' }
+        ];
+                        this._pdfExportService.exportToPdf('Rapport Sociétés', columns, items, 'Societes_Export.pdf');
+                    } else {
+                        console.warn('No data available to export to PDF');
+                    }
+                });
+            }
+        }
+    }
 }

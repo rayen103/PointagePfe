@@ -1,0 +1,93 @@
+@startuml
+skinparam class {
+  BorderColor #0B3B66
+  BackgroundColor #F4F7FB
+  HeaderBackgroundColor #E2F0FD
+}
+skinparam shadowing false
+skinparam roundcorner 10
+hide circle
+
+class OrdreTravail {
+  + OrdreTravailId : OrdreTravailId
+  + NumeroOrdreTravail : string
+  + NumeroChantier : string
+  + CodeClient : string
+  + NumeroBonCommande : string
+  + CodeEquipe : string
+  + EtatOT : string
+  + Montant : decimal
+  + DateCreation : DateTime
+  + Libelle : string
+  + IsActive : bool
+  + SocieteId : SocieteId
+}
+
+class OrdreTravailDetail {
+  + OrdreTravailDetailId : OrdreTravailDetailId
+  + OrdreTravailId : OrdreTravailId
+  + CodeArticle : string
+  + LibelleArticle : string
+  + Quantite : decimal
+  + PrixUnitaire : decimal
+}
+
+class Equipe {
+  + EquipeId : EquipeId
+  + CodeEquipe : string
+  + LibelleEquipe : string
+  + CodeClient : string
+  + CodeEntrepot : string
+  + Responsable : string
+  + IsInternal : bool
+  + CodeVehicule : string
+  + IsActive : bool
+  + SocieteId : SocieteId
+}
+
+class Chantier {
+  + ChantierId : ChantierId
+  + NumeroChantier : string
+  + LibelleChantier : string
+  + CodeClient : string
+  + IsActive : bool
+}
+
+class Rattachement {
+  + RattachementId : RattachementId
+  + NumeroRattachement : string
+  + DateRattachement : DateTime
+  + NumeroChantier : string
+  + Cout : decimal
+  + Type : string
+  + Nature : string
+  + HeureDebut : TimeSpan
+  + HeureFin : TimeSpan
+  + Status : string
+  + SocieteId : SocieteId
+}
+
+class RattachementEmploye {
+  + RattachementEmployeId : RattachementEmployeId
+  + RattachementId : RattachementId
+  + Matricule : string
+  + NomPrenom : string
+  + DateDebut : DateTime
+  + Cout : decimal
+}
+
+class RattachementArticle {
+  + RattachementArticleId : RattachementArticleId
+  + RattachementId : RattachementId
+  + ArticleId : string
+  + Quantity : decimal
+  + Cost : decimal
+}
+
+OrdreTravail "1" *-- "0..*" OrdreTravailDetail : contains
+OrdreTravail "0..*" --> "0..1" Equipe : assigned to
+OrdreTravail "0..*" --> "0..1" Chantier : executes at
+Rattachement "1" *-- "0..*" RattachementEmploye : tracks workers
+Rattachement "1" *-- "0..*" RattachementArticle : tracks materials
+Rattachement "0..*" --> "1" Chantier : associated to
+@enduml

@@ -1,237 +1,217 @@
-<div class="absolute inset-0 min-w-0 overflow-hidden flex flex-col flex-auto bg-default px-6 md:px-8" *transloco="let t">
-
-    <div class="relative flex flex-row flex-0 items-center justify-between py-8 h-16 my-4">
-
-        <div class="flex gap-2 items-center">
-            <a
-                class="text-white"
-                mat-icon-button
-                [routerLink]="['../']"
-            >
-                <mat-icon
-                    class="text-hint icon-size-8"
-                    [svgIcon]="'heroicons_outline:arrow-left'"></mat-icon>
-            </a>
-
-            <!-- Title -->
-            <div class="text-4xl font-extrabold tracking-tight">{{(!!roleUtilisateur?.roleUtilisateurId ? t('Change-role') : t('new-role')) }} </div>
+<div class="cst-form-page" *transloco="let t">
+    <div class="cst-form-wrap">
+        <!-- Breadcrumb -->
+        <div class="cst-crumb">
+            <a routerLink="/fichier/bus">Gestion</a><span>/</span><a routerLink="../">Rôles</a><span>/</span>
+            <b>{{ (!!roleUtilisateur?.roleUtilisateurId ? t('Change-role') || 'Modifier le rôle' : t('new-role') || 'Nouveau rôle') }}</b>
         </div>
 
-        <div class="flex items-center gap-4">
-            <mat-form-field [subscriptSizing]="'dynamic'" class="fuse-mat-dense min-w-64">
-                <input
-                    matInput
-                    placeholder="Libelle"
-                    [(ngModel)]="roleUtilisateur.libelleRoleUtilisateur"
-                />
-            </mat-form-field>
-
-            <mat-form-field [subscriptSizing]="'dynamic'" class="fuse-mat-dense min-w-64">
-                <mat-select [placeholder]="'Société'" [(ngModel)]="roleUtilisateur.societeId">
-                    <mat-option [value]="null">Aucune</mat-option>
-                    @for (societe of societes; track societe.societeId) {
-                        <mat-option [value]="societe.societeId">{{societe.nom}}</mat-option>
-                    }
-                </mat-select>
-            </mat-form-field>
-        </div>
-
-    </div>
-
-    <div class="relative flex flex-col flex-auto overflow-y-auto overflow-x-auto rounded-lg bg-card grow justify-between">
-
-        @if(flatNavigation.length > 0){
-
-            <!-- Header -->
-            <div
-                class="flex sticky top-0 z-10 gap-4 px-6 py-4 items-center text-md font-semibold text-hint bg-card border-b border-b-slate-300 dark:border-b-slate-700"
-            >
-                <div class="flex items-center justify-center grow-0 w-10">Nº</div>
-                <div class="flex items-center justify-center grow-0 w-16">
-                    @if(selectAllState(); as allState){
-                        <mat-pseudo-checkbox
-                            #selectAll
-                            [class.bg-primary]="allState != 'unchecked'"
-                            [state]="allState"
-                            (click)="selectAllClicked(selectAll)"
-                        >
-                        </mat-pseudo-checkbox>
-                    }
-
+        <!-- Header line -->
+        <div class="cst-form-topline">
+            <div class="cst-form-id">
+                <a class="cst-round" routerLink="../">
+                    <mat-icon [svgIcon]="'heroicons_outline:arrow-left'"></mat-icon>
+                </a>
+                <div>
+                    <div class="cst-form-id__title">
+                        <span>{{ (!!roleUtilisateur?.roleUtilisateurId ? roleUtilisateur.libelleRoleUtilisateur : t('new-role') || 'Nouveau rôle') }}</span>
+                    </div>
+                    <div class="cst-form-id__meta">
+                        Configuration des accès et permissions de navigation
+                    </div>
                 </div>
-                <div class="flex items-center grow">{{ t('Title') }}</div>
-                @for( item of actions; track item.id || $index){
-                    <div class="flex items-center justify-center grow-0 w-24">{{item.value}}</div>
+            </div>
+            <div class="cst-head__actions">
+                <a class="cst-btn cst-btn--ghost" routerLink="../">{{ t('Cancel') || 'Annuler' }}</a>
+                @if ((hasActionPermission(FuseNavigationAction.Edit) && !!this.roleUtilisateur.roleUtilisateurId) ||
+                    (hasActionPermission(FuseNavigationAction.Add) && !this.roleUtilisateur.roleUtilisateurId)) {
+                    <button class="cst-btn cst-btn--primary" type="button" (click)="save()">{{ t('Save') || 'Enregistrer' }}</button>
                 }
             </div>
+        </div>
 
-            <!-- Rows -->
-            @for( item of flatNavigation; track item.id || $index){
+        <!-- Card for Title & Societe selection -->
+        <div class="cst-form-card">
+            <div>
+                <div class="cst-form-sec__title">{{ t('Role-Configuration') || 'Configuration du rôle' }}</div>
+                <div class="cst-form-sec__sub">Définir le libellé et l'association à une société</div>
+                <div class="cst-form-grid" style="grid-template-columns: 1.5fr 1.5fr;">
+                    <!-- Libellé -->
+                    <div class="cst-field">
+                        <label>{{ t('Label') || 'Libellé' }} <span style="color:var(--cst-red)">*</span></label>
+                        <input class="cst-input" [(ngModel)]="roleUtilisateur.libelleRoleUtilisateur" placeholder="Ex: Administrateur" />
+                    </div>
 
-                <div class="flex flex-col w-full">
-
-                    <div
-                        class="flex items-center gap-4 px-6 py-4 hover:bg-slate-200 dark:hover:bg-slate-700 border-b dark:border-b-slate-700"
-                    >
-                        <div class="flex items-center justify-center grow-0 w-10">{{$index+1}}</div>
-                        <div
-                            class="flex items-center justify-center grow-0 w-16"
-                        >
-                            @if(selectRowState(item); as rowState){
-                                <mat-pseudo-checkbox
-                                    #rowSelect
-                                    [class.bg-primary]="rowState != 'unchecked'"
-                                    [appearance]="'full'"
-                                    [state]="rowState"
-                                    (click)="selectRow(item, rowSelect)"
-                                >
-                                </mat-pseudo-checkbox>
-                            }
-
+                    <!-- Société -->
+                    <div class="cst-field">
+                        <label>{{ t('Societe') || 'Société' }}</label>
+                        <div class="cst-select">
+                            <select [(ngModel)]="roleUtilisateur.societeId">
+                                <option [value]="null">Aucune</option>
+                                @for (societe of societes; track societe.societeId) {
+                                    <option [value]="societe.societeId">{{societe.nom}}</option>
+                                }
+                            </select>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
                         </div>
+                    </div>
+                </div>
+            </div>
 
-                        <div class="flex items-center grow">{{item.title}}</div>
+            <div class="cst-divider"></div>
 
-                        @for( action of actions; track action.id || $index){
-                            <div class="flex items-center justify-center grow-0 w-24">
-                                @if(isActionExists(item, action.id)){
-                                    @if (isActionChecked(item, action.id)) {
-                                        <mat-pseudo-checkbox
-                                            #actionSelect
-                                            [class.bg-primary]="true"
-                                            [appearance]="'full'"
-                                            [state]="'checked'"
-                                            (click)="selectAction(item, actionSelect, action.id)"
-                                        >
-                                        </mat-pseudo-checkbox>
-                                    } @else {
-                                        <mat-pseudo-checkbox
-                                            #actionSelect
-                                            [class.bg-primary]="false"
-                                            [appearance]="'full'"
-                                            [state]="'unchecked'"
-                                            (click)="selectAction(item, actionSelect, action.id)"
-                                        >
-                                        </mat-pseudo-checkbox>
-                                    }
-                                } @else {
+            <!-- Permissions Matrix -->
+            <div>
+                <div class="cst-form-sec__title">{{ t('Permissions-Matrix') || 'Matrice des permissions' }}</div>
+                <div class="cst-form-sec__sub">Gérer les droits d'accès pour chaque module</div>
+                
+                <div class="cst-panel" style="margin-top: 12px; border-radius: 12px; overflow: hidden;">
+                    @if(flatNavigation.length > 0){
+                        <!-- Header -->
+                        <div class="cst-tbl__head" style="--cols: 40px 50px 1.5fr repeat(5, 80px); --colmin: 750px; font-weight: 700; align-items: center;">
+                            <div class="text-center">Nº</div>
+                            <div class="flex justify-center">
+                                @if(selectAllState(); as allState){
                                     <mat-pseudo-checkbox
-                                        [appearance]="'full'"
-                                        [state]="'unchecked'"
-                                        [disabled]="true"
+                                        #selectAll
+                                        [class.bg-primary]="allState != 'unchecked'"
+                                        [state]="allState"
+                                        (click)="selectAllClicked(selectAll)"
+                                        style="transform: scale(0.9);"
                                     >
                                     </mat-pseudo-checkbox>
                                 }
                             </div>
-                        }
+                            <div>{{ t('Title') || 'Module' }}</div>
+                            @for( item of actions; track item.id || $index){
+                                <div class="text-center font-bold text-xs" style="text-transform: uppercase;">{{item.value}}</div>
+                            }
+                        </div>
 
-                    </div>
-
-                    @if(item.section?.length > 0){
-                        <div class="flex flex-col w-full ">
-                            @for( section of item.section; track section.id || $index){
-                                <div class="flex px-6 py-4 pl-28 gap-4 w-full hover:bg-slate-200 dark:hover:bg-slate-700 border-b dark:border-slate-700">
-                                    <div class="flex items-center justify-center grow-0 w-10">
-                                        <mat-icon svgIcon="mat_solid:subdirectory_arrow_right"></mat-icon>
-                                    </div>
-                                    <div class="flex items-center justify-center grow-0 w-16">
-                                        @if(isNavigationSectionExists(item, section); as sectionChecked){
-                                            <mat-pseudo-checkbox
-                                                [class.bg-primary]="sectionChecked"
-                                                [state]="sectionChecked ? 'checked' : 'unchecked'"
-                                                (click)="selectSection(item, section)"
-                                            >
-                                            </mat-pseudo-checkbox>
-                                        } @else {
-                                            <mat-pseudo-checkbox
-                                                [class.bg-primary]="false"
-                                                [state]="'unchecked'"
-                                                (click)="selectSection(item, section)"
-                                            >
-                                            </mat-pseudo-checkbox>
-                                        }
-
-                                    </div>
-                                    <div class="flex items-center grow">{{ section.title }}</div>
-
-                                    @for( action of actions; track action.id || $index){
-                                        <div class="flex items-center justify-center grow-0 w-24">
-                                            @if(isActionExists(section, action.id)){
-                                                @if (isSectionActionChecked(item, section, action.id)) {
+                        <!-- Rows -->
+                        <div class="cst-tbl" style="--cols: 40px 50px 1.5fr repeat(5, 80px); --colmin: 750px;">
+                            @for( item of flatNavigation; track item.id || $index){
+                                <div class="flex flex-col w-full border-b border-gray-100 hover:bg-gray-50/50">
+                                    <!-- Main Row -->
+                                    <div class="cst-tbl__row" style="border: none; padding: 12px 20px;">
+                                        <div class="text-center font-medium cst-mut text-xs">{{$index+1}}</div>
+                                        <div class="flex justify-center">
+                                            @if(selectRowState(item); as rowState){
+                                                <mat-pseudo-checkbox
+                                                    #rowSelect
+                                                    [class.bg-primary]="rowState != 'unchecked'"
+                                                    [appearance]="'full'"
+                                                    [state]="rowState"
+                                                    (click)="selectRow(item, rowSelect)"
+                                                    style="transform: scale(0.9);"
+                                                >
+                                                </mat-pseudo-checkbox>
+                                            }
+                                        </div>
+                                        <div class="cst-strong text-navy flex items-center gap-2">
+                                            @if (item.icon) {
+                                                <mat-icon class="icon-size-4 text-gray-400" [svgIcon]="item.icon"></mat-icon>
+                                            }
+                                            {{item.title}}
+                                        </div>
+                                        @for( action of actions; track action.id || $index){
+                                            <div class="flex justify-center">
+                                                @if(isActionExists(item, action.id)){
                                                     <mat-pseudo-checkbox
-                                                        [class.bg-primary]="true"
+                                                        #actionSelect
+                                                        [class.bg-primary]="isActionChecked(item, action.id)"
                                                         [appearance]="'full'"
-                                                        [state]="'checked'"
-                                                        (click)="selectSectionAction(item, section, action.id)"
+                                                        [state]="isActionChecked(item, action.id) ? 'checked' : 'unchecked'"
+                                                        (click)="selectAction(item, actionSelect, action.id)"
+                                                        style="transform: scale(0.9);"
                                                     >
                                                     </mat-pseudo-checkbox>
                                                 } @else {
                                                     <mat-pseudo-checkbox
-                                                        [class.bg-primary]="false"
                                                         [appearance]="'full'"
                                                         [state]="'unchecked'"
-                                                        (click)="selectSectionAction(item, section, action.id)"
+                                                        [disabled]="true"
+                                                        style="transform: scale(0.9); opacity: 0.25;"
                                                     >
                                                     </mat-pseudo-checkbox>
                                                 }
-                                            } @else {
-                                                <mat-pseudo-checkbox
-                                                    [appearance]="'full'"
-                                                    [state]="'unchecked'"
-                                                    [disabled]="true"
-                                                >
-                                                </mat-pseudo-checkbox>
+                                            </div>
+                                        }
+                                    </div>
+
+                                    <!-- Sections (sub-navigation) -->
+                                    @if(item.section?.length > 0){
+                                        <div class="flex flex-col w-full bg-gray-50/30 pl-8 border-t border-gray-50/50">
+                                            @for( section of item.section; track section.id || $index){
+                                                <div class="cst-tbl__row" style="border: none; padding: 8px 20px; font-size: 12.5px;">
+                                                    <div class="flex justify-center text-gray-400">
+                                                        <mat-icon style="width: 14px; height: 14px; font-size: 14px;" svgIcon="mat_solid:subdirectory_arrow_right"></mat-icon>
+                                                    </div>
+                                                    <div class="flex justify-center">
+                                                        @if(isNavigationSectionExists(item, section); as sectionChecked){
+                                                            <mat-pseudo-checkbox
+                                                                [class.bg-primary]="sectionChecked"
+                                                                [state]="sectionChecked ? 'checked' : 'unchecked'"
+                                                                (click)="selectSection(item, section)"
+                                                                style="transform: scale(0.8);"
+                                                            >
+                                                            </mat-pseudo-checkbox>
+                                                        } @else {
+                                                            <mat-pseudo-checkbox
+                                                                [class.bg-primary]="false"
+                                                                [state]="'unchecked'"
+                                                                (click)="selectSection(item, section)"
+                                                                style="transform: scale(0.8);"
+                                                            >
+                                                            </mat-pseudo-checkbox>
+                                                        }
+                                                    </div>
+                                                    <div class="text-gray-600 pl-2">{{ section.title }}</div>
+                                                    @for( action of actions; track action.id || $index){
+                                                        <div class="flex justify-center">
+                                                            @if(isActionExists(section, action.id)){
+                                                                <mat-pseudo-checkbox
+                                                                    [class.bg-primary]="isSectionActionChecked(item, section, action.id)"
+                                                                    [appearance]="'full'"
+                                                                    [state]="isSectionActionChecked(item, section, action.id) ? 'checked' : 'unchecked'"
+                                                                    (click)="selectSectionAction(item, section, action.id)"
+                                                                    style="transform: scale(0.8);"
+                                                                >
+                                                                </mat-pseudo-checkbox>
+                                                            } @else {
+                                                                <mat-pseudo-checkbox
+                                                                    [appearance]="'full'"
+                                                                    [state]="'unchecked'"
+                                                                    [disabled]="true"
+                                                                    style="transform: scale(0.8); opacity: 0.25;"
+                                                                >
+                                                                </mat-pseudo-checkbox>
+                                                            }
+                                                        </div>
+                                                    }
+                                                </div>
                                             }
                                         </div>
                                     }
                                 </div>
                             }
                         </div>
+                    } @else {
+                        <div class="cst-tbl__empty">
+                            <div class="cst-tbl__empty-ic"><mat-icon [svgIcon]="'mat_outline:shield'"></mat-icon></div>
+                            <div class="cst-tbl__empty-t">{{ t('Empty-List!') }}</div>
+                        </div>
                     }
                 </div>
+            </div>
+
+            <!-- Mandatory Fields Alert (If applicable) -->
+            @if (!roleUtilisateur?.libelleRoleUtilisateur || roleUtilisateur?.navigations?.length === 0) {
+                <div class="cst-form-flash is-err flex items-center gap-2 mt-4" style="font-weight: 500;">
+                    <mat-icon [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                    <span>{{ t('Mandatory-fields-not-filled-in!') }} (Libellé requis et au moins une permission sélectionnée)</span>
+                </div>
             }
-
-        } @else {
-
-            <div class="flex flex-col items-center gap-2 justify-center h-full p-8 sm:p-16 text-2xl font-semibold tracking-tight text-center">
-                {{ t('Empty-List!') }}
-            </div>
-        }
-
-    </div>
-
-    @if((hasActionPermission(FuseNavigationAction.Edit) && !!this.roleUtilisateur.roleUtilisateurId) ||
-    (hasActionPermission(FuseNavigationAction.Add) && !this.roleUtilisateur.roleUtilisateurId)){
-        <!-- Submit button section -->
-        <div class="flex items-center w-full px-4 py-4 gap-4 justify-end">
-
-            <div class="flex items-center gap-4">
-                @if (!roleUtilisateur?.libelleRoleUtilisateur || roleUtilisateur?.navigations?.length === 0) {
-                    <div class="flex items-start gap-2 px-6 py-2 rounded-lg border border-rose-500 bg-rose-100 text-rose-950">
-
-                        <mat-icon
-                            class="text-red-900"
-                            [svgIcon]="'heroicons_solid:x-circle'"
-                        ></mat-icon>
-                        <div class="flex gap-1 items-center">
-                            <span class="font-semibold">Alert: </span>
-                            <p>{{ t('Mandatory-fields-not-filled-in!') }}</p>
-                        </div>
-
-                    </div>
-                }
-
-                <button
-                    [@shake]="saveClicked && (!roleUtilisateur?.libelleRoleUtilisateur || roleUtilisateur?.navigations?.length === 0)"
-                    [disabled]="saveClicked && (!!roleUtilisateur?.libelleRoleUtilisateur && roleUtilisateur?.navigations?.length > 0)"
-                    mat-flat-button
-                    [color]="'primary'"
-                    (click)="save()">
-                    <mat-icon [svgIcon]="'feather:save'"></mat-icon>
-                    <span class="ml-2 mr-1">{{ t('Save') }}</span>
-                </button>
-            </div>
-
         </div>
-    }
+    </div>
 </div>

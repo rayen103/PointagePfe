@@ -1,3 +1,6 @@
+import { PdfExportService } from '../../../../core/common/pdf-export.service';
+import { CsvExportService } from '../../../../core/common/csv-export.service';
+import { take } from 'rxjs';
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
@@ -64,6 +67,10 @@ export class ListComponent implements OnInit, OnDestroy {
     isViewMode: boolean = false;
 
     constructor(
+        private _pdfExportService: PdfExportService,
+
+        private _csvExportService: CsvExportService,
+
         private _rattachementService: RattachementService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseConfirmationService: FuseConfirmationService
@@ -227,4 +234,26 @@ export class ListComponent implements OnInit, OnDestroy {
     }
 
     protected readonly FuseNavigationAction = FuseNavigationAction;
+
+    exportData(): void {
+        if (this._rattachementService) {
+            const obs$ = (this as any).rattachements$ || this._rattachementService.rattachements$ || this._rattachementService.rattachements$;
+            if (obs$) {
+                obs$.pipe(take(1)).subscribe((data: any) => {
+                    const items = Array.isArray(data) ? data : (data?.items || data?.rattachements || data?.rattachements || []);
+                    if (items && items.length > 0) {
+                        const columns = [
+            { header: 'Code Rattachement', dataKey: 'codeRattachement' },
+            { header: 'Code Employé', dataKey: 'codeEmploye' },
+            { header: 'Code Bus', dataKey: 'codeBus' },
+            { header: 'Code Circuit', dataKey: 'codeCircuit' }
+        ];
+                        this._pdfExportService.exportToPdf('Rapport Rattachements', columns, items, 'Rattachements_Export.pdf');
+                    } else {
+                        console.warn('No data available to export to PDF');
+                    }
+                });
+            }
+        }
+    }
 }
