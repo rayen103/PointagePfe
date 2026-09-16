@@ -30,6 +30,7 @@ import { FuseConfirmationService } from '../../../../../@fuse/services/confirmat
 import { SecurefilePipe } from '../../../../core/pipes/securefile.pipe';
 import { RoleNavigation } from '../../../../core/role-utilisateur/role-utilisateur.model';
 import { FuseNavigationAction } from '../../../../../@fuse/components/navigation';
+import { AuthService } from '../../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-list',
@@ -62,7 +63,7 @@ export class ListComponent implements OnInit, OnDestroy{
 
     flashMessage: 'success' | 'error' | null = null;
     isLoading: boolean = false;
-    societeslength: number;
+    societesLength: number = 0;
     searchInputControl: UntypedFormControl = new UntypedFormControl();
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     roleNavigation: RoleNavigation;
@@ -78,7 +79,8 @@ export class ListComponent implements OnInit, OnDestroy{
 
         private _societeService: SocieteService,
         private _changeDetectorRef: ChangeDetectorRef,
-        private _fuseConfirmationService: FuseConfirmationService
+        private _fuseConfirmationService: FuseConfirmationService,
+        private _authService: AuthService
     ) {}
 
     SortChange() {
@@ -117,12 +119,20 @@ export class ListComponent implements OnInit, OnDestroy{
 
 
     ngOnInit(): void {
-        this.societe$ = this._societeService.societes$;
+        const currentSocieteId = this._authService.societeId;
+
+        this.societe$ = this._societeService.societes$.pipe(
+            map((societes) => {
+                if (!societes) return [];
+                if (!currentSocieteId) return societes;
+                return societes.filter((s) => s.societeId === currentSocieteId);
+            })
+        );
 
         this._societeService.societesLength$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((length) => {
-                this.societeslength = length;
+                this.societesLength = currentSocieteId && length > 0 ? 1 : length;
 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -264,24 +274,22 @@ export class ListComponent implements OnInit, OnDestroy{
     protected readonly FuseNavigationAction = FuseNavigationAction;
 
     exportData(): void {
-        if (this._societeService) {
-            const obs$ = (this as any).societes$ || this._societeService.societes$ || this._societeService.societes$;
-            if (obs$) {
-                obs$.pipe(take(1)).subscribe((data: any) => {
-                    const items = Array.isArray(data) ? data : (data?.items || data?.societes || data?.societes || []);
-                    if (items && items.length > 0) {
-                        const columns = [
-            { header: 'Code Société', dataKey: 'codeSociete' },
-            { header: 'Raison Sociale', dataKey: 'raisonSociale' },
-            { header: 'Adresse', dataKey: 'adresse' },
-            { header: 'Téléphone', dataKey: 'telephone' }
-        ];
-                        this._pdfExportService.exportToPdf('Rapport Sociétés', columns, items, 'Societes_Export.pdf');
-                    } else {
-                        console.warn('No data available to export to PDF');
-                    }
-                });
-            }
+        const obs$ = this.societe$ || this._societeService.societes$;
+        if (obs$) {
+            obs$.pipe(take(1)).subscribe((data: any) => {
+                const items = Array.isArray(data) ? data : (data?.items || data?.societes || []);
+                if (items && items.length > 0) {
+                    const columns = [
+                        { header: 'Code Société', dataKey: 'codeSociete' },
+                        { header: 'Nom', dataKey: 'nom' },
+                        { header: 'Adresse', dataKey: 'adresse' },
+                        { header: 'Téléphone', dataKey: 'telephone1' }
+                    ];
+                    this._pdfExportService.exportToPdf('Rapport Sociétés', columns, items, 'Societes_Export.pdf');
+                } else {
+                    console.warn('No data available to export to PDF');
+                }
+            });
         }
     }
 }

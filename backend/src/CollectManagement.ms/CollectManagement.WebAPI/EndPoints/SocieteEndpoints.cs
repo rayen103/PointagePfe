@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Carter;
 using CollectManagement.Application.Common;
 using CollectManagement.Application.Features.Societes.Commands.CreateSociete;
@@ -19,7 +19,7 @@ public class SocieteEndpoints :ICarterModule
     {
         var routeGroupBuilder = app.MapGroup("cm/societe").RequireNavigationPermission("fichier.societe");
         
-        routeGroupBuilder.MapGet("list",SocieteList).AllowAnonymous();
+        routeGroupBuilder.MapGet("list",SocieteList);
         routeGroupBuilder.MapPost("add",CreateSociete);
         routeGroupBuilder.MapPatch("update", UpdateSociete);
         routeGroupBuilder.MapPost("{id}/delete", DeleteSociete);
