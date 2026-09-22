@@ -57,7 +57,7 @@ public class AuthenticationEndpoints : ICarterModule
                 .ToListAsync(ct);
 
             var buses = await db.Set<Bus>().IgnoreQueryFilters()
-                .Select(b => new { b.NumeroIMM, b.ModelBus, SocieteId = b.SocieteId.Value.ToString(), b.IsActive })
+                .Select(b => new { b.NumeroIMM, b.ModelBus, b.IsActive })
                 .ToListAsync(ct);
 
             var busCount = buses.Count;

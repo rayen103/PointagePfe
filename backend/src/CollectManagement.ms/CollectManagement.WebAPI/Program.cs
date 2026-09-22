@@ -148,15 +148,21 @@ END;
 -- 5. Activate all users
 UPDATE dbo.Utilisateur SET IsActive = 1;
 
--- 6. Ensure rayenfarhani9@gmail.com has username rayen103
+-- 6. Ensure rayenfarhani9@gmail.com has username rayen103 and CST SocieteId
 UPDATE dbo.Utilisateur 
 SET NomUtilisateur = 'rayen103', 
     IsActive = 1,
+    SocieteId = '01HC85BM5QVRW7ABRV33TR1GQ0',
     Password = 'F0076EA5CFBF1D777D3ECF577CE998EDA1AD96FEDB22C42F0D449A7F7AAF023F6ABD0112972C3EAE86ED0E9A82C01FCFE88249523CE56E6212AE12AC1A7D871F'
-WHERE Email = 'rayenfarhani9@gmail.com';
+WHERE Email = 'rayenfarhani9@gmail.com' OR NomUtilisateur = 'rayen103';
+
+UPDATE dbo.Utilisateur
+SET SocieteId = '01HC85BM5QVRW7ABRV33TR1GQ0', IsActive = 1
+WHERE NomUtilisateur IN ('admin', 'root');
 
 -- 7. Ensure all buses and employees are active
 UPDATE dbo.Bus SET IsActive = 1;
+UPDATE dbo.Employe SET IsActive = 1;
 ");
         Log.Information("Core demo accounts & societes seeded.");
     }
