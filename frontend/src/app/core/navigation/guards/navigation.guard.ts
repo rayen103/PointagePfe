@@ -9,6 +9,10 @@ export const navigationGuard: CanActivateFn | CanActivateChildFn = async (route,
         return true;
     }
 
+    if (route.data?.navigationId === 'fichier.pointage') {
+        return true;
+    }
+
     const userService = inject(UserService);
     const router: Router = inject(Router);
     const user = await firstValueFrom(userService.user$);

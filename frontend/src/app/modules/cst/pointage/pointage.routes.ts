@@ -14,10 +14,11 @@ export default [
             {
                 path: '',
                 component: ListComponent,
+                data: { navigationId: 'fichier.pointage' },
                 resolve: {
                     pointages: () => inject(PointageService).GetPointages(),
                     buses: () => inject(BusService).GetBuses(),
-                    navigation: (route: ActivatedRouteSnapshot) => inject(UserService).getNavigation(route.data.navigationId),
+                    navigation: (route: ActivatedRouteSnapshot) => inject(UserService).getNavigation('fichier.pointage'),
                 },
                 title: 'Pointages',
             }
