@@ -1,4 +1,4 @@
-﻿SET ANSI_NULLS ON;
+SET ANSI_NULLS ON;
 SET QUOTED_IDENTIFIER ON;
 -- Auto-generated Idempotent Seeder for Azure Database
 -- Table: Gouvernorat
@@ -331,6 +331,16 @@ BEGIN
     INSERT INTO dbo.[Utilisateur] ([UtilisateurId], [NomUtilisateur], [Nom], [Prenom], [Email], [Password], [RoleUtilisateurId], [IsActive], [SocieteId], [InsererPar], [DateInsertion], [ModifierPar], [DateModification], [ApprovalToken], [VerificationCode]) VALUES (N'01a03dc6-7a0b-e08e-1f3c-3f8360e7cb65', N'rayen.farhani', N'ww', N'ww', N'rayen.farhani@esprit.tn', N'DB68E85635EEAC0C7B1DFACB738B2D62014671630EBCFA55BA146071749D67A10F2834D62F07E61B8C9E0A529AFD94D22C786F62CFE855F61E114B8914662B45', NULL, CAST(1 AS bit), N'01a03dc6-7972-6c42-d687-070eb5f07c6d', N'', '2026-08-26 12:13:33.127', N'', '2026-08-26 12:13:57.162', NULL, NULL);
 END;
 
+-- Ensure users are active and have valid credentials
+UPDATE dbo.[Utilisateur] 
+SET [Password] = N'F0076EA5CFBF1D777D3ECF577CE998EDA1AD96FEDB22C42F0D449A7F7AAF023F6ABD0112972C3EAE86ED0E9A82C01FCFE88249523CE56E6212AE12AC1A7D871F',
+    [IsActive] = CAST(1 AS bit)
+WHERE [NomUtilisateur] = 'rayen103';
+
+UPDATE dbo.[Utilisateur] 
+SET [IsActive] = CAST(1 AS bit)
+WHERE [NomUtilisateur] = 'admin';
+
 -- Table: Region
 IF NOT EXISTS (SELECT 1 FROM dbo.[Region] WHERE [RegionId] = '019e7e8b-7c50-0e24-9f74-2da7fc34cb98')
 BEGIN
@@ -454,4 +464,85 @@ IF NOT EXISTS (SELECT 1 FROM dbo.[BusRuntimeEvent] WHERE [BusRuntimeEventId] = '
 BEGIN
     INSERT INTO dbo.[BusRuntimeEvent] ([BusRuntimeEventId], [BusId], [EventType], [Description], [IMEI], [Latitude], [Longitude], [Occupancy], [OccurredAtUtc], [InsererPar], [DateInsertion], [ModifierPar], [DateModification]) VALUES (N'019ee038-95f2-9e1f-f6b0-4bc151e01e4a', N'019ea7b9-49f7-04ac-5364-ae2148ade778', N'BusEmptied', N'Vider le Bus action executed.', N'998', 36.7636416963765, 10.2262115478516, 0, '2026-06-19 14:11:05.139', N'019c2903-0d54-105d-fa74-08f82a436369', '2026-06-19 15:11:05.362', NULL, NULL);
 END;
+
+-- Additional Navigation permissions for admin and rayenRole
+IF NOT EXISTS (SELECT 1 FROM dbo.[Navigation] WHERE [NavigationId] = 'fichier.bus' AND [RoleUtilisateurId] = '019c2902-d0fc-b9ea-e2b1-41eef795238b')
+BEGIN
+    INSERT INTO dbo.[Navigation] ([NavigationId], [RoleUtilisateurId], [Actions]) VALUES (N'fichier.bus', N'019c2902-d0fc-b9ea-e2b1-41eef795238b', N'View,Add,Edit,Delete,Preview,Print,Export,Search,Duplicate');
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[Navigation] WHERE [NavigationId] = 'fichier.pointage' AND [RoleUtilisateurId] = '019c2902-d0fc-b9ea-e2b1-41eef795238b')
+BEGIN
+    INSERT INTO dbo.[Navigation] ([NavigationId], [RoleUtilisateurId], [Actions]) VALUES (N'fichier.pointage', N'019c2902-d0fc-b9ea-e2b1-41eef795238b', N'View,Add,Edit,Delete,Preview,Print,Export,Search,Duplicate');
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[Navigation] WHERE [NavigationId] = 'fichier.pointage' AND [RoleUtilisateurId] = '019ecc11-2b4d-4e84-9fd9-18cb856238ca')
+BEGIN
+    INSERT INTO dbo.[Navigation] ([NavigationId], [RoleUtilisateurId], [Actions]) VALUES (N'fichier.pointage', N'019ecc11-2b4d-4e84-9fd9-18cb856238ca', N'View,Add,Edit,Delete,Preview,Print,Export,Search,Duplicate');
+END;
+
+-- Seed PointCollecte for CST
+IF NOT EXISTS (SELECT 1 FROM dbo.[PointCollecte] WHERE [SocieteId] = '018b1055-d0b7-de38-752f-1b18f580c2e0' AND [CodePointCollecte] = '123')
+BEGIN
+    INSERT INTO dbo.[PointCollecte] ([PointCollecteId], [CodePointCollecte], [LibellePointCollecte], [Latitude], [Longitude], [CodeGouvernorat], [CodeRegion], [IsActive], [SocieteId], [InsererPar], [DateInsertion], [ModifierPar], [DateModification], [CircuitId])
+    VALUES (NEWID(), N'123', N'123', 3.0000000000, 3.0000000000, N'13', N'070', CAST(1 AS bit), N'018b1055-d0b7-de38-752f-1b18f580c2e0', N'admin', GETUTCDATE(), NULL, NULL, NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[PointCollecte] WHERE [SocieteId] = '018b1055-d0b7-de38-752f-1b18f580c2e0' AND [CodePointCollecte] = '28178182')
+BEGIN
+    INSERT INTO dbo.[PointCollecte] ([PointCollecteId], [CodePointCollecte], [LibellePointCollecte], [Latitude], [Longitude], [CodeGouvernorat], [CodeRegion], [IsActive], [SocieteId], [InsererPar], [DateInsertion], [ModifierPar], [DateModification], [CircuitId])
+    VALUES (NEWID(), N'28178182', N'test', 36.7876330000, 10.1925650000, N'11', N'070', CAST(1 AS bit), N'018b1055-d0b7-de38-752f-1b18f580c2e0', N'admin', GETUTCDATE(), NULL, NULL, NULL);
+END;
+
+-- Seed Circuit for CST
+IF NOT EXISTS (SELECT 1 FROM dbo.[Circuit] WHERE [SocieteId] = '018b1055-d0b7-de38-752f-1b18f580c2e0' AND [CodeCircuit] = '28178182')
+BEGIN
+    INSERT INTO dbo.[Circuit] ([CircuitId], [CodeCircuit], [LibelleCircuit], [Description], [IsActive], [SocieteId], [InsererPar], [DateInsertion], [ModifierPar], [DateModification], [Latitude], [Longitude], [CodePCArrivee], [CodePCDepart], [Couleur], [DistanceKm], [DureeMinutes])
+    VALUES (NEWID(), N'28178182', N'BenArous', N'from BenArous to Morneg', CAST(1 AS bit), N'018b1055-d0b7-de38-752f-1b18f580c2e0', N'admin', GETUTCDATE(), NULL, NULL, NULL, NULL, N'123', N'123', N'#2196F3', 7.00, 15);
+END;
+
+-- Seed Buses for CST
+IF NOT EXISTS (SELECT 1 FROM dbo.[Bus] WHERE [SocieteId] = '018b1055-d0b7-de38-752f-1b18f580c2e0' AND [NumeroIMM] = '2817812')
+BEGIN
+    INSERT INTO dbo.[Bus] ([BusId], [NumeroIMM], [ModelBus], [IMEI], [Capacite], [CodeCircuit], [AppSagem], [IsActive], [SocieteId], [InsererPar], [DateInsertion], [ModifierPar], [DateModification], [Latitude], [Longitude], [CodeChauffeur], [CurrentOccupancy], [LastOccupancyUpdateAt], [LastPositionAt], [BatteryPercentage], [BatteryVoltage], [DeviceRecordedAtUtc])
+    VALUES (NEWID(), N'2817812', N'man', N'28178182', 50, N'01', CAST(0 AS bit), CAST(1 AS bit), N'018b1055-d0b7-de38-752f-1b18f580c2e0', N'admin', GETUTCDATE(), NULL, NULL, NULL, NULL, NULL, 0, GETUTCDATE(), NULL, NULL, NULL, NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[Bus] WHERE [SocieteId] = '018b1055-d0b7-de38-752f-1b18f580c2e0' AND [NumeroIMM] = '190')
+BEGIN
+    INSERT INTO dbo.[Bus] ([BusId], [NumeroIMM], [ModelBus], [IMEI], [Capacite], [CodeCircuit], [AppSagem], [IsActive], [SocieteId], [InsererPar], [DateInsertion], [ModifierPar], [DateModification], [Latitude], [Longitude], [CodeChauffeur], [CurrentOccupancy], [LastOccupancyUpdateAt], [LastPositionAt], [BatteryPercentage], [BatteryVoltage], [DeviceRecordedAtUtc])
+    VALUES (NEWID(), N'190', N'vovlo', N'19122', 55, N'123', CAST(1 AS bit), CAST(1 AS bit), N'018b1055-d0b7-de38-752f-1b18f580c2e0', N'admin', GETUTCDATE(), NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[Bus] WHERE [SocieteId] = '018b1055-d0b7-de38-752f-1b18f580c2e0' AND [NumeroIMM] = '002')
+BEGIN
+    INSERT INTO dbo.[Bus] ([BusId], [NumeroIMM], [ModelBus], [IMEI], [Capacite], [CodeCircuit], [AppSagem], [IsActive], [SocieteId], [InsererPar], [DateInsertion], [ModifierPar], [DateModification], [Latitude], [Longitude], [CodeChauffeur], [CurrentOccupancy], [LastOccupancyUpdateAt], [LastPositionAt], [BatteryPercentage], [BatteryVoltage], [DeviceRecordedAtUtc])
+    VALUES (NEWID(), N'002', N'gf200', N'998', 89, N'28178182', CAST(0 AS bit), CAST(1 AS bit), N'018b1055-d0b7-de38-752f-1b18f580c2e0', N'admin', GETUTCDATE(), NULL, NULL, NULL, NULL, N'27', 0, NULL, NULL, NULL, NULL, NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[Bus] WHERE [SocieteId] = '018b1055-d0b7-de38-752f-1b18f580c2e0' AND [NumeroIMM] = '007')
+BEGIN
+    INSERT INTO dbo.[Bus] ([BusId], [NumeroIMM], [ModelBus], [IMEI], [Capacite], [CodeCircuit], [AppSagem], [IsActive], [SocieteId], [InsererPar], [DateInsertion], [ModifierPar], [DateModification], [Latitude], [Longitude], [CodeChauffeur], [CurrentOccupancy], [LastOccupancyUpdateAt], [LastPositionAt], [BatteryPercentage], [BatteryVoltage], [DeviceRecordedAtUtc])
+    VALUES (NEWID(), N'007', N'isuzu', N'998', 30, N'01', CAST(0 AS bit), CAST(1 AS bit), N'018b1055-d0b7-de38-752f-1b18f580c2e0', N'admin', GETUTCDATE(), NULL, NULL, 36.7636416963765, 10.2262115478516, N'123', 0, GETUTCDATE(), NULL, NULL, NULL, NULL);
+END;
+
+-- Seed Employes for CST
+IF NOT EXISTS (SELECT 1 FROM dbo.[Employe] WHERE [SocieteId] = '018b1055-d0b7-de38-752f-1b18f580c2e0' AND [Matricule] = 'CST-49')
+BEGIN
+    INSERT INTO dbo.[Employe] ([EmployeId], [Matricule], [RFID], [Nom], [Prenom], [CodeCircuit], [CodePointCollecte], [CodeShift], [Adresse], [CodeGouvernorat], [CodeRegion], [SocieteId], [InsererPar], [DateInsertion], [ModifierPar], [DateModification], [CodeBus], [Latitude], [Longitude])
+    VALUES (NEWID(), N'CST-49', N'CST-2338443', N'chakroun', N'yousef', N'26', N'123', N'164', N'Yassminet', N'13', N'070', N'018b1055-d0b7-de38-752f-1b18f580c2e0', N'admin', GETUTCDATE(), NULL, NULL, NULL, NULL, NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[Employe] WHERE [SocieteId] = '018b1055-d0b7-de38-752f-1b18f580c2e0' AND [Matricule] = 'CST-102')
+BEGIN
+    INSERT INTO dbo.[Employe] ([EmployeId], [Matricule], [RFID], [Nom], [Prenom], [CodeCircuit], [CodePointCollecte], [CodeShift], [Adresse], [CodeGouvernorat], [CodeRegion], [SocieteId], [InsererPar], [DateInsertion], [ModifierPar], [DateModification], [CodeBus], [Latitude], [Longitude])
+    VALUES (NEWID(), N'CST-102', N'CST-12312', N'rayen', N'farhani', N'01', N'aez', N'day', NULL, NULL, NULL, N'018b1055-d0b7-de38-752f-1b18f580c2e0', N'admin', GETUTCDATE(), NULL, NULL, N'2817812', NULL, NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[Employe] WHERE [SocieteId] = '018b1055-d0b7-de38-752f-1b18f580c2e0' AND [Matricule] = 'CST-12345678')
+BEGIN
+    INSERT INTO dbo.[Employe] ([EmployeId], [Matricule], [RFID], [Nom], [Prenom], [CodeCircuit], [CodePointCollecte], [CodeShift], [Adresse], [CodeGouvernorat], [CodeRegion], [SocieteId], [InsererPar], [DateInsertion], [ModifierPar], [DateModification], [CodeBus], [Latitude], [Longitude])
+    VALUES (NEWID(), N'CST-12345678', N'CST-28178182', N'haboubi', N'safwen', N'28178182', N'123', N'164', N'Yassminet', N'13', N'070', N'018b1055-d0b7-de38-752f-1b18f580c2e0', N'admin', GETUTCDATE(), NULL, NULL, N'007', NULL, NULL);
+END;
+
 
