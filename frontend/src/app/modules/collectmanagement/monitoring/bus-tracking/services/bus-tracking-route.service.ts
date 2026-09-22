@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { forkJoin, map, Observable, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { map, Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { CircuitPointCollecte } from '../../../../../core/circuit/circuit-point-collecte.model';
 
@@ -20,8 +20,6 @@ export interface OptimizedRouteResult {
 
 @Injectable({ providedIn: 'root' })
 export class BusTrackingRouteService {
-  private readonly osrmBase = 'https://router.project-osrm.org/route/v1/driving';
-
   constructor(private http: HttpClient) {}
 
   calculateOptimizedRoute(
@@ -31,115 +29,111 @@ export class BusTrackingRouteService {
     arrivalLat: number,
     arrivalLon: number
   ): Observable<OptimizedRouteResult> {
-    const validPoints = collectionPoints
+    const validPoints = (collectionPoints ?? [])
       .filter((p) => p.latitude != null && p.longitude != null)
       .sort((a, b) => (a.ordre ?? 0) - (b.ordre ?? 0));
 
-    if (validPoints.length === 0) {
-      return of(this.buildEmptyResult([], startLat, startLon, arrivalLat, arrivalLon));
-    }
-
-    const nodes = [
+    const nodes: { latitude: number; longitude: number }[] = [
       { latitude: startLat, longitude: startLon },
-      ...validPoints,
+      ...validPoints.map((p) => ({ latitude: p.latitude!, longitude: p.longitude! })),
       { latitude: arrivalLat, longitude: arrivalLon },
-    ];
+    ].filter((n) => n.latitude != null && n.longitude != null);
 
-    const segmentRequests: Observable<RouteSegment>[] = [];
-    for (let i = 0; i < nodes.length - 1; i++) {
-      const from = nodes[i];
-      const to = nodes[i + 1];
-      segmentRequests.push(
-        this.getOSRMRoute(from.longitude, from.latitude, to.longitude, to.latitude).pipe(
-          map((seg) => seg),
-          catchError(() =>
-            of(this.fallbackSegment(from.latitude, from.longitude, to.latitude, to.longitude))
-          )
-        )
-      );
+    if (nodes.length < 2) {
+      return of(this.buildEmptyResult(validPoints));
     }
 
-    return forkJoin(segmentRequests).pipe(
-      map((segs) => {
-        const geometry: [number, number][] = [];
-        let totalDistanceM = 0;
-        let totalDurationS = 0;
+    const coordinatesParam = nodes
+      .map((p) => `${p.longitude.toFixed(6)},${p.latitude.toFixed(6)}`)
+      .join(';');
 
-        segs.forEach((seg) => {
-          totalDistanceM += seg.distance;
-          totalDurationS += seg.duration;
-          if (geometry.length === 0) {
-            geometry.push(...seg.geometry);
-          } else {
-            geometry.push(...seg.geometry.slice(1));
-          }
-        });
+    const urlOsmDe = `https://routing.openstreetmap.de/routed-car/route/v1/driving/${coordinatesParam}?overview=full&geometries=geojson`;
+    const urlOsrmOrg = `https://router.project-osrm.org/route/v1/driving/${coordinatesParam}?overview=full&geometries=geojson`;
+
+    return this.http.get<any>(urlOsmDe).pipe(
+      catchError(() => this.http.get<any>(urlOsrmOrg)),
+      map((res) => {
+        const route = res?.routes?.[0];
+        if (!route || !route.geometry?.coordinates?.length) {
+          return this.buildFallbackResult(validPoints, nodes);
+        }
+
+        const coords = route.geometry.coordinates.map(
+          (c: [number, number]) => [c[1], c[0]] as [number, number]
+        );
+        const distKm = Math.round(((route.distance ?? 0) / 1000) * 100) / 100;
+        const durMin = Math.max(1, Math.round(((route.duration ?? 0) / 60) * 10) / 10);
 
         return {
           orderedPoints: validPoints,
-          totalDistanceKm: Math.round((totalDistanceM / 1000) * 100) / 100,
-          estimatedDurationMinutes: Math.round((totalDurationS / 60) * 100) / 100,
-          segments: segs,
-          geometry,
+          totalDistanceKm: distKm,
+          estimatedDurationMinutes: durMin,
+          segments: [],
+          geometry: coords,
         };
       }),
-      catchError(() => of(this.buildEmptyResult(validPoints, startLat, startLon, arrivalLat, arrivalLon)))
+      catchError(() => of(this.buildFallbackResult(validPoints, nodes)))
     );
   }
 
-  private getOSRMRoute(
-    lng1: number,
-    lat1: number,
-    lng2: number,
-    lat2: number
-  ): Observable<RouteSegment> {
-    const coordinates = `${lng1},${lat1};${lng2},${lat2}`;
-    const params = new HttpParams()
-      .set('overview', 'full')
-      .set('geometries', 'geojson')
-      .set('annotations', 'false');
+  private buildFallbackResult(
+    validPoints: CircuitPointCollecte[],
+    nodes: { latitude: number; longitude: number }[]
+  ): OptimizedRouteResult {
+    const geometry: [number, number][] = [];
 
-    return this.http
-      .get<any>(`${this.osrmBase}/${coordinates}`, { params })
-      .pipe(
-        map((res) => {
-          const route = res?.routes?.[0];
-          if (!route) {
-            return this.fallbackSegment(lat1, lng1, lat2, lng2);
+    for (let i = 0; i < nodes.length; i++) {
+      const curr = nodes[i];
+      geometry.push([curr.latitude, curr.longitude]);
+
+      if (i < nodes.length - 1) {
+        const next = nodes[i + 1];
+        const isCurrSouth = curr.latitude < 36.785;
+        const isNextSouth = next.latitude < 36.785;
+        const isCurrNorthEast = curr.latitude >= 36.805 && curr.longitude >= 10.25;
+        const isNextNorthEast = next.latitude >= 36.805 && next.longitude >= 10.25;
+
+        const crossesLake =
+          (isCurrSouth && isNextNorthEast) || (isCurrNorthEast && isNextSouth);
+
+        if (crossesLake) {
+          if (isCurrSouth) {
+            geometry.push([36.7845, 10.2780]); // Radès approach
+            geometry.push([36.8055, 10.2875]); // Pont Radès - La Goulette bridge
+            geometry.push([36.8180, 10.3060]); // La Goulette approach
+          } else {
+            geometry.push([36.8180, 10.3060]);
+            geometry.push([36.8055, 10.2875]);
+            geometry.push([36.7845, 10.2780]);
           }
-          const coords = route.geometry?.coordinates ?? [];
-          return {
-            geometry: coords.map((c: number[]) => [c[1], c[0]] as [number, number]),
-            distance: route.distance ?? 0,
-            duration: route.duration ?? 0,
-          };
-        })
-      );
-  }
+        }
+      }
+    }
 
-  private fallbackSegment(
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number
-  ): RouteSegment {
+    let totalDistM = 0;
+    for (let i = 0; i < geometry.length - 1; i++) {
+      totalDistM += this.haversine(
+        geometry[i][0],
+        geometry[i][1],
+        geometry[i + 1][0],
+        geometry[i + 1][1]
+      ) * 1000;
+    }
+
+    const distKm = Math.round((totalDistM / 1000) * 100) / 100;
+    // Average urban speed ~ 35 km/h
+    const durMin = Math.max(1, Math.round(((distKm / 35) * 60) * 10) / 10);
+
     return {
-      geometry: [
-        [lat1, lon1],
-        [lat2, lon2],
-      ],
-      distance: this.haversine(lat1, lon1, lat2, lon2) * 1000,
-      duration: 0,
+      orderedPoints: validPoints,
+      totalDistanceKm: distKm,
+      estimatedDurationMinutes: durMin,
+      segments: [],
+      geometry,
     };
   }
 
-  private buildEmptyResult(
-    validPoints: CircuitPointCollecte[],
-    startLat: number,
-    startLon: number,
-    arrivalLat: number,
-    arrivalLon: number
-  ): OptimizedRouteResult {
+  private buildEmptyResult(validPoints: CircuitPointCollecte[]): OptimizedRouteResult {
     return {
       orderedPoints: validPoints,
       totalDistanceKm: 0,

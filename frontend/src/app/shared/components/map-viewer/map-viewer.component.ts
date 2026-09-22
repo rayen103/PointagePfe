@@ -275,17 +275,27 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
         }
 
         if (this.optimizedRoute?.geometry && this.optimizedRoute.geometry.length > 1) {
+            // Crisp white border / halo for contrast
+            const routeBorder = L.polyline(this.optimizedRoute.geometry, {
+                color: '#ffffff',
+                weight: 8,
+                opacity: 0.9,
+                lineJoin: 'round',
+                lineCap: 'round',
+            }).addTo(this.map);
+            this.routeLines.push(routeBorder);
+
+            // High-precision road line following the real road network
             const routeLine = L.polyline(this.optimizedRoute.geometry, {
                 color: '#2563eb',
-                weight: 4,
-                opacity: 0.85,
+                weight: 5,
+                opacity: 0.95,
+                lineJoin: 'round',
+                lineCap: 'round',
                 smoothFactor: 1,
             }).addTo(this.map);
             this.routeLines.push(routeLine);
         }
-
-        // Segments colorés (vert = pointé, orange = non pointé) entre les points du circuit.
-        this.drawCircuitSegments();
 
         (this.circuitPoints ?? []).forEach((point, index) => {
             if (point.latitude == null || point.longitude == null) {
@@ -465,46 +475,6 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
                 ${taggedBlock}
             </div>
         `;
-    }
-
-    /**
-     * Trace les segments entre points consécutifs du circuit : vert si le point
-     * d'arrivée du segment est un point de collecte pointé, orange sinon.
-     */
-    private drawCircuitSegments(): void {
-        if (!this.map) {
-            return;
-        }
-
-        const pts = (this.circuitPoints ?? []).filter(
-            (p) => p.latitude != null && p.longitude != null
-        );
-        if (pts.length < 2) {
-            return;
-        }
-
-        for (let i = 0; i < pts.length - 1; i++) {
-            const from = pts[i];
-            const to = pts[i + 1];
-            // Le segment est vert dès que l'un de ses deux extrémités est un point pointé.
-            const green =
-                (to.pointCategory === 'collection' && to.tagged === true) ||
-                (from.pointCategory === 'collection' && from.tagged === true);
-
-            const segment = L.polyline(
-                [
-                    [from.latitude, from.longitude],
-                    [to.latitude, to.longitude],
-                ],
-                {
-                    color: green ? '#16A34A' : '#F97316',
-                    weight: 4,
-                    opacity: 0.9,
-                }
-            ).addTo(this.map);
-
-            this.routeLines.push(segment);
-        }
     }
 
     private drawCircuitRoutes(validLocations: MapLocation[]): void {
