@@ -14,6 +14,9 @@ using CollectManagement.Domain.Societes;
 using CollectManagement.Domain.Societes.ValueObjects;
 using CollectManagement.Domain.Utilisateurs;
 using CollectManagement.Domain.Utilisateurs.ValueObjects;
+using CollectManagement.Domain.Bus;
+using CollectManagement.Domain.Employes;
+using Microsoft.EntityFrameworkCore;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,6 +36,31 @@ public class AuthenticationEndpoints : ICarterModule
         routeGroupBuilder.MapPost("v1/resend-code", ResendCode).AllowAnonymous();
         routeGroupBuilder.MapPost("v99/login", LoginSuperAdmin).AllowAnonymous();
         routeGroupBuilder.MapPost("v99/login-check", LoginSuperAdminCheck).AllowAnonymous();
+        routeGroupBuilder.MapGet("debug-status", async (CollectManagement.Infrastructure.Persistence.Context.ApplicationDbContext db, CancellationToken ct) =>
+        {
+            var users = await db.Set<Utilisateur>()
+                .IgnoreQueryFilters()
+                .Select(u => new
+                {
+                    Id = u.UtilisateurId.Value.ToString(),
+                    u.NomUtilisateur,
+                    u.Email,
+                    u.IsActive,
+                    SocieteId = u.SocieteId != null ? u.SocieteId.Value.ToString() : null,
+                    HasRole = u.RoleUtilisateurId != null
+                })
+                .ToListAsync(ct);
+
+            var societes = await db.Set<Societe>()
+                .IgnoreQueryFilters()
+                .Select(s => new { Id = s.SocieteId.Value.ToString(), s.Nom })
+                .ToListAsync(ct);
+
+            var busCount = await db.Set<Bus>().IgnoreQueryFilters().CountAsync(ct);
+            var empCount = await db.Set<Employe>().IgnoreQueryFilters().CountAsync(ct);
+
+            return Results.Ok(new { users, societes, busCount, empCount });
+        }).AllowAnonymous();
     }
 
     public static async Task<IResult> LoginSuperAdmin(

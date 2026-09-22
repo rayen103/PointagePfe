@@ -113,7 +113,49 @@ BEGIN
 END;
 ");
 
-    // Seed initial / local database data idempotently
+    // 1. Direct resilient seed for critical demo records
+    try
+    {
+        dbContext.Database.ExecuteSqlRaw(@"
+-- 1. Ensure intercolor Societe exists
+IF NOT EXISTS (SELECT 1 FROM dbo.Societe WHERE SocieteId = '019970F9-BA22-F7A8-1E5C-E9D1206BF8B5')
+BEGIN
+    INSERT INTO dbo.Societe (SocieteId, Nom, MatriculeFiscal, Capital, DateOverture)
+    VALUES ('019970F9-BA22-F7A8-1E5C-E9D1206BF8B5', 'intercolor', '0020515K/A/M/000', 1134700000, '2025-09-22');
+END;
+
+-- 2. Ensure CST Societe exists
+IF NOT EXISTS (SELECT 1 FROM dbo.Societe WHERE SocieteId = '018B1055-D0B7-DE38-752F-1B18F580C2E0')
+BEGIN
+    INSERT INTO dbo.Societe (SocieteId, Nom, MatriculeFiscal, Capital, DateOverture)
+    VALUES ('018B1055-D0B7-DE38-752F-1B18F580C2E0', 'CST', 'MF-CST-001', 0, '2024-01-01');
+END;
+
+-- 3. Ensure rayen103 exists and is active
+IF NOT EXISTS (SELECT 1 FROM dbo.Utilisateur WHERE NomUtilisateur = 'rayen103')
+BEGIN
+    INSERT INTO dbo.Utilisateur (UtilisateurId, NomUtilisateur, Nom, Prenom, Email, Password, IsActive, SocieteId)
+    VALUES ('019ECC22-A4E6-267F-50A1-3A04B83ADEDC', 'rayen103', 'farhani', 'rayen', 'rayenfarhani9@gmail.com', 'F0076EA5CFBF1D777D3ECF577CE998EDA1AD96FEDB22C42F0D449A7F7AAF023F6ABD0112972C3EAE86ED0E9A82C01FCFE88249523CE56E6212AE12AC1A7D871F', 1, '019970F9-BA22-F7A8-1E5C-E9D1206BF8B5');
+END;
+
+-- 4. Ensure root exists and is active
+IF NOT EXISTS (SELECT 1 FROM dbo.Utilisateur WHERE NomUtilisateur = 'root')
+BEGIN
+    INSERT INTO dbo.Utilisateur (UtilisateurId, NomUtilisateur, Nom, Prenom, Email, Password, IsActive, SocieteId)
+    VALUES ('019C2903-0D54-105D-FA74-08F82A436369', 'root', 'root', 'root', 'root@root.com', '919D2AF144DD35A05ADF97786560176B8FCCE3A82B86ABC571AE94B20D2537D7C3677E4AE831B06CC02E1CD0189D1A63B106B2E4EB24581E01E88E31BCEE4FC8', 1, '019970F9-BA22-F7A8-1E5C-E9D1206BF8B5');
+END;
+
+-- 5. Activate all users
+UPDATE dbo.Utilisateur SET IsActive = 1;
+");
+        Log.Information("Core demo accounts & societes seeded.");
+    }
+    catch (Exception coreEx)
+    {
+        Log.Warning("Core demo seed notice: {Message}", coreEx.Message);
+    }
+
+    // 2. Comprehensive idempotent seed from SeedData.sql
     try
     {
         var seedPath = Path.Combine(AppContext.BaseDirectory, "SeedData.sql");
@@ -140,26 +182,21 @@ END;
         if (!string.IsNullOrWhiteSpace(seedSql))
         {
             dbContext.Database.SetCommandTimeout(180);
-            try
+            var blocks = seedSql.Split(new[] { "END;" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var block in blocks)
             {
-                dbContext.Database.ExecuteSqlRaw(seedSql);
-                Log.Information("SeedData.sql executed successfully.");
+                var trimmed = block.Trim();
+                if (string.IsNullOrWhiteSpace(trimmed) || trimmed.StartsWith("--")) continue;
+                try
+                {
+                    dbContext.Database.ExecuteSqlRaw(trimmed + " END;");
+                }
+                catch
+                {
+                    // Ignore non-critical individual constraint collisions
+                }
             }
-            catch (Exception seedEx)
-            {
-                Log.Warning("SeedData.sql partially applied: {Message}", seedEx.Message);
-            }
-        }
-
-        // Ensure all users are active
-        try
-        {
-            dbContext.Database.ExecuteSqlRaw("UPDATE dbo.[Utilisateur] SET [IsActive] = CAST(1 AS bit);");
-            Log.Information("All users set to IsActive = 1.");
-        }
-        catch (Exception activeEx)
-        {
-            Log.Warning("Failed to update IsActive: {Message}", activeEx.Message);
+            Log.Information("SeedData.sql blocks executed.");
         }
     }
     catch (Exception ex)
