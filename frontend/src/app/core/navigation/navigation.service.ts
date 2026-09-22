@@ -77,6 +77,23 @@ export class NavigationService {
                         }
                     });
 
+                    // Ensure the parent 'fichier' navigation item links to the first accessible child for restricted users
+                    const syncParentFichierLink = (navItems: FuseNavigationItem[]) => {
+                        const f = navItems.find(i => i.id === 'fichier');
+                        if (f) {
+                            if (f.children && f.children.length > 0) {
+                                f.link = f.children[0].link;
+                            } else if (setA.length > 0) {
+                                const idx = navItems.indexOf(f);
+                                if (idx > -1) navItems.splice(idx, 1);
+                            }
+                        }
+                    };
+                    syncParentFichierLink(defaultNavigation);
+                    syncParentFichierLink(compactNavigation);
+                    syncParentFichierLink(futuristicNavigation);
+                    syncParentFichierLink(horizontalNavigation);
+
                     compactNavigation.forEach((compactNavItem) => {
                         defaultNavigation.forEach((defaultNavItem) => {
                             if (defaultNavItem.id === compactNavItem.id) {
