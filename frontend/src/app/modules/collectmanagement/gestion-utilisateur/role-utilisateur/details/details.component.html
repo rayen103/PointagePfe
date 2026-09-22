@@ -65,37 +65,38 @@
                 <div class="cst-form-sec__title">{{ t('Permissions-Matrix') || 'Matrice des permissions' }}</div>
                 <div class="cst-form-sec__sub">Gérer les droits d'accès pour chaque module</div>
                 
-                <div class="cst-panel" style="margin-top: 12px; border-radius: 12px; overflow: hidden;">
+                <div class="cst-panel role-matrix-container" style="margin-top: 12px; border-radius: 12px;">
                     @if(flatNavigation.length > 0){
                         <!-- Header -->
-                        <div class="cst-tbl__head" style="--cols: 40px 50px 1.5fr repeat(5, 80px); --colmin: 750px; font-weight: 700; align-items: center;">
-                            <div class="text-center">Nº</div>
-                            <div class="flex justify-center">
+                        <div class="cst-tbl__head" [style.--cols]="gridCols" [style.--colmin]="gridColMin" style="font-weight: 700; align-items: center;">
+                            <div class="text-center font-bold text-xs text-gray-500">Nº</div>
+                            <div class="flex justify-center items-center">
                                 @if(selectAllState(); as allState){
                                     <mat-pseudo-checkbox
                                         #selectAll
                                         [class.bg-primary]="allState != 'unchecked'"
                                         [state]="allState"
                                         (click)="selectAllClicked(selectAll)"
+                                        class="cursor-pointer"
                                         style="transform: scale(0.9);"
                                     >
                                     </mat-pseudo-checkbox>
                                 }
                             </div>
-                            <div>{{ t('Title') || 'Module' }}</div>
+                            <div class="font-bold text-xs text-gray-600 uppercase tracking-wider">{{ t('Title') || 'Module' }}</div>
                             @for( item of actions; track item.id || $index){
-                                <div class="text-center font-bold text-xs" style="text-transform: uppercase;">{{item.value}}</div>
+                                <div class="text-center font-bold text-xs px-1 truncate text-gray-600 uppercase tracking-wider" [title]="item.value">{{item.value}}</div>
                             }
                         </div>
 
                         <!-- Rows -->
-                        <div class="cst-tbl" style="--cols: 40px 50px 1.5fr repeat(5, 80px); --colmin: 750px;">
+                        <div class="cst-tbl" [style.--cols]="gridCols" [style.--colmin]="gridColMin">
                             @for( item of flatNavigation; track item.id || $index){
                                 <div class="flex flex-col w-full border-b border-gray-100 hover:bg-gray-50/50">
                                     <!-- Main Row -->
                                     <div class="cst-tbl__row" style="border: none; padding: 12px 20px;">
                                         <div class="text-center font-medium cst-mut text-xs">{{$index+1}}</div>
-                                        <div class="flex justify-center">
+                                        <div class="flex justify-center items-center">
                                             @if(selectRowState(item); as rowState){
                                                 <mat-pseudo-checkbox
                                                     #rowSelect
@@ -103,19 +104,20 @@
                                                     [appearance]="'full'"
                                                     [state]="rowState"
                                                     (click)="selectRow(item, rowSelect)"
+                                                    class="cursor-pointer"
                                                     style="transform: scale(0.9);"
                                                 >
                                                 </mat-pseudo-checkbox>
                                             }
                                         </div>
-                                        <div class="cst-strong text-navy flex items-center gap-2">
+                                        <div class="cst-strong text-navy flex items-center gap-2 pr-2 truncate" [title]="item.title">
                                             @if (item.icon) {
-                                                <mat-icon class="icon-size-4 text-gray-400" [svgIcon]="item.icon"></mat-icon>
+                                                <mat-icon class="icon-size-4 text-gray-400 shrink-0" [svgIcon]="item.icon"></mat-icon>
                                             }
-                                            {{item.title}}
+                                            <span class="truncate">{{item.title}}</span>
                                         </div>
                                         @for( action of actions; track action.id || $index){
-                                            <div class="flex justify-center">
+                                            <div class="flex justify-center items-center">
                                                 @if(isActionExists(item, action.id)){
                                                     <mat-pseudo-checkbox
                                                         #actionSelect
@@ -123,6 +125,7 @@
                                                         [appearance]="'full'"
                                                         [state]="isActionChecked(item, action.id) ? 'checked' : 'unchecked'"
                                                         (click)="selectAction(item, actionSelect, action.id)"
+                                                        class="cursor-pointer"
                                                         style="transform: scale(0.9);"
                                                     >
                                                     </mat-pseudo-checkbox>
@@ -131,7 +134,7 @@
                                                         [appearance]="'full'"
                                                         [state]="'unchecked'"
                                                         [disabled]="true"
-                                                        style="transform: scale(0.9); opacity: 0.25;"
+                                                        style="transform: scale(0.9); opacity: 0.15; pointer-events: none;"
                                                     >
                                                     </mat-pseudo-checkbox>
                                                 }
@@ -147,12 +150,13 @@
                                                     <div class="flex justify-center text-gray-400">
                                                         <mat-icon style="width: 14px; height: 14px; font-size: 14px;" svgIcon="mat_solid:subdirectory_arrow_right"></mat-icon>
                                                     </div>
-                                                    <div class="flex justify-center">
+                                                    <div class="flex justify-center items-center">
                                                         @if(isNavigationSectionExists(item, section); as sectionChecked){
                                                             <mat-pseudo-checkbox
                                                                 [class.bg-primary]="sectionChecked"
                                                                 [state]="sectionChecked ? 'checked' : 'unchecked'"
                                                                 (click)="selectSection(item, section)"
+                                                                class="cursor-pointer"
                                                                 style="transform: scale(0.8);"
                                                             >
                                                             </mat-pseudo-checkbox>
@@ -161,20 +165,22 @@
                                                                 [class.bg-primary]="false"
                                                                 [state]="'unchecked'"
                                                                 (click)="selectSection(item, section)"
+                                                                class="cursor-pointer"
                                                                 style="transform: scale(0.8);"
                                                             >
                                                             </mat-pseudo-checkbox>
                                                         }
                                                     </div>
-                                                    <div class="text-gray-600 pl-2">{{ section.title }}</div>
+                                                    <div class="text-gray-600 pl-2 truncate" [title]="section.title">{{ section.title }}</div>
                                                     @for( action of actions; track action.id || $index){
-                                                        <div class="flex justify-center">
+                                                        <div class="flex justify-center items-center">
                                                             @if(isActionExists(section, action.id)){
                                                                 <mat-pseudo-checkbox
                                                                     [class.bg-primary]="isSectionActionChecked(item, section, action.id)"
                                                                     [appearance]="'full'"
                                                                     [state]="isSectionActionChecked(item, section, action.id) ? 'checked' : 'unchecked'"
                                                                     (click)="selectSectionAction(item, section, action.id)"
+                                                                    class="cursor-pointer"
                                                                     style="transform: scale(0.8);"
                                                                 >
                                                                 </mat-pseudo-checkbox>
@@ -183,7 +189,7 @@
                                                                     [appearance]="'full'"
                                                                     [state]="'unchecked'"
                                                                     [disabled]="true"
-                                                                    style="transform: scale(0.8); opacity: 0.25;"
+                                                                    style="transform: scale(0.8); opacity: 0.15; pointer-events: none;"
                                                                 >
                                                                 </mat-pseudo-checkbox>
                                                             }

@@ -90,6 +90,16 @@ export class RoleUtilisateurDetailsComponent implements OnInit, OnDestroy{
         return !this.roleNavigation || this.roleNavigation?.actions?.includes(action);
     }
 
+    get gridCols(): string {
+        const count = this.actions?.length || 9;
+        return `44px 44px minmax(180px, 1.6fr) repeat(${count}, minmax(82px, 1fr))`;
+    }
+
+    get gridColMin(): string {
+        const count = this.actions?.length || 9;
+        return `${88 + 180 + count * 82}px`;
+    }
+
     ngOnInit(): void {
 
         this._roleUtilisateurService.roleUtilisateur$
