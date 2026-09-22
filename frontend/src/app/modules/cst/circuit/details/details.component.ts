@@ -191,31 +191,45 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         } else {
             this._circuitPointCollecteService.getByCircuit(this.circuit.circuitId).subscribe({
                 next: (circuitPoints) => {
+                    const depCode = this.circuit?.codePCDepart;
+                    const arrCode = this.circuit?.codePCArrivee;
+
                     if (circuitPoints && circuitPoints.length > 0) {
                         const sorted = [...circuitPoints].sort((a, b) => (a.ordre ?? 0) - (b.ordre ?? 0));
-                        const depCode = this.circuit?.codePCDepart;
-                        const arrCode = this.circuit?.codePCArrivee;
-                        let intermediate = sorted;
-                        if (intermediate.length > 0 && intermediate[0].codePointCollecte === depCode) {
-                            intermediate = intermediate.slice(1);
+                        let intermediate: CircuitPointCollecte[] = [];
+
+                        if (sorted.length > 2) {
+                            intermediate = sorted.slice(1, -1);
+                        } else if (sorted.length === 2) {
+                            if (sorted[0].codePointCollecte === depCode && sorted[1].codePointCollecte === arrCode) {
+                                intermediate = [];
+                            } else if (sorted[0].codePointCollecte === depCode) {
+                                intermediate = [sorted[1]];
+                            } else if (sorted[1].codePointCollecte === arrCode) {
+                                intermediate = [sorted[0]];
+                            } else {
+                                intermediate = sorted;
+                            }
+                        } else if (sorted.length === 1) {
+                            if (sorted[0].codePointCollecte !== depCode && sorted[0].codePointCollecte !== arrCode) {
+                                intermediate = sorted;
+                            }
                         }
-                        if (intermediate.length > 0 && intermediate[intermediate.length - 1].codePointCollecte === arrCode) {
-                            intermediate = intermediate.slice(0, -1);
-                        }
+
                         const idsFromCircuitPoints = intermediate
                             .map(cp => this.allPoints.find(p => p.codePointCollecte === cp.codePointCollecte)?.pointCollecteId)
                             .filter((id): id is string => !!id);
 
                         if (idsFromCircuitPoints.length > 0) {
                             this.selectedPointIds = idsFromCircuitPoints;
-                        } else {
+                        } else if (this.allPoints.length > 0) {
                             this.selectedPointIds = this.allPoints
-                                .filter((p) => p.circuitId === this.circuit.circuitId)
+                                .filter((p) => p.circuitId === this.circuit.circuitId && p.codePointCollecte !== depCode && p.codePointCollecte !== arrCode)
                                 .map((p) => p.pointCollecteId);
                         }
-                    } else {
+                    } else if (this.allPoints.length > 0) {
                         this.selectedPointIds = this.allPoints
-                            .filter((p) => p.circuitId === this.circuit.circuitId)
+                            .filter((p) => p.circuitId === this.circuit.circuitId && p.codePointCollecte !== depCode && p.codePointCollecte !== arrCode)
                             .map((p) => p.pointCollecteId);
                     }
                     this.applyPointFilter(this.pointSearchControl.value);
@@ -224,9 +238,13 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                     this._changeDetectorRef.markForCheck();
                 },
                 error: () => {
-                    this.selectedPointIds = this.allPoints
-                        .filter((p) => p.circuitId === this.circuit.circuitId)
-                        .map((p) => p.pointCollecteId);
+                    const depCode = this.circuit?.codePCDepart;
+                    const arrCode = this.circuit?.codePCArrivee;
+                    if (this.allPoints.length > 0) {
+                        this.selectedPointIds = this.allPoints
+                            .filter((p) => p.circuitId === this.circuit.circuitId && p.codePointCollecte !== depCode && p.codePointCollecte !== arrCode)
+                            .map((p) => p.pointCollecteId);
+                    }
                     this.applyPointFilter(this.pointSearchControl.value);
                     this.rebuildOrderedPoints();
                     this.composeCircuitRoutePoints();
@@ -637,16 +655,16 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                     });
                 }
 
+                const targetCircuitId = this.circuit?.circuitId || circuit.circuitId;
+                circuit.circuitId = targetCircuitId;
+                circuit.pointCollecteIds = [...this.selectedPointIds];
+
                 this.isLoading = true;
 
                 if (!this.circuit?.circuitId) {
                     this._circuitService
                         .AddCircuit(circuit)
                         .pipe(
-                            switchMap((created) => {
-                                const newId = created?.circuitId || circuit.circuitId;
-                                return newId ? this.saveCircuitPointsAndAssociations(newId) : of(null);
-                            }),
                             catchError(() => {
                                 this.showFlashMessage('error');
                                 return EMPTY;
@@ -669,7 +687,6 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                 this._circuitService
                     .UpdateCircuit(circuit)
                     .pipe(
-                        switchMap(() => this.saveCircuitPointsAndAssociations(circuit.circuitId)),
                         catchError(() => {
                             this.showFlashMessage('error');
                             return EMPTY;
@@ -679,8 +696,25 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                             this._changeDetectorRef.markForCheck();
                         })
                     )
-                    .subscribe(() => {
-                        this.showFlashMessage('success');
+                    .subscribe((res) => {
+                        if (res) {
+                            const selectedIds = new Set(this.selectedPointIds);
+                            this.allPoints.forEach((p) => {
+                                if (selectedIds.has(p.pointCollecteId)) {
+                                    p.circuitId = targetCircuitId;
+                                } else if (p.circuitId === targetCircuitId) {
+                                    p.circuitId = null;
+                                }
+                            });
+                            this.circuit = { ...this.circuit, ...circuit, circuitId: targetCircuitId };
+                            this.applyPointFilter(this.pointSearchControl.value);
+                            this.rebuildOrderedPoints();
+                            this.composeCircuitRoutePoints();
+                            this.showFlashMessage('success');
+                            this._changeDetectorRef.markForCheck();
+                        } else {
+                            this.showFlashMessage('error');
+                        }
                     });
             });
 

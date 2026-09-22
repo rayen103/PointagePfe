@@ -101,6 +101,11 @@ public class PointCollecte : AuditableEntity, ITenantEntity
         IsActive = isActive;
         CircuitId = circuitId;
     }
+
+    public void AssignCircuit(CircuitId? circuitId)
+    {
+        CircuitId = circuitId;
+    }
     
     public static PointCollecte QueryCreate(
         PointCollecteId pointCollecteId,
