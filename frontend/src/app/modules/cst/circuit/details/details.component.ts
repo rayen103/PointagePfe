@@ -86,6 +86,8 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
     manualEvaluation: RouteEvaluation | null = null;
     optimizedResult: OptimizedRoute | null = null;
     optimizedApplied: boolean = false;
+    isCalculatingRoute: boolean = false;
+    private routeCalculationRequestId: number = 0;
 
     private departureAddressPoint: MapRoutePoint | null = null;
     private arrivalAddressPoint: MapRoutePoint | null = null;
@@ -654,6 +656,13 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                         longitude: circuit.longitude,
                     });
                 }
+                // Fallback: auto-fill distance & duration if not yet populated
+                if (circuit.distanceKm == null && this.manualEvaluation?.totalDistanceKm != null) {
+                    circuit.distanceKm = Math.round(this.manualEvaluation.totalDistanceKm * 10) / 10;
+                }
+                if (circuit.dureeMinutes == null && this.manualEvaluation?.estimatedDurationMinutes != null) {
+                    circuit.dureeMinutes = this.manualEvaluation.estimatedDurationMinutes;
+                }
 
                 const targetCircuitId = this.circuit?.circuitId || circuit.circuitId;
                 circuit.circuitId = targetCircuitId;
@@ -665,6 +674,15 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                     this._circuitService
                         .AddCircuit(circuit)
                         .pipe(
+                            switchMap((res: any) => {
+                                const newId = res?.circuitId || res?.id || res?.data?.circuitId;
+                                if (newId) {
+                                    return this.saveCircuitPointsAndAssociations(newId).pipe(
+                                        catchError(() => of(true))
+                                    );
+                                }
+                                return of(true);
+                            }),
                             catchError(() => {
                                 this.showFlashMessage('error');
                                 return EMPTY;
@@ -687,6 +705,15 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                 this._circuitService
                     .UpdateCircuit(circuit)
                     .pipe(
+                        switchMap((res) => {
+                            if (res && targetCircuitId) {
+                                return this.saveCircuitPointsAndAssociations(targetCircuitId).pipe(
+                                    map(() => res),
+                                    catchError(() => of(res))
+                                );
+                            }
+                            return of(res);
+                        }),
                         catchError(() => {
                             this.showFlashMessage('error');
                             return EMPTY;
@@ -956,16 +983,128 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
 
         this.circuitRoutePoints = routePoints;
 
-        // Live evaluation of the current (manual) order for the stats chips
-        if (this.departureAddressPoint && this.arrivalAddressPoint && stops.length > 0) {
-            this.manualEvaluation = this._dijkstraService.evaluateOrder(
-                { id: '__start__', latitude: this.departureAddressPoint.latitude, longitude: this.departureAddressPoint.longitude },
-                stops.map((s, i) => ({ id: String(i), latitude: s.latitude, longitude: s.longitude })),
-                { id: '__end__', latitude: this.arrivalAddressPoint.latitude, longitude: this.arrivalAddressPoint.longitude }
-            );
-        } else {
+        // Auto-calculate distance and duration along actual road network
+        this.calculateRouteMetrics(stops);
+    }
+
+    get canCalculateRoute(): boolean {
+        return !!this.departureAddressPoint && !!this.arrivalAddressPoint;
+    }
+
+    recalculateRouteMetrics(): void {
+        const stops: MapRoutePoint[] = this.orderedSelectedPoints
+            .filter((p) => p.latitude != null && p.longitude != null)
+            .map((p, index) => ({
+                latitude: Number(p.latitude),
+                longitude: Number(p.longitude),
+                label: `${index + 1}. ${p.libellePointCollecte || p.codePointCollecte}`,
+                kind: 'stop' as const,
+                order: index + 1,
+            }));
+        this.calculateRouteMetrics(stops, true);
+    }
+
+    private calculateRouteMetrics(stops: MapRoutePoint[], force = false): void {
+        if (!this.departureAddressPoint || !this.arrivalAddressPoint) {
             this.manualEvaluation = null;
+            return;
         }
+
+        const startNode: RouteNode = {
+            id: '__start__',
+            latitude: this.departureAddressPoint.latitude,
+            longitude: this.departureAddressPoint.longitude,
+        };
+        const endNode: RouteNode = {
+            id: '__end__',
+            latitude: this.arrivalAddressPoint.latitude,
+            longitude: this.arrivalAddressPoint.longitude,
+        };
+        const stopNodes: RouteNode[] = stops.map((s, i) => ({
+            id: String(i),
+            latitude: s.latitude,
+            longitude: s.longitude,
+        }));
+
+        // 1. Instant fallback evaluation via Dijkstra service (0ms latency)
+        const instantEval = this._dijkstraService.evaluateOrder(startNode, stopNodes, endNode);
+        this.manualEvaluation = instantEval;
+
+        const currentDist = this.circuitForm.get('distanceKm')?.value;
+        const currentDuree = this.circuitForm.get('dureeMinutes')?.value;
+
+        // Populate form if creating a new circuit, or if empty, or if explicitly requested
+        if (force || this.isNewCircuit || currentDist == null || currentDuree == null) {
+            this.circuitForm.patchValue({
+                distanceKm: Math.round(instantEval.totalDistanceKm * 10) / 10,
+                dureeMinutes: instantEval.estimatedDurationMinutes,
+            }, { emitEvent: false });
+        }
+
+        // 2. High-precision road calculation via OpenStreetMap / OSRM routing API
+        const allOrderedPoints = [startNode, ...stopNodes, endNode];
+        const coordinatesParam = allOrderedPoints
+            .map((p) => `${p.longitude.toFixed(6)},${p.latitude.toFixed(6)}`)
+            .join(';');
+
+        const requestId = ++this.routeCalculationRequestId;
+        this.isCalculatingRoute = true;
+        this._changeDetectorRef.markForCheck();
+
+        const providers = [
+            `https://routing.openstreetmap.de/routed-car/route/v1/driving/${coordinatesParam}?overview=false`,
+            `https://router.project-osrm.org/route/v1/driving/${coordinatesParam}?overview=false`,
+        ];
+
+        this.fetchRouteMetrics(providers).then((metrics) => {
+            if (requestId !== this.routeCalculationRequestId) {
+                return;
+            }
+            this.isCalculatingRoute = false;
+            if (metrics) {
+                const distanceField = this.circuitForm.get('distanceKm');
+                const isDistancePristine = !distanceField?.dirty;
+
+                if (force || this.isNewCircuit || currentDist == null || currentDuree == null || isDistancePristine) {
+                    this.circuitForm.patchValue({
+                        distanceKm: metrics.distanceKm,
+                        dureeMinutes: metrics.dureeMinutes,
+                    }, { emitEvent: false });
+                }
+
+                if (this.manualEvaluation) {
+                    this.manualEvaluation = {
+                        ...this.manualEvaluation,
+                        totalDistanceKm: metrics.distanceKm,
+                        estimatedDurationMinutes: metrics.dureeMinutes,
+                    };
+                }
+            }
+            this._changeDetectorRef.markForCheck();
+        });
+    }
+
+    private async fetchRouteMetrics(providers: string[]): Promise<{ distanceKm: number; dureeMinutes: number } | null> {
+        for (const url of providers) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3500);
+                const res = await fetch(url, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                if (!res.ok) continue;
+                const data = await res.json();
+                if (data?.code === 'Ok' && data.routes?.[0]) {
+                    const route = data.routes[0];
+                    const distanceKm = Math.round(((route.distance ?? 0) / 1000) * 10) / 10;
+                    const dureeMinutes = Math.max(1, Math.round((route.duration ?? 0) / 60));
+                    return { distanceKm, dureeMinutes };
+                }
+            } catch (err) {
+                // Try next provider
+            }
+        }
+        return null;
     }
 
     ngOnDestroy(): void {
