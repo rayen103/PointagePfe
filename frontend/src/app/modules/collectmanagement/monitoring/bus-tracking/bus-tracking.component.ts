@@ -710,6 +710,7 @@ export class BusTrackingComponent implements OnInit, OnDestroy {
                                     overviewItem.distanceKm = result.totalDistanceKm;
                                     overviewItem.durationMinutes = result.estimatedDurationMinutes;
                                 }
+                                this.allCircuitsMapOverview = [...this.allCircuitsMapOverview];
                             }
 
                             if (this.selectedBus && this.selectedBus.latitude != null && this.selectedBus.longitude != null) {
@@ -794,7 +795,7 @@ export class BusTrackingComponent implements OnInit, OnDestroy {
                 name: c.libelleCircuit || c.codeCircuit,
                 color: c.couleur || '#2563eb',
                 coordinates: coords,
-                geometry: cachedRoute?.geometry ?? coords,
+                geometry: cachedRoute?.geometry ?? [],
                 distanceKm: cachedRoute?.totalDistanceKm ?? c.distanceKm ?? undefined,
                 durationMinutes: cachedRoute?.estimatedDurationMinutes ?? c.dureeMinutes ?? undefined,
             });
@@ -826,6 +827,7 @@ export class BusTrackingComponent implements OnInit, OnDestroy {
                                 item.geometry = res.geometry;
                                 item.distanceKm = res.totalDistanceKm;
                                 item.durationMinutes = res.estimatedDurationMinutes;
+                                this.allCircuitsMapOverview = [...this.allCircuitsMapOverview];
                                 this._changeDetectorRef.markForCheck();
                             }
                         }

@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { map, Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { from, Observable, of } from 'rxjs';
 import { CircuitPointCollecte } from '../../../../../core/circuit/circuit-point-collecte.model';
 
 export interface RouteSegment {
@@ -20,8 +18,6 @@ export interface OptimizedRouteResult {
 
 @Injectable({ providedIn: 'root' })
 export class BusTrackingRouteService {
-  constructor(private http: HttpClient) {}
-
   calculateOptimizedRoute(
     startLat: number,
     startLon: number,
@@ -43,37 +39,58 @@ export class BusTrackingRouteService {
       return of(this.buildEmptyResult(validPoints));
     }
 
+    return from(this.fetchRoadRoute(validPoints, nodes));
+  }
+
+  private async fetchRoadRoute(
+    validPoints: CircuitPointCollecte[],
+    nodes: { latitude: number; longitude: number }[]
+  ): Promise<OptimizedRouteResult> {
     const coordinatesParam = nodes
       .map((p) => `${p.longitude.toFixed(6)},${p.latitude.toFixed(6)}`)
       .join(';');
 
-    const urlOsmDe = `https://routing.openstreetmap.de/routed-car/route/v1/driving/${coordinatesParam}?overview=full&geometries=geojson`;
-    const urlOsrmOrg = `https://router.project-osrm.org/route/v1/driving/${coordinatesParam}?overview=full&geometries=geojson`;
+    // Multi-provider OSRM architecture using clean native fetch() without custom Authorization headers
+    const providers = [
+      `https://routing.openstreetmap.de/routed-car/route/v1/driving/${coordinatesParam}?overview=full&geometries=geojson`,
+      `https://router.project-osrm.org/route/v1/driving/${coordinatesParam}?overview=full&geometries=geojson`,
+    ];
 
-    return this.http.get<any>(urlOsmDe).pipe(
-      catchError(() => this.http.get<any>(urlOsrmOrg)),
-      map((res) => {
-        const route = res?.routes?.[0];
-        if (!route || !route.geometry?.coordinates?.length) {
-          return this.buildFallbackResult(validPoints, nodes);
+    for (const url of providers) {
+      try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 4000);
+        const res = await fetch(url, { signal: controller.signal });
+        clearTimeout(timer);
+
+        if (!res.ok) {
+          continue;
         }
 
-        const coords = route.geometry.coordinates.map(
-          (c: [number, number]) => [c[1], c[0]] as [number, number]
-        );
-        const distKm = Math.round(((route.distance ?? 0) / 1000) * 100) / 100;
-        const durMin = Math.max(1, Math.round(((route.duration ?? 0) / 60) * 10) / 10);
+        const data = await res.json();
+        const route = data?.routes?.[0];
+        if (route && Array.isArray(route.geometry?.coordinates) && route.geometry.coordinates.length > 1) {
+          const coords = route.geometry.coordinates.map(
+            (c: [number, number]) => [c[1], c[0]] as [number, number]
+          );
+          const distKm = Math.round(((route.distance ?? 0) / 1000) * 100) / 100;
+          const durMin = Math.max(1, Math.round(((route.duration ?? 0) / 60) * 10) / 10);
 
-        return {
-          orderedPoints: validPoints,
-          totalDistanceKm: distKm,
-          estimatedDurationMinutes: durMin,
-          segments: [],
-          geometry: coords,
-        };
-      }),
-      catchError(() => of(this.buildFallbackResult(validPoints, nodes)))
-    );
+          return {
+            orderedPoints: validPoints,
+            totalDistanceKm: distKm,
+            estimatedDurationMinutes: durMin,
+            segments: [],
+            geometry: coords,
+          };
+        }
+      } catch {
+        // Try next provider
+      }
+    }
+
+    // High-resilience geographic fallback corridor (never crosses the Lake of Tunis / Baie de Tunis)
+    return this.buildFallbackResult(validPoints, nodes);
   }
 
   private buildFallbackResult(
@@ -88,23 +105,40 @@ export class BusTrackingRouteService {
 
       if (i < nodes.length - 1) {
         const next = nodes[i + 1];
-        const isCurrSouth = curr.latitude < 36.785;
-        const isNextSouth = next.latitude < 36.785;
-        const isCurrNorthEast = curr.latitude >= 36.805 && curr.longitude >= 10.25;
-        const isNextNorthEast = next.latitude >= 36.805 && next.longitude >= 10.25;
 
-        const crossesLake =
-          (isCurrSouth && isNextNorthEast) || (isCurrNorthEast && isNextSouth);
+        // Identify if moving between South bank (Mégrine / Ben Arous / Radès: lat < 36.79)
+        // and North / East bank (Lac 1, Lac 2, Le Kram, La Goulette, Carthage: lat > 36.805)
+        const isCurrSouth = curr.latitude < 36.79;
+        const isNextSouth = next.latitude < 36.79;
+        const isCurrNorth = curr.latitude >= 36.805 && curr.longitude >= 10.18;
+        const isNextNorth = next.latitude >= 36.805 && next.longitude >= 10.18;
+
+        const crossesLake = (isCurrSouth && isNextNorth) || (isCurrNorth && isNextSouth);
 
         if (crossesLake) {
-          if (isCurrSouth) {
-            geometry.push([36.7845, 10.2780]); // Radès approach
-            geometry.push([36.8055, 10.2875]); // Pont Radès - La Goulette bridge
-            geometry.push([36.8180, 10.3060]); // La Goulette approach
+          const targetLon = isCurrSouth ? next.longitude : curr.longitude;
+          if (targetLon >= 10.24) {
+            // Route through Pont Radès - La Goulette bridge corridor (East)
+            if (isCurrSouth) {
+              geometry.push([36.7845, 10.2780]);
+              geometry.push([36.8055, 10.2875]);
+              geometry.push([36.8180, 10.3060]);
+            } else {
+              geometry.push([36.8180, 10.3060]);
+              geometry.push([36.8055, 10.2875]);
+              geometry.push([36.7845, 10.2780]);
+            }
           } else {
-            geometry.push([36.8180, 10.3060]);
-            geometry.push([36.8055, 10.2875]);
-            geometry.push([36.7845, 10.2780]);
+            // Route through Avenue de la République / Route du Bac corridor (West)
+            if (isCurrSouth) {
+              geometry.push([36.7870, 10.1920]);
+              geometry.push([36.8010, 10.1980]);
+              geometry.push([36.8150, 10.2150]);
+            } else {
+              geometry.push([36.8150, 10.2150]);
+              geometry.push([36.8010, 10.1980]);
+              geometry.push([36.7870, 10.1920]);
+            }
           }
         }
       }
@@ -121,7 +155,7 @@ export class BusTrackingRouteService {
     }
 
     const distKm = Math.round((totalDistM / 1000) * 100) / 100;
-    // Average urban speed ~ 35 km/h
+    // Estimated urban vehicle speed ~ 35 km/h
     const durMin = Math.max(1, Math.round(((distKm / 35) * 60) * 10) / 10);
 
     return {

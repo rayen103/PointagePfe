@@ -180,8 +180,6 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
             this.markers.push(marker);
         });
 
-        this.drawCircuitRoutes(validLocations);
-
         if (validLocations.length > 0) {
             const bounds = L.latLngBounds(
                 validLocations.map((loc) => [loc.latitude, loc.longitude] as [number, number])
@@ -221,11 +219,10 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
                     (this.selectedCircuitId.toLowerCase() === circuit.circuitId.toLowerCase() ||
                      this.selectedCircuitId.toLowerCase() === circuit.codeCircuit.toLowerCase());
 
-                const path = (circuit.geometry && circuit.geometry.length > 1)
-                    ? circuit.geometry
-                    : circuit.coordinates;
-
-                if (!path || path.length < 2) {
+                // Only render if road geometry has been resolved (more than 2 points),
+                // to prevent straight chords from slicing across lakes, bays, or cities.
+                const hasRoadGeometry = circuit.geometry && circuit.geometry.length > 2;
+                if (!hasRoadGeometry) {
                     return;
                 }
 
@@ -235,7 +232,7 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
                 }
 
                 const color = circuit.color || '#2563eb';
-                const polyline = L.polyline(path, {
+                const polyline = L.polyline(circuit.geometry, {
                     color: color,
                     weight: isSelected ? 5 : 3.5,
                     opacity: isSelected ? 0.95 : 0.7,
@@ -477,69 +474,7 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
         `;
     }
 
-    private drawCircuitRoutes(validLocations: MapLocation[]): void {
-        if (!this.map) {
-            return;
-        }
 
-        const locationsByCircuit = new Map<string, MapLocation[]>();
-        validLocations.forEach((location) => {
-            if (!location.circuitId) {
-                return;
-            }
-
-            const circuitLocations = locationsByCircuit.get(location.circuitId) ?? [];
-            circuitLocations.push(location);
-            locationsByCircuit.set(location.circuitId, circuitLocations);
-        });
-
-        locationsByCircuit.forEach((locations) => {
-            const departure = locations.find((location) => location.pointType === 'departure');
-            const arrival = locations.find((location) => location.pointType === 'arrival');
-            const circuitColor = locations[0]?.color || '#2563eb';
-
-            if (!departure || !arrival) {
-                return;
-            }
-
-            const waypoints = [
-                L.latLng(departure.latitude, departure.longitude),
-                L.latLng(arrival.latitude, arrival.longitude),
-            ];
-
-            const routingControl = L.Routing.control({
-                waypoints,
-                show: false,
-                addWaypoints: false,
-                fitSelectedRoutes: false,
-                routeWhileDragging: false,
-                createMarker: () => null,
-                lineOptions: {
-                    styles: [{ color: circuitColor, weight: 3, opacity: 0.8 }],
-                    extendToWaypoints: true,
-                    missingRouteTolerance: 0,
-                },
-            } as any)
-                .on('routingerror', () => {
-                    const fallbackLine = L.polyline(
-                        [
-                            [departure.latitude, departure.longitude],
-                            [arrival.latitude, arrival.longitude],
-                        ],
-                        {
-                            color: circuitColor,
-                            weight: 3,
-                            opacity: 0.8,
-                        }
-                    ).addTo(this.map!);
-
-                    this.routeLines.push(fallbackLine);
-                })
-                .addTo(this.map);
-
-            this.routeControls.push(routingControl);
-        });
-    }
 
     private createMarkerIcon(location: MapLocation): L.Icon {
         let iconUrl = 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png';

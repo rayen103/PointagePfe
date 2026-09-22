@@ -26,15 +26,17 @@ export const authInterceptor = (
     // Clone the request object
     let newReq = req.clone();
 
-    // Request
-    //
-    // If the access token didn't expire, add the Authorization header.
-    // We won't add the Authorization header if the access token expired.
-    // This will force the server to return a "401 Unauthorized" response
-    // for the protected API routes which our response interceptor will
-    // catch and delete the access token from the local storage while logging
-    // the user out from the app.
+    // Only attach Authorization header to internal backend API requests.
+    // External 3rd-party services (OSRM, OpenStreetMap, Leaflet, Nominatim, etc.)
+    // will fail with CORS errors if an Authorization header is sent.
+    const isAbsolute = req.url.startsWith('http://') || req.url.startsWith('https://');
+    const isExternal = isAbsolute &&
+        !req.url.includes('germanywestcentral-01.azurewebsites.net') &&
+        !req.url.includes('/cm/') &&
+        !req.url.includes('/api/');
+
     if (
+        !isExternal &&
         authService.accessToken &&
         !AuthUtils.isTokenExpired(authService.accessToken)
     ) {
@@ -49,8 +51,8 @@ export const authInterceptor = (
     // Response
     return next(newReq).pipe(
         catchError((error) => {
-            // Catch "401 Unauthorized" responses
-            if (error instanceof HttpErrorResponse && error.status === 401) {
+            // Catch "401 Unauthorized" responses ONLY from internal API routes
+            if (!isExternal && error instanceof HttpErrorResponse && error.status === 401) {
                 // Sign out
                 authService.signOut();
                 // Redirect to sign-in without hard refresh to avoid reload loops
