@@ -56,10 +56,14 @@ public class AuthenticationEndpoints : ICarterModule
                 .Select(s => new { Id = s.SocieteId.Value.ToString(), s.Nom })
                 .ToListAsync(ct);
 
-            var busCount = await db.Set<Bus>().IgnoreQueryFilters().CountAsync(ct);
+            var buses = await db.Set<Bus>().IgnoreQueryFilters()
+                .Select(b => new { b.NumeroIMM, b.ModelBus, SocieteId = b.SocieteId.Value.ToString(), b.IsActive })
+                .ToListAsync(ct);
+
+            var busCount = buses.Count;
             var empCount = await db.Set<Employe>().IgnoreQueryFilters().CountAsync(ct);
 
-            return Results.Ok(new { users, societes, busCount, empCount });
+            return Results.Ok(new { users, societes, busCount, buses, empCount });
         }).AllowAnonymous();
     }
 
