@@ -13,12 +13,7 @@ import {
 } from '@angular/core';
 import * as L from 'leaflet';
 import { LatLng, Map, Marker, Polyline } from 'leaflet';
-import 'leaflet-routing-machine';
 import { GeoPoint } from '../../../core/circuit/dijkstra.service';
-
-if (typeof window !== 'undefined' && !(window as any).L) {
-    (window as any).L = L;
-}
 
 export type MapRoutePointKind = 'departure' | 'arrival' | 'stop' | 'poi';
 export type PolygonMode = 'none' | 'draw' | 'edit';
@@ -84,8 +79,9 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
     private map: Map | null = null;
     private marker: Marker | null = null;
     private routeMarkers: Marker[] = [];
-    private routeControl: L.Routing.Control | null = null;
     private routePolyline: Polyline | null = null;
+    private routePolylineBorder: Polyline | null = null;
+    private currentRouteRequestId = 0;
     private routeUpdateTimer: ReturnType<typeof setTimeout> | null = null;
     private poiPoints: MapRoutePoint[] = [];
     private poiMarkers: Marker[] = [];
@@ -317,13 +313,9 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
             this.routePolyline.remove();
             this.routePolyline = null;
         }
-        if (this.routeControl) {
-            try {
-                this.routeControl.remove();
-            } catch (e) {
-                // ignore
-            }
-            this.routeControl = null;
+        if (this.routePolylineBorder) {
+            this.routePolylineBorder.remove();
+            this.routePolylineBorder = null;
         }
 
         const validPoints = (this.routePoints ?? [])
@@ -379,51 +371,87 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
             ...this.poiPoints.map((p) => L.latLng(p.latitude, p.longitude)),
         ]);
 
-        // 3. Draw route line if requested
-        if (this.drawRoute && latLngs.length > 1) {
-            // Deduplicate consecutive identical/very close points
-            const routeLatLngs = latLngs.filter(
-                (pt, i) => i === 0 || pt.distanceTo(latLngs[i - 1]) > 10
-            );
+        // 3. Draw road route along actual road network
+        if (this.drawRoute && validRoutePoints.length > 1) {
+            // Deduplicate consecutive identical/very close points (< 20m)
+            const routePointsToFollow = validRoutePoints.filter((pt, i) => {
+                if (i === 0) return true;
+                const prev = validRoutePoints[i - 1];
+                return L.latLng(pt.latitude, pt.longitude).distanceTo(L.latLng(prev.latitude, prev.longitude)) > 20;
+            });
 
-            // Always add a direct polyline immediately so a line is visible right away
-            this.routePolyline = L.polyline(routeLatLngs.length > 1 ? routeLatLngs : latLngs, {
-                color: this.color,
+            const pointsForLine = routePointsToFollow.length > 1 ? routePointsToFollow : validRoutePoints;
+            const directLatLngs = pointsForLine.map((p) => L.latLng(p.latitude, p.longitude));
+
+            // Temporary direct line while fetching high-res road geometry
+            this.routePolyline = L.polyline(directLatLngs, {
+                color: this.color || '#2563eb',
                 weight: 4,
-                opacity: 0.85,
+                opacity: 0.75,
                 dashArray: '8 6',
             }).addTo(this.map!);
 
-            // Try OSRM road snapping if available
-            try {
-                if ((L as any).Routing && typeof (L as any).Routing.control === 'function' && routeLatLngs.length > 1) {
-                    this.routeControl = (L as any).Routing.control({
-                        waypoints: routeLatLngs,
-                        show: false,
-                        addWaypoints: false,
-                        fitSelectedRoutes: false,
-                        routeWhileDragging: false,
-                        createMarker: () => null,
-                        lineOptions: {
-                            styles: [
-                                { color: '#ffffff', weight: 7, opacity: 0.85 },
-                                { color: this.color, weight: 4, opacity: 0.95 },
-                            ],
-                            extendToWaypoints: true,
-                            missingRouteTolerance: 0,
-                        },
+            if (pointsForLine.length >= 2) {
+                const requestId = ++this.currentRouteRequestId;
+                const coordinatesParam = pointsForLine
+                    .map((p) => `${p.longitude.toFixed(6)},${p.latitude.toFixed(6)}`)
+                    .join(';');
+
+                const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${coordinatesParam}?overview=full&geometries=geojson`;
+
+                fetch(osrmUrl)
+                    .then((res) => {
+                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                        return res.json();
                     })
-                    .on('routesfound', () => {
-                        // Once road-snapped route is rendered, remove the dashed fallback line
-                        if (this.routePolyline) {
-                            this.routePolyline.remove();
-                            this.routePolyline = null;
+                    .then((data) => {
+                        if (requestId !== this.currentRouteRequestId || !this.map) {
+                            return;
+                        }
+                        if (data?.code === 'Ok' && data.routes?.[0]?.geometry?.coordinates?.length) {
+                            const roadCoordinates: [number, number][] = data.routes[0].geometry.coordinates;
+                            const roadLatLngs: LatLng[] = roadCoordinates.map(
+                                (c) => L.latLng(c[1], c[0])
+                            );
+
+                            // Remove direct fallback line
+                            if (this.routePolyline) {
+                                this.routePolyline.remove();
+                                this.routePolyline = null;
+                            }
+                            if (this.routePolylineBorder) {
+                                this.routePolylineBorder.remove();
+                                this.routePolylineBorder = null;
+                            }
+
+                            // 1. Crisp white border / halo
+                            this.routePolylineBorder = L.polyline(roadLatLngs, {
+                                color: '#ffffff',
+                                weight: 8,
+                                opacity: 0.9,
+                                lineJoin: 'round',
+                                lineCap: 'round',
+                            }).addTo(this.map!);
+
+                            // 2. High-precision road line following the real road network
+                            this.routePolyline = L.polyline(roadLatLngs, {
+                                color: this.color || '#2563eb',
+                                weight: 5,
+                                opacity: 0.95,
+                                lineJoin: 'round',
+                                lineCap: 'round',
+                            }).addTo(this.map!);
+
+                            // Adjust camera bounds so the entire road trajectory is framed
+                            this.fitToContent([
+                                ...roadLatLngs,
+                                ...this.poiPoints.map((p) => L.latLng(p.latitude, p.longitude)),
+                            ]);
                         }
                     })
-                    .addTo(this.map);
-                }
-            } catch (routingErr) {
-                console.warn('Leaflet routing control could not be created:', routingErr);
+                    .catch((err) => {
+                        console.warn('Road routing fell back to direct line:', err);
+                    });
             }
         }
     }
@@ -660,9 +688,9 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
             this.routePolyline.remove();
             this.routePolyline = null;
         }
-        if (this.routeControl) {
-            this.routeControl.remove();
-            this.routeControl = null;
+        if (this.routePolylineBorder) {
+            this.routePolylineBorder.remove();
+            this.routePolylineBorder = null;
         }
 
         if (this.map) {
