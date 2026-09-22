@@ -284,14 +284,25 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
     //  Route overlay
     // ------------------------------------------------------------------ //
 
-    /** Coalesce rapid input changes into a single route redraw (OSRM request). */
+    /** Coalesce rapid input changes into a single route redraw. */
     private scheduleRouteUpdate(): void {
         if (this.routeUpdateTimer) {
             clearTimeout(this.routeUpdateTimer);
         }
         this.routeUpdateTimer = setTimeout(() => {
             this._ngZone.runOutsideAngular(() => this.updateRouteOverlay());
-        }, 250);
+        }, 50);
+    }
+
+    private parseCoord(val: any): number | null {
+        if (val == null) return null;
+        if (typeof val === 'number') return !isNaN(val) && val !== 0 ? val : null;
+        if (typeof val === 'string') {
+            const cleaned = val.trim().replace(',', '.');
+            const num = parseFloat(cleaned);
+            return !isNaN(num) && num !== 0 ? num : null;
+        }
+        return null;
     }
 
     private updateRouteOverlay(): void {
@@ -316,7 +327,12 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
         }
 
         const validPoints = (this.routePoints ?? [])
-            .filter((point) => point.latitude != null && point.longitude != null);
+            .map((p) => ({
+                ...p,
+                latitude: this.parseCoord(p.latitude) as number,
+                longitude: this.parseCoord(p.longitude) as number,
+            }))
+            .filter((p) => p.latitude !== null && p.longitude !== null);
 
         const validRoutePoints = validPoints.filter((point) => point.kind !== 'poi');
         this.poiPoints = validPoints.filter((point) => point.kind === 'poi');
@@ -349,6 +365,13 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
 
             this.routeMarkers.push(routeMarker);
         });
+
+        // Ensure Leaflet map container has correct layout size before calculating bounds
+        try {
+            this.map.invalidateSize();
+        } catch (e) {
+            // ignore
+        }
 
         // 2. Zoom & center map immediately on the points
         this.fitToContent([
@@ -492,10 +515,27 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
         if (this.marker) {
             boundsPoints.push(this.marker.getLatLng());
         }
-        this.workingPolygon.forEach((v) => boundsPoints.push(L.latLng(v.latitude, v.longitude)));
+        this.workingPolygon.forEach((v) => {
+            const lat = this.parseCoord(v.latitude);
+            const lng = this.parseCoord(v.longitude);
+            if (lat !== null && lng !== null) {
+                boundsPoints.push(L.latLng(lat, lng));
+            }
+        });
 
         if (boundsPoints.length > 0) {
-            this.map.fitBounds(L.latLngBounds(boundsPoints), { padding: [40, 40], maxZoom: 14 });
+            try {
+                const bounds = L.latLngBounds(boundsPoints);
+                if (bounds.isValid()) {
+                    if (bounds.getNorthEast().equals(bounds.getSouthWest())) {
+                        this.map.setView(bounds.getCenter(), 13);
+                    } else {
+                        this.map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+                    }
+                }
+            } catch (e) {
+                console.warn('fitBounds error:', e);
+            }
         }
     }
 

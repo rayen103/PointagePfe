@@ -135,7 +135,9 @@ export class ListComponent implements OnInit, OnDestroy {
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((res) => {
                 this.allPoints = res?.pointsCollecte ?? [];
-                if (!this.selectedCircuit) {
+                if (this.selectedCircuit) {
+                    this.refreshSelectedCircuitRoute();
+                } else {
                     this.circuit$.pipe(take(1)).subscribe((circuits) => {
                         this.mapPoints = this.buildOverviewPoints(circuits ?? []);
                         this._changeDetectorRef.markForCheck();
@@ -216,6 +218,46 @@ export class ListComponent implements OnInit, OnDestroy {
     //  Selection → points + route on the map
     // ------------------------------------------------------------------ //
 
+    private parseCoord(val: any): number | null {
+        if (val == null) return null;
+        if (typeof val === 'number') {
+            return !isNaN(val) && val !== 0 ? val : null;
+        }
+        if (typeof val === 'string') {
+            const cleaned = val.trim().replace(',', '.');
+            const num = parseFloat(cleaned);
+            return !isNaN(num) && num !== 0 ? num : null;
+        }
+        return null;
+    }
+
+    private isValidCoordinate(lat: any, lng: any): boolean {
+        const nLat = this.parseCoord(lat);
+        const nLng = this.parseCoord(lng);
+        return nLat !== null && nLng !== null && nLat >= 25 && nLat <= 40 && nLng >= 5 && nLng <= 15;
+    }
+
+    refreshSelectedCircuitRoute(): void {
+        if (!this.selectedCircuit || !this.selectedCircuitPoints?.length) {
+            return;
+        }
+
+        this.selectedCircuitPoints.forEach((p) => {
+            if (!this.isValidCoordinate(p.latitude, p.longitude) && this.allPoints?.length) {
+                const match = this.allPoints.find((ap) =>
+                    ap.codePointCollecte?.trim().toLowerCase() === p.codePointCollecte?.trim().toLowerCase()
+                );
+                if (match && this.isValidCoordinate(match.latitude, match.longitude)) {
+                    p.latitude = this.parseCoord(match.latitude)!;
+                    p.longitude = this.parseCoord(match.longitude)!;
+                }
+            }
+        });
+
+        this.mapPoints = this.buildSelectedRoutePoints(this.selectedCircuit, this.selectedCircuitPoints);
+        this._changeDetectorRef.markForCheck();
+    }
+
     toggleDetails(circuitId: string): void {
         if (this.selectedCircuit && this.selectedCircuit.circuitId === circuitId) {
             this.closeDetails();
@@ -224,6 +266,7 @@ export class ListComponent implements OnInit, OnDestroy {
 
         this.circuit$
             .pipe(
+                take(1),
                 map((circuits) => circuits.find((item) => item.circuitId === circuitId) ?? null),
                 switchMap((circuit) => {
                     this.selectedCircuit = circuit;
@@ -249,8 +292,12 @@ export class ListComponent implements OnInit, OnDestroy {
                 // Fallback for circuits without CircuitPointCollecte records yet
                 if (orderedPoints.length === 0 && circuit) {
                     const fallbackPoints: CircuitPointCollecte[] = [];
-                    const startPoint = this.allPoints.find((p) => p.codePointCollecte === circuit.codePCDepart);
-                    const endPoint = this.allPoints.find((p) => p.codePointCollecte === circuit.codePCArrivee);
+                    const startPoint = this.allPoints.find((p) =>
+                        p.codePointCollecte?.trim().toLowerCase() === circuit.codePCDepart?.trim().toLowerCase()
+                    );
+                    const endPoint = this.allPoints.find((p) =>
+                        p.codePointCollecte?.trim().toLowerCase() === circuit.codePCArrivee?.trim().toLowerCase()
+                    );
                     const assignedPoints = this.allPoints.filter((p) => p.circuitId === circuit.circuitId);
 
                     if (startPoint) {
@@ -259,8 +306,8 @@ export class ListComponent implements OnInit, OnDestroy {
                             circuitId: circuit.circuitId,
                             codePointCollecte: startPoint.codePointCollecte,
                             libellePointCollecte: startPoint.libellePointCollecte || startPoint.codePointCollecte,
-                            latitude: startPoint.latitude != null ? Number(startPoint.latitude) : null,
-                            longitude: startPoint.longitude != null ? Number(startPoint.longitude) : null,
+                            latitude: this.parseCoord(startPoint.latitude),
+                            longitude: this.parseCoord(startPoint.longitude),
                             ordre: 0,
                         });
                     }
@@ -272,8 +319,8 @@ export class ListComponent implements OnInit, OnDestroy {
                                 circuitId: circuit.circuitId,
                                 codePointCollecte: p.codePointCollecte,
                                 libellePointCollecte: p.libellePointCollecte || p.codePointCollecte,
-                                latitude: p.latitude != null ? Number(p.latitude) : null,
-                                longitude: p.longitude != null ? Number(p.longitude) : null,
+                                latitude: this.parseCoord(p.latitude),
+                                longitude: this.parseCoord(p.longitude),
                                 ordre: idx + 1,
                             });
                         }
@@ -285,8 +332,8 @@ export class ListComponent implements OnInit, OnDestroy {
                             circuitId: circuit.circuitId,
                             codePointCollecte: endPoint.codePointCollecte,
                             libellePointCollecte: endPoint.libellePointCollecte || endPoint.codePointCollecte,
-                            latitude: endPoint.latitude != null ? Number(endPoint.latitude) : null,
-                            longitude: endPoint.longitude != null ? Number(endPoint.longitude) : null,
+                            latitude: this.parseCoord(endPoint.latitude),
+                            longitude: this.parseCoord(endPoint.longitude),
                             ordre: fallbackPoints.length,
                         });
                     }
@@ -300,13 +347,15 @@ export class ListComponent implements OnInit, OnDestroy {
                     }
                 }
 
-                // Ensure all points have coordinates (enrich from allPoints if missing in CircuitPointCollecte)
+                // Ensure all points have valid coordinates (enrich from allPoints if missing in CircuitPointCollecte)
                 orderedPoints.forEach((p) => {
-                    if ((p.latitude == null || p.longitude == null) && this.allPoints?.length) {
-                        const match = this.allPoints.find((ap) => ap.codePointCollecte === p.codePointCollecte);
-                        if (match?.latitude != null && match?.longitude != null) {
-                            p.latitude = Number(match.latitude);
-                            p.longitude = Number(match.longitude);
+                    if (!this.isValidCoordinate(p.latitude, p.longitude) && this.allPoints?.length) {
+                        const match = this.allPoints.find((ap) =>
+                            ap.codePointCollecte?.trim().toLowerCase() === p.codePointCollecte?.trim().toLowerCase()
+                        );
+                        if (match && this.isValidCoordinate(match.latitude, match.longitude)) {
+                            p.latitude = this.parseCoord(match.latitude)!;
+                            p.longitude = this.parseCoord(match.longitude)!;
                         }
                     }
                 });
@@ -341,19 +390,21 @@ export class ListComponent implements OnInit, OnDestroy {
     private buildOverviewPoints(circuits: Circuit[]): MapRoutePoint[] {
         return circuits
             .map((c): MapRoutePoint | null => {
-                let lat = c.latitude != null ? Number(c.latitude) : null;
-                let lng = c.longitude != null ? Number(c.longitude) : null;
+                let lat = this.parseCoord(c.latitude);
+                let lng = this.parseCoord(c.longitude);
 
                 // Fallback to departure point coordinates if circuit coordinates are missing
-                if ((lat == null || lng == null) && c.codePCDepart && this.allPoints?.length) {
-                    const startPoint = this.allPoints.find((p) => p.codePointCollecte === c.codePCDepart);
-                    if (startPoint?.latitude != null && startPoint?.longitude != null) {
-                        lat = Number(startPoint.latitude);
-                        lng = Number(startPoint.longitude);
+                if ((lat === null || lng === null) && c.codePCDepart && this.allPoints?.length) {
+                    const startPoint = this.allPoints.find((p) =>
+                        p.codePointCollecte?.trim().toLowerCase() === c.codePCDepart?.trim().toLowerCase()
+                    );
+                    if (startPoint && this.isValidCoordinate(startPoint.latitude, startPoint.longitude)) {
+                        lat = this.parseCoord(startPoint.latitude);
+                        lng = this.parseCoord(startPoint.longitude);
                     }
                 }
 
-                if (lat == null || lng == null) {
+                if (lat === null || lng === null) {
                     return null;
                 }
 
@@ -370,19 +421,27 @@ export class ListComponent implements OnInit, OnDestroy {
     }
 
     private buildSelectedRoutePoints(circuit: Circuit, points: CircuitPointCollecte[]): MapRoutePoint[] {
-        const located = points.filter((p) => p.latitude != null && p.longitude != null);
+        const located = points
+            .map((p) => ({
+                ...p,
+                parsedLat: this.parseCoord(p.latitude),
+                parsedLng: this.parseCoord(p.longitude),
+            }))
+            .filter((p) => p.parsedLat !== null && p.parsedLng !== null);
 
         if (located.length === 0) {
-            let lat = circuit.latitude != null ? Number(circuit.latitude) : null;
-            let lng = circuit.longitude != null ? Number(circuit.longitude) : null;
-            if ((lat == null || lng == null) && circuit.codePCDepart && this.allPoints?.length) {
-                const sp = this.allPoints.find((p) => p.codePointCollecte === circuit.codePCDepart);
-                if (sp?.latitude != null && sp?.longitude != null) {
-                    lat = Number(sp.latitude);
-                    lng = Number(sp.longitude);
+            let lat = this.parseCoord(circuit.latitude);
+            let lng = this.parseCoord(circuit.longitude);
+            if ((lat === null || lng === null) && circuit.codePCDepart && this.allPoints?.length) {
+                const sp = this.allPoints.find((p) =>
+                    p.codePointCollecte?.trim().toLowerCase() === circuit.codePCDepart?.trim().toLowerCase()
+                );
+                if (sp && this.isValidCoordinate(sp.latitude, sp.longitude)) {
+                    lat = this.parseCoord(sp.latitude);
+                    lng = this.parseCoord(sp.longitude);
                 }
             }
-            if (lat != null && lng != null) {
+            if (lat !== null && lng !== null) {
                 return [{
                     latitude: lat,
                     longitude: lng,
@@ -396,8 +455,8 @@ export class ListComponent implements OnInit, OnDestroy {
 
         // No `id` here: clicking a route waypoint should not re-trigger a circuit selection
         return located.map((p, index) => ({
-            latitude: Number(p.latitude),
-            longitude: Number(p.longitude),
+            latitude: p.parsedLat!,
+            longitude: p.parsedLng!,
             label: p.libellePointCollecte || p.codePointCollecte,
             kind: index === 0 ? 'departure' as const
                 : index === located.length - 1 ? 'arrival' as const
