@@ -118,6 +118,7 @@ export class ListComponent implements OnInit, OnDestroy {
     successRate = 100;
 
     resetFilters() {
+        this._pointageService.clearCache();
         this.searchInputControl.setValue('');
         this.busIdControl.setValue('');
         this.isSuccessControl.setValue('');
