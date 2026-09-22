@@ -66,6 +66,9 @@ export class BusTrackingListComponent {
     }
 
     getCircuitDriverLabel(bus: BusTrackingItem): string {
+        if (bus.busId?.startsWith('circuit_')) {
+            return bus.codeCircuit ? `Circuit ${bus.codeCircuit}` : (bus.numeroIMM || 'Circuit planifié');
+        }
         const circuit = bus.codeCircuit || 'Aucun circuit';
         const driver = bus.codeChauffeur || 'Aucun chauffeur';
         return `${circuit} · ${driver}`;

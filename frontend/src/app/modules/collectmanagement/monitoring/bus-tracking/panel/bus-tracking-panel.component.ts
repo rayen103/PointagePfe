@@ -90,10 +90,16 @@ export class BusTrackingPanelComponent {
     }
 
     getStatusLabel(): string {
+        if (this.bus?.busId?.startsWith('circuit_')) {
+            return 'Planifié';
+        }
         return this.bus?.isActive ? 'En route' : 'Arrêt';
     }
 
     getStatusColor(): string {
+        if (this.bus?.busId?.startsWith('circuit_')) {
+            return 'text-blue-600';
+        }
         return this.bus?.isActive ? 'text-green-600' : 'text-gray-500';
     }
 }

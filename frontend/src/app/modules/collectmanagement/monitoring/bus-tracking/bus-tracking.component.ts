@@ -47,6 +47,9 @@ import { Circuit } from '../../../../core/circuit/circuit.model';
 import { CircuitPointCollecte } from '../../../../core/circuit/circuit-point-collecte.model';
 import { CircuitPointCollecteService } from '../../../../core/circuit/circuit-point-collecte.service';
 import { CircuitService } from '../../../../core/circuit/circuit.service';
+import { PointCollecte } from '../../../../core/point-collecte/point-collecte.model';
+import { PointCollecteService } from '../../../../core/point-collecte/point-collecte.service';
+import { CircuitMapOverview } from '../../../../shared/components/map-viewer/map-viewer.component';
 import {
     BusTrackingAdapterService,
     BusTrackingItem,
@@ -98,6 +101,9 @@ export class BusTrackingComponent implements OnInit, OnDestroy {
 
     buses: BusTrackingItem[] = [];
     filteredBuses: BusTrackingItem[] = [];
+    allCircuits: Circuit[] = [];
+    allPointsCollecte: PointCollecte[] = [];
+    allCircuitsMapOverview: CircuitMapOverview[] = [];
     selectedBus: BusTrackingItem | null = null;
     selectedEvents: BusRuntimeEvent[] = [];
     selectedBusEventsLoading: boolean = false;
@@ -117,6 +123,7 @@ export class BusTrackingComponent implements OnInit, OnDestroy {
     private readonly _unsubscribeAll = new Subject<void>();
     private readonly _pollIntervalMs = 10000;
     private readonly _circuitsMap = new Map<string, Circuit>();
+    private readonly _routeCache = new Map<string, OptimizedRouteResult>();
 
     constructor(
         private readonly _activatedRoute: ActivatedRoute,
@@ -126,6 +133,7 @@ export class BusTrackingComponent implements OnInit, OnDestroy {
         private readonly _fuseConfirmationService: FuseConfirmationService,
         private readonly _circuitService: CircuitService,
         private readonly _circuitPointService: CircuitPointCollecteService,
+        private readonly _pointCollecteService: PointCollecteService,
         private readonly _routeService: BusTrackingRouteService,
     ) {}
 
@@ -156,7 +164,7 @@ export class BusTrackingComponent implements OnInit, OnDestroy {
         this._selectedBusId$
             .pipe(
                 switchMap((busId) => {
-                    if (!busId) {
+                    if (!busId || busId.startsWith('circuit_')) {
                         this.selectedEvents = [];
                         this._changeDetectorRef.markForCheck();
                         return of([]);
@@ -188,7 +196,7 @@ export class BusTrackingComponent implements OnInit, OnDestroy {
         this._selectedBusId$
             .pipe(
                 switchMap((busId) => {
-                    if (!busId) {
+                    if (!busId || busId.startsWith('circuit_')) {
                         this.selectedPointages = [];
                         this._changeDetectorRef.markForCheck();
                         return of([]);
@@ -242,19 +250,81 @@ export class BusTrackingComponent implements OnInit, OnDestroy {
         this._changeDetectorRef.markForCheck();
 
         return forkJoin({
-            paged: this._busService.GetBuses(1, 1000, 'numeroIMM', 'asc', ''),
-            snapshot: this._busService.GetLivePositionsSnapshot(),
+            paged: this._busService.GetBuses(1, 1000, 'numeroIMM', 'asc', '').pipe(
+                catchError(() => of({ buses: [], totalCount: 0 }))
+            ),
+            snapshot: this._busService.GetLivePositionsSnapshot().pipe(
+                catchError(() => of(null))
+            ),
+            circuitsPaged: this._circuitService.GetCircuit(1, 1000, 'codeCircuit', 'asc', '').pipe(
+                catchError(() => of({ circuits: [], totalCount: 0 }))
+            ),
+            pointsPaged: this._pointCollecteService.GetPointsCollecte(1, 1000).pipe(
+                catchError(() => of({ pointsCollecte: [], totalCount: 0 }))
+            ),
         }).pipe(
-            map(({ paged, snapshot }) => {
-                const items = this._adapter.buildTrackingItems(
-                    paged?.buses ?? [],
-                    snapshot ?? null
+            map(({ paged, snapshot, circuitsPaged, pointsPaged }) => {
+                const buses = paged?.buses ?? [];
+                const circuits = circuitsPaged?.circuits ?? [];
+                const allPoints = pointsPaged?.pointsCollecte ?? [];
+
+                this.allCircuits = circuits;
+                this.allPointsCollecte = allPoints;
+
+                // Cache all circuits
+                circuits.forEach((c) => {
+                    if (c.codeCircuit) this._circuitsMap.set(c.codeCircuit.trim(), c);
+                    if (c.circuitId) this._circuitsMap.set(c.circuitId.trim(), c);
+                });
+
+                const busItems = this._adapter.buildTrackingItems(buses, snapshot ?? null);
+
+                // Find which circuit codes already have a bus assigned
+                const assignedCircuitCodes = new Set(
+                    busItems
+                        .map((b) => (b.codeCircuit ?? '').trim().toLowerCase())
+                        .filter(Boolean)
                 );
 
-                this.buses = items;
+                // Add virtual items for circuits without assigned buses
+                const circuitItems: BusTrackingItem[] = [];
+                for (const c of circuits) {
+                    const code = (c.codeCircuit ?? '').trim().toLowerCase();
+                    if (code && assignedCircuitCodes.has(code)) {
+                        continue;
+                    }
+
+                    const depPoint = allPoints.find((p) => p.codePointCollecte === c.codePCDepart);
+                    const arrPoint = allPoints.find((p) => p.codePointCollecte === c.codePCArrivee);
+                    const lat = c.latitude ?? depPoint?.latitude ?? arrPoint?.latitude;
+                    const lng = c.longitude ?? depPoint?.longitude ?? arrPoint?.longitude;
+
+                    circuitItems.push({
+                        busId: `circuit_${c.circuitId}`,
+                        numeroIMM: c.libelleCircuit || `Circuit ${c.codeCircuit}`,
+                        societeId: c.societeId,
+                        isActive: false,
+                        capacite: undefined,
+                        latitude: lat,
+                        longitude: lng,
+                        currentOccupancy: undefined,
+                        lastPositionAt: undefined,
+                        lastOccupancyUpdateAt: undefined,
+                        codeCircuit: c.codeCircuit,
+                        codeChauffeur: undefined,
+                    });
+                }
+
+                this.buses = [...busItems, ...circuitItems];
                 this.applyClientFilter();
                 this.lastRefreshAtUtc = snapshot?.generatedAtUtc ?? null;
+
+                if (!this._selectedBusId$.value && this.buses.length > 0) {
+                    this._selectedBusId$.next(this.buses[0].busId);
+                }
+
                 this.syncSelectedBusAndCircuit();
+                this.buildAllCircuitsMapOverview(circuits, allPoints);
                 this._changeDetectorRef.markForCheck();
             }),
             finalize(() => {
@@ -275,13 +345,26 @@ export class BusTrackingComponent implements OnInit, OnDestroy {
         this._changeDetectorRef.markForCheck();
     }
 
+    onSelectCircuitFromMap(circuitIdentifier: string): void {
+        const matchingBus = this.buses.find(
+            (b) =>
+                (b.codeCircuit && b.codeCircuit.toLowerCase() === circuitIdentifier.toLowerCase()) ||
+                b.busId === circuitIdentifier ||
+                b.busId === `circuit_${circuitIdentifier}`
+        );
+        if (matchingBus) {
+            this.onSelectBus(matchingBus.busId);
+        }
+    }
+
     onToggleShowAllOnMap(showAll: boolean): void {
         this.showAllOnMapControl.setValue(showAll);
         this._changeDetectorRef.markForCheck();
     }
 
     getMapLocations() {
-        return this._adapter.buildMapLocations(this.filteredBuses, {
+        const realBuses = this.filteredBuses.filter((b) => !b.busId.startsWith('circuit_'));
+        return this._adapter.buildMapLocations(realBuses, {
             selectedBusId: this.selectedBus?.busId ?? this._selectedBusId$.value,
             showAll: this.showAllOnMapControl.value === true,
         });
@@ -454,7 +537,7 @@ export class BusTrackingComponent implements OnInit, OnDestroy {
             previousSelectedBus?.codeCircuit !== this.selectedBus?.codeCircuit;
         const busChanged = this.selectedBus && this.selectedBus !== previousSelectedBus;
 
-        if (busChanged && codeCircuitChanged && this.selectedBus?.codeCircuit) {
+        if ((busChanged || !this.circuitData || codeCircuitChanged) && this.selectedBus?.codeCircuit) {
             this.loadCircuitDataForSelectedBus();
         } else if (!this.selectedBus) {
             this.clearCircuitState();
@@ -476,7 +559,6 @@ export class BusTrackingComponent implements OnInit, OnDestroy {
         this.remainingDistanceKm = null;
         this.remainingEtaMinutes = null;
         this.routeProgressPercent = null;
-        this._circuitsMap.clear();
     }
 
     private loadCircuitDataForSelectedBus(): void {
@@ -541,7 +623,49 @@ export class BusTrackingComponent implements OnInit, OnDestroy {
             .getByCircuit(circuit.circuitId)
             .pipe(
                 map((points) => {
-                    const categorized = this.categorizePoints(points, circuit.circuitId);
+                    let effectivePoints = points ? [...points] : [];
+                    if (effectivePoints.length === 0) {
+                        effectivePoints = this.allPointsCollecte
+                            .filter((p) => p.circuitId === circuit.circuitId)
+                            .map((p, idx) => ({
+                                circuitPointCollecteId: p.pointCollecteId,
+                                circuitId: circuit.circuitId,
+                                codePointCollecte: p.codePointCollecte,
+                                libellePointCollecte: p.libellePointCollecte,
+                                latitude: p.latitude,
+                                longitude: p.longitude,
+                                ordre: idx + 1,
+                            }));
+                    }
+
+                    const depPoint = this.allPointsCollecte.find((p) => p.codePointCollecte === circuit.codePCDepart);
+                    const arrPoint = this.allPointsCollecte.find((p) => p.codePointCollecte === circuit.codePCArrivee);
+
+                    if (depPoint && !effectivePoints.some((p) => p.codePointCollecte === depPoint.codePointCollecte)) {
+                        effectivePoints.unshift({
+                            circuitPointCollecteId: depPoint.pointCollecteId,
+                            circuitId: circuit.circuitId,
+                            codePointCollecte: depPoint.codePointCollecte,
+                            libellePointCollecte: depPoint.libellePointCollecte,
+                            latitude: depPoint.latitude,
+                            longitude: depPoint.longitude,
+                            ordre: 0,
+                        });
+                    }
+
+                    if (arrPoint && !effectivePoints.some((p) => p.codePointCollecte === arrPoint.codePointCollecte)) {
+                        effectivePoints.push({
+                            circuitPointCollecteId: arrPoint.pointCollecteId,
+                            circuitId: circuit.circuitId,
+                            codePointCollecte: arrPoint.codePointCollecte,
+                            libellePointCollecte: arrPoint.libellePointCollecte,
+                            latitude: arrPoint.latitude,
+                            longitude: arrPoint.longitude,
+                            ordre: 999,
+                        });
+                    }
+
+                    const categorized = this.categorizePoints(effectivePoints, circuit.circuitId);
                     if (categorized.allPoints.length === 0) {
                         this.circuitData = categorized;
                         this.routeResult = null;
@@ -576,19 +700,29 @@ export class BusTrackingComponent implements OnInit, OnDestroy {
                         )
                         .subscribe((result) => {
                             this.routeResult = result;
+                            if (result) {
+                                this._routeCache.set(circuit.circuitId, result);
+                                const overviewItem = this.allCircuitsMapOverview.find(
+                                    (o) => o.circuitId === circuit.circuitId
+                                );
+                                if (overviewItem) {
+                                    overviewItem.geometry = result.geometry;
+                                    overviewItem.distanceKm = result.totalDistanceKm;
+                                    overviewItem.durationMinutes = result.estimatedDurationMinutes;
+                                }
+                            }
 
                             if (this.selectedBus && this.selectedBus.latitude != null && this.selectedBus.longitude != null) {
                                 this.updateRouteProgress(this.selectedBus.latitude, this.selectedBus.longitude);
-                            }
-
-                            if (!this.selectedBus && this.circuitData && this.circuitData.allPoints.length > 0) {
-                                const dep = this.circuitData.allPoints[0];
-                                const arr = this.circuitData.allPoints[this.circuitData.allPoints.length - 1];
-                                if (dep) {
-                                    this.nextDestinationName = dep.libellePointCollecte || dep.codePointCollecte;
+                            } else {
+                                if (this.circuitData && this.circuitData.allPoints.length > 0) {
+                                    const dep = this.circuitData.allPoints[0];
+                                    if (dep) {
+                                        this.nextDestinationName = dep.libellePointCollecte || dep.codePointCollecte;
+                                    }
                                 }
-                                this.remainingDistanceKm = result?.totalDistanceKm ?? null;
-                                this.remainingEtaMinutes = result?.estimatedDurationMinutes ?? null;
+                                this.remainingDistanceKm = result?.totalDistanceKm ?? circuit.distanceKm ?? null;
+                                this.remainingEtaMinutes = result?.estimatedDurationMinutes ?? circuit.dureeMinutes ?? null;
                                 this.routeProgressPercent = 0;
                             }
 
@@ -603,6 +737,103 @@ export class BusTrackingComponent implements OnInit, OnDestroy {
                 takeUntil(this._unsubscribeAll)
             )
             .subscribe();
+    }
+
+    private buildAllCircuitsMapOverview(circuits: Circuit[], allPoints: PointCollecte[]): void {
+        const overviewList: CircuitMapOverview[] = [];
+
+        for (const c of circuits) {
+            const depPoint = allPoints.find((p) => p.codePointCollecte === c.codePCDepart);
+            const arrPoint = allPoints.find((p) => p.codePointCollecte === c.codePCArrivee);
+            const circuitPts = allPoints.filter(
+                (p) =>
+                    p.circuitId === c.circuitId &&
+                    p.codePointCollecte !== c.codePCDepart &&
+                    p.codePointCollecte !== c.codePCArrivee
+            );
+
+            const orderedNodes: { latitude: number; longitude: number; name: string }[] = [];
+            if (depPoint?.latitude != null && depPoint?.longitude != null) {
+                orderedNodes.push({
+                    latitude: depPoint.latitude,
+                    longitude: depPoint.longitude,
+                    name: depPoint.libellePointCollecte || depPoint.codePointCollecte,
+                });
+            } else if (c.latitude != null && c.longitude != null) {
+                orderedNodes.push({
+                    latitude: c.latitude,
+                    longitude: c.longitude,
+                    name: c.codePCDepart || 'Départ',
+                });
+            }
+
+            for (const pt of circuitPts) {
+                if (pt.latitude != null && pt.longitude != null) {
+                    orderedNodes.push({
+                        latitude: pt.latitude,
+                        longitude: pt.longitude,
+                        name: pt.libellePointCollecte || pt.codePointCollecte,
+                    });
+                }
+            }
+
+            if (arrPoint?.latitude != null && arrPoint?.longitude != null) {
+                orderedNodes.push({
+                    latitude: arrPoint.latitude,
+                    longitude: arrPoint.longitude,
+                    name: arrPoint.libellePointCollecte || arrPoint.codePointCollecte,
+                });
+            }
+
+            const coords: [number, number][] = orderedNodes.map((n) => [n.latitude, n.longitude]);
+            const cachedRoute = this._routeCache.get(c.circuitId);
+
+            overviewList.push({
+                circuitId: c.circuitId,
+                codeCircuit: c.codeCircuit,
+                name: c.libelleCircuit || c.codeCircuit,
+                color: c.couleur || '#2563eb',
+                coordinates: coords,
+                geometry: cachedRoute?.geometry ?? coords,
+                distanceKm: cachedRoute?.totalDistanceKm ?? c.distanceKm ?? undefined,
+                durationMinutes: cachedRoute?.estimatedDurationMinutes ?? c.dureeMinutes ?? undefined,
+            });
+
+            if (!cachedRoute && orderedNodes.length >= 2) {
+                const dep = orderedNodes[0];
+                const arr = orderedNodes[orderedNodes.length - 1];
+                const inter: CircuitPointCollecte[] = orderedNodes.slice(1, -1).map((pt, idx) => ({
+                    circuitPointCollecteId: `inter_${idx}`,
+                    circuitId: c.circuitId,
+                    codePointCollecte: pt.name,
+                    libellePointCollecte: pt.name,
+                    latitude: pt.latitude,
+                    longitude: pt.longitude,
+                    ordre: idx + 1,
+                }));
+
+                this._routeService
+                    .calculateOptimizedRoute(dep.latitude, dep.longitude, inter, arr.latitude, arr.longitude)
+                    .pipe(
+                        catchError(() => of(null)),
+                        takeUntil(this._unsubscribeAll)
+                    )
+                    .subscribe((res) => {
+                        if (res && res.geometry?.length > 1) {
+                            this._routeCache.set(c.circuitId, res);
+                            const item = this.allCircuitsMapOverview.find((item) => item.circuitId === c.circuitId);
+                            if (item) {
+                                item.geometry = res.geometry;
+                                item.distanceKm = res.totalDistanceKm;
+                                item.durationMinutes = res.estimatedDurationMinutes;
+                                this._changeDetectorRef.markForCheck();
+                            }
+                        }
+                    });
+            }
+        }
+
+        this.allCircuitsMapOverview = overviewList;
     }
 
     private categorizePoints(

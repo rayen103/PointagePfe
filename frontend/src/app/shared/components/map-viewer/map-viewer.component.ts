@@ -55,6 +55,17 @@ export interface OptimizedRouteData {
     orderedPointIds?: string[];
 }
 
+export interface CircuitMapOverview {
+    circuitId: string;
+    codeCircuit: string;
+    name: string;
+    color: string;
+    coordinates: [number, number][];
+    geometry?: [number, number][];
+    distanceKm?: number;
+    durationMinutes?: number;
+}
+
 @Component({
     selector: 'app-map-viewer',
     standalone: true,
@@ -71,12 +82,18 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
     @Input() optimizedRoute: OptimizedRouteData | null = null;
     @Input() selectedBusPosition: { latitude: number; longitude: number; heading?: number } | null = null;
     @Input() circuitArea: [number, number][] | null = null;
+    @Input() allCircuits: CircuitMapOverview[] = [];
+    @Input() showAllCircuits: boolean = true;
+    @Input() showAllCollectionPoints: boolean = true;
+    @Input() selectedCircuitId: string | null = null;
+    @Output() readonly selectCircuit = new EventEmitter<string>();
     @Output() readonly mapClick = new EventEmitter<L.LeafletMouseEvent>();
 
     private map: LeafletMap | null = null;
     private markers: Marker[] = [];
     private routeControls: L.Routing.Control[] = [];
     private routeLines: Polyline[] = [];
+    private allCircuitLines: Polyline[] = [];
     private circuitMarkers: Marker[] = [];
     private busMarker: Marker | null = null;
     private areaPolygon: Polygon | null = null;
@@ -90,7 +107,14 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
             this.updateMarkers();
         }
         if (
-            (changes['circuitPoints'] || changes['optimizedRoute'] || changes['selectedBusPosition'] || changes['circuitArea']) &&
+            (changes['circuitPoints'] ||
+             changes['optimizedRoute'] ||
+             changes['selectedBusPosition'] ||
+             changes['circuitArea'] ||
+             changes['allCircuits'] ||
+             changes['showAllCircuits'] ||
+             changes['showAllCollectionPoints'] ||
+             changes['selectedCircuitId']) &&
             this.map
         ) {
             this.updateCircuitOverlays();
@@ -171,6 +195,9 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
             return;
         }
 
+        this.allCircuitLines.forEach((line) => line.remove());
+        this.allCircuitLines = [];
+
         this.circuitMarkers.forEach((marker) => marker.remove());
         this.circuitMarkers = [];
 
@@ -185,6 +212,47 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
         if (this.areaPolygon) {
             this.areaPolygon.remove();
             this.areaPolygon = null;
+        }
+
+        // Draw all circuits across the network
+        if (this.showAllCircuits && (this.allCircuits?.length ?? 0) > 0) {
+            this.allCircuits.forEach((circuit) => {
+                const isSelected = !!this.selectedCircuitId &&
+                    (this.selectedCircuitId.toLowerCase() === circuit.circuitId.toLowerCase() ||
+                     this.selectedCircuitId.toLowerCase() === circuit.codeCircuit.toLowerCase());
+
+                const path = (circuit.geometry && circuit.geometry.length > 1)
+                    ? circuit.geometry
+                    : circuit.coordinates;
+
+                if (!path || path.length < 2) {
+                    return;
+                }
+
+                // If selected and optimizedRoute is already drawn, skip drawing underneath
+                if (isSelected && this.optimizedRoute?.geometry && this.optimizedRoute.geometry.length > 1) {
+                    return;
+                }
+
+                const color = circuit.color || '#2563eb';
+                const polyline = L.polyline(path, {
+                    color: color,
+                    weight: isSelected ? 5 : 3.5,
+                    opacity: isSelected ? 0.95 : 0.7,
+                    smoothFactor: 1,
+                }).addTo(this.map!);
+
+                polyline.bindTooltip(
+                    `<b>${circuit.name}</b> (${circuit.codeCircuit})${circuit.distanceKm ? ` · ${circuit.distanceKm} km` : ''}`,
+                    { sticky: true }
+                );
+
+                polyline.on('click', () => {
+                    this.selectCircuit.emit(circuit.circuitId || circuit.codeCircuit);
+                });
+
+                this.allCircuitLines.push(polyline);
+            });
         }
 
         if (this.selectedBusPosition) {
@@ -227,6 +295,28 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
             const marker = this.createCircuitPointMarker(point, index).addTo(this.map);
             this.circuitMarkers.push(marker);
         });
+
+        // Fit map bounds appropriately
+        if (this.optimizedRoute?.geometry && this.optimizedRoute.geometry.length > 1) {
+            const bounds = L.latLngBounds(this.optimizedRoute.geometry);
+            this.map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+        } else if (this.circuitPoints && this.circuitPoints.length > 0) {
+            const validPts = this.circuitPoints.filter(p => p.latitude != null && p.longitude != null);
+            if (validPts.length > 0) {
+                const bounds = L.latLngBounds(validPts.map(p => [p.latitude, p.longitude] as [number, number]));
+                this.map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+            }
+        } else if (this.showAllCircuits && (this.allCircuits?.length ?? 0) > 0) {
+            const allCoords: [number, number][] = [];
+            this.allCircuits.forEach(c => {
+                const pts = (c.geometry && c.geometry.length > 1) ? c.geometry : c.coordinates;
+                if (pts) allCoords.push(...pts);
+            });
+            if (allCoords.length > 0) {
+                const bounds = L.latLngBounds(allCoords);
+                this.map.fitBounds(bounds, { padding: [50, 50], maxZoom: 12 });
+            }
+        }
     }
 
     private createCircuitPointMarker(point: CircuitPointLocation, index: number): Marker {
@@ -541,6 +631,9 @@ export class MapViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
 
         this.routeLines.forEach((line) => line.remove());
         this.routeLines = [];
+
+        this.allCircuitLines.forEach((line) => line.remove());
+        this.allCircuitLines = [];
 
         this.markers.forEach((marker) => marker.remove());
         this.markers = [];
