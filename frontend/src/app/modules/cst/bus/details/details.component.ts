@@ -130,7 +130,10 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
 
         this._circuitService
             .GetCircuit()
-            .pipe(takeUntil(this._unsubscribeAll))
+            .pipe(
+                catchError(() => of(null)),
+                takeUntil(this._unsubscribeAll)
+            )
             .subscribe((pagedCircuits) => {
                 this.circuits = pagedCircuits?.circuits ?? [];
                 this.refreshSelectedCircuitRoute();
@@ -139,7 +142,10 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
 
         this._modemService
             .GetModems()
-            .pipe(takeUntil(this._unsubscribeAll))
+            .pipe(
+                catchError(() => of(null)),
+                takeUntil(this._unsubscribeAll)
+            )
             .subscribe((pagedModems) => {
                 this.modems = (pagedModems?.modems ?? []).filter((m) => m.isActive);
                 this._changeDetectorRef.markForCheck();
@@ -147,7 +153,10 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
 
         this._chauffeurService
             .GetChauffeurs()
-            .pipe(takeUntil(this._unsubscribeAll))
+            .pipe(
+                catchError(() => of(null)),
+                takeUntil(this._unsubscribeAll)
+            )
             .subscribe((pagedChauffeurs) => {
                 this.chauffeurs = (pagedChauffeurs?.chauffeurs ?? []).filter((c) => c.isActive);
                 this._changeDetectorRef.markForCheck();

@@ -11,7 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { fuseAnimations } from '../../../../../@fuse/animations';
 import { map, Observable, Subject, switchMap, takeUntil } from 'rxjs';
 import { Bus } from '../../../../core/bus/bus.model';
@@ -62,7 +62,8 @@ export class ListComponent implements OnInit, OnDestroy {
         private _pdfExportService: PdfExportService,
         private _busService: BusService,
         private _changeDetectorRef: ChangeDetectorRef,
-        private _fuseConfirmationService: FuseConfirmationService
+        private _fuseConfirmationService: FuseConfirmationService,
+        private _activatedRoute: ActivatedRoute
     ) {}
 
     SortChange() {
@@ -99,6 +100,15 @@ export class ListComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.bus$ = this._busService.buses$;
+
+        this._activatedRoute.data
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((data) => {
+                if (data?.navigation) {
+                    this.roleNavigation = data.navigation;
+                    this._changeDetectorRef.markForCheck();
+                }
+            });
 
         this._busService.busesLength$
             .pipe(takeUntil(this._unsubscribeAll))

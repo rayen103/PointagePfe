@@ -41,7 +41,7 @@ export default [
                 component: ListComponent,
                 resolve: {
                     buses: () => inject(BusService).GetBuses(),
-                    navigation: (route: ActivatedRouteSnapshot) => inject(UserService).getNavigation(route.data.navigationId),
+                    navigation: (route: ActivatedRouteSnapshot) => inject(UserService).getNavigation(route.data?.navigationId || 'fichier.bus'),
                 },
                 title: 'Buses',
             },
@@ -50,7 +50,7 @@ export default [
                 component: DetailsComponent,
                 resolve: {
                     bus: busResolver,
-                    navigation: (route: ActivatedRouteSnapshot) => inject(UserService).getNavigation(route.data.navigationId),
+                    navigation: (route: ActivatedRouteSnapshot) => inject(UserService).getNavigation(route.data?.navigationId || 'fichier.bus'),
                 },
                 title: 'Bus',
             }
