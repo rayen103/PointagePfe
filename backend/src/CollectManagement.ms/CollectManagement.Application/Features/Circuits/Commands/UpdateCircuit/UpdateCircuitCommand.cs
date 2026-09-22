@@ -12,5 +12,6 @@ public record UpdateCircuitCommand(
     string? CodePCArrivee,
     decimal? DistanceKm,
     int? DureeMinutes,
-    string? Couleur
+    string? Couleur,
+    List<string>? PointCollecteIds = null
 ) : IRequest<UpdateCircuitResponse>;

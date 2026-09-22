@@ -122,12 +122,28 @@
                         </div>
 
                         <div class="cst-field">
-                            <label>{{ t('Distance-Km') || 'Distance (km)' }}</label>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                                <label style="margin:0">{{ t('Distance-Km') || 'Distance (km)' }}</label>
+                                @if (isCalculatingRoute) {
+                                    <span style="font-size:11px;color:var(--cst-blue);display:inline-flex;align-items:center;gap:4px">
+                                        <mat-icon class="icon-size-3 animate-spin" [svgIcon]="'heroicons_outline:arrow-path'"></mat-icon> Calcul...
+                                    </span>
+                                } @else if (canCalculateRoute) {
+                                    <button type="button" style="font-size:11px;border:none;background:none;color:var(--cst-blue);cursor:pointer;padding:0;text-decoration:underline" (click)="recalculateRouteMetrics()" title="Recalculer selon le tracé routier">Recalculer</button>
+                                }
+                            </div>
                             <input class="cst-input" type="number" formControlName="distanceKm" [placeholder]="t('Enter-distance-km') || 'Ex: 12'" />
                         </div>
 
                         <div class="cst-field">
-                            <label>{{ t('Duree-Minutes') || 'Durée (min)' }}</label>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                                <label style="margin:0">{{ t('Duree-Minutes') || 'Durée (min)' }}</label>
+                                @if (isCalculatingRoute) {
+                                    <span style="font-size:11px;color:var(--cst-blue);display:inline-flex;align-items:center;gap:4px">
+                                        <mat-icon class="icon-size-3 animate-spin" [svgIcon]="'heroicons_outline:arrow-path'"></mat-icon> Calcul...
+                                    </span>
+                                }
+                            </div>
                             <input class="cst-input" type="number" formControlName="dureeMinutes" [placeholder]="t('Enter-duree-minutes') || 'Ex: 35'" />
                         </div>
 

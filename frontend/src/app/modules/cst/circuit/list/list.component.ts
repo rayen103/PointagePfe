@@ -1,3 +1,5 @@
+import { PdfExportService } from '../../../../core/common/pdf-export.service';
+import { CsvExportService } from '../../../../core/common/csv-export.service';
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
@@ -37,6 +39,8 @@ import { MapPickerComponent, MapRoutePoint } from '../../../../shared/components
 import { MapSkeletonComponent } from '../../../../shared/components/map-skeleton/map-skeleton.component';
 import { CircuitPointCollecteService } from '../../../../core/circuit/circuit-point-collecte.service';
 import { CircuitPointCollecte } from '../../../../core/circuit/circuit-point-collecte.model';
+import { PointCollecteService } from '../../../../core/point-collecte/point-collecte.service';
+import { PointCollecte } from '../../../../core/point-collecte/point-collecte.model';
 
 type StatusFilter = 'all' | 'active' | 'inactive';
 
@@ -80,6 +84,7 @@ export class ListComponent implements OnInit, OnDestroy {
     /** Points count per circuit, learned as circuits get selected. */
     pointsCountByCircuit = new Map<string, number>();
 
+    allPoints: PointCollecte[] = [];
     mapPoints: MapRoutePoint[] = [];
     sortActive: string = 'codeCircuit';
     sortDirection: 'asc' | 'desc' = 'asc';
@@ -90,8 +95,13 @@ export class ListComponent implements OnInit, OnDestroy {
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     constructor(
+        private _pdfExportService: PdfExportService,
+
+        private _csvExportService: CsvExportService,
+
         private _circuitService: CircuitService,
         private _circuitPointCollecteService: CircuitPointCollecteService,
+        private _pointCollecteService: PointCollecteService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseConfirmationService: FuseConfirmationService
     ) {}
@@ -117,6 +127,22 @@ export class ListComponent implements OnInit, OnDestroy {
             .subscribe((length) => {
                 this.circuitsLength = length;
                 this._changeDetectorRef.markForCheck();
+            });
+
+        // Load collection points to resolve coordinates and route fallbacks
+        this._pointCollecteService
+            .GetPointsCollecte(1, 1000)
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((res) => {
+                this.allPoints = res?.pointsCollecte ?? [];
+                if (this.selectedCircuit) {
+                    this.refreshSelectedCircuitRoute();
+                } else {
+                    this.circuit$.pipe(take(1)).subscribe((circuits) => {
+                        this.mapPoints = this.buildOverviewPoints(circuits ?? []);
+                        this._changeDetectorRef.markForCheck();
+                    });
+                }
             });
 
         // Overview map: every circuit with coordinates, as a clustered poi dot
@@ -192,6 +218,78 @@ export class ListComponent implements OnInit, OnDestroy {
     //  Selection → points + route on the map
     // ------------------------------------------------------------------ //
 
+    private parseCoord(val: any): number | null {
+        if (val == null) return null;
+        if (typeof val === 'number') {
+            return !isNaN(val) && val !== 0 ? val : null;
+        }
+        if (typeof val === 'string') {
+            const cleaned = val.trim().replace(',', '.');
+            const num = parseFloat(cleaned);
+            return !isNaN(num) && num !== 0 ? num : null;
+        }
+        return null;
+    }
+
+    private isValidCoordinate(lat: any, lng: any): boolean {
+        const nLat = this.parseCoord(lat);
+        const nLng = this.parseCoord(lng);
+        return nLat !== null && nLng !== null && nLat >= 25 && nLat <= 40 && nLng >= 5 && nLng <= 15;
+    }
+
+    private enrichCircuitPoints(circuit: Circuit, points: CircuitPointCollecte[]): void {
+        if (!points?.length || !this.allPoints?.length) {
+            return;
+        }
+
+        const circuitAssignedPoints = this.allPoints.filter(
+            (ap) => circuit?.circuitId && ap.circuitId === circuit.circuitId
+        );
+
+        points.forEach((p, idx) => {
+            if (this.isValidCoordinate(p.latitude, p.longitude)) {
+                return;
+            }
+
+            const pCode = p.codePointCollecte?.trim().toLowerCase();
+            const pLib = p.libellePointCollecte?.trim().toLowerCase();
+
+            let match = this.allPoints.find((ap) => {
+                const apCode = ap.codePointCollecte?.trim().toLowerCase();
+                const apLib = ap.libellePointCollecte?.trim().toLowerCase();
+                return (
+                    (pCode && apCode && apCode === pCode) ||
+                    (pLib && apLib && apLib === pLib) ||
+                    (pCode && apLib && apLib === pCode) ||
+                    (pLib && apCode && apCode === pLib)
+                );
+            });
+
+            if (!match && circuitAssignedPoints.length > 0) {
+                match = circuitAssignedPoints[idx] || circuitAssignedPoints.find((ap) => !points.some(pt => pt.codePointCollecte === ap.codePointCollecte));
+            }
+
+            if (match && this.isValidCoordinate(match.latitude, match.longitude)) {
+                p.latitude = this.parseCoord(match.latitude)!;
+                p.longitude = this.parseCoord(match.longitude)!;
+                if (!p.libellePointCollecte && match.libellePointCollecte) {
+                    p.libellePointCollecte = match.libellePointCollecte;
+                }
+            }
+        });
+    }
+
+    refreshSelectedCircuitRoute(): void {
+        if (!this.selectedCircuit || !this.selectedCircuitPoints?.length) {
+            return;
+        }
+
+        this.enrichCircuitPoints(this.selectedCircuit, this.selectedCircuitPoints);
+
+        this.mapPoints = this.buildSelectedRoutePoints(this.selectedCircuit, this.selectedCircuitPoints);
+        this._changeDetectorRef.markForCheck();
+    }
+
     toggleDetails(circuitId: string): void {
         if (this.selectedCircuit && this.selectedCircuit.circuitId === circuitId) {
             this.closeDetails();
@@ -200,6 +298,7 @@ export class ListComponent implements OnInit, OnDestroy {
 
         this.circuit$
             .pipe(
+                take(1),
                 map((circuits) => circuits.find((item) => item.circuitId === circuitId) ?? null),
                 switchMap((circuit) => {
                     this.selectedCircuit = circuit;
@@ -220,7 +319,69 @@ export class ListComponent implements OnInit, OnDestroy {
                     return;
                 }
 
-                const orderedPoints = [...points].sort((a, b) => (a.ordre ?? 0) - (b.ordre ?? 0));
+                let orderedPoints = [...points].sort((a, b) => (a.ordre ?? 0) - (b.ordre ?? 0));
+
+                // Fallback for circuits without CircuitPointCollecte records yet
+                if (orderedPoints.length === 0 && circuit) {
+                    const fallbackPoints: CircuitPointCollecte[] = [];
+                    const startPoint = this.allPoints.find((p) =>
+                        p.codePointCollecte?.trim().toLowerCase() === circuit.codePCDepart?.trim().toLowerCase()
+                    );
+                    const endPoint = this.allPoints.find((p) =>
+                        p.codePointCollecte?.trim().toLowerCase() === circuit.codePCArrivee?.trim().toLowerCase()
+                    );
+                    const assignedPoints = this.allPoints.filter((p) => p.circuitId === circuit.circuitId);
+
+                    if (startPoint) {
+                        fallbackPoints.push({
+                            circuitPointCollecteId: null,
+                            circuitId: circuit.circuitId,
+                            codePointCollecte: startPoint.codePointCollecte,
+                            libellePointCollecte: startPoint.libellePointCollecte || startPoint.codePointCollecte,
+                            latitude: this.parseCoord(startPoint.latitude),
+                            longitude: this.parseCoord(startPoint.longitude),
+                            ordre: 0,
+                        });
+                    }
+
+                    assignedPoints.forEach((p, idx) => {
+                        if (p.codePointCollecte !== circuit.codePCDepart && p.codePointCollecte !== circuit.codePCArrivee) {
+                            fallbackPoints.push({
+                                circuitPointCollecteId: null,
+                                circuitId: circuit.circuitId,
+                                codePointCollecte: p.codePointCollecte,
+                                libellePointCollecte: p.libellePointCollecte || p.codePointCollecte,
+                                latitude: this.parseCoord(p.latitude),
+                                longitude: this.parseCoord(p.longitude),
+                                ordre: idx + 1,
+                            });
+                        }
+                    });
+
+                    if (endPoint) {
+                        fallbackPoints.push({
+                            circuitPointCollecteId: null,
+                            circuitId: circuit.circuitId,
+                            codePointCollecte: endPoint.codePointCollecte,
+                            libellePointCollecte: endPoint.libellePointCollecte || endPoint.codePointCollecte,
+                            latitude: this.parseCoord(endPoint.latitude),
+                            longitude: this.parseCoord(endPoint.longitude),
+                            ordre: fallbackPoints.length,
+                        });
+                    }
+
+                    if (fallbackPoints.length > 0) {
+                        orderedPoints = fallbackPoints;
+                        // Silently backfill to CircuitPointCollecte for future requests
+                        fallbackPoints.forEach((fp) => {
+                            this._circuitPointCollecteService.add(fp).subscribe();
+                        });
+                    }
+                }
+
+                // Ensure all points have valid coordinates (enrich from allPoints if missing in CircuitPointCollecte)
+                this.enrichCircuitPoints(circuit, orderedPoints);
+
                 this.selectedCircuitPoints = orderedPoints;
                 this.isLoadingPoints = false;
                 this.pointsCountByCircuit.set(circuit.circuitId, orderedPoints.length);
@@ -250,24 +411,74 @@ export class ListComponent implements OnInit, OnDestroy {
 
     private buildOverviewPoints(circuits: Circuit[]): MapRoutePoint[] {
         return circuits
-            .filter((c) => c.latitude != null && c.longitude != null)
-            .map((c) => ({
-                id: c.circuitId,
-                kind: 'poi' as const,
-                latitude: Number(c.latitude),
-                longitude: Number(c.longitude),
-                label: `${c.codeCircuit}${c.libelleCircuit ? ' — ' + c.libelleCircuit : ''}`,
-                color: c.couleur || '#2563eb',
-            }));
+            .map((c): MapRoutePoint | null => {
+                let lat = this.parseCoord(c.latitude);
+                let lng = this.parseCoord(c.longitude);
+
+                // Fallback to departure point coordinates if circuit coordinates are missing
+                if ((lat === null || lng === null) && c.codePCDepart && this.allPoints?.length) {
+                    const startPoint = this.allPoints.find((p) =>
+                        p.codePointCollecte?.trim().toLowerCase() === c.codePCDepart?.trim().toLowerCase()
+                    );
+                    if (startPoint && this.isValidCoordinate(startPoint.latitude, startPoint.longitude)) {
+                        lat = this.parseCoord(startPoint.latitude);
+                        lng = this.parseCoord(startPoint.longitude);
+                    }
+                }
+
+                if (lat === null || lng === null) {
+                    return null;
+                }
+
+                return {
+                    id: c.circuitId,
+                    kind: 'poi' as const,
+                    latitude: lat,
+                    longitude: lng,
+                    label: `${c.codeCircuit}${c.libelleCircuit ? ' — ' + c.libelleCircuit : ''}`,
+                    color: c.couleur || '#2563eb',
+                };
+            })
+            .filter((p): p is MapRoutePoint => p != null);
     }
 
     private buildSelectedRoutePoints(circuit: Circuit, points: CircuitPointCollecte[]): MapRoutePoint[] {
-        const located = points.filter((p) => p.latitude != null && p.longitude != null);
+        const located = points
+            .map((p) => ({
+                ...p,
+                parsedLat: this.parseCoord(p.latitude),
+                parsedLng: this.parseCoord(p.longitude),
+            }))
+            .filter((p) => p.parsedLat !== null && p.parsedLng !== null);
+
+        if (located.length === 0) {
+            let lat = this.parseCoord(circuit.latitude);
+            let lng = this.parseCoord(circuit.longitude);
+            if ((lat === null || lng === null) && circuit.codePCDepart && this.allPoints?.length) {
+                const sp = this.allPoints.find((p) =>
+                    p.codePointCollecte?.trim().toLowerCase() === circuit.codePCDepart?.trim().toLowerCase()
+                );
+                if (sp && this.isValidCoordinate(sp.latitude, sp.longitude)) {
+                    lat = this.parseCoord(sp.latitude);
+                    lng = this.parseCoord(sp.longitude);
+                }
+            }
+            if (lat !== null && lng !== null) {
+                return [{
+                    latitude: lat,
+                    longitude: lng,
+                    label: circuit.libelleCircuit || circuit.codeCircuit,
+                    kind: 'departure',
+                    order: 0,
+                }];
+            }
+            return [];
+        }
 
         // No `id` here: clicking a route waypoint should not re-trigger a circuit selection
         return located.map((p, index) => ({
-            latitude: Number(p.latitude),
-            longitude: Number(p.longitude),
+            latitude: p.parsedLat!,
+            longitude: p.parsedLng!,
             label: p.libellePointCollecte || p.codePointCollecte,
             kind: index === 0 ? 'departure' as const
                 : index === located.length - 1 ? 'arrival' as const
@@ -385,4 +596,26 @@ export class ListComponent implements OnInit, OnDestroy {
     }
 
     protected readonly FuseNavigationAction = FuseNavigationAction;
+
+    exportData(): void {
+        if (this._circuitService) {
+            const obs$ = (this as any).circuits$ || this._circuitService.circuits$ || this._circuitService.circuit$;
+            if (obs$) {
+                obs$.pipe(take(1)).subscribe((data: any) => {
+                    const items = Array.isArray(data) ? data : (data?.items || data?.circuits || data?.circuit || []);
+                    if (items && items.length > 0) {
+                        const columns = [
+            { header: 'Code Circuit', dataKey: 'codeCircuit' },
+            { header: 'Libellé', dataKey: 'libelle' },
+            { header: 'Distance (km)', dataKey: 'distance' },
+            { header: 'Statut', dataKey: 'isActive' }
+        ];
+                        this._pdfExportService.exportToPdf('Rapport Circuits de Collecte', columns, items, 'Circuits_Export.pdf');
+                    } else {
+                        console.warn('No data available to export to PDF');
+                    }
+                });
+            }
+        }
+    }
 }

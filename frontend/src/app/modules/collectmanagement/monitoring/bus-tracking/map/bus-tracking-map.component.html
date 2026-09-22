@@ -1,18 +1,26 @@
 <div class="w-full h-full relative bg-gray-50 dark:bg-gray-950 overflow-hidden">
     <!-- Floating Map Controls (Top Left) -->
-    <div class="absolute top-4 left-4 z-[999] flex gap-2">
+    <div class="absolute top-4 left-4 z-[999] flex items-center gap-2">
         <button class="px-4 py-1.5 rounded-full text-xs font-bold shadow-sm transition-all bg-[#121242] text-white flex items-center gap-1.5" type="button">
             <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
             Temps réel
         </button>
-        @if (showCircuitOverlay) {
-            <button class="px-4 py-1.5 rounded-full text-xs font-bold shadow-sm transition-all bg-white hover:bg-gray-50 text-secondary border border-gray-200 dark:bg-gray-900 dark:border-gray-750 dark:text-gray-300" type="button">
-                Circuits
-            </button>
-            <button class="px-4 py-1.5 rounded-full text-xs font-bold shadow-sm transition-all bg-white hover:bg-gray-50 text-secondary border border-gray-200 dark:bg-gray-900 dark:border-gray-750 dark:text-gray-300" type="button">
-                Points de collecte
-            </button>
-        }
+        <button
+            class="px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm transition-all border flex items-center gap-1.5"
+            [ngClass]="showAllCircuits ? 'bg-[#121242] text-white border-transparent' : 'bg-white hover:bg-gray-50 text-secondary border-gray-200 dark:bg-gray-900 dark:border-gray-750 dark:text-gray-300'"
+            (click)="toggleCircuits()"
+            type="button">
+            <mat-icon class="icon-size-3.5" [svgIcon]="'heroicons_outline:map'"></mat-icon>
+            Circuits ({{ allCircuits.length }})
+        </button>
+        <button
+            class="px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm transition-all border flex items-center gap-1.5"
+            [ngClass]="showAllPoints ? 'bg-[#121242] text-white border-transparent' : 'bg-white hover:bg-gray-50 text-secondary border-gray-200 dark:bg-gray-900 dark:border-gray-750 dark:text-gray-300'"
+            (click)="togglePoints()"
+            type="button">
+            <mat-icon class="icon-size-3.5" [svgIcon]="'heroicons_outline:map-pin'"></mat-icon>
+            Arrêts
+        </button>
     </div>
 
     <!-- Floating Toggle for Show All (Tous) (Top Right) -->
@@ -37,10 +45,10 @@
 
     <!-- Map Viewport -->
     <div class="w-full h-full relative min-h-0">
-        @if ((locations?.length ?? 0) === 0 && !showCircuitOverlay) {
+        @if ((locations?.length ?? 0) === 0 && !showCircuitOverlay && (allCircuits?.length ?? 0) === 0) {
             <div class="flex flex-col items-center justify-center gap-2 p-10 text-sm text-hint absolute inset-0 bg-white/70 dark:bg-gray-900/70">
                 <mat-icon class="icon-size-10 opacity-30" [svgIcon]="'heroicons_outline:map'"></mat-icon>
-                <span>Aucune position à afficher.</span>
+                <span>Aucune position ou circuit à afficher.</span>
             </div>
         } @else {
             <app-map-viewer
@@ -49,6 +57,11 @@
                 [optimizedRoute]="optimizedRoute"
                 [selectedBusPosition]="selectedBusPosition"
                 [circuitArea]="circuitArea"
+                [allCircuits]="allCircuits"
+                [showAllCircuits]="showAllCircuits"
+                [showAllCollectionPoints]="showAllPoints"
+                [selectedCircuitId]="selectedCircuitId"
+                (selectCircuit)="selectCircuit.emit($event)"
                 [height]="'100%'"
                 [zoom]="7"
                 class="w-full h-full block">

@@ -1,0 +1,38 @@
+@startuml
+!theme plain
+left to right direction
+skinparam dpi 300
+skinparam defaultFontName "Helvetica"
+skinparam defaultFontSize 12
+
+actor "Operator / Dispatcher" as operator
+actor "Administrator" as admin
+
+rectangle "Fleet & Route Logistics Sub-System" {
+  together {
+    usecase "UC-1: Authenticate User" as UC_auth
+    usecase "Configure Circuits\n& Transit Paths" as UC_circuits
+    usecase "Sequence Ordered\nPickup Points" as UC_points
+    usecase "Assign Drivers & Buses\nto Routes" as UC_assign
+    usecase "Manage Bus Fleet Assets" as UC_bus
+    usecase "Pair IoT Modems\nwith Vehicles" as UC_modem
+  }
+}
+
+operator --> UC_auth
+operator --> UC_circuits
+operator --> UC_points
+operator --> UC_assign
+
+admin --> UC_auth
+admin --> UC_assign
+admin --> UC_bus
+admin --> UC_modem
+
+UC_circuits ..> UC_auth : <<include>>
+UC_points ..> UC_auth : <<include>>
+UC_assign ..> UC_auth : <<include>>
+UC_bus ..> UC_auth : <<include>>
+UC_modem ..> UC_auth : <<include>>
+
+@enduml

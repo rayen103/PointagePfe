@@ -13,7 +13,6 @@ import {
 } from '@angular/core';
 import * as L from 'leaflet';
 import { LatLng, Map, Marker, Polyline } from 'leaflet';
-import 'leaflet-routing-machine';
 import { GeoPoint } from '../../../core/circuit/dijkstra.service';
 
 export type MapRoutePointKind = 'departure' | 'arrival' | 'stop' | 'poi';
@@ -80,8 +79,9 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
     private map: Map | null = null;
     private marker: Marker | null = null;
     private routeMarkers: Marker[] = [];
-    private routeControl: L.Routing.Control | null = null;
     private routePolyline: Polyline | null = null;
+    private routePolylineBorder: Polyline | null = null;
+    private currentRouteRequestId = 0;
     private routeUpdateTimer: ReturnType<typeof setTimeout> | null = null;
     private poiPoints: MapRoutePoint[] = [];
     private poiMarkers: Marker[] = [];
@@ -106,7 +106,7 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
             this.syncMainMarkerPosition();
         }
 
-        if (changes['routePoints'] || changes['color']) {
+        if (changes['routePoints'] || changes['color'] || changes['drawRoute']) {
             this.scheduleRouteUpdate();
         }
 
@@ -280,14 +280,25 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
     //  Route overlay
     // ------------------------------------------------------------------ //
 
-    /** Coalesce rapid input changes into a single route redraw (OSRM request). */
+    /** Coalesce rapid input changes into a single route redraw. */
     private scheduleRouteUpdate(): void {
         if (this.routeUpdateTimer) {
             clearTimeout(this.routeUpdateTimer);
         }
         this.routeUpdateTimer = setTimeout(() => {
             this._ngZone.runOutsideAngular(() => this.updateRouteOverlay());
-        }, 250);
+        }, 50);
+    }
+
+    private parseCoord(val: any): number | null {
+        if (val == null) return null;
+        if (typeof val === 'number') return !isNaN(val) && val !== 0 ? val : null;
+        if (typeof val === 'string') {
+            const cleaned = val.trim().replace(',', '.');
+            const num = parseFloat(cleaned);
+            return !isNaN(num) && num !== 0 ? num : null;
+        }
+        return null;
     }
 
     private updateRouteOverlay(): void {
@@ -302,13 +313,18 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
             this.routePolyline.remove();
             this.routePolyline = null;
         }
-        if (this.routeControl) {
-            this.routeControl.remove();
-            this.routeControl = null;
+        if (this.routePolylineBorder) {
+            this.routePolylineBorder.remove();
+            this.routePolylineBorder = null;
         }
 
         const validPoints = (this.routePoints ?? [])
-            .filter((point) => point.latitude != null && point.longitude != null);
+            .map((p) => ({
+                ...p,
+                latitude: this.parseCoord(p.latitude) as number,
+                longitude: this.parseCoord(p.longitude) as number,
+            }))
+            .filter((p) => p.latitude !== null && p.longitude !== null);
 
         const validRoutePoints = validPoints.filter((point) => point.kind !== 'poi');
         this.poiPoints = validPoints.filter((point) => point.kind === 'poi');
@@ -320,34 +336,7 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
 
         const latLngs = validRoutePoints.map((point) => L.latLng(point.latitude, point.longitude));
 
-        if (this.drawRoute && latLngs.length > 1) {
-            this.routeControl = L.Routing.control({
-                waypoints: latLngs,
-                show: false,
-                addWaypoints: false,
-                fitSelectedRoutes: false,
-                routeWhileDragging: false,
-                createMarker: () => null,
-                lineOptions: {
-                    styles: [
-                        { color: '#ffffff', weight: 7, opacity: 0.85 },
-                        { color: this.color, weight: 4, opacity: 0.95 },
-                    ],
-                    extendToWaypoints: true,
-                    missingRouteTolerance: 0,
-                },
-            } as any)
-                .on('routingerror', () => {
-                    this.routePolyline = L.polyline(latLngs, {
-                        color: this.color,
-                        weight: 4,
-                        opacity: 0.8,
-                        dashArray: '8 6',
-                    }).addTo(this.map!);
-                })
-                .addTo(this.map);
-        }
-
+        // 1. Render all waypoint markers and popups FIRST so they are ALWAYS visible
         validRoutePoints.forEach((point, index) => {
             const routeIcon = this.createRouteMarkerIcon(point, index, validRoutePoints.length);
             const markerLabel = point.label ?? (index === 0
@@ -369,10 +358,143 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
             this.routeMarkers.push(routeMarker);
         });
 
+        // Ensure Leaflet map container has correct layout size before calculating bounds
+        try {
+            this.map.invalidateSize();
+        } catch (e) {
+            // ignore
+        }
+
+        // 2. Zoom & center map immediately on the points
         this.fitToContent([
             ...latLngs,
             ...this.poiPoints.map((p) => L.latLng(p.latitude, p.longitude)),
         ]);
+
+        // 3. Draw road route along actual road network
+        if (this.drawRoute && validRoutePoints.length > 1) {
+            // Deduplicate consecutive identical/very close points (< 20m)
+            const routePointsToFollow = validRoutePoints.filter((pt, i) => {
+                if (i === 0) return true;
+                const prev = validRoutePoints[i - 1];
+                return L.latLng(pt.latitude, pt.longitude).distanceTo(L.latLng(prev.latitude, prev.longitude)) > 20;
+            });
+
+            const pointsForLine = routePointsToFollow.length > 1 ? routePointsToFollow : validRoutePoints;
+            if (pointsForLine.length >= 2) {
+                const requestId = ++this.currentRouteRequestId;
+                this.fetchRoadGeometry(pointsForLine).then((roadLatLngs) => {
+                    if (requestId !== this.currentRouteRequestId || !this.map) {
+                        return;
+                    }
+                    if (roadLatLngs && roadLatLngs.length > 1) {
+                        if (this.routePolyline) {
+                            this.routePolyline.remove();
+                            this.routePolyline = null;
+                        }
+                        if (this.routePolylineBorder) {
+                            this.routePolylineBorder.remove();
+                            this.routePolylineBorder = null;
+                        }
+
+                        // 1. Crisp white border / halo for high visibility
+                        this.routePolylineBorder = L.polyline(roadLatLngs, {
+                            color: '#ffffff',
+                            weight: 8,
+                            opacity: 0.9,
+                            lineJoin: 'round',
+                            lineCap: 'round',
+                        }).addTo(this.map!);
+
+                        // 2. High-precision road line following the real road network
+                        this.routePolyline = L.polyline(roadLatLngs, {
+                            color: this.color || '#2563eb',
+                            weight: 5,
+                            opacity: 0.95,
+                            lineJoin: 'round',
+                            lineCap: 'round',
+                        }).addTo(this.map!);
+
+                        // Adjust camera bounds so the entire road trajectory is framed
+                        this.fitToContent([
+                            ...roadLatLngs,
+                            ...this.poiPoints.map((p) => L.latLng(p.latitude, p.longitude)),
+                        ]);
+                    }
+                });
+            }
+        }
+    }
+
+    private async fetchRoadGeometry(points: { latitude: number; longitude: number }[]): Promise<LatLng[]> {
+        if (points.length < 2) return [];
+
+        const coordinatesParam = points
+            .map((p) => `${p.longitude.toFixed(6)},${p.latitude.toFixed(6)}`)
+            .join(';');
+
+        // Primary: OpenStreetMap Germany (extremely fast, CORS open)
+        // Secondary: Project OSRM global
+        const providers = [
+            `https://routing.openstreetmap.de/routed-car/route/v1/driving/${coordinatesParam}?overview=full&geometries=geojson`,
+            `https://router.project-osrm.org/route/v1/driving/${coordinatesParam}?overview=full&geometries=geojson`,
+        ];
+
+        for (const url of providers) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3500);
+                const res = await fetch(url, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                if (!res.ok) continue;
+                const data = await res.json();
+                if (data?.code === 'Ok' && data.routes?.[0]?.geometry?.coordinates?.length) {
+                    const roadCoordinates: [number, number][] = data.routes[0].geometry.coordinates;
+                    return roadCoordinates.map((c) => L.latLng(c[1], c[0]));
+                }
+            } catch (err) {
+                // Try next provider
+            }
+        }
+
+        // Resilient fallback: ensure route never crosses the Lake of Tunis by routing through the bridge
+        return this.generateRoadFallbackPath(points);
+    }
+
+    private generateRoadFallbackPath(points: { latitude: number; longitude: number }[]): LatLng[] {
+        const result: LatLng[] = [];
+
+        for (let i = 0; i < points.length; i++) {
+            const current = points[i];
+            result.push(L.latLng(current.latitude, current.longitude));
+
+            if (i < points.length - 1) {
+                const next = points[i + 1];
+                // Check if straight line between current and next crosses the Lake of Tunis
+                // (e.g. South bank Mégrine/Radès <-> North/East bank Le Kram/La Goulette)
+                const isCurrentSouth = current.latitude < 36.785;
+                const isNextSouth = next.latitude < 36.785;
+                const isCurrentNorthEast = current.latitude >= 36.805 && current.longitude >= 10.25;
+                const isNextNorthEast = next.latitude >= 36.805 && next.longitude >= 10.25;
+
+                const crossesLake = (isCurrentSouth && isNextNorthEast) || (isCurrentNorthEast && isNextSouth);
+
+                if (crossesLake) {
+                    if (isCurrentSouth) {
+                        result.push(L.latLng(36.7845, 10.2780)); // Radès approach
+                        result.push(L.latLng(36.8055, 10.2875)); // Pont Radès - La Goulette
+                        result.push(L.latLng(36.8180, 10.3060)); // La Goulette approach
+                    } else {
+                        result.push(L.latLng(36.8180, 10.3060)); // La Goulette approach
+                        result.push(L.latLng(36.8055, 10.2875)); // Pont Radès - La Goulette
+                        result.push(L.latLng(36.7845, 10.2780)); // Radès approach
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -462,10 +584,27 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
         if (this.marker) {
             boundsPoints.push(this.marker.getLatLng());
         }
-        this.workingPolygon.forEach((v) => boundsPoints.push(L.latLng(v.latitude, v.longitude)));
+        this.workingPolygon.forEach((v) => {
+            const lat = this.parseCoord(v.latitude);
+            const lng = this.parseCoord(v.longitude);
+            if (lat !== null && lng !== null) {
+                boundsPoints.push(L.latLng(lat, lng));
+            }
+        });
 
         if (boundsPoints.length > 0) {
-            this.map.fitBounds(L.latLngBounds(boundsPoints), { padding: [40, 40], maxZoom: 14 });
+            try {
+                const bounds = L.latLngBounds(boundsPoints);
+                if (bounds.isValid()) {
+                    if (bounds.getNorthEast().equals(bounds.getSouthWest())) {
+                        this.map.setView(bounds.getCenter(), 13);
+                    } else {
+                        this.map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+                    }
+                }
+            } catch (e) {
+                console.warn('fitBounds error:', e);
+            }
         }
     }
 
@@ -590,9 +729,9 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
             this.routePolyline.remove();
             this.routePolyline = null;
         }
-        if (this.routeControl) {
-            this.routeControl.remove();
-            this.routeControl = null;
+        if (this.routePolylineBorder) {
+            this.routePolylineBorder.remove();
+            this.routePolylineBorder = null;
         }
 
         if (this.map) {

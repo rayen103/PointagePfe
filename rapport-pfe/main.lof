@@ -1,0 +1,35 @@
+\babel@toc {english}{}\relax 
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Manual Boarding and Attendance Process Sequence}}{10}{figure.caption.8}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Legacy Deployment Architecture and Data Flow}}{11}{figure.caption.9}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Communication and Logistical Timeline during a Vehicle Breakdown}}{14}{figure.caption.11}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Global Use Case Diagram -- CST LePoint Platform}}{25}{figure.caption.14}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Sub-System Use Case -- Fleet and Route Logistics}}{26}{figure.caption.16}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Sub-System Use Case -- Real-Time Supervision and Telemetry}}{27}{figure.caption.18}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Sub-System Use Case -- Operations and Workforce Logistics}}{28}{figure.caption.20}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Sub-System Use Case -- System Administration and Governance}}{28}{figure.caption.22}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Global System Architecture -- Multi-Tier Functional Ecosystem}}{38}{figure.caption.30}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Logical System Architecture -- Layered Clean Architecture and Component Topology}}{40}{figure.caption.31}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Physical System Architecture -- Containerized Microservice Topology and Hardware Nodes}}{44}{figure.caption.32}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces End-to-End Operational Transit Lifecycle}}{48}{figure.caption.34}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Multi-Tenant \& Dynamic RBAC Governance Flow}}{51}{figure.caption.35}%
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Real-Time Telemetry Ingestion \& Automated Geofence Detection Pipeline}}{55}{figure.caption.37}%
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Predictive ETA Forecasting \& Supervision Intelligence Flow}}{56}{figure.caption.38}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Unified Conceptual Domain Information Model}}{61}{figure.caption.36}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Core Technology Stack and Application Frameworks}}{63}{figure.caption.39}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces DevOps, Cloud Infrastructure, and API Documentation Platforms}}{63}{figure.caption.40}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Integrated Development Environments and Collaboration Tooling}}{64}{figure.caption.41}%
+\contentsline {figure}{\numberline {5.4}{\ignorespaces User Authentication and Role Management Interfaces}}{65}{figure.caption.43}%
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Authentication and Security Token Issuance Flow}}{66}{figure.caption.45}%
+\contentsline {figure}{\numberline {5.6}{\ignorespaces Central Operations and Real-Time Telemetry Overview Dashboard}}{67}{figure.caption.48}%
+\contentsline {figure}{\numberline {5.7}{\ignorespaces Fleet Vehicle and Driver Management Interfaces}}{69}{figure.caption.50}%
+\contentsline {figure}{\numberline {5.8}{\ignorespaces Transit Circuit Planning and Pickup Geocoding Interfaces}}{70}{figure.caption.52}%
+\contentsline {figure}{\numberline {5.9}{\ignorespaces Workforce Directory and Shift Scheduling Interfaces}}{71}{figure.caption.54}%
+\contentsline {figure}{\numberline {5.10}{\ignorespaces Employee Logistics Attachment (\emph {Rattachements}) Management Interface}}{72}{figure.caption.55}%
+\contentsline {figure}{\numberline {5.11}{\ignorespaces IoT Telemetry Ingestion \& Geofencing Pipeline}}{73}{figure.caption.58}%
+\contentsline {figure}{\numberline {5.12}{\ignorespaces Real-Time Cartographic Bus Tracking and Telemetry Supervision Board}}{74}{figure.caption.61}%
+\contentsline {figure}{\numberline {5.13}{\ignorespaces Dynamic BI Report Designer and Multi-Dimensional Pivot Analyzer}}{76}{figure.caption.65}%

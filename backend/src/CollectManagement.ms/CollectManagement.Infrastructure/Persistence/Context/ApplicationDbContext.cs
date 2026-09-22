@@ -1,14 +1,20 @@
+using System.Linq.Expressions;
+using CollectManagement.Application.Interfaces.Services;
 using CollectManagement.Domain.Common;
+using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Infrastructure.Persistence.Context;
 
 public class ApplicationDbContext: DbContext
 {
+    private readonly ITenantProvider _tenantProvider;
+
     public ApplicationDbContext(
-        DbContextOptions<ApplicationDbContext> options) : 
+        DbContextOptions<ApplicationDbContext> options,
+        ITenantProvider tenantProvider) : 
         base(options)
     {
-        
+        _tenantProvider = tenantProvider;
     }
 
     public DbSet<CollectManagement.Domain.Bus.BusRuntimeEvent> BusRuntimeEvent { get; set; }
@@ -24,5 +30,43 @@ public class ApplicationDbContext: DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
         
         base.OnModelCreating(modelBuilder);
+        
+        // Apply global query filters for all entities implementing ITenantEntity.
+        // This ensures every query is automatically scoped to the current user's société.
+        // When _tenantProvider.SocieteId is null (unauthenticated/anonymous requests),
+        // the filter is bypassed so login/registration can access all data.
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            if (typeof(ITenantEntity).IsAssignableFrom(entityType.ClrType))
+            {
+                modelBuilder.Entity(entityType.ClrType)
+                    .HasQueryFilter(BuildTenantFilter(entityType.ClrType));
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Builds a lambda expression for the given entity type:
+    public SocieteId? CurrentTenantId => _tenantProvider.SocieteId;
+
+    private LambdaExpression BuildTenantFilter(Type entityType)
+    {
+        // Parameter: e (the entity)
+        var parameter = Expression.Parameter(entityType, "e");
+        var entitySocieteId = Expression.Property(parameter, nameof(ITenantEntity.SocieteId));
+        
+        // Property on DbContext: CurrentTenantId
+        var currentTenantProp = Expression.Property(Expression.Constant(this), nameof(CurrentTenantId));
+        
+        // Condition 1: CurrentTenantId == null (bypass for unauthenticated requests)
+        var nullCheck = Expression.Equal(currentTenantProp, Expression.Constant(null, typeof(SocieteId)));
+        
+        // Condition 2: e.SocieteId == CurrentTenantId
+        var tenantMatch = Expression.Equal(entitySocieteId, currentTenantProp);
+        
+        // Combined: CurrentTenantId == null || e.SocieteId == CurrentTenantId
+        var body = Expression.OrElse(nullCheck, tenantMatch);
+        
+        return Expression.Lambda(body, parameter);
     }
 }

@@ -5,7 +5,7 @@ using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Domain.OrdresTravail;
 
-public class OrdreTravail : AuditableEntity
+public class OrdreTravail : AuditableEntity, ITenantEntity
 {
     public OrdreTravailId OrdreTravailId { get; private set; }
     

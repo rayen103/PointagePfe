@@ -5,7 +5,7 @@ using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Domain.Chantiers;
 
-public class Chantier : AuditableEntity
+public class Chantier : AuditableEntity, ITenantEntity
 {
     public ChantierId ChantierId { get; private set; }
 

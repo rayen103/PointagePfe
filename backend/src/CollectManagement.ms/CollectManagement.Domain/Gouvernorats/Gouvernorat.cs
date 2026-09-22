@@ -5,7 +5,7 @@ using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Domain.Gouvernorats;
 
-public class Gouvernorat : AuditableEntity
+public class Gouvernorat : AuditableEntity, ITenantEntity
 {
     public GouvernoratId GouvernoratId { get; private set; }
 

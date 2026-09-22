@@ -1,0 +1,39 @@
+%%{init: { "theme": "redux", "themeVariables": { "fontSize": "26px", "fontFamily": "Arial, sans-serif" } }}%%
+flowchart TB
+    subgraph Field["1. Field & IoT Tier (Vehicular Operations)"]
+        direction LR
+        Modem["Onboard IoT Modems<br/>(GPS Coordinates)"]
+        Scanner["RFID Badge Scanners<br/>(Passenger Boardings)"]
+    end
+
+    subgraph Client["2. User Portal Tier (Role-Adapted Web Interface)"]
+        direction LR
+        AdminUI["Administration & Security"]
+        FleetUI["Fleet & Route Planning"]
+        LiveUI["Live Cartographic Map"]
+        BiUI["BI Analytics & Reports"]
+    end
+
+    subgraph Core["3. Central Business Orchestration Tier"]
+        direction TB
+        Ingest["Telemetry & Event Ingestion"]
+        Plan["Fleet & Roster Logistics"]
+        Sec["Multi-Tenant RBAC Security"]
+        Analytics["Analytics & Reporting Engine"]
+    end
+
+    subgraph StorageAI["4. Data & Intelligence Tier"]
+        direction LR
+        DB[("Multi-Tenant Database<br/>(Transactional Store)")]
+        ML["Predictive AI Engine<br/>(Real-Time ETA Forecasting)"]
+    end
+
+    Modem -->|"HTTP GPS Streams"| Ingest
+    Scanner -->|"HTTP RFID Events"| Ingest
+    Client <-->|"REST APIs & Security Tokens"| Core
+    Ingest -->|"Save Telemetry & Events"| DB
+    Plan <-->|"Read & Write Master Data"| DB
+    Sec <-->|"Validate Tenant & Permissions"| DB
+    Analytics <-->|"Aggregate Metrics & Layouts"| DB
+    LiveUI -.->|"Request ETA"| Ingest
+    Ingest <-->|"Predict Arrival Time"| ML

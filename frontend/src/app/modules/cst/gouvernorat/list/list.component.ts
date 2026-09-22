@@ -1,3 +1,6 @@
+import { PdfExportService } from '../../../../core/common/pdf-export.service';
+import { CsvExportService } from '../../../../core/common/csv-export.service';
+import { take } from 'rxjs';
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
@@ -62,6 +65,10 @@ export class ListComponent implements OnInit, OnDestroy {
     sortDirection: 'asc' | 'desc' = 'asc';
 
     constructor(
+        private _pdfExportService: PdfExportService,
+
+        private _csvExportService: CsvExportService,
+
         private _gouvernoratService: GouvernoratService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseConfirmationService: FuseConfirmationService
@@ -181,4 +188,24 @@ export class ListComponent implements OnInit, OnDestroy {
     }
 
     protected readonly FuseNavigationAction = FuseNavigationAction;
+
+    exportData(): void {
+        if (this._gouvernoratService) {
+            const obs$ = (this as any).gouvernorats$ || this._gouvernoratService.gouvernorats$ || this._gouvernoratService.gouvernorats$;
+            if (obs$) {
+                obs$.pipe(take(1)).subscribe((data: any) => {
+                    const items = Array.isArray(data) ? data : (data?.items || data?.gouvernorats || data?.gouvernorats || []);
+                    if (items && items.length > 0) {
+                        const columns = [
+            { header: 'Code Gouvernorat', dataKey: 'codeGouvernorat' },
+            { header: 'Libellé Gouvernorat', dataKey: 'libelleGouvernorat' }
+        ];
+                        this._pdfExportService.exportToPdf('Rapport Gouvernorats', columns, items, 'Gouvernorats_Export.pdf');
+                    } else {
+                        console.warn('No data available to export to PDF');
+                    }
+                });
+            }
+        }
+    }
 }

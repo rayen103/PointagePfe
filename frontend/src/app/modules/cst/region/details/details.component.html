@@ -1,99 +1,82 @@
-<div class="flex flex-col flex-auto min-w-0" *transloco="let t">
+<div class="cst-form-page" *transloco="let t">
+    <form class="cst-form-wrap" [formGroup]="regionForm" #regionFormDirective="ngForm">
+        <!-- Breadcrumb -->
+        <div class="cst-crumb">
+            <a routerLink="/fichier/bus">Gestion</a><span>/</span><a routerLink="..">{{ t('Régions') }}</a><span>/</span>
+            <b>{{ isNewRegion ? t('Add') : (region?.codeRegion || t('Edit')) }}</b>
+        </div>
 
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between p-6 sm:py-8 sm:px-10 border-b bg-card dark:bg-transparent">
-        <div class="flex-1 min-w-0">
-            <!-- Breadcrumbs -->
-            <div class="flex flex-wrap items-center font-medium">
+        <!-- Header line -->
+        <div class="cst-form-topline">
+            <div class="cst-form-id">
+                <a class="cst-round" routerLink="..">
+                    <mat-icon [svgIcon]="'heroicons_outline:arrow-left'"></mat-icon>
+                </a>
                 <div>
-                    <a class="whitespace-nowrap text-primary-500" routerLink="..">{{ t('Régions') }}</a>
-                </div>
-                <div class="flex items-center ml-1 whitespace-nowrap">
-                    <mat-icon
-                        class="icon-size-5 text-secondary"
-                        [svgIcon]="'heroicons_solid:chevron-right'"></mat-icon>
-                    <span class="ml-1 text-secondary">{{ isNewRegion ? t('Add') : t('Edit') }}</span>
+                    <div class="cst-form-id__title">
+                        <span>{{ isNewRegion ? t('New-Region') : region?.codeRegion }}</span>
+                        @if (!isNewRegion) {
+                            <span class="cst-pill" [ngClass]="regionForm.get('isActive')?.value ? 'cst-pill--ok' : 'cst-pill--off'">
+                                {{ regionForm.get('isActive')?.value ? (t('Active') || 'ACTIF') : (t('Inactive') || 'INACTIF') }}
+                            </span>
+                        }
+                    </div>
                 </div>
             </div>
-            <!-- Title -->
-            <div class="mt-2">
-                <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-7 sm:leading-10 truncate">
-                    {{ isNewRegion ? t('New-Region') : region?.codeRegion }}
-                </h2>
+            <div class="cst-head__actions">
+                <a class="cst-btn cst-btn--ghost" routerLink="..">{{ t('Cancel') || 'Annuler' }}</a>
+                <button class="cst-btn cst-btn--primary" type="button" (click)="saveRegion()">{{ t('Save') || 'Enregistrer' }}</button>
             </div>
         </div>
-        <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
-            <button
-                mat-flat-button
-                [color]="'primary'"
-                (click)="saveRegion()">
-                <mat-icon [svgIcon]="'heroicons_outline:check'"></mat-icon>
-                <span class="ml-2">{{ t('Save') }}</span>
-            </button>
-        </div>
-    </div>
 
-    <!-- Main -->
-    <div class="flex-auto p-6 sm:p-10">
-        <div class="max-w-3xl">
-            <form [formGroup]="regionForm" #regionFormDirective="ngForm">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+        @if (flashMessage) {
+            <div class="cst-form-flash" [class.is-ok]="flashMessage === 'success'" [class.is-err]="flashMessage === 'error'">
+                {{ flashMessage === 'success' ? t('Successfully-saved') : t('Something-went-wrong') }}
+            </div>
+        }
+
+        <div class="cst-form-card">
+            <div>
+                <div class="cst-form-sec__title">{{ t('Region-Details') || 'Détails de la région' }}</div>
+                <div class="cst-form-sec__sub">Renseigner le code, libellé et gouvernorat associé</div>
+                <div class="cst-form-grid" style="grid-template-columns: 1fr 1fr;">
                     <!-- Code -->
-                    <mat-form-field class="fuse-mat-dense">
-                        <mat-label>{{ t('Code') }}</mat-label>
-                        <input matInput formControlName="codeRegion">
-                        <mat-icon
-                            matPrefix
-                            class="icon-size-5"
-                            [svgIcon]="'heroicons_solid:hashtag'"></mat-icon>
-                    </mat-form-field>
+                    <div class="cst-field">
+                        <label>{{ t('Code') }} <span style="color:var(--cst-red)">*</span></label>
+                        <input class="cst-input" [class.is-err]="regionForm.get('codeRegion')?.invalid && (regionForm.get('codeRegion')?.touched || regionFormDirective.submitted)"
+                               formControlName="codeRegion" placeholder="Ex: REG01" />
+                    </div>
 
-                    <!-- Libelle -->
-                    <mat-form-field class="fuse-mat-dense">
-                        <mat-label>{{ t('Libelle') }}</mat-label>
-                        <input matInput formControlName="libelleRegion">
-                        <mat-icon
-                            matPrefix
-                            class="icon-size-5"
-                            [svgIcon]="'heroicons_solid:identification'"></mat-icon>
-                    </mat-form-field>
+                    <!-- Libellé -->
+                    <div class="cst-field">
+                        <label>{{ t('Libelle') }}</label>
+                        <input class="cst-input" formControlName="libelleRegion" placeholder="Ex: Tunis Centre" />
+                    </div>
 
                     <!-- Gouvernorat -->
-                    <mat-form-field class="fuse-mat-dense">
-                        <mat-label>{{ t('Gouvernorat') }}</mat-label>
-                        <mat-select formControlName="codeGouvernorat">
-                            @for(gouvernorat of gouvernorats; track gouvernorat.gouvernoratId){
-                                <mat-option [value]="gouvernorat.codeGouvernorat">{{ gouvernorat.libelleGouvernorat }}</mat-option>
-                            }
-                        </mat-select>
-                        <mat-icon
-                            matPrefix
-                            class="icon-size-5"
-                            [svgIcon]="'heroicons_solid:map-pin'"></mat-icon>
-                    </mat-form-field>
+                    <div class="cst-field">
+                        <label>{{ t('Gouvernorat') }}</label>
+                        <div class="cst-select">
+                            <select formControlName="codeGouvernorat">
+                                <option [value]="null">Aucun</option>
+                                @for (gouvernorat of gouvernorats; track gouvernorat.gouvernoratId) {
+                                    <option [value]="gouvernorat.codeGouvernorat">{{ gouvernorat.libelleGouvernorat }}</option>
+                                }
+                            </select>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="#5A6B85" stroke-width="2" stroke-linecap="round"><path d="M4 6l4 4 4-4"></path></svg>
+                        </div>
+                    </div>
 
                     <!-- Status -->
-                    <div class="flex items-center mt-4">
-                        <mat-slide-toggle
-                            [color]="'primary'"
-                            formControlName="isActive">
-                            {{ t('Active') }}
-                        </mat-slide-toggle>
+                    <div class="flex items-center pt-5">
+                        <label class="cst-toggle">
+                            <span [ngClass]="regionForm.get('isActive')?.value ? 'cst-toggle__on' : 'cst-toggle__off'">Actif</span>
+                            <input type="checkbox" formControlName="isActive" />
+                            <span class="cst-toggle__track"></span>
+                        </label>
                     </div>
                 </div>
-
-                <!-- Flash message -->
-                @if (flashMessage) {
-                    <div
-                        class="mt-8 p-4 rounded-lg"
-                        [ngClass]="{
-                            'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100': flashMessage === 'success',
-                            'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100': flashMessage === 'error'
-                        }">
-                        {{ flashMessage === 'success' ? t('Successfully-saved') : t('Something-went-wrong') }}
-                    </div>
-                }
-            </form>
+            </div>
         </div>
-    </div>
+    </form>
 </div>

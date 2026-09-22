@@ -5,7 +5,7 @@ using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Domain.Modems;
 
-public class Modem : AuditableEntity
+public class Modem : AuditableEntity, ITenantEntity
 {
     public ModemId ModemId { get; private set; }
 

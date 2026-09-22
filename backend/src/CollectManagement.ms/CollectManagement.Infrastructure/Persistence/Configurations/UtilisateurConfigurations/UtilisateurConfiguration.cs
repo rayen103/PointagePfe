@@ -1,4 +1,4 @@
-﻿using CollectManagement.Domain.Societes.ValueObjects;
+using CollectManagement.Domain.Societes.ValueObjects;
 using CollectManagement.Domain.Utilisateurs;
 using CollectManagement.Domain.Utilisateurs.ValueObjects;
 using Microsoft.EntityFrameworkCore;
@@ -45,21 +45,29 @@ public class UtilisateurConfiguration
             .IsRequired()
             .ValueGeneratedNever();
 
+        builder.Property(x => x.VerificationCode)
+            .HasColumnType("nvarchar(10)")
+            .IsRequired(false);
+
+        builder.Property(x => x.ApprovalToken)
+            .HasColumnType("nvarchar(100)")
+            .IsRequired(false);
+
         builder.HasIndex(x => x.Email)
             .IsUnique();
 
         builder.HasIndex(x => x.NomUtilisateur)
             .IsUnique();
         
-        builder.Property(s=>s.SocieteId)
-            .HasConversion(s=>s.Value.ToGuid(),
-                value => new SocieteId(new Ulid(value)))
+        builder.Property(s => s.SocieteId)
+            .HasConversion(c => c == null ? null : (Guid?)c.Value.ToGuid(),
+                value => value.HasValue ? new SocieteId(new Ulid(value.Value)) : null)
             .IsRequired(false);
         
         builder.HasOne(c => c.Societe)
             .WithMany()
             .HasForeignKey(k => k.SocieteId)
-            .IsRequired()
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasOne(c => c.RoleUtilisateur)

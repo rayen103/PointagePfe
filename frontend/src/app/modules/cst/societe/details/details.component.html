@@ -1,49 +1,51 @@
-<div class="absolute inset-0 min-w-0 overflow-x-hidden overflow-y-auto flex flex-col flex-auto bg-default"  *transloco="let t">
+<div class="absolute inset-0 min-w-0 overflow-x-hidden overflow-y-auto flex flex-col flex-auto bg-default" *transloco="let t">
 
     <mat-drawer-container
         class="bg-card h-full flex-auto dark:bg-transparent"
         (backdropClick)="onBackdropClicked()"
     >
-
-
         <mat-drawer-content class="flex flex-col px-2 sm:px-6 md:px-8 pb-10 sm:pb-20 bg-default">
 
-            <div class="relative flex flex-row items-center py-8 gap-2" *transloco="let t">
-                <a
-                    class="text-white"
-                    mat-icon-button
-                    [routerLink]="['../']"
-                >
-                    <mat-icon
-                        class="text-hint icon-size-8"
-                        [svgIcon]="'heroicons_outline:arrow-left'"></mat-icon>
-                </a>
-                <!-- Title -->
-                @if(!societe.societeId){
-                    <div class="text-2xl sm:text-4xl font-extrabold tracking-tight">{{ t('New-Company') }}</div>
-                } @else {
-                    <div class="text-2xl sm:text-4xl font-extrabold tracking-tight">{{ t('Edit-Company') }}</div>
-                }
+            <!-- Breadcrumb -->
+            <div class="cst-crumb mt-6" style="font-family: var(--cst-font);">
+                <a routerLink="/fichier/bus">Gestion</a><span>/</span><a [routerLink]="['../']">Sociétés</a><span>/</span>
+                <b>{{ !societe.societeId ? t('New-Company') : t('Edit-Company') }}</b>
             </div>
 
-            <div class="flex flex-auto p-6 rounded-2xl bg-white dark:bg-slate-800 shadow-lg">
+            <!-- Header line -->
+            <div class="cst-form-topline mt-2" style="font-family: var(--cst-font);">
+                <div class="cst-form-id">
+                    <a class="cst-round" [routerLink]="['../']">
+                        <mat-icon [svgIcon]="'heroicons_outline:arrow-left'"></mat-icon>
+                    </a>
+                    <div>
+                        <div class="cst-form-id__title">
+                            <span>{{ !societe.societeId ? t('New-Company') : (societeForm.get('nom')?.value || t('Edit-Company')) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-auto p-6 rounded-2xl bg-white dark:bg-slate-800 shadow-lg mt-6" style="font-family: var(--cst-font);">
                 <mat-tab-group class="w-full">
                     <mat-tab label="Société">
-                        <form [formGroup]="societeForm" class="flex flex-col w-full space-y-6 py-4">
-                            <div class="flex flex-col items-center mb-6">
+                        <form [formGroup]="societeForm" #societeFormDirective="ngForm" class="flex flex-col w-full py-4 gap-6">
+                            
+                            <!-- Logo Uploader -->
+                            <div class="flex flex-col items-center">
                                 <div
-                                    class="relative flex items-center justify-center w-28 h-28 rounded-full border-2 border-dashed border-gray-400 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 overflow-hidden cursor-pointer hover:scale-105 hover:border-primary transition-all duration-300"
+                                    class="relative flex items-center justify-center w-28 h-28 rounded-full border-2 border-dashed border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700 overflow-hidden cursor-pointer hover:scale-105 hover:border-blue-500 transition-all duration-300 shadow-sm"
                                     matTooltip="Changer le logo"
                                     (click)="societeLogoInput.click()">
 
                                     @if (!societeForm.value?.logoPath && !logoSrc) {
-                                        <span class="font-bold text-secondary text-sm">LOGO</span>
+                                        <span class="font-bold text-gray-400 text-sm">LOGO</span>
                                     } @else if (logoSrc === null && societeForm.value?.logoPath) {
                                         <ng-container *ngIf="('societe/images/'+societeForm.value?.logoPath | securefile | async) as modalPhotoUrl; else noModalPhoto">
                                             <img alt="" class="absolute w-28 h-28 rounded-full object-cover" [src]="modalPhotoUrl" width="240" height="240">
                                         </ng-container>
                                         <ng-template #noModalPhoto>
-                                            <span class="font-bold text-secondary text-sm">LOGO</span>
+                                            <span class="font-bold text-gray-400 text-sm">LOGO</span>
                                         </ng-template>
                                     } @else if (logoSrc) {
                                         <img alt="" class="absolute w-28 h-28 rounded-full object-cover" [src]="logoSrc" width="240" height="240">
@@ -52,178 +54,229 @@
                                 <input #societeLogoInput class="hidden" type="file" (change)="saveImage($event)" accept=".png, .jpeg, .jpg" />
                             </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <!-- Societe fields grid -->
+                            <div class="cst-form-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+                                <div class="cst-field">
+                                    <label>{{ t('Company-name') }} <span style="color:var(--cst-red)">*</span></label>
+                                    <input class="cst-input" [class.is-err]="societeForm.get('nom').invalid && societeForm.get('nom').touched"
+                                           formControlName="nom" placeholder="Nom de la société" />
+                                    @if(societeForm.get('nom').hasError('required') && societeForm.get('nom').touched){
+                                        <div class="cst-field__err">
+                                            <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                            {{ t('Company-name-is-required!') }}
+                                        </div>
+                                    }
+                                </div>
 
-                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
-                            <mat-label>{{ t('Company-name') }}</mat-label>
-                            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:building-office-2'" matPrefix></mat-icon>
-                            <input matInput [formControlName]="'nom'" placeholder="Nom de la société">
-                            <mat-error>{{ t('Company-name-is-required!') }}</mat-error>
-                        </mat-form-field>
+                                <div class="cst-field">
+                                    <label>Initiales</label>
+                                    <input class="cst-input" formControlName="initiales" placeholder="Initiales" />
+                                </div>
 
-                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
-                            <mat-label>Initiales</mat-label>
-                            <input matInput [formControlName]="'initiales'" placeholder="Initiales">
-                        </mat-form-field>
+                                <div class="cst-field">
+                                    <label>TVA</label>
+                                    <input class="cst-input" formControlName="tva" placeholder="Numéro TVA" />
+                                </div>
 
-                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
-                            <mat-label>TVA</mat-label>
-                            <input matInput [formControlName]="'tva'" placeholder="Numéro TVA">
-                        </mat-form-field>
+                                <div class="cst-field">
+                                    <label>RC</label>
+                                    <input class="cst-input" formControlName="rc" placeholder="Registre de commerce" />
+                                </div>
 
-                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
-                            <mat-label>RC</mat-label>
-                            <input matInput [formControlName]="'rc'" placeholder="Registre de commerce">
-                        </mat-form-field>
+                                <div class="cst-field">
+                                    <label>{{ t('Tax-Number') }} <span style="color:var(--cst-red)">*</span></label>
+                                    <input class="cst-input" [class.is-err]="societeForm.get('matriculeFiscal').invalid && societeForm.get('matriculeFiscal').touched"
+                                           formControlName="matriculeFiscal" placeholder="Matricule fiscal" />
+                                    @if(societeForm.get('matriculeFiscal').hasError('required') && societeForm.get('matriculeFiscal').touched){
+                                        <div class="cst-field__err">
+                                            <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                            {{ t('tax-number-required') }}
+                                        </div>
+                                    }
+                                </div>
 
-                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
-                            <mat-label>{{ t('Tax-Number') }}</mat-label>
-                            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:building-office-2'" matPrefix></mat-icon>
-                            <input matInput [formControlName]="'matriculeFiscal'" placeholder="Matricule fiscal">
-                            <mat-error>{{ t('tax-number-required') }}</mat-error>
-                        </mat-form-field>
+                                <div class="cst-field">
+                                    <label>{{ t('RNE') }} <span style="color:var(--cst-red)">*</span></label>
+                                    <input class="cst-input" [class.is-err]="societeForm.get('rne').invalid && societeForm.get('rne').touched"
+                                           formControlName="rne" placeholder="Numéro RNE" />
+                                    @if(societeForm.get('rne').hasError('required') && societeForm.get('rne').touched){
+                                        <div class="cst-field__err">
+                                            <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                            {{ t('RNE-required!') }}
+                                        </div>
+                                    }
+                                </div>
 
-                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
-                            <mat-label>{{ t('RNE') }}</mat-label>
-                            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:building-office-2'" matPrefix></mat-icon>
-                            <input matInput [formControlName]="'rne'" placeholder="Numéro RNE">
-                            <mat-error>{{ t('RNE-required!') }}</mat-error>
-                        </mat-form-field>
+                                <div class="cst-field">
+                                    <label>{{ t('Capital') }} <span style="color:var(--cst-red)">*</span></label>
+                                    <input class="cst-input" [class.is-err]="societeForm.get('capital').invalid && societeForm.get('capital').touched"
+                                           formControlName="capital" placeholder="Capital social" />
+                                    @if(societeForm.get('capital').hasError('required') && societeForm.get('capital').touched){
+                                        <div class="cst-field__err">
+                                            <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                            {{ t('capital-required') }}
+                                        </div>
+                                    }
+                                </div>
 
-                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
-                            <mat-label>{{ t('Capital') }}</mat-label>
-                            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:building-office-2'" matPrefix></mat-icon>
-                            <input matInput [formControlName]="'capital'" placeholder="Capital social">
-                            <mat-error>{{ t('capital-required') }}</mat-error>
-                        </mat-form-field>
+                                <div class="cst-field">
+                                    <label>{{ t('Opening-Date') }} <span style="color:var(--cst-red)">*</span></label>
+                                    <div class="cst-input--group cst-input" [class.is-err]="societeForm.get('dateOverture').invalid && societeForm.get('dateOverture').touched">
+                                        <input [matDatepicker]="dateOverture" formControlName="dateOverture" placeholder="Choisir une date" />
+                                        <mat-datepicker-toggle matIconSuffix [for]="dateOverture"></mat-datepicker-toggle>
+                                        <mat-datepicker #dateOverture></mat-datepicker>
+                                    </div>
+                                    @if(societeForm.get('dateOverture').hasError('required') && societeForm.get('dateOverture').touched){
+                                        <div class="cst-field__err">
+                                            <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                            {{ t('Opening-Date-is-required') }}
+                                        </div>
+                                    }
+                                </div>
 
-                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
-                            <mat-label>{{ t('Opening-Date') }}</mat-label>
-                            <input matInput [matDatepicker]="dateOverture" [formControlName]="'dateOverture'" placeholder="Choisir une date">
-                            <mat-datepicker-toggle matIconSuffix [for]="dateOverture"></mat-datepicker-toggle>
-                            <mat-datepicker #dateOverture></mat-datepicker>
-                            <mat-error>{{ t('Opening-Date-is-required') }}</mat-error>
-                        </mat-form-field>
+                                <div class="cst-field">
+                                    <label>{{ t('Phone') }} 1 <span style="color:var(--cst-red)">*</span></label>
+                                    <input class="cst-input" [class.is-err]="societeForm.get('telephone1').invalid && societeForm.get('telephone1').touched"
+                                           formControlName="telephone1" placeholder="Téléphone principal" />
+                                    @if(societeForm.get('telephone1').hasError('required') && societeForm.get('telephone1').touched){
+                                        <div class="cst-field__err">
+                                            <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                            {{ t('Phone-is-required!') }}
+                                        </div>
+                                    }
+                                </div>
 
-                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
-                            <mat-label>{{ t('Phone') }} 1</mat-label>
-                            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:phone'" matPrefix></mat-icon>
-                            <input matInput [formControlName]="'telephone1'" placeholder="Téléphone principal">
-                            <mat-error>{{ t('Phone-is-required!') }}</mat-error>
-                        </mat-form-field>
+                                <div class="cst-field">
+                                    <label>{{ t('Phone') }} 2 <span style="color:var(--cst-red)">*</span></label>
+                                    <input class="cst-input" [class.is-err]="societeForm.get('telephone2').invalid && societeForm.get('telephone2').touched"
+                                           formControlName="telephone2" placeholder="Deuxième téléphone" />
+                                    @if(societeForm.get('telephone2').hasError('required') && societeForm.get('telephone2').touched){
+                                        <div class="cst-field__err">
+                                            <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                            {{ t('Phone-is-required!') }}
+                                        </div>
+                                    }
+                                </div>
 
-                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
-                            <mat-label>{{ t('Phone') }} 2</mat-label>
-                            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:phone'" matPrefix></mat-icon>
-                            <input matInput [formControlName]="'telephone2'" placeholder="Deuxième téléphone">
-                            <mat-error>{{ t('Phone-is-required!') }}</mat-error>
-                        </mat-form-field>
+                                <div class="cst-field">
+                                    <label>{{ t('Fax') }} 1 <span style="color:var(--cst-red)">*</span></label>
+                                    <input class="cst-input" [class.is-err]="societeForm.get('fax1').invalid && societeForm.get('fax1').touched"
+                                           formControlName="fax1" placeholder="Fax principal" />
+                                    @if(societeForm.get('fax1').hasError('required') && societeForm.get('fax1').touched){
+                                        <div class="cst-field__err">
+                                            <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                            {{ t('Fax-is-required!!') }}
+                                        </div>
+                                    }
+                                </div>
 
-                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
-                            <mat-label>{{ t('Fax') }} 1</mat-label>
-                            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:inbox-arrow-down'" matPrefix></mat-icon>
-                            <input matInput [formControlName]="'fax1'" placeholder="Fax principal">
-                            <mat-error>{{ t('Fax-is-required!!') }}</mat-error>
-                        </mat-form-field>
+                                <div class="cst-field">
+                                    <label>{{ t('Fax') }} 2</label>
+                                    <input class="cst-input" formControlName="fax2" placeholder="Deuxième fax" />
+                                </div>
 
-                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
-                            <mat-label>{{ t('Fax') }} 2</mat-label>
-                            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:inbox-arrow-down'" matPrefix></mat-icon>
-                            <input matInput [formControlName]="'fax2'" placeholder="Deuxième fax">
-                        </mat-form-field>
+                                <div class="cst-field">
+                                    <label>{{ t('E-mail') }} <span style="color:var(--cst-red)">*</span></label>
+                                    <input class="cst-input" type="email" [class.is-err]="societeForm.get('email').invalid && societeForm.get('email').touched"
+                                           formControlName="email" placeholder="example@email.com" />
+                                    @if(societeForm.get('email').hasError('required') && societeForm.get('email').touched){
+                                        <div class="cst-field__err">
+                                            <mat-icon class="icon-size-3" [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                            {{ t('E-mail-is-required!') }}
+                                        </div>
+                                    }
+                                </div>
 
-                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
-                            <mat-label>{{ t('E-mail') }}</mat-label>
-                            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:envelope'" matPrefix></mat-icon>
-                            <input matInput type="email" [formControlName]="'email'" placeholder="example@email.com">
-                            <mat-error>{{ t('E-mail-is-required!') }}</mat-error>
-                        </mat-form-field>
+                                <div class="cst-field">
+                                    <label>{{ t('Address') }}</label>
+                                    <input class="cst-input" formControlName="adresse" placeholder="Adresse complète" />
+                                </div>
 
-                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
-                            <mat-label>{{ t('Address') }}</mat-label>
-                            <mat-icon class="icon-size-5 text-primary" [svgIcon]="'heroicons_solid:map-pin'" matPrefix></mat-icon>
-                            <input matInput [formControlName]="'adresse'" placeholder="Adresse complète">
-                        </mat-form-field>
+                                <div class="cst-field">
+                                    <label>Code postal</label>
+                                    <input class="cst-input" formControlName="codePostal" placeholder="Code postal" />
+                                </div>
 
-                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
-                            <mat-label>Code postal</mat-label>
-                            <input matInput [formControlName]="'codePostal'">
-                        </mat-form-field>
+                                <div class="cst-field">
+                                    <label>Ville</label>
+                                    <input class="cst-input" formControlName="ville" placeholder="Ville" />
+                                </div>
 
-                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
-                            <mat-label>Ville</mat-label>
-                            <input matInput [formControlName]="'ville'">
-                        </mat-form-field>
+                                <div class="cst-field">
+                                    <label>Pays</label>
+                                    <input class="cst-input" formControlName="pays" placeholder="Pays" />
+                                </div>
 
-                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
-                            <mat-label>Pays</mat-label>
-                            <input matInput [formControlName]="'pays'">
-                        </mat-form-field>
-
-                        <mat-form-field appearance="outline" class="w-full fuse-mat-dense">
-                            <mat-label>Code société</mat-label>
-                            <input matInput [formControlName]="'codeSociete'">
-                        </mat-form-field>
+                                <div class="cst-field">
+                                    <label>Code société</label>
+                                    <input class="cst-input" formControlName="codeSociete" placeholder="Code de la société" />
+                                </div>
                             </div>
 
-                            <div class="flex flex-col sm:flex-row items-center justify-end gap-4">
+                            <div class="flex flex-col sm:flex-row items-center justify-end gap-4 mt-6">
                                 @if (flashMessage){
-                                    <div class="flex items-center">
-                                        @if (flashMessage === 'success'){
-                                            <div class="flex py-2 px-4 bg-green-100 rounded-lg items-center gap-2">
-                                                <mat-icon class="text-green-700" [svgIcon]="'heroicons_outline:check'"></mat-icon>
-                                                <span class="text-green-700 font-bold">Société enregistrée avec succès.</span>
-                                            </div>
-                                        }
-                                        @if (flashMessage === 'error'){
-                                            <div class="flex py-2 px-4 bg-red-100 rounded-lg items-center gap-2">
-                                                <mat-icon class="text-red-700" [svgIcon]="'feather:x-circle'"></mat-icon>
-                                                <span class="text-red-700 font-bold">Une erreur est survenue, réessayez !</span>
-                                            </div>
-                                        }
+                                    <div class="cst-form-flash" [class.is-ok]="flashMessage === 'success'" [class.is-err]="flashMessage === 'error'">
+                                        {{ flashMessage === 'success' ? 'Société enregistrée avec succès.' : 'Une erreur est survenue, réessayez !' }}
                                     </div>
                                 }
-                                <button
-                                    mat-flat-button
-                                    color="primary"
-                                    class="rounded-xl px-6 py-3 shadow-md hover:shadow-lg transition-all"
-                                    (click)="saveSociete()">
-                                    <mat-icon [svgIcon]="'feather:save'"></mat-icon>
-                                    <span class="ml-2 font-semibold">Enregistrer</span>
+                                <button class="cst-btn cst-btn--primary animate-pulse-subtle" type="button" (click)="saveSociete()">
+                                    <mat-icon [svgIcon]="'heroicons_outline:check'"></mat-icon>
+                                    <span class="ml-2">Enregistrer</span>
                                 </button>
                             </div>
                         </form>
                     </mat-tab>
 
                     <mat-tab label="Site">
-                        <div class="py-4 flex flex-col gap-4">
-                            <form [formGroup]="siteForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <mat-form-field appearance="outline" class="w-full fuse-mat-dense"><mat-label>Code</mat-label><input matInput formControlName="code"></mat-form-field>
-                                <mat-form-field appearance="outline" class="w-full fuse-mat-dense"><mat-label>Site</mat-label><input matInput formControlName="site"></mat-form-field>
-                                <mat-form-field appearance="outline" class="w-full fuse-mat-dense"><mat-label>Longitude</mat-label><input matInput type="number" formControlName="longitude"></mat-form-field>
-                                <mat-form-field appearance="outline" class="w-full fuse-mat-dense"><mat-label>Latitude</mat-label><input matInput type="number" formControlName="latitude"></mat-form-field>
-                                <mat-form-field appearance="outline" class="w-full fuse-mat-dense"><mat-label>Rayon</mat-label><input matInput type="number" formControlName="rayon"></mat-form-field>
-                                <mat-form-field appearance="outline" class="w-full fuse-mat-dense"><mat-label>TimeMinute</mat-label><input matInput type="number" formControlName="timeMinute"></mat-form-field>
-                                <mat-checkbox formControlName="siege">Siège</mat-checkbox>
-                                <mat-checkbox formControlName="isActive">Actif</mat-checkbox>
+                        <div class="py-6 flex flex-col gap-6">
+                            <form [formGroup]="siteForm" class="cst-form-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                                <div class="cst-field"><label>Code</label><input class="cst-input" formControlName="code" /></div>
+                                <div class="cst-field"><label>Site</label><input class="cst-input" formControlName="site" /></div>
+                                <div class="cst-field"><label>Longitude</label><input class="cst-input" type="number" formControlName="longitude" /></div>
+                                <div class="cst-field"><label>Latitude</label><input class="cst-input" type="number" formControlName="latitude" /></div>
+                                <div class="cst-field"><label>Rayon</label><input class="cst-input" type="number" formControlName="rayon" /></div>
+                                <div class="cst-field"><label>TimeMinute</label><input class="cst-input" type="number" formControlName="timeMinute" /></div>
+                                <div class="flex items-center pt-5 gap-6">
+                                    <label class="cst-check"><input type="checkbox" formControlName="siege" /><span>Siège</span></label>
+                                    <label class="cst-toggle">
+                                        <span [ngClass]="siteForm.get('isActive')?.value ? 'cst-toggle__on' : 'cst-toggle__off'">Actif</span>
+                                        <input type="checkbox" formControlName="isActive" />
+                                        <span class="cst-toggle__track"></span>
+                                    </label>
+                                </div>
                             </form>
                             <div class="flex gap-2 justify-end">
-                                <button mat-stroked-button color="primary" (click)="resetSiteForm()">Nouveau</button>
-                                <button mat-flat-button color="primary" (click)="saveSite()">Enregistrer site</button>
+                                <button class="cst-btn cst-btn--ghost" type="button" (click)="resetSiteForm()">Nouveau</button>
+                                <button class="cst-btn cst-btn--primary" type="button" (click)="saveSite()">Enregistrer site</button>
                             </div>
-                            <div class="border rounded-lg p-4 overflow-auto">
-                                <table class="w-full text-sm">
-                                    <thead><tr><th class="text-left">Code</th><th class="text-left">Site</th><th>Siège</th><th></th></tr></thead>
+                            <div class="overflow-auto mt-4 border border-gray-150 rounded-xl">
+                                <table class="cst-tbl">
+                                    <thead>
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Site</th>
+                                            <th>Siège</th>
+                                            <th style="width: 100px;"></th>
+                                        </tr>
+                                    </thead>
                                     <tbody>
-                                    <tr *ngFor="let item of sites">
-                                        <td>{{item.code}}</td>
-                                        <td>{{item.site}}</td>
-                                        <td class="text-center">{{item.siege ? 'Oui' : 'Non'}}</td>
-                                        <td class="text-right">
-                                            <button mat-icon-button (click)="editSite(item)"><mat-icon [svgIcon]="'heroicons_outline:pencil'"></mat-icon></button>
-                                            <button mat-icon-button color="warn" (click)="deleteSite(item)"><mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon></button>
-                                        </td>
-                                    </tr>
+                                        <tr *ngFor="let item of sites">
+                                            <td>{{item.code}}</td>
+                                            <td>{{item.site}}</td>
+                                            <td>
+                                                <span class="cst-pill" [ngClass]="item.siege ? 'cst-pill--ok' : 'cst-pill--off'">
+                                                    {{item.siege ? 'Oui' : 'Non'}}
+                                                </span>
+                                            </td>
+                                            <td style="text-align: right;">
+                                                <a class="cst-round" style="display:inline-flex; margin-right:4px;" (click)="editSite(item)">
+                                                    <mat-icon [svgIcon]="'heroicons_outline:pencil'"></mat-icon>
+                                                </a>
+                                                <a class="cst-round cst-round--err" style="display:inline-flex;" (click)="deleteSite(item)">
+                                                    <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                                                </a>
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -231,34 +284,51 @@
                     </mat-tab>
 
                     <mat-tab label="Réseau">
-                        <div class="py-4 flex flex-col gap-4">
-                            <form [formGroup]="reseauForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                <mat-form-field appearance="outline" class="w-full fuse-mat-dense"><mat-label>IP</mat-label><input matInput formControlName="ipAddress"></mat-form-field>
-                                <mat-form-field appearance="outline" class="w-full fuse-mat-dense"><mat-label>Port</mat-label><input matInput type="number" formControlName="port"></mat-form-field>
-                                <mat-form-field appearance="outline" class="w-full fuse-mat-dense"><mat-label>GMT+</mat-label><input matInput type="number" formControlName="gmtPlus"></mat-form-field>
-                                <mat-form-field appearance="outline" class="w-full fuse-mat-dense"><mat-label>Latitude</mat-label><input matInput type="number" formControlName="latitude"></mat-form-field>
-                                <mat-form-field appearance="outline" class="w-full fuse-mat-dense"><mat-label>Longitude</mat-label><input matInput type="number" formControlName="longitude"></mat-form-field>
-                                <mat-form-field appearance="outline" class="w-full fuse-mat-dense"><mat-label>Rayon</mat-label><input matInput type="number" formControlName="rayon"></mat-form-field>
-                                <mat-form-field appearance="outline" class="w-full fuse-mat-dense"><mat-label>Time tolerance</mat-label><input matInput type="number" formControlName="timeToleranceMinute"></mat-form-field>
-                                <mat-checkbox formControlName="isActive">Actif</mat-checkbox>
+                        <div class="py-6 flex flex-col gap-6">
+                            <form [formGroup]="reseauForm" class="cst-form-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                                <div class="cst-field"><label>IP</label><input class="cst-input" formControlName="ipAddress" /></div>
+                                <div class="cst-field"><label>Port</label><input class="cst-input" type="number" formControlName="port" /></div>
+                                <div class="cst-field"><label>GMT+</label><input class="cst-input" type="number" formControlName="gmtPlus" /></div>
+                                <div class="cst-field"><label>Latitude</label><input class="cst-input" type="number" formControlName="latitude" /></div>
+                                <div class="cst-field"><label>Longitude</label><input class="cst-input" type="number" formControlName="longitude" /></div>
+                                <div class="cst-field"><label>Rayon</label><input class="cst-input" type="number" formControlName="rayon" /></div>
+                                <div class="cst-field"><label>Time tolerance</label><input class="cst-input" type="number" formControlName="timeToleranceMinute" /></div>
+                                <div class="flex items-center pt-5">
+                                    <label class="cst-toggle">
+                                        <span [ngClass]="reseauForm.get('isActive')?.value ? 'cst-toggle__on' : 'cst-toggle__off'">Actif</span>
+                                        <input type="checkbox" formControlName="isActive" />
+                                        <span class="cst-toggle__track"></span>
+                                    </label>
+                                </div>
                             </form>
                             <div class="flex gap-2 justify-end">
-                                <button mat-stroked-button color="primary" (click)="resetReseauForm()">Nouveau</button>
-                                <button mat-flat-button color="primary" (click)="saveReseau()">Enregistrer réseau</button>
+                                <button class="cst-btn cst-btn--ghost" type="button" (click)="resetReseauForm()">Nouveau</button>
+                                <button class="cst-btn cst-btn--primary" type="button" (click)="saveReseau()">Enregistrer réseau</button>
                             </div>
-                            <div class="border rounded-lg p-4 overflow-auto">
-                                <table class="w-full text-sm">
-                                    <thead><tr><th class="text-left">IP</th><th>Port</th><th>GMT+</th><th></th></tr></thead>
+                            <div class="overflow-auto mt-4 border border-gray-150 rounded-xl">
+                                <table class="cst-tbl">
+                                    <thead>
+                                        <tr>
+                                            <th>IP</th>
+                                            <th>Port</th>
+                                            <th>GMT+</th>
+                                            <th style="width: 100px;"></th>
+                                        </tr>
+                                    </thead>
                                     <tbody>
-                                    <tr *ngFor="let item of reseaux">
-                                        <td>{{item.ipAddress}}</td>
-                                        <td class="text-center">{{item.port}}</td>
-                                        <td class="text-center">{{item.gmtPlus}}</td>
-                                        <td class="text-right">
-                                            <button mat-icon-button (click)="editReseau(item)"><mat-icon [svgIcon]="'heroicons_outline:pencil'"></mat-icon></button>
-                                            <button mat-icon-button color="warn" (click)="deleteReseau(item)"><mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon></button>
-                                        </td>
-                                    </tr>
+                                        <tr *ngFor="let item of reseaux">
+                                            <td>{{item.ipAddress}}</td>
+                                            <td style="text-align: center;">{{item.port}}</td>
+                                            <td style="text-align: center;">{{item.gmtPlus}}</td>
+                                            <td style="text-align: right;">
+                                                <a class="cst-round" style="display:inline-flex; margin-right:4px;" (click)="editReseau(item)">
+                                                    <mat-icon [svgIcon]="'heroicons_outline:pencil'"></mat-icon>
+                                                </a>
+                                                <a class="cst-round cst-round--err" style="display:inline-flex;" (click)="deleteReseau(item)">
+                                                    <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                                                </a>
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>

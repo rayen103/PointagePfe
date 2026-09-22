@@ -26,7 +26,10 @@
                 [optimizedRoute]="OptimizedRouteForMap"
                 [selectedBusPosition]="SelectedBusPosition"
                 [routeLoading]="circuitLoading"
-                (toggleShowAll)="onToggleShowAllOnMap($event)">
+                [allCircuits]="allCircuitsMapOverview"
+                [selectedCircuitId]="selectedBus?.codeCircuit ?? null"
+                (toggleShowAll)="onToggleShowAllOnMap($event)"
+                (selectCircuit)="onSelectCircuitFromMap($event)">
             </app-bus-tracking-map>
         </div>
 

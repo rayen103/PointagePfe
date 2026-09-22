@@ -1,3 +1,6 @@
+import { PdfExportService } from '../../../../core/common/pdf-export.service';
+import { CsvExportService } from '../../../../core/common/csv-export.service';
+import { take } from 'rxjs';
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
@@ -62,6 +65,10 @@ export class ListComponent implements OnInit, OnDestroy {
     sortDirection: 'asc' | 'desc' = 'asc';
 
     constructor(
+        private _pdfExportService: PdfExportService,
+
+        private _csvExportService: CsvExportService,
+
         private _modemService: ModemService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseConfirmationService: FuseConfirmationService
@@ -181,4 +188,26 @@ export class ListComponent implements OnInit, OnDestroy {
     }
 
     protected readonly FuseNavigationAction = FuseNavigationAction;
+
+    exportData(): void {
+        if (this._modemService) {
+            const obs$ = (this as any).modems$ || this._modemService.modems$ || this._modemService.modems$;
+            if (obs$) {
+                obs$.pipe(take(1)).subscribe((data: any) => {
+                    const items = Array.isArray(data) ? data : (data?.items || data?.modems || data?.modems || []);
+                    if (items && items.length > 0) {
+                        const columns = [
+            { header: 'N° IMEI', dataKey: 'numeroIMEI' },
+            { header: 'Véhicule', dataKey: 'codeVehicule' },
+            { header: 'Libellé', dataKey: 'libelle' },
+            { header: 'Statut', dataKey: 'isActive' }
+        ];
+                        this._pdfExportService.exportToPdf('Rapport Modems', columns, items, 'Modems_Export.pdf');
+                    } else {
+                        console.warn('No data available to export to PDF');
+                    }
+                });
+            }
+        }
+    }
 }

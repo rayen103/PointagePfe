@@ -48,95 +48,96 @@ export class NavigationService {
      * Get all navigation data
      */
     get(): Observable<Navigation> {
+        return this._userService.user$.pipe(
+            take(1),
+            switchMap((user) => {
+                const isSuperAdmin = !user?.navigations || user.navigations.length === 0;
+                const allowedSet = new Set(user?.navigations?.map((n) => n.navigationId) ?? []);
 
-        return this._userService.user$
-            .pipe(
-                take(1),
-                switchMap((user) => {
+                // Always work with fresh deep clones so the base definitions are never mutated
+                let defaultNav: FuseNavigationItem[] = cloneDeep(this._defaultNavigation);
+                let compactNav: FuseNavigationItem[] = cloneDeep(this._compactNavigation);
+                let futuristicNav: FuseNavigationItem[] = cloneDeep(this._futuristicNavigation);
+                let horizontalNav: FuseNavigationItem[] = cloneDeep(this._horizontalNavigation);
 
-                    const flatNavigation = this._fuseNavigationService.getFlatNavigation(this._defaultNavigation);
-
-                    const setB = flatNavigation.map(item => item.id);
-                    const setA = user?.navigations?.map(item => item.navigationId)??[];
-
-                    let defaultNavigation: FuseNavigationItem[]=this._defaultNavigation;
-                    let compactNavigation: FuseNavigationItem[]=this._compactNavigation;
-                    let futuristicNavigation: FuseNavigationItem[]=this._futuristicNavigation;
-                    let horizontalNavigation: FuseNavigationItem[]=this._horizontalNavigation;
-
-                    setB?.forEach(item => {
-                        if (setA.length===0){
-                            return;
-                        }
-                        const exists = setA.includes(item);
-                        if (!exists){
-                            defaultNavigation = this._fuseNavigationService.removeItemById(defaultNavigation, item);
-                            compactNavigation = this._fuseNavigationService.removeItemById(compactNavigation, item);
-                            futuristicNavigation = this._fuseNavigationService.removeItemById(futuristicNavigation, item);
-                            horizontalNavigation = this._fuseNavigationService.removeItemById(horizontalNavigation, item);
+                if (!isSuperAdmin) {
+                    const flatNavigation = this._fuseNavigationService.getFlatNavigation(defaultNav);
+                    flatNavigation.forEach((item) => {
+                        if (!allowedSet.has(item.id)) {
+                            defaultNav = this._fuseNavigationService.removeItemById(defaultNav, item.id);
                         }
                     });
+                }
 
-                    compactNavigation.forEach((compactNavItem) => {
-                        defaultNavigation.forEach((defaultNavItem) => {
-                            if (defaultNavItem.id === compactNavItem.id) {
-                                compactNavItem.children = cloneDeep(
-                                    defaultNavItem.children
-                                );
-                                compactNavItem.action = cloneDeep(
-                                    defaultNavItem.action??[]
-                                );
-                                compactNavItem.section = cloneDeep(
-                                    defaultNavItem.section??[]
-                                );
-                            }
-                        });
-                    });
-
-                    // Fill futuristic navigation children using the default navigation
-                    futuristicNavigation.forEach((futuristicNavItem) => {
-                        defaultNavigation.forEach((defaultNavItem) => {
-                            if (defaultNavItem.id === futuristicNavItem.id) {
-                                futuristicNavItem.children = cloneDeep(
-                                    defaultNavItem.children
-                                );
-                                futuristicNavItem.action = cloneDeep(
-                                    defaultNavItem.action??[]
-                                );
-                                futuristicNavItem.section = cloneDeep(
-                                    defaultNavItem.section??[]
-                                );
-                            }
-                        });
-                    });
-
-                    // Fill horizontal navigation children using the default navigation
-                    horizontalNavigation.forEach((horizontalNavItem) => {
-                        defaultNavigation.forEach((defaultNavItem) => {
-                            if (defaultNavItem.id === horizontalNavItem.id) {
-                                horizontalNavItem.children = cloneDeep(
-                                    defaultNavItem.children
-                                );
-                                horizontalNavItem.action = cloneDeep(
-                                    defaultNavItem.action??[]
-                                );
-                                horizontalNavItem.section = cloneDeep(
-                                    defaultNavItem.section??[]
-                                );
-                            }
-                        });
-                    });
-
-                    const navigation = {
-                        compact: cloneDeep(compactNavigation),
-                        default: cloneDeep(this._defaultNavigation),
-                        futuristic: cloneDeep(futuristicNavigation),
-                        horizontal: cloneDeep(horizontalNavigation),
+                // Copy filtered children from defaultNav to compactNav
+                compactNav.forEach((compactNavItem) => {
+                    const defaultNavItem = defaultNav.find((d) => d.id === compactNavItem.id);
+                    if (defaultNavItem) {
+                        compactNavItem.children = cloneDeep(defaultNavItem.children);
+                        compactNavItem.action = cloneDeep(defaultNavItem.action ?? []);
+                        compactNavItem.section = cloneDeep(defaultNavItem.section ?? []);
                     }
+                });
 
-                    this._navigation.next(navigation);
+                // Copy filtered children from defaultNav to futuristicNav
+                futuristicNav.forEach((futuristicNavItem) => {
+                    const defaultNavItem = defaultNav.find((d) => d.id === futuristicNavItem.id);
+                    if (defaultNavItem) {
+                        futuristicNavItem.children = cloneDeep(defaultNavItem.children);
+                        futuristicNavItem.action = cloneDeep(defaultNavItem.action ?? []);
+                        futuristicNavItem.section = cloneDeep(defaultNavItem.section ?? []);
+                    }
+                });
 
-                    return of(navigation);
-                }));
+                // Copy filtered children from defaultNav to horizontalNav
+                horizontalNav.forEach((horizontalNavItem) => {
+                    const defaultNavItem = defaultNav.find((d) => d.id === horizontalNavItem.id);
+                    if (defaultNavItem) {
+                        horizontalNavItem.children = cloneDeep(defaultNavItem.children);
+                        horizontalNavItem.action = cloneDeep(defaultNavItem.action ?? []);
+                        horizontalNavItem.section = cloneDeep(defaultNavItem.section ?? []);
+                    }
+                });
+
+                // For restricted users, link parent groups to their first permitted child,
+                // and hide any parent groups that have 0 accessible children left.
+                if (!isSuperAdmin) {
+                    const syncAndFilterNav = (items: FuseNavigationItem[]): FuseNavigationItem[] => {
+                        return items
+                            .map((item) => {
+                                if (item.children && item.children.length > 0) {
+                                    return {
+                                        ...item,
+                                        link: item.children[0].link || item.link,
+                                    };
+                                }
+                                return item;
+                            })
+                            .filter((item) => {
+                                if (item.type === 'group' || item.type === 'aside' || item.type === 'collapsable') {
+                                    return !!item.children && item.children.length > 0;
+                                }
+                                return true;
+                            });
+                    };
+
+                    defaultNav = syncAndFilterNav(defaultNav);
+                    compactNav = syncAndFilterNav(compactNav);
+                    futuristicNav = syncAndFilterNav(futuristicNav);
+                    horizontalNav = syncAndFilterNav(horizontalNav);
+                }
+
+                const navigation: Navigation = {
+                    compact: compactNav,
+                    default: defaultNav,
+                    futuristic: futuristicNav,
+                    horizontal: horizontalNav,
+                };
+
+                this._navigation.next(navigation);
+
+                return of(navigation);
+            })
+        );
     }
 }

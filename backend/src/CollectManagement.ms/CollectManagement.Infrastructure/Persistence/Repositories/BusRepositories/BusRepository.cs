@@ -63,6 +63,9 @@ public class BusRepository : RepositoryBase<Bus>, IBusRepository
                 c.CurrentOccupancy,
                 c.LastPositionAt,
                 c.LastOccupancyUpdateAt,
+                c.DeviceRecordedAtUtc,
+                c.BatteryPercentage,
+                c.BatteryVoltage,
                 c.SocieteId
             ))
             .ToListAsync(cancellationToken: cancellationToken)
@@ -92,6 +95,9 @@ public class BusRepository : RepositoryBase<Bus>, IBusRepository
                 c.CurrentOccupancy,
                 c.LastPositionAt,
                 c.LastOccupancyUpdateAt,
+                c.DeviceRecordedAtUtc,
+                c.BatteryPercentage,
+                c.BatteryVoltage,
                 c.SocieteId
             ))
             .FirstOrDefaultAsync(cancellationToken)

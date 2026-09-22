@@ -12,9 +12,9 @@
         </div>
         <div class="cst-head__actions">
             @if (filteredCircuits$ | async; as circuits) {
-                <button class="cst-btn cst-btn--ghost" type="button" (click)="exportCircuits(circuits)" [disabled]="!circuits.length">
-                    <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:arrow-down-tray'"></mat-icon>
-                    {{ t('Export') || 'Exporter' }}
+                <button class="cst-btn cst-btn--ghost" type="button" (click)="exportData()">
+                    <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:document-text'"></mat-icon>
+                    Exporter PDF
                 </button>
             }
             @if (hasActionPermission(FuseNavigationAction.Add)) {

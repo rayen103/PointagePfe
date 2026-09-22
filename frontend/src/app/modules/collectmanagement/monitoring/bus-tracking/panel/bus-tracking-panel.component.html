@@ -223,7 +223,7 @@
             <button
                 class="cst-btn cst-btn--primary flex-auto justify-center"
                 type="button"
-                [disabled]="!canEmptyBus"
+                [disabled]="!canEmptyBus || bus.busId.startsWith('circuit_')"
                 (click)="emptyBus.emit()">
                 Vider le bus
             </button>

@@ -1,5 +1,6 @@
 using Carter;
 using CollectManagement.Application;
+using CollectManagement.Application.Interfaces.Services;
 using CollectManagement.Infrastructure;
 using CollectManagement.Infrastructure.Persistence.Context;
 using CollectManagement.WebAPI.Authorization;
@@ -10,6 +11,12 @@ using Microsoft.Extensions.FileProviders;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddJsonFile("appsettings.Developement.json", optional: true, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
 
 // Rin logger
 builder.Logging.AddRinLogger();
@@ -105,17 +112,124 @@ BEGIN
     END;
 END;
 ");
+
+    // 1. Direct resilient seed for critical demo records
+    try
+    {
+        dbContext.Database.ExecuteSqlRaw(@"
+-- 1. Ensure intercolor Societe exists
+IF NOT EXISTS (SELECT 1 FROM dbo.Societe WHERE SocieteId = '019970F9-BA22-F7A8-1E5C-E9D1206BF8B5')
+BEGIN
+    INSERT INTO dbo.Societe (SocieteId, Nom, MatriculeFiscal, Capital, DateOverture)
+    VALUES ('019970F9-BA22-F7A8-1E5C-E9D1206BF8B5', 'intercolor', '0020515K/A/M/000', 1134700000, '2025-09-22');
+END;
+
+-- 2. Ensure CST Societe exists
+IF NOT EXISTS (SELECT 1 FROM dbo.Societe WHERE SocieteId = '018B1055-D0B7-DE38-752F-1B18F580C2E0')
+BEGIN
+    INSERT INTO dbo.Societe (SocieteId, Nom, MatriculeFiscal, Capital, DateOverture)
+    VALUES ('018B1055-D0B7-DE38-752F-1B18F580C2E0', 'CST', 'MF-CST-001', 0, '2024-01-01');
+END;
+
+-- 3. Ensure rayen103 exists and is active
+IF NOT EXISTS (SELECT 1 FROM dbo.Utilisateur WHERE NomUtilisateur = 'rayen103')
+BEGIN
+    INSERT INTO dbo.Utilisateur (UtilisateurId, NomUtilisateur, Nom, Prenom, Email, Password, IsActive, SocieteId)
+    VALUES ('019ECC22-A4E6-267F-50A1-3A04B83ADEDC', 'rayen103', 'farhani', 'rayen', 'rayenfarhani9@gmail.com', 'F0076EA5CFBF1D777D3ECF577CE998EDA1AD96FEDB22C42F0D449A7F7AAF023F6ABD0112972C3EAE86ED0E9A82C01FCFE88249523CE56E6212AE12AC1A7D871F', 1, '019970F9-BA22-F7A8-1E5C-E9D1206BF8B5');
+END;
+
+-- 4. Ensure root exists and is active
+IF NOT EXISTS (SELECT 1 FROM dbo.Utilisateur WHERE NomUtilisateur = 'root')
+BEGIN
+    INSERT INTO dbo.Utilisateur (UtilisateurId, NomUtilisateur, Nom, Prenom, Email, Password, IsActive, SocieteId)
+    VALUES ('019C2903-0D54-105D-FA74-08F82A436369', 'root', 'root', 'root', 'root@root.com', '919D2AF144DD35A05ADF97786560176B8FCCE3A82B86ABC571AE94B20D2537D7C3677E4AE831B06CC02E1CD0189D1A63B106B2E4EB24581E01E88E31BCEE4FC8', 1, '019970F9-BA22-F7A8-1E5C-E9D1206BF8B5');
+END;
+
+-- 5. Activate all users
+UPDATE dbo.Utilisateur SET IsActive = 1;
+
+-- 6. Ensure rayenfarhani9@gmail.com has username rayen103 and CST SocieteId
+UPDATE dbo.Utilisateur 
+SET NomUtilisateur = 'rayen103', 
+    IsActive = 1,
+    SocieteId = '01HC85BM5QVRW7ABRV33TR1GQ0',
+    Password = 'F0076EA5CFBF1D777D3ECF577CE998EDA1AD96FEDB22C42F0D449A7F7AAF023F6ABD0112972C3EAE86ED0E9A82C01FCFE88249523CE56E6212AE12AC1A7D871F'
+WHERE Email = 'rayenfarhani9@gmail.com' OR NomUtilisateur = 'rayen103';
+
+UPDATE dbo.Utilisateur
+SET SocieteId = '01HC85BM5QVRW7ABRV33TR1GQ0', IsActive = 1
+WHERE NomUtilisateur IN ('admin', 'root');
+
+-- 7. Ensure all buses and employees are active
+UPDATE dbo.Bus SET IsActive = 1;
+UPDATE dbo.Employe SET IsActive = 1;
+");
+        Log.Information("Core demo accounts & societes seeded.");
+    }
+    catch (Exception coreEx)
+    {
+        Log.Warning("Core demo seed notice: {Message}", coreEx.Message);
+    }
+
+    // 2. Comprehensive idempotent seed from SeedData.sql
+    try
+    {
+        var seedPath = Path.Combine(AppContext.BaseDirectory, "SeedData.sql");
+        string? seedSql = null;
+        if (File.Exists(seedPath))
+        {
+            seedSql = File.ReadAllText(seedPath);
+        }
+        else
+        {
+            var assembly = typeof(Program).Assembly;
+            var resourceName = assembly.GetManifestResourceNames().FirstOrDefault(n => n.EndsWith("SeedData.sql", StringComparison.OrdinalIgnoreCase));
+            if (resourceName != null)
+            {
+                using var stream = assembly.GetManifestResourceStream(resourceName);
+                if (stream != null)
+                {
+                    using var reader = new StreamReader(stream);
+                    seedSql = reader.ReadToEnd();
+                }
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(seedSql))
+        {
+            dbContext.Database.SetCommandTimeout(180);
+            var blocks = seedSql.Split(new[] { "END;" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var block in blocks)
+            {
+                var trimmed = block.Trim();
+                if (string.IsNullOrWhiteSpace(trimmed) || trimmed.StartsWith("--")) continue;
+                try
+                {
+                    dbContext.Database.ExecuteSqlRaw(trimmed + " END;");
+                }
+                catch
+                {
+                    // Ignore non-critical individual constraint collisions
+                }
+            }
+            Log.Information("SeedData.sql blocks executed.");
+        }
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "Failed to apply SeedData.sql on startup");
+    }
 }
 
 //Handle exceptions priority it's important
 app.UseExceptionHandler((_) => { });
 
-// Configure the HTTP request pipeline.
+app.UseSwagger();
+app.UseSwaggerUI();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseRin();
-    app.UseSwagger();
-    app.UseSwaggerUI();
     app.UseRinDiagnosticsHandler();
 }
 
@@ -123,13 +237,13 @@ app.UseHttpsRedirection();
 
 app.UseSerilogRequestLogging();
 
-var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
-app.UseCors(policyBuilder  =>
+app.UseCors(policyBuilder =>
 {
     policyBuilder
-        .WithOrigins(allowedOrigins)
-        .WithMethods("GET","POST","PUT","PATCH","DELETE")
-        .WithHeaders("Authorization", "Content-Type");
+        .SetIsOriginAllowed(origin => true)
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
 });
 
 app.UseAuthentication()
@@ -150,39 +264,54 @@ app.UseAuthentication()
 
 app.MapCarter();
 
+app.MapGet("/", () => Results.Ok(new { status = "Healthy", service = "CollectManagement.WebAPI", version = "1.0.0" }));
+
 // Auto-start ML ETA Prediction Service on backend startup
 if (app.Environment.IsDevelopment())
 {
     try
     {
-        // Get project root path (relative from WebAPI to ml-service)
         var solutionRoot = Path.GetFullPath(Path.Combine(app.Environment.ContentRootPath, "..", "..", ".."));
         var mlServicePath = Path.Combine(solutionRoot, "ml-service");
 
         if (Directory.Exists(mlServicePath))
         {
-            Console.WriteLine("🚀 Starting ML ETA Prediction Service automatically...");
+            var venvPythonWin = Path.Combine(mlServicePath, ".venv", "Scripts", "python.exe");
+            var venvPythonUnix = Path.Combine(mlServicePath, ".venv", "bin", "python");
+
+            string pythonExec;
+            if (OperatingSystem.IsWindows() && File.Exists(venvPythonWin))
+            {
+                pythonExec = venvPythonWin;
+            }
+            else if (!OperatingSystem.IsWindows() && File.Exists(venvPythonUnix))
+            {
+                pythonExec = venvPythonUnix;
+            }
+            else
+            {
+                pythonExec = OperatingSystem.IsWindows() ? "python" : "python3";
+            }
+
+            Console.WriteLine($"🚀 Starting ML ETA Prediction Service automatically using '{pythonExec}'...");
 
             var processStartInfo = new System.Diagnostics.ProcessStartInfo
             {
-                FileName = OperatingSystem.IsWindows() ? "python" : "python3",
-                Arguments = "-m uvicorn main:app --host 0.0.0.0 --port 8001 --reload",
+                FileName = pythonExec,
+                Arguments = "-m uvicorn main:app --host 0.0.0.0 --port 8000 --reload",
                 WorkingDirectory = mlServicePath,
                 UseShellExecute = true,
                 CreateNoWindow = false,
-                WindowStyle = OperatingSystem.IsWindows() 
-                    ? System.Diagnostics.ProcessWindowStyle.Normal 
-                    : System.Diagnostics.ProcessWindowStyle.Normal
+                WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal
             };
 
             var mlProcess = System.Diagnostics.Process.Start(processStartInfo);
-            
+
             if (mlProcess != null)
             {
-                Console.WriteLine($"✅ ML Service started (PID: {mlProcess.Id}) at http://localhost:8001");
-                
-                // Keep track of the ML process so we can clean it up if needed
-                AppDomain.CurrentDomain.ProcessExit += (s, e) => 
+                Console.WriteLine($"✅ ML Service started (PID: {mlProcess.Id}) at http://localhost:8000");
+
+                AppDomain.CurrentDomain.ProcessExit += (s, e) =>
                 {
                     if (!mlProcess.HasExited)
                     {
@@ -202,6 +331,26 @@ if (app.Environment.IsDevelopment())
     {
         Console.WriteLine($"❌ Failed to auto-start ML service: {ex.Message}");
     }
+
+    // Auto-trigger ML Initialization and Warmup on startup
+    Task.Run(async () =>
+    {
+        await Task.Delay(3000);
+        try
+        {
+            using var scope = app.Services.CreateScope();
+            var predictionService = scope.ServiceProvider.GetService<IExternalPredictionService>();
+            if (predictionService != null)
+            {
+                var meta = await predictionService.GetModelMetadataAsync();
+                Console.WriteLine($"🤖 ML Service Initialized: Version={meta.ModelVersion}, DurationSamples={meta.DurationSampleCount}, AbsenceSamples={meta.AbsenceSampleCount}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"⚠️ ML Warmup trigger warning: {ex.Message}");
+        }
+    });
 }
 
 app.Run();

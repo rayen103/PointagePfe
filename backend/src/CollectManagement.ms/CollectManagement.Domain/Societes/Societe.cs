@@ -1,9 +1,9 @@
-﻿using CollectManagement.Domain.Common;
+using CollectManagement.Domain.Common;
 using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Domain.Societes;
 
-public class Societe : AuditableEntity
+public class Societe : AuditableEntity, ITenantEntity
 {
     public SocieteId SocieteId { get; private set; }
     

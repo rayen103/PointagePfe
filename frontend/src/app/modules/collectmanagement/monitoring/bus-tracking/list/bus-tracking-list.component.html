@@ -53,7 +53,7 @@
                             <span
                                 class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase"
                                 [ngClass]="bus.isActive ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'">
-                                {{ bus.isActive ? 'En route' : 'Arrêt' }}
+                                {{ bus.isActive ? 'En route' : (bus.busId.startsWith('circuit_') ? 'Planifié' : 'Arrêt') }}
                             </span>
                         </div>
                         <div class="flex items-center gap-2">
@@ -63,7 +63,7 @@
                             <span
                                 class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase"
                                 [ngClass]="bus.isActive ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'">
-                                {{ bus.isActive ? 'En ligne' : 'Hors ligne' }}
+                                {{ bus.isActive ? 'En ligne' : (bus.busId.startsWith('circuit_') ? 'Prêt' : 'Hors ligne') }}
                             </span>
                         </div>
                     </div>

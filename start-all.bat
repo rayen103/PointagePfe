@@ -12,11 +12,11 @@ echo [2/3] Starting Frontend...
 start "Frontend Service" cmd /k "cd /d %~dp0frontend && npm start"
 
 echo.
-echo [3/3] Starting ETA Prediction ML Service (if exists)...
-if exist "%~dp0ml-services\eta_prediction" (
-    start "ETA Prediction Service" cmd /k "cd /d %~dp0ml-services\eta_prediction && python -m uvicorn main:app --host 0.0.0.0 --port 8001 --reload"
+echo [3/3] Starting ETA Prediction ML Service...
+if exist "%~dp0ml-service" (
+    start "ETA Prediction Service" cmd /k "cd /d %~dp0ml-service && python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
 ) else (
-    echo Warning: ml-services/eta_prediction directory not found!
+    echo Warning: ml-service directory not found!
 )
 
 echo.
@@ -24,6 +24,6 @@ echo ========================================
 echo All services are starting!
 echo - Backend: http://localhost:6064
 echo - Frontend: http://localhost:4200
-echo - ETA Prediction: http://localhost:8001
+echo - ETA Prediction: http://localhost:8000
 echo ========================================
 pause

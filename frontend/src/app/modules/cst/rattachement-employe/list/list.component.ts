@@ -1,3 +1,6 @@
+import { PdfExportService } from '../../../../core/common/pdf-export.service';
+import { CsvExportService } from '../../../../core/common/csv-export.service';
+import { take } from 'rxjs';
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
@@ -65,6 +68,10 @@ export class ListComponent implements OnInit, OnDestroy {
     sortDirection: 'asc' | 'desc' = 'asc';
 
     constructor(
+        private _pdfExportService: PdfExportService,
+
+        private _csvExportService: CsvExportService,
+
         private _rattachementEmployeService: RattachementEmployeService,
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseConfirmationService: FuseConfirmationService
@@ -167,4 +174,26 @@ export class ListComponent implements OnInit, OnDestroy {
     }
 
     protected readonly FuseNavigationAction = FuseNavigationAction;
+
+    exportData(): void {
+        if (this._rattachementEmployeService) {
+            const obs$ = (this as any).rattachementEmployes$ || this._rattachementEmployeService.rattachementEmployes$ || this._rattachementEmployeService.rattachementEmployes$;
+            if (obs$) {
+                obs$.pipe(take(1)).subscribe((data: any) => {
+                    const items = Array.isArray(data) ? data : (data?.items || data?.rattachementEmployes || data?.rattachementEmployes || []);
+                    if (items && items.length > 0) {
+                        const columns = [
+            { header: 'Code Employé', dataKey: 'codeEmploye' },
+            { header: 'Matricule', dataKey: 'matricule' },
+            { header: 'Nom', dataKey: 'nom' },
+            { header: 'Prénom', dataKey: 'prenom' }
+        ];
+                        this._pdfExportService.exportToPdf('Rapport Rattachements Employés', columns, items, 'RattachementEmployes_Export.pdf');
+                    } else {
+                        console.warn('No data available to export to PDF');
+                    }
+                });
+            }
+        }
+    }
 }

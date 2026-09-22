@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroupDirective, ReactiveFormsModule, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
-import { catchError, EMPTY, finalize, forkJoin, map, Observable, of, Subject, take, takeUntil } from 'rxjs';
+import { catchError, EMPTY, finalize, forkJoin, map, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
 import { fuseAnimations } from '../../../../../@fuse/animations';
 import { Circuit } from '../../../../core/circuit/circuit.model';
 import { CircuitService } from '../../../../core/circuit/circuit.service';
@@ -23,6 +23,8 @@ import { MapSkeletonComponent } from '../../../../shared/components/map-skeleton
 import { MapGeocodingService } from '../../../../core/common/map-geocoding.service';
 import { PointCollecteService } from '../../../../core/point-collecte/point-collecte.service';
 import { PointCollecte } from '../../../../core/point-collecte/point-collecte.model';
+import { CircuitPointCollecteService } from '../../../../core/circuit/circuit-point-collecte.service';
+import { CircuitPointCollecte } from '../../../../core/circuit/circuit-point-collecte.model';
 import { FuseConfirmationService } from '../../../../../@fuse/services/confirmation';
 import {
     DijkstraService,
@@ -84,6 +86,8 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
     manualEvaluation: RouteEvaluation | null = null;
     optimizedResult: OptimizedRoute | null = null;
     optimizedApplied: boolean = false;
+    isCalculatingRoute: boolean = false;
+    private routeCalculationRequestId: number = 0;
 
     private departureAddressPoint: MapRoutePoint | null = null;
     private arrivalAddressPoint: MapRoutePoint | null = null;
@@ -95,6 +99,7 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         private formBuilder: FormBuilder,
         private _circuitService: CircuitService,
         private _pointCollecteService: PointCollecteService,
+        private _circuitPointCollecteService: CircuitPointCollecteService,
         private _mapGeocodingService: MapGeocodingService,
         private _dijkstraService: DijkstraService,
         private _changeDetectorRef: ChangeDetectorRef,
@@ -182,14 +187,73 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
     private refreshPointSelection(): void {
         if (!this.circuit?.circuitId || this.isNewCircuit) {
             this.selectedPointIds = [];
+            this.applyPointFilter(this.pointSearchControl.value);
+            this.rebuildOrderedPoints();
+            this.composeCircuitRoutePoints();
         } else {
-            this.selectedPointIds = this.allPoints
-                .filter((p) => p.circuitId === this.circuit.circuitId)
-                .map((p) => p.pointCollecteId);
+            this._circuitPointCollecteService.getByCircuit(this.circuit.circuitId).subscribe({
+                next: (circuitPoints) => {
+                    const depCode = this.circuit?.codePCDepart;
+                    const arrCode = this.circuit?.codePCArrivee;
+
+                    if (circuitPoints && circuitPoints.length > 0) {
+                        const sorted = [...circuitPoints].sort((a, b) => (a.ordre ?? 0) - (b.ordre ?? 0));
+                        let intermediate: CircuitPointCollecte[] = [];
+
+                        if (sorted.length > 2) {
+                            intermediate = sorted.slice(1, -1);
+                        } else if (sorted.length === 2) {
+                            if (sorted[0].codePointCollecte === depCode && sorted[1].codePointCollecte === arrCode) {
+                                intermediate = [];
+                            } else if (sorted[0].codePointCollecte === depCode) {
+                                intermediate = [sorted[1]];
+                            } else if (sorted[1].codePointCollecte === arrCode) {
+                                intermediate = [sorted[0]];
+                            } else {
+                                intermediate = sorted;
+                            }
+                        } else if (sorted.length === 1) {
+                            if (sorted[0].codePointCollecte !== depCode && sorted[0].codePointCollecte !== arrCode) {
+                                intermediate = sorted;
+                            }
+                        }
+
+                        const idsFromCircuitPoints = intermediate
+                            .map(cp => this.allPoints.find(p => p.codePointCollecte === cp.codePointCollecte)?.pointCollecteId)
+                            .filter((id): id is string => !!id);
+
+                        if (idsFromCircuitPoints.length > 0) {
+                            this.selectedPointIds = idsFromCircuitPoints;
+                        } else if (this.allPoints.length > 0) {
+                            this.selectedPointIds = this.allPoints
+                                .filter((p) => p.circuitId === this.circuit.circuitId && p.codePointCollecte !== depCode && p.codePointCollecte !== arrCode)
+                                .map((p) => p.pointCollecteId);
+                        }
+                    } else if (this.allPoints.length > 0) {
+                        this.selectedPointIds = this.allPoints
+                            .filter((p) => p.circuitId === this.circuit.circuitId && p.codePointCollecte !== depCode && p.codePointCollecte !== arrCode)
+                            .map((p) => p.pointCollecteId);
+                    }
+                    this.applyPointFilter(this.pointSearchControl.value);
+                    this.rebuildOrderedPoints();
+                    this.composeCircuitRoutePoints();
+                    this._changeDetectorRef.markForCheck();
+                },
+                error: () => {
+                    const depCode = this.circuit?.codePCDepart;
+                    const arrCode = this.circuit?.codePCArrivee;
+                    if (this.allPoints.length > 0) {
+                        this.selectedPointIds = this.allPoints
+                            .filter((p) => p.circuitId === this.circuit.circuitId && p.codePointCollecte !== depCode && p.codePointCollecte !== arrCode)
+                            .map((p) => p.pointCollecteId);
+                    }
+                    this.applyPointFilter(this.pointSearchControl.value);
+                    this.rebuildOrderedPoints();
+                    this.composeCircuitRoutePoints();
+                    this._changeDetectorRef.markForCheck();
+                }
+            });
         }
-        this.applyPointFilter(this.pointSearchControl.value);
-        this.rebuildOrderedPoints();
-        this.composeCircuitRoutePoints();
     }
 
     get selectedPointCount(): number {
@@ -316,6 +380,12 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
         if (this.departureAddressPoint) {
             this.departureAddressNotFound = false;
             this.setAddressNotFoundError('codePCDepart', false);
+            if (this.circuitForm.get('latitude')?.value == null || this.circuitForm.get('longitude')?.value == null) {
+                this.circuitForm.patchValue({
+                    latitude: this.departureAddressPoint.latitude,
+                    longitude: this.departureAddressPoint.longitude,
+                });
+            }
         }
         if (this.arrivalAddressPoint) {
             this.arrivalAddressNotFound = false;
@@ -572,12 +642,47 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                 const circuit = this.circuitForm.getRawValue() as Circuit;
                 circuit.pointCollecteIds = this.selectedPointIds;
 
+                // Ensure latitude & longitude are populated from departure point or first collection point
+                if (circuit.latitude == null || circuit.longitude == null) {
+                    if (this.departureAddressPoint) {
+                        circuit.latitude = this.departureAddressPoint.latitude;
+                        circuit.longitude = this.departureAddressPoint.longitude;
+                    } else if (this.orderedSelectedPoints.length > 0 && this.orderedSelectedPoints[0].latitude != null) {
+                        circuit.latitude = Number(this.orderedSelectedPoints[0].latitude);
+                        circuit.longitude = Number(this.orderedSelectedPoints[0].longitude);
+                    }
+                    this.circuitForm.patchValue({
+                        latitude: circuit.latitude,
+                        longitude: circuit.longitude,
+                    });
+                }
+                // Fallback: auto-fill distance & duration if not yet populated
+                if (circuit.distanceKm == null && this.manualEvaluation?.totalDistanceKm != null) {
+                    circuit.distanceKm = Math.round(this.manualEvaluation.totalDistanceKm * 10) / 10;
+                }
+                if (circuit.dureeMinutes == null && this.manualEvaluation?.estimatedDurationMinutes != null) {
+                    circuit.dureeMinutes = this.manualEvaluation.estimatedDurationMinutes;
+                }
+
+                const targetCircuitId = this.circuit?.circuitId || circuit.circuitId;
+                circuit.circuitId = targetCircuitId;
+                circuit.pointCollecteIds = [...this.selectedPointIds];
+
                 this.isLoading = true;
 
                 if (!this.circuit?.circuitId) {
                     this._circuitService
                         .AddCircuit(circuit)
                         .pipe(
+                            switchMap((res: any) => {
+                                const newId = res?.circuitId || res?.id || res?.data?.circuitId;
+                                if (newId) {
+                                    return this.saveCircuitPointsAndAssociations(newId).pipe(
+                                        catchError(() => of(true))
+                                    );
+                                }
+                                return of(true);
+                            }),
                             catchError(() => {
                                 this.showFlashMessage('error');
                                 return EMPTY;
@@ -600,6 +705,15 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                 this._circuitService
                     .UpdateCircuit(circuit)
                     .pipe(
+                        switchMap((res) => {
+                            if (res && targetCircuitId) {
+                                return this.saveCircuitPointsAndAssociations(targetCircuitId).pipe(
+                                    map(() => res),
+                                    catchError(() => of(res))
+                                );
+                            }
+                            return of(res);
+                        }),
                         catchError(() => {
                             this.showFlashMessage('error');
                             return EMPTY;
@@ -609,11 +723,108 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
                             this._changeDetectorRef.markForCheck();
                         })
                     )
-                    .subscribe((val) => {
-                        this.showFlashMessage(val ? 'success' : 'error');
+                    .subscribe((res) => {
+                        if (res) {
+                            const selectedIds = new Set(this.selectedPointIds);
+                            this.allPoints.forEach((p) => {
+                                if (selectedIds.has(p.pointCollecteId)) {
+                                    p.circuitId = targetCircuitId;
+                                } else if (p.circuitId === targetCircuitId) {
+                                    p.circuitId = null;
+                                }
+                            });
+                            this.circuit = { ...this.circuit, ...circuit, circuitId: targetCircuitId };
+                            this.applyPointFilter(this.pointSearchControl.value);
+                            this.rebuildOrderedPoints();
+                            this.composeCircuitRoutePoints();
+                            this.showFlashMessage('success');
+                            this._changeDetectorRef.markForCheck();
+                        } else {
+                            this.showFlashMessage('error');
+                        }
                     });
             });
 
+    }
+
+    private saveCircuitPointsAndAssociations(circuitId: string): Observable<any> {
+        const depCode = (this.circuitForm.get('codePCDepart')?.value ?? '').trim();
+        const arrCode = (this.circuitForm.get('codePCArrivee')?.value ?? '').trim();
+
+        const departurePoint = this.allPoints.find((p) => p.codePointCollecte === depCode);
+        const arrivalPoint = this.allPoints.find((p) => p.codePointCollecte === arrCode);
+
+        const pointsToSave: CircuitPointCollecte[] = [];
+
+        // 0. Departure point
+        if (departurePoint) {
+            pointsToSave.push({
+                circuitPointCollecteId: null,
+                circuitId: circuitId,
+                codePointCollecte: departurePoint.codePointCollecte,
+                libellePointCollecte: departurePoint.libellePointCollecte || departurePoint.codePointCollecte,
+                latitude: departurePoint.latitude != null ? Number(departurePoint.latitude) : null,
+                longitude: departurePoint.longitude != null ? Number(departurePoint.longitude) : null,
+                ordre: 0,
+            });
+        }
+
+        // 1..N. Intermediate collection points in visiting order
+        this.orderedSelectedPoints.forEach((p, idx) => {
+            pointsToSave.push({
+                circuitPointCollecteId: null,
+                circuitId: circuitId,
+                codePointCollecte: p.codePointCollecte,
+                libellePointCollecte: p.libellePointCollecte || p.codePointCollecte,
+                latitude: p.latitude != null ? Number(p.latitude) : null,
+                longitude: p.longitude != null ? Number(p.longitude) : null,
+                ordre: idx + 1,
+            });
+        });
+
+        // N+1. Arrival point
+        if (arrivalPoint) {
+            pointsToSave.push({
+                circuitPointCollecteId: null,
+                circuitId: circuitId,
+                codePointCollecte: arrivalPoint.codePointCollecte,
+                libellePointCollecte: arrivalPoint.libellePointCollecte || arrivalPoint.codePointCollecte,
+                latitude: arrivalPoint.latitude != null ? Number(arrivalPoint.latitude) : null,
+                longitude: arrivalPoint.longitude != null ? Number(arrivalPoint.longitude) : null,
+                ordre: this.orderedSelectedPoints.length + 1,
+            });
+        }
+
+        return this._circuitPointCollecteService.getByCircuit(circuitId).pipe(
+            catchError(() => of([] as CircuitPointCollecte[])),
+            switchMap((existing) => {
+                const delete$ = (existing && existing.length > 0)
+                    ? forkJoin(existing.map((ep) => this._circuitPointCollecteService.delete(ep.circuitPointCollecteId).pipe(catchError(() => of(true)))))
+                    : of([]);
+                return delete$.pipe(
+                    switchMap(() => {
+                        const add$ = (pointsToSave.length > 0)
+                            ? forkJoin(pointsToSave.map((pt) => this._circuitPointCollecteService.add(pt).pipe(catchError(() => of(null)))))
+                            : of([]);
+                        return add$;
+                    })
+                );
+            }),
+            switchMap(() => {
+                const selectedIds = new Set(this.selectedPointIds);
+                const updates$: Observable<any>[] = [];
+                this.allPoints.forEach((p) => {
+                    if (selectedIds.has(p.pointCollecteId) && p.circuitId !== circuitId) {
+                        p.circuitId = circuitId;
+                        updates$.push(this._pointCollecteService.UpdatePointCollecte(p).pipe(catchError(() => of(true))));
+                    } else if (!selectedIds.has(p.pointCollecteId) && p.circuitId === circuitId) {
+                        p.circuitId = null;
+                        updates$.push(this._pointCollecteService.UpdatePointCollecte(p).pipe(catchError(() => of(true))));
+                    }
+                });
+                return updates$.length > 0 ? forkJoin(updates$) : of([]);
+            })
+        );
     }
 
     onLocationChange(location: { latitude: number; longitude: number }): void {
@@ -772,16 +983,128 @@ export class DetailsComponent implements OnInit, OnDestroy, AfterViewInit {
 
         this.circuitRoutePoints = routePoints;
 
-        // Live evaluation of the current (manual) order for the stats chips
-        if (this.departureAddressPoint && this.arrivalAddressPoint && stops.length > 0) {
-            this.manualEvaluation = this._dijkstraService.evaluateOrder(
-                { id: '__start__', latitude: this.departureAddressPoint.latitude, longitude: this.departureAddressPoint.longitude },
-                stops.map((s, i) => ({ id: String(i), latitude: s.latitude, longitude: s.longitude })),
-                { id: '__end__', latitude: this.arrivalAddressPoint.latitude, longitude: this.arrivalAddressPoint.longitude }
-            );
-        } else {
+        // Auto-calculate distance and duration along actual road network
+        this.calculateRouteMetrics(stops);
+    }
+
+    get canCalculateRoute(): boolean {
+        return !!this.departureAddressPoint && !!this.arrivalAddressPoint;
+    }
+
+    recalculateRouteMetrics(): void {
+        const stops: MapRoutePoint[] = this.orderedSelectedPoints
+            .filter((p) => p.latitude != null && p.longitude != null)
+            .map((p, index) => ({
+                latitude: Number(p.latitude),
+                longitude: Number(p.longitude),
+                label: `${index + 1}. ${p.libellePointCollecte || p.codePointCollecte}`,
+                kind: 'stop' as const,
+                order: index + 1,
+            }));
+        this.calculateRouteMetrics(stops, true);
+    }
+
+    private calculateRouteMetrics(stops: MapRoutePoint[], force = false): void {
+        if (!this.departureAddressPoint || !this.arrivalAddressPoint) {
             this.manualEvaluation = null;
+            return;
         }
+
+        const startNode: RouteNode = {
+            id: '__start__',
+            latitude: this.departureAddressPoint.latitude,
+            longitude: this.departureAddressPoint.longitude,
+        };
+        const endNode: RouteNode = {
+            id: '__end__',
+            latitude: this.arrivalAddressPoint.latitude,
+            longitude: this.arrivalAddressPoint.longitude,
+        };
+        const stopNodes: RouteNode[] = stops.map((s, i) => ({
+            id: String(i),
+            latitude: s.latitude,
+            longitude: s.longitude,
+        }));
+
+        // 1. Instant fallback evaluation via Dijkstra service (0ms latency)
+        const instantEval = this._dijkstraService.evaluateOrder(startNode, stopNodes, endNode);
+        this.manualEvaluation = instantEval;
+
+        const currentDist = this.circuitForm.get('distanceKm')?.value;
+        const currentDuree = this.circuitForm.get('dureeMinutes')?.value;
+
+        // Populate form if creating a new circuit, or if empty, or if explicitly requested
+        if (force || this.isNewCircuit || currentDist == null || currentDuree == null) {
+            this.circuitForm.patchValue({
+                distanceKm: Math.round(instantEval.totalDistanceKm * 10) / 10,
+                dureeMinutes: instantEval.estimatedDurationMinutes,
+            }, { emitEvent: false });
+        }
+
+        // 2. High-precision road calculation via OpenStreetMap / OSRM routing API
+        const allOrderedPoints = [startNode, ...stopNodes, endNode];
+        const coordinatesParam = allOrderedPoints
+            .map((p) => `${p.longitude.toFixed(6)},${p.latitude.toFixed(6)}`)
+            .join(';');
+
+        const requestId = ++this.routeCalculationRequestId;
+        this.isCalculatingRoute = true;
+        this._changeDetectorRef.markForCheck();
+
+        const providers = [
+            `https://routing.openstreetmap.de/routed-car/route/v1/driving/${coordinatesParam}?overview=false`,
+            `https://router.project-osrm.org/route/v1/driving/${coordinatesParam}?overview=false`,
+        ];
+
+        this.fetchRouteMetrics(providers).then((metrics) => {
+            if (requestId !== this.routeCalculationRequestId) {
+                return;
+            }
+            this.isCalculatingRoute = false;
+            if (metrics) {
+                const distanceField = this.circuitForm.get('distanceKm');
+                const isDistancePristine = !distanceField?.dirty;
+
+                if (force || this.isNewCircuit || currentDist == null || currentDuree == null || isDistancePristine) {
+                    this.circuitForm.patchValue({
+                        distanceKm: metrics.distanceKm,
+                        dureeMinutes: metrics.dureeMinutes,
+                    }, { emitEvent: false });
+                }
+
+                if (this.manualEvaluation) {
+                    this.manualEvaluation = {
+                        ...this.manualEvaluation,
+                        totalDistanceKm: metrics.distanceKm,
+                        estimatedDurationMinutes: metrics.dureeMinutes,
+                    };
+                }
+            }
+            this._changeDetectorRef.markForCheck();
+        });
+    }
+
+    private async fetchRouteMetrics(providers: string[]): Promise<{ distanceKm: number; dureeMinutes: number } | null> {
+        for (const url of providers) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3500);
+                const res = await fetch(url, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                if (!res.ok) continue;
+                const data = await res.json();
+                if (data?.code === 'Ok' && data.routes?.[0]) {
+                    const route = data.routes[0];
+                    const distanceKm = Math.round(((route.distance ?? 0) / 1000) * 10) / 10;
+                    const dureeMinutes = Math.max(1, Math.round((route.duration ?? 0) / 60));
+                    return { distanceKm, dureeMinutes };
+                }
+            } catch (err) {
+                // Try next provider
+            }
+        }
+        return null;
     }
 
     ngOnDestroy(): void {

@@ -70,6 +70,7 @@ export interface AvailableBusEtaPrediction {
     distanceFromStop: number;
     etaMinutes: number;
     confidence: number;
+    stopName?: string | null;
 }
 
 export interface AvailableBusEtaPredictionResponse {

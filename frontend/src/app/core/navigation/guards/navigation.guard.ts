@@ -12,12 +12,14 @@ export const navigationGuard: CanActivateFn | CanActivateChildFn = async (route,
     const userService = inject(UserService);
     const router: Router = inject(Router);
     const user = await firstValueFrom(userService.user$);
-    if (user?.navigations.length === 0){
+
+    // Unrestricted superadmins have no specific navigation constraints
+    if (!user?.navigations || user?.navigations.length === 0){
         return true;
     }
 
-    const navigationIndex = user?.navigations
-        ?.findIndex(n => n.navigationId===route.data?.navigationId);
+    const navigationIndex = user.navigations
+        .findIndex(n => n.navigationId === route.data?.navigationId);
 
     if (navigationIndex === -1){
         return router.navigate(['/Accueil/page']);

@@ -11,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import {
+    CircuitMapOverview,
     CircuitPointLocation,
     MapLocation,
     MapViewerComponent,
@@ -33,9 +34,23 @@ export class BusTrackingMapComponent {
     @Input() selectedBusPosition: { latitude: number; longitude: number; heading?: number } | null = null;
     @Input() circuitArea: [number, number][] | null = null;
     @Input() routeLoading: boolean = false;
+    @Input() allCircuits: CircuitMapOverview[] = [];
+    @Input() selectedCircuitId: string | null = null;
     @Output() readonly toggleShowAll = new EventEmitter<boolean>();
+    @Output() readonly selectCircuit = new EventEmitter<string>();
+
+    showAllCircuits: boolean = true;
+    showAllPoints: boolean = true;
 
     get showCircuitOverlay(): boolean {
-        return this.circuitPoints.length > 0 || !!this.optimizedRoute || !!this.selectedBusPosition;
+        return this.circuitPoints.length > 0 || !!this.optimizedRoute || !!this.selectedBusPosition || this.allCircuits.length > 0;
+    }
+
+    toggleCircuits(): void {
+        this.showAllCircuits = !this.showAllCircuits;
+    }
+
+    togglePoints(): void {
+        this.showAllPoints = !this.showAllPoints;
     }
 }

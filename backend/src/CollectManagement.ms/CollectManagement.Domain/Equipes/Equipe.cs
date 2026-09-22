@@ -5,7 +5,7 @@ using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Domain.Equipes;
 
-public class Equipe : AuditableEntity
+public class Equipe : AuditableEntity, ITenantEntity
 {
     public EquipeId EquipeId { get; private set; }
     

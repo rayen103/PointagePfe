@@ -11,8 +11,9 @@
         </div>
         <div class="cst-head__actions">
             @if (selectedCount > 0) {
-                <button class="cst-btn cst-btn--ghost" type="button" (click)="clearSelection()">
-                    <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:x-mark'"></mat-icon> Effacer
+                <button class="cst-btn cst-btn--ghost" type="button" (click)="exportData()">
+                    <mat-icon class="cst-btn__i" [svgIcon]="'heroicons_outline:document-text'"></mat-icon>
+                    Exporter PDF
                 </button>
             }
             @if (hasActionPermission(FuseNavigationAction.Add)) {

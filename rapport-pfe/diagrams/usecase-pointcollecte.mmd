@@ -1,0 +1,27 @@
+%%{init: { "theme": "redux", "flowchart": { "curve": "linear", "nodeSpacing": 35, "rankSpacing": 70 }, "themeVariables": { "fontSize": "18px", "actorFontSize": "18px", "noteFontSize": "16px", "fontFamily": "Arial, sans-serif" } }}%%
+flowchart LR
+    Operator["fa:fa-user Operator / Dispatcher"]
+
+    subgraph System ["Real-Time Tracking & Telemetry"]
+        direction TB
+        UC1(["Supervise Live Bus Positions on Map"])
+        UC2(["Receive Geofence Route Alerts"])
+        UC3(["Consult Telemetry Event Timeline"])
+        UC4(["Predict Bus Arrival Times (ETA)"])
+        UC5(["Transmit GPS & Occupancy Stream"])
+
+        UC1 ~~~ UC2
+        UC2 ~~~ UC3
+        UC3 ~~~ UC4
+        UC4 ~~~ UC5
+    end
+
+    Modem["fa:fa-satellite-dish IoT Telemetry Modem"]
+
+    Operator --- UC1
+    Operator --- UC2
+    Operator --- UC3
+    Operator --- UC4
+
+    UC2 --- Modem
+    UC5 --- Modem

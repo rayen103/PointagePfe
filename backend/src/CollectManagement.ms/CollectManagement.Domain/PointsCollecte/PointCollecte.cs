@@ -7,7 +7,7 @@ using CollectManagement.Domain.Societes.ValueObjects;
 
 namespace CollectManagement.Domain.PointsCollecte;
 
-public class PointCollecte : AuditableEntity
+public class PointCollecte : AuditableEntity, ITenantEntity
 {
     public PointCollecteId PointCollecteId { get; private set; }
     
@@ -99,6 +99,11 @@ public class PointCollecte : AuditableEntity
         CodeGouvernorat = codeGouvernorat;
         CodeRegion = codeRegion;
         IsActive = isActive;
+        CircuitId = circuitId;
+    }
+
+    public void AssignCircuit(CircuitId? circuitId)
+    {
         CircuitId = circuitId;
     }
     

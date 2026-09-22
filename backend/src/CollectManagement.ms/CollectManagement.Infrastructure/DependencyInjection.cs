@@ -70,8 +70,10 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         services.AddScoped<ILoggedInUserService, LoggedInUserService>();
+        services.AddScoped<ITenantProvider, TenantProvider>();
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         services.Configure<PuppeteerOptions>(configuration.GetSection(PuppeteerOptions.SectionName));
+        services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.SectionName));
         services.Configure<JsonOptions>(options =>
         {
             options.SerializerOptions.Converters.Add(new NullableUlidJsonConverter());
@@ -87,6 +89,7 @@ public static class DependencyInjection
 
         
         services.AddScoped<IPasswordService, PasswordService>();
+        services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IFileSystem, FileSystem>();
         services.AddScoped<IImageService, ImageService>();
         services.AddScoped<IPdfGeneratorService, PdfGeneratorService>();
@@ -171,6 +174,16 @@ public static class DependencyInjection
         services.AddSingleton(Options.Create(jwtOptions));
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 
+        var secretKey = !string.IsNullOrWhiteSpace(jwtOptions.Secret)
+            ? jwtOptions.Secret
+            : "01HBBRZ5CY308W01M2FQVXB0Z5@yelzem-May3ref-3lih-7ad";
+        var issuer = !string.IsNullOrWhiteSpace(jwtOptions.Issuer)
+            ? jwtOptions.Issuer
+            : "AJ.CST";
+        var audience = !string.IsNullOrWhiteSpace(jwtOptions.Audience)
+            ? jwtOptions.Audience
+            : "Dispatching";
+
         services.AddAuthentication(defaultScheme: JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
@@ -180,10 +193,10 @@ public static class DependencyInjection
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwtOptions.Issuer,
-                    ValidAudience = jwtOptions.Audience,
+                    ValidIssuer = issuer,
+                    ValidAudience = audience,
                     IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(jwtOptions.Secret)),
+                        Encoding.UTF8.GetBytes(secretKey)),
 
                 };
                 
