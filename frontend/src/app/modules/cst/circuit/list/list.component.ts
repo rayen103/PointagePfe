@@ -237,22 +237,54 @@ export class ListComponent implements OnInit, OnDestroy {
         return nLat !== null && nLng !== null && nLat >= 25 && nLat <= 40 && nLng >= 5 && nLng <= 15;
     }
 
+    private enrichCircuitPoints(circuit: Circuit, points: CircuitPointCollecte[]): void {
+        if (!points?.length || !this.allPoints?.length) {
+            return;
+        }
+
+        const circuitAssignedPoints = this.allPoints.filter(
+            (ap) => circuit?.circuitId && ap.circuitId === circuit.circuitId
+        );
+
+        points.forEach((p, idx) => {
+            if (this.isValidCoordinate(p.latitude, p.longitude)) {
+                return;
+            }
+
+            const pCode = p.codePointCollecte?.trim().toLowerCase();
+            const pLib = p.libellePointCollecte?.trim().toLowerCase();
+
+            let match = this.allPoints.find((ap) => {
+                const apCode = ap.codePointCollecte?.trim().toLowerCase();
+                const apLib = ap.libellePointCollecte?.trim().toLowerCase();
+                return (
+                    (pCode && apCode && apCode === pCode) ||
+                    (pLib && apLib && apLib === pLib) ||
+                    (pCode && apLib && apLib === pCode) ||
+                    (pLib && apCode && apCode === pLib)
+                );
+            });
+
+            if (!match && circuitAssignedPoints.length > 0) {
+                match = circuitAssignedPoints[idx] || circuitAssignedPoints.find((ap) => !points.some(pt => pt.codePointCollecte === ap.codePointCollecte));
+            }
+
+            if (match && this.isValidCoordinate(match.latitude, match.longitude)) {
+                p.latitude = this.parseCoord(match.latitude)!;
+                p.longitude = this.parseCoord(match.longitude)!;
+                if (!p.libellePointCollecte && match.libellePointCollecte) {
+                    p.libellePointCollecte = match.libellePointCollecte;
+                }
+            }
+        });
+    }
+
     refreshSelectedCircuitRoute(): void {
         if (!this.selectedCircuit || !this.selectedCircuitPoints?.length) {
             return;
         }
 
-        this.selectedCircuitPoints.forEach((p) => {
-            if (!this.isValidCoordinate(p.latitude, p.longitude) && this.allPoints?.length) {
-                const match = this.allPoints.find((ap) =>
-                    ap.codePointCollecte?.trim().toLowerCase() === p.codePointCollecte?.trim().toLowerCase()
-                );
-                if (match && this.isValidCoordinate(match.latitude, match.longitude)) {
-                    p.latitude = this.parseCoord(match.latitude)!;
-                    p.longitude = this.parseCoord(match.longitude)!;
-                }
-            }
-        });
+        this.enrichCircuitPoints(this.selectedCircuit, this.selectedCircuitPoints);
 
         this.mapPoints = this.buildSelectedRoutePoints(this.selectedCircuit, this.selectedCircuitPoints);
         this._changeDetectorRef.markForCheck();
@@ -348,17 +380,7 @@ export class ListComponent implements OnInit, OnDestroy {
                 }
 
                 // Ensure all points have valid coordinates (enrich from allPoints if missing in CircuitPointCollecte)
-                orderedPoints.forEach((p) => {
-                    if (!this.isValidCoordinate(p.latitude, p.longitude) && this.allPoints?.length) {
-                        const match = this.allPoints.find((ap) =>
-                            ap.codePointCollecte?.trim().toLowerCase() === p.codePointCollecte?.trim().toLowerCase()
-                        );
-                        if (match && this.isValidCoordinate(match.latitude, match.longitude)) {
-                            p.latitude = this.parseCoord(match.latitude)!;
-                            p.longitude = this.parseCoord(match.longitude)!;
-                        }
-                    }
-                });
+                this.enrichCircuitPoints(circuit, orderedPoints);
 
                 this.selectedCircuitPoints = orderedPoints;
                 this.isLoadingPoints = false;

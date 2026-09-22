@@ -381,79 +381,120 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
             });
 
             const pointsForLine = routePointsToFollow.length > 1 ? routePointsToFollow : validRoutePoints;
-            const directLatLngs = pointsForLine.map((p) => L.latLng(p.latitude, p.longitude));
-
-            // Temporary direct line while fetching high-res road geometry
-            this.routePolyline = L.polyline(directLatLngs, {
-                color: this.color || '#2563eb',
-                weight: 4,
-                opacity: 0.75,
-                dashArray: '8 6',
-            }).addTo(this.map!);
-
             if (pointsForLine.length >= 2) {
                 const requestId = ++this.currentRouteRequestId;
-                const coordinatesParam = pointsForLine
-                    .map((p) => `${p.longitude.toFixed(6)},${p.latitude.toFixed(6)}`)
-                    .join(';');
-
-                const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${coordinatesParam}?overview=full&geometries=geojson`;
-
-                fetch(osrmUrl)
-                    .then((res) => {
-                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                        return res.json();
-                    })
-                    .then((data) => {
-                        if (requestId !== this.currentRouteRequestId || !this.map) {
-                            return;
+                this.fetchRoadGeometry(pointsForLine).then((roadLatLngs) => {
+                    if (requestId !== this.currentRouteRequestId || !this.map) {
+                        return;
+                    }
+                    if (roadLatLngs && roadLatLngs.length > 1) {
+                        if (this.routePolyline) {
+                            this.routePolyline.remove();
+                            this.routePolyline = null;
                         }
-                        if (data?.code === 'Ok' && data.routes?.[0]?.geometry?.coordinates?.length) {
-                            const roadCoordinates: [number, number][] = data.routes[0].geometry.coordinates;
-                            const roadLatLngs: LatLng[] = roadCoordinates.map(
-                                (c) => L.latLng(c[1], c[0])
-                            );
-
-                            // Remove direct fallback line
-                            if (this.routePolyline) {
-                                this.routePolyline.remove();
-                                this.routePolyline = null;
-                            }
-                            if (this.routePolylineBorder) {
-                                this.routePolylineBorder.remove();
-                                this.routePolylineBorder = null;
-                            }
-
-                            // 1. Crisp white border / halo
-                            this.routePolylineBorder = L.polyline(roadLatLngs, {
-                                color: '#ffffff',
-                                weight: 8,
-                                opacity: 0.9,
-                                lineJoin: 'round',
-                                lineCap: 'round',
-                            }).addTo(this.map!);
-
-                            // 2. High-precision road line following the real road network
-                            this.routePolyline = L.polyline(roadLatLngs, {
-                                color: this.color || '#2563eb',
-                                weight: 5,
-                                opacity: 0.95,
-                                lineJoin: 'round',
-                                lineCap: 'round',
-                            }).addTo(this.map!);
-
-                            // Adjust camera bounds so the entire road trajectory is framed
-                            this.fitToContent([
-                                ...roadLatLngs,
-                                ...this.poiPoints.map((p) => L.latLng(p.latitude, p.longitude)),
-                            ]);
+                        if (this.routePolylineBorder) {
+                            this.routePolylineBorder.remove();
+                            this.routePolylineBorder = null;
                         }
-                    })
-                    .catch((err) => {
-                        console.warn('Road routing fell back to direct line:', err);
-                    });
+
+                        // 1. Crisp white border / halo for high visibility
+                        this.routePolylineBorder = L.polyline(roadLatLngs, {
+                            color: '#ffffff',
+                            weight: 8,
+                            opacity: 0.9,
+                            lineJoin: 'round',
+                            lineCap: 'round',
+                        }).addTo(this.map!);
+
+                        // 2. High-precision road line following the real road network
+                        this.routePolyline = L.polyline(roadLatLngs, {
+                            color: this.color || '#2563eb',
+                            weight: 5,
+                            opacity: 0.95,
+                            lineJoin: 'round',
+                            lineCap: 'round',
+                        }).addTo(this.map!);
+
+                        // Adjust camera bounds so the entire road trajectory is framed
+                        this.fitToContent([
+                            ...roadLatLngs,
+                            ...this.poiPoints.map((p) => L.latLng(p.latitude, p.longitude)),
+                        ]);
+                    }
+                });
             }
         }
+    }
+
+    private async fetchRoadGeometry(points: { latitude: number; longitude: number }[]): Promise<LatLng[]> {
+        if (points.length < 2) return [];
+
+        const coordinatesParam = points
+            .map((p) => `${p.longitude.toFixed(6)},${p.latitude.toFixed(6)}`)
+            .join(';');
+
+        // Primary: OpenStreetMap Germany (extremely fast, CORS open)
+        // Secondary: Project OSRM global
+        const providers = [
+            `https://routing.openstreetmap.de/routed-car/route/v1/driving/${coordinatesParam}?overview=full&geometries=geojson`,
+            `https://router.project-osrm.org/route/v1/driving/${coordinatesParam}?overview=full&geometries=geojson`,
+        ];
+
+        for (const url of providers) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3500);
+                const res = await fetch(url, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                if (!res.ok) continue;
+                const data = await res.json();
+                if (data?.code === 'Ok' && data.routes?.[0]?.geometry?.coordinates?.length) {
+                    const roadCoordinates: [number, number][] = data.routes[0].geometry.coordinates;
+                    return roadCoordinates.map((c) => L.latLng(c[1], c[0]));
+                }
+            } catch (err) {
+                // Try next provider
+            }
+        }
+
+        // Resilient fallback: ensure route never crosses the Lake of Tunis by routing through the bridge
+        return this.generateRoadFallbackPath(points);
+    }
+
+    private generateRoadFallbackPath(points: { latitude: number; longitude: number }[]): LatLng[] {
+        const result: LatLng[] = [];
+
+        for (let i = 0; i < points.length; i++) {
+            const current = points[i];
+            result.push(L.latLng(current.latitude, current.longitude));
+
+            if (i < points.length - 1) {
+                const next = points[i + 1];
+                // Check if straight line between current and next crosses the Lake of Tunis
+                // (e.g. South bank Mégrine/Radès <-> North/East bank Le Kram/La Goulette)
+                const isCurrentSouth = current.latitude < 36.785;
+                const isNextSouth = next.latitude < 36.785;
+                const isCurrentNorthEast = current.latitude >= 36.805 && current.longitude >= 10.25;
+                const isNextNorthEast = next.latitude >= 36.805 && next.longitude >= 10.25;
+
+                const crossesLake = (isCurrentSouth && isNextNorthEast) || (isCurrentNorthEast && isNextSouth);
+
+                if (crossesLake) {
+                    if (isCurrentSouth) {
+                        result.push(L.latLng(36.7845, 10.2780)); // Radès approach
+                        result.push(L.latLng(36.8055, 10.2875)); // Pont Radès - La Goulette
+                        result.push(L.latLng(36.8180, 10.3060)); // La Goulette approach
+                    } else {
+                        result.push(L.latLng(36.8180, 10.3060)); // La Goulette approach
+                        result.push(L.latLng(36.8055, 10.2875)); // Pont Radès - La Goulette
+                        result.push(L.latLng(36.7845, 10.2780)); // Radès approach
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     /**
