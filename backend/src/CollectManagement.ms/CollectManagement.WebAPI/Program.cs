@@ -157,6 +157,8 @@ app.UseAuthentication()
 
 app.MapCarter();
 
+app.MapGet("/", () => Results.Ok(new { status = "Healthy", service = "CollectManagement.WebAPI", version = "1.0.0" }));
+
 // Auto-start ML ETA Prediction Service on backend startup
 if (app.Environment.IsDevelopment())
 {
