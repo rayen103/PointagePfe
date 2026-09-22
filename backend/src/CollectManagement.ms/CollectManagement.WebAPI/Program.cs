@@ -112,6 +112,42 @@ BEGIN
     END;
 END;
 ");
+
+    // Seed initial / local database data idempotently
+    try
+    {
+        var seedPath = Path.Combine(AppContext.BaseDirectory, "SeedData.sql");
+        string? seedSql = null;
+        if (File.Exists(seedPath))
+        {
+            seedSql = File.ReadAllText(seedPath);
+        }
+        else
+        {
+            var assembly = typeof(Program).Assembly;
+            var resourceName = assembly.GetManifestResourceNames().FirstOrDefault(n => n.EndsWith("SeedData.sql", StringComparison.OrdinalIgnoreCase));
+            if (resourceName != null)
+            {
+                using var stream = assembly.GetManifestResourceStream(resourceName);
+                if (stream != null)
+                {
+                    using var reader = new StreamReader(stream);
+                    seedSql = reader.ReadToEnd();
+                }
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(seedSql))
+        {
+            dbContext.Database.SetCommandTimeout(180);
+            dbContext.Database.ExecuteSqlRaw(seedSql);
+            Log.Information("SeedData.sql executed successfully.");
+        }
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "Failed to apply SeedData.sql on startup");
+    }
 }
 
 //Handle exceptions priority it's important
