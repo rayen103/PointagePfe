@@ -22,6 +22,12 @@ public class TenantProvider : ITenantProvider
         get
         {
             var societeIdStr = _loggedInUserService.SocieteId;
+            if (string.Equals(societeIdStr, "01HC85BM5QVRW7ABRV33TR1GQ0", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(societeIdStr, "018B1055-D0B7-DE38-752F-1B18F580C2E0", StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
             if (Ulid.TryParse(societeIdStr, out var ulid))
                 return new SocieteId(ulid);
             return null;

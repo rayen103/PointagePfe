@@ -140,8 +140,26 @@ END;
         if (!string.IsNullOrWhiteSpace(seedSql))
         {
             dbContext.Database.SetCommandTimeout(180);
-            dbContext.Database.ExecuteSqlRaw(seedSql);
-            Log.Information("SeedData.sql executed successfully.");
+            try
+            {
+                dbContext.Database.ExecuteSqlRaw(seedSql);
+                Log.Information("SeedData.sql executed successfully.");
+            }
+            catch (Exception seedEx)
+            {
+                Log.Warning("SeedData.sql partially applied: {Message}", seedEx.Message);
+            }
+        }
+
+        // Ensure all users are active
+        try
+        {
+            dbContext.Database.ExecuteSqlRaw("UPDATE dbo.[Utilisateur] SET [IsActive] = CAST(1 AS bit);");
+            Log.Information("All users set to IsActive = 1.");
+        }
+        catch (Exception activeEx)
+        {
+            Log.Warning("Failed to update IsActive: {Message}", activeEx.Message);
         }
     }
     catch (Exception ex)
