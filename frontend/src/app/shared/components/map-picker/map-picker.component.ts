@@ -16,6 +16,10 @@ import { LatLng, Map, Marker, Polyline } from 'leaflet';
 import 'leaflet-routing-machine';
 import { GeoPoint } from '../../../core/circuit/dijkstra.service';
 
+if (typeof window !== 'undefined' && !(window as any).L) {
+    (window as any).L = L;
+}
+
 export type MapRoutePointKind = 'departure' | 'arrival' | 'stop' | 'poi';
 export type PolygonMode = 'none' | 'draw' | 'edit';
 
@@ -106,7 +110,7 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
             this.syncMainMarkerPosition();
         }
 
-        if (changes['routePoints'] || changes['color']) {
+        if (changes['routePoints'] || changes['color'] || changes['drawRoute']) {
             this.scheduleRouteUpdate();
         }
 
@@ -303,7 +307,11 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
             this.routePolyline = null;
         }
         if (this.routeControl) {
-            this.routeControl.remove();
+            try {
+                this.routeControl.remove();
+            } catch (e) {
+                // ignore
+            }
             this.routeControl = null;
         }
 
@@ -320,34 +328,7 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
 
         const latLngs = validRoutePoints.map((point) => L.latLng(point.latitude, point.longitude));
 
-        if (this.drawRoute && latLngs.length > 1) {
-            this.routeControl = L.Routing.control({
-                waypoints: latLngs,
-                show: false,
-                addWaypoints: false,
-                fitSelectedRoutes: false,
-                routeWhileDragging: false,
-                createMarker: () => null,
-                lineOptions: {
-                    styles: [
-                        { color: '#ffffff', weight: 7, opacity: 0.85 },
-                        { color: this.color, weight: 4, opacity: 0.95 },
-                    ],
-                    extendToWaypoints: true,
-                    missingRouteTolerance: 0,
-                },
-            } as any)
-                .on('routingerror', () => {
-                    this.routePolyline = L.polyline(latLngs, {
-                        color: this.color,
-                        weight: 4,
-                        opacity: 0.8,
-                        dashArray: '8 6',
-                    }).addTo(this.map!);
-                })
-                .addTo(this.map);
-        }
-
+        // 1. Render all waypoint markers and popups FIRST so they are ALWAYS visible
         validRoutePoints.forEach((point, index) => {
             const routeIcon = this.createRouteMarkerIcon(point, index, validRoutePoints.length);
             const markerLabel = point.label ?? (index === 0
@@ -369,10 +350,59 @@ export class MapPickerComponent implements AfterViewInit, OnChanges, OnDestroy {
             this.routeMarkers.push(routeMarker);
         });
 
+        // 2. Zoom & center map immediately on the points
         this.fitToContent([
             ...latLngs,
             ...this.poiPoints.map((p) => L.latLng(p.latitude, p.longitude)),
         ]);
+
+        // 3. Draw route line if requested
+        if (this.drawRoute && latLngs.length > 1) {
+            // Deduplicate consecutive identical/very close points
+            const routeLatLngs = latLngs.filter(
+                (pt, i) => i === 0 || pt.distanceTo(latLngs[i - 1]) > 10
+            );
+
+            // Always add a direct polyline immediately so a line is visible right away
+            this.routePolyline = L.polyline(routeLatLngs.length > 1 ? routeLatLngs : latLngs, {
+                color: this.color,
+                weight: 4,
+                opacity: 0.85,
+                dashArray: '8 6',
+            }).addTo(this.map!);
+
+            // Try OSRM road snapping if available
+            try {
+                if ((L as any).Routing && typeof (L as any).Routing.control === 'function' && routeLatLngs.length > 1) {
+                    this.routeControl = (L as any).Routing.control({
+                        waypoints: routeLatLngs,
+                        show: false,
+                        addWaypoints: false,
+                        fitSelectedRoutes: false,
+                        routeWhileDragging: false,
+                        createMarker: () => null,
+                        lineOptions: {
+                            styles: [
+                                { color: '#ffffff', weight: 7, opacity: 0.85 },
+                                { color: this.color, weight: 4, opacity: 0.95 },
+                            ],
+                            extendToWaypoints: true,
+                            missingRouteTolerance: 0,
+                        },
+                    })
+                    .on('routesfound', () => {
+                        // Once road-snapped route is rendered, remove the dashed fallback line
+                        if (this.routePolyline) {
+                            this.routePolyline.remove();
+                            this.routePolyline = null;
+                        }
+                    })
+                    .addTo(this.map);
+                }
+            } catch (routingErr) {
+                console.warn('Leaflet routing control could not be created:', routingErr);
+            }
+        }
     }
 
     /**

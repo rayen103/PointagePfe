@@ -300,6 +300,17 @@ export class ListComponent implements OnInit, OnDestroy {
                     }
                 }
 
+                // Ensure all points have coordinates (enrich from allPoints if missing in CircuitPointCollecte)
+                orderedPoints.forEach((p) => {
+                    if ((p.latitude == null || p.longitude == null) && this.allPoints?.length) {
+                        const match = this.allPoints.find((ap) => ap.codePointCollecte === p.codePointCollecte);
+                        if (match?.latitude != null && match?.longitude != null) {
+                            p.latitude = Number(match.latitude);
+                            p.longitude = Number(match.longitude);
+                        }
+                    }
+                });
+
                 this.selectedCircuitPoints = orderedPoints;
                 this.isLoadingPoints = false;
                 this.pointsCountByCircuit.set(circuit.circuitId, orderedPoints.length);
@@ -360,6 +371,28 @@ export class ListComponent implements OnInit, OnDestroy {
 
     private buildSelectedRoutePoints(circuit: Circuit, points: CircuitPointCollecte[]): MapRoutePoint[] {
         const located = points.filter((p) => p.latitude != null && p.longitude != null);
+
+        if (located.length === 0) {
+            let lat = circuit.latitude != null ? Number(circuit.latitude) : null;
+            let lng = circuit.longitude != null ? Number(circuit.longitude) : null;
+            if ((lat == null || lng == null) && circuit.codePCDepart && this.allPoints?.length) {
+                const sp = this.allPoints.find((p) => p.codePointCollecte === circuit.codePCDepart);
+                if (sp?.latitude != null && sp?.longitude != null) {
+                    lat = Number(sp.latitude);
+                    lng = Number(sp.longitude);
+                }
+            }
+            if (lat != null && lng != null) {
+                return [{
+                    latitude: lat,
+                    longitude: lng,
+                    label: circuit.libelleCircuit || circuit.codeCircuit,
+                    kind: 'departure',
+                    order: 0,
+                }];
+            }
+            return [];
+        }
 
         // No `id` here: clicking a route waypoint should not re-trigger a circuit selection
         return located.map((p, index) => ({
